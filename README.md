@@ -24,7 +24,17 @@ Vitality GOES is designed to make data from the GOES HRIT/EMWIN feed easily acce
 
 The following diagram shows how data flows from a GOES satellite through to Vitality GOES, and ultimately your end users:
 
+![Vitality GOES reads data saved to disk that came from goestools and secondary processing scripts](resources/data-flow-diagram.png)
+
+To put it simply: goestools and secondary scripts dump data to a folder on the ground station computer. From there, Vitality GOES reads the data and presents it to the user on their device across the local network.
+
 ## System Requirements
+
+There are different ways to set up the Vitality GOES server. It is recommended that you run Vitality GOES on your ground station itself for the most up-to-date information and to simplify setup/maintenance, but it can be run on another machine if you have a sync process set up between the ground station and the Vitality GOES server.
+
+It is recommended to use a Debian-based Linux distro to run the Vitality GOES server - something like Raspberry Pi OS, Ubuntu, or Linux Mint. Running the server on Windows is untested, but should work. If you enable the video rendering scripts, keep in mind that these scripts may take more power than a low-end machine, like a Raspberry Pi, can provide. You may need to offload these tasks to another machine or upgrade your server to something beefier. I'm using an old Dell Latitude laptop, which has more than enough power to run goestools and all secondary scripts.
+
+Once configured, any modern web browser can connect to Vitality GOES and view the data.
 
 ## Configuring goestools for Vitality GOES
 
