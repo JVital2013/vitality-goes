@@ -32,7 +32,9 @@ To put it simply: goestools and secondary scripts dump data to a folder on the g
 
 There are different ways to set up the Vitality GOES server. It is recommended that you run Vitality GOES on your ground station itself for the most up-to-date information and to simplify setup/maintenance, but it can be run on another machine if you have a sync process set up between the ground station and the Vitality GOES server.
 
-It is recommended to use a Debian-based Linux distro to run the Vitality GOES server - something like Raspberry Pi OS, Ubuntu, or Linux Mint. Running the server on Windows is untested, but should work. If you enable the video rendering scripts, keep in mind that these scripts may take more power than a low-end machine, like a Raspberry Pi, can provide. You may need to offload these tasks to another machine or upgrade your server to something beefier. I'm using an old Dell Latitude laptop, which has more than enough power to run goestools and all secondary scripts.
+It is recommended that you use a Debian-based Linux distro to run the Vitality GOES server - something like Raspberry Pi OS, Ubuntu, or Debian itself. Running the server on Windows is untested, but should work.
+
+If you enable the video rendering scripts, keep in mind that these scripts may take more power than a low-end machine, like a Raspberry Pi, can provide. You may need to offload these tasks to another machine or upgrade your server to something beefier. I'm using an old Dell Latitude laptop, which has more than enough power to run goestools and all secondary scripts.
 
 Once configured, any modern web browser can connect to Vitality GOES and view the data.
 
@@ -45,7 +47,7 @@ Once configured, any modern web browser can connect to Vitality GOES and view th
 ## Troubleshooting
 
 ## Credits
-Special thanks to [Pieter Noordhuis for his amazing goestools package](https://pietern.github.io/goestools/). Without him Vitality GOES would be nothing, and the GOES HRIT/EMWIN feed would remain out of reach for a large number of amateur satellite operators.
+Special thanks to [Pieter Noordhuis for his amazing goestools package](https://pietern.github.io/goestools/). Without him, Vitality GOES would be nothing, and the GOES HRIT/EMWIN feed would remain out of reach for a large number of amateur satellite operators.
 
 The following software packages are included in Vitality GOES:
 * **FontAwesome Free** ([https://fontawesome.com](https://fontawesome.com/)): made available under the Creative Commons License
