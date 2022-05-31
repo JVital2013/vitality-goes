@@ -13,7 +13,9 @@ A simple Progressive Web App for showcasing Geostationary Weather Satellite Data
 
 ## What does Vitality GOES do?
 
-Vitality GOES makes data from the GOES HRIT/EMWIN feed easily accessible, from anywhere on your local network, through a web browser. Even if the internet goes down due to a weather emergency, people on your local LAN can still access real-time emergency weather information. Vitality GOES was designed with the following goals in mind:
+Vitality GOES makes data from the GOES HRIT/EMWIN feed easily accessible, from anywhere on your local network, through a web browser. Even if the internet goes down due to a weather emergency, people on your local LAN can still access real-time emergency weather information.
+
+Vitality GOES has the following features:
 
 * Once set up by the ground station technician (you!), Vitality GOES is easily usable by anyone with no knowledge of radio, satellites, or programming
 * It presents all full-disk, Level 2 products, and mesoscale imagery in a user friendly and easily navigatable way
@@ -38,7 +40,37 @@ If you enable the video rendering scripts, keep in mind that these scripts may t
 
 Once configured, any modern web browser can connect to Vitality GOES and view the data.
 
-## Configuring goestools for Vitality GOES
+## Preparing your systems for Vitality GOES
+
+### Graphite/statsd
+
+Goesrecv supports logging information about error correction rate, packet drop rates, and so on to a statsd server. This information is invaluble to ground station operators, so it should be made easily accessible. This project accomplishes this by staging the information in a Graphite database, which Vitality GOES can then query and present to the user. Configuring Graphite is not necessary to use Vitality GOES, but no graphs will be available if you don't set it up. If Vitality GOES is on a different machine from goestools, graphite/statsd can be installed on either machine.
+
+To configure graphits/statsd:
+
+TODO
+
+### goestools
+To assist you in configuring goestools for Vitality GOES, sample `goesrecv.conf` and `goesproc-goesr.conf` files have been included in the goestools-conf folder of this repository. These files are pretty close to "stock" suggested files. You do not need to use these exact configs, but your setup should be configured as follows:
+
+* If you plan on tracking satellite decoding statistics, make sure your `goesrecv.conf` file has a `statsd_address` defined where you are hosting Graphite/statsd
+* If you are going to enable EMWIN information, make sure you have the emwin handler enabled in `goesproc-goesr.conf` and it's not ignoring text files.
+* In goesproc-goesr.conf, image handlers should have the filename end in `{time:%Y%m%dT%H%M%SZ}` and the file format should be jpg. Here is an example of a GOES-16 product handler:
+  ```ini
+  [[handler]]
+  type = "image"
+  origin = "goes16"
+  directory = "/path/to/goestoolsrepo/goes16/{region:short|lower}/{channel:short|lower}"
+  filename = "GOES16_{region:short}_{channel:short}_{time:%Y%m%dT%H%M%SZ}"
+  format = "jpg"
+  json = false
+
+    [[handler.map]]
+    path = "/usr/local/share/goestools/ne/ne_50m_admin_0_countries_lakes.json"
+
+    [[handler.map]]
+    path = "/usr/local/share/goestools/ne/ne_50m_admin_1_states_provinces_lakes.json"
+  ```
 
 ## Configuring Vitality GOES
 
