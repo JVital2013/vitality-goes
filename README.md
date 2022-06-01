@@ -4,7 +4,7 @@ A simple Progressive Web App for showcasing Geostationary Weather Satellite Data
 ### Table of Contents
 1. [What does Vitality GOES do?](#what-does-vitality-goes-do)
 2. [System Requirements](#system-requirements)
-3. [Configuring goestools for Vitality GOES](#configuring-goestools-for-vitality-goes)
+3. [Preparing your system for Vitality GOES](#preparing-your-system-for-vitality-goes)
 4. [Configuring Vitality GOES](#configuring-vitality-goes)
 5. [Additional Script Setup](#additional-script-setup)
 6. [Troubleshooting](#troubleshooting)
@@ -13,13 +13,13 @@ A simple Progressive Web App for showcasing Geostationary Weather Satellite Data
 
 ## What does Vitality GOES do?
 
-Vitality GOES makes data from the GOES HRIT/EMWIN feed easily accessible, from anywhere on your local network, through a web browser. Even if the internet goes down due to a weather emergency, people on your local LAN can still access real-time emergency weather information.
+Vitality GOES makes data from the GOES HRIT/EMWIN feed easily accessible, through a web browser, from anywhere on your local network. Even if the internet goes down due to a weather emergency, people on your local LAN can still access real-time emergency weather information.
 
 Vitality GOES has the following features:
 
-* Once set up by the ground station technician (you!), Vitality GOES is easily usable by anyone with no knowledge of radio, satellites, or programming
-* It presents all full-disk, Level 2 products, and mesoscale imagery in a user friendly and easily navigatable way
-* Pertinent EMWIN data (which includes current weather conditions, forecasts, watches, and warnings) must be presented to the user in a way that is appealing and easy to read. There is no need to parse through data for other locations: your configured location's data is the only thing you're shown.
+* Once set up by the ground station technician (you!), Vitality GOES is easily usable by anyone with no knowledge of radio, satellites, or programming.
+* It presents all full-disk, Level 2 products, and mesoscale imagery in a user friendly and easily navigatable way.
+* Pertinent EMWIN data (which includes current weather conditions, forecasts, watches, and warnings) are presented to the user in a way that is appealing and easy to read. There is no need to parse through data for other locations: your configured location's data is the only thing you're shown.
 * It is able to monitor the status of the underlying goestools stack, including systems temps, error correction rates, and packet drop rates.
 
 ### How does it work?
@@ -40,7 +40,7 @@ If you enable the video rendering scripts, keep in mind that these scripts may t
 
 Once configured, any modern web browser can connect to Vitality GOES and view the data.
 
-## Preparing your systems for Vitality GOES
+## Preparing your system for Vitality GOES
 
 ### Graphite/statsd
 
@@ -51,7 +51,7 @@ To configure graphits/statsd:
 TODO
 
 ### goestools
-To assist you in configuring goestools for Vitality GOES, sample `goesrecv.conf` and `goesproc-goesr.conf` files have been included in the goestools-conf folder of this repository. These files are pretty close to "stock" suggested files. You do not need to use these exact configs, and you might want to remove sections you won't be using. In the end, your setup should be configured as follows:
+To assist you in configuring goestools for Vitality GOES, sample `goesrecv.conf` and `goesproc-goesr.conf` files have been included in the goestools-conf folder of this repository. These files are pretty close to "stock" suggested files. You do not need to use these exact configs. You might want to remove sections you won't be using. In the end, your setup should be configured as follows:
 
 * If you plan on tracking satellite decoding statistics, make sure your `goesrecv.conf` file has a `statsd_address` defined where you are hosting Graphite/statsd
 * If you are going to enable EMWIN information, make sure you have the emwin handler enabled in `goesproc-goesr.conf` and it's not ignoring text files.
