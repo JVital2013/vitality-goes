@@ -55,22 +55,7 @@ To assist you in configuring goestools for Vitality GOES, sample `goesrecv.conf`
 
 * If you plan on tracking satellite decoding statistics, make sure your `goesrecv.conf` file has a `statsd_address` defined where you are hosting Graphite/statsd
 * If you are going to enable EMWIN information, make sure you have the emwin handler enabled in `goesproc-goesr.conf` and it's not ignoring text files.
-* In goesproc-goesr.conf, image handlers should have the filename end in `{time:%Y%m%dT%H%M%SZ}` and the file format should be jpg. Here is an example of a GOES-16 product handler:
-  ```ini
-  [[handler]]
-  type = "image"
-  origin = "goes16"
-  directory = "/path/to/goestoolsrepo/goes16/{region:short|lower}/{channel:short|lower}"
-  filename = "GOES16_{region:short}_{channel:short}_{time:%Y%m%dT%H%M%SZ}"
-  format = "jpg"
-  json = false
-
-    [[handler.map]]
-    path = "/usr/local/share/goestools/ne/ne_50m_admin_0_countries_lakes.json"
-
-    [[handler.map]]
-    path = "/usr/local/share/goestools/ne/ne_50m_admin_1_states_provinces_lakes.json"
-  ```
+* In goesproc-goesr.conf, image handlers should have the filename end in `{time:%Y%m%dT%H%M%SZ}` and the file format should be jpg.
 
 ## Configuring Vitality GOES
 
