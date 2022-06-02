@@ -1,0 +1,397 @@
+body
+{
+	margin: 0px;
+	font-family: 'Open Sans', sans-serif;
+	background: #111111;
+}
+p:first-child
+{
+	margin-top: 0;
+}
+select, input
+{
+	padding: 5px;
+	margin: 2px;
+	max-width: 100%;
+}
+.topBar
+{
+	background: #000080;
+	background: linear-gradient(#000080, #000040);
+	position: fixed;
+	width:100%;
+	height: 75px;
+	top: 0;
+	left:0;
+	z-index: 50;
+	box-shadow: 0px 0px 5px #000000;
+	white-space: nowrap;
+}
+.topBarInner
+{
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
+	padding-left: 20px;
+	color: white;
+}
+.barLogo
+{
+	cursor: pointer;
+	vertical-align: middle;
+	font-size: 24pt;
+	padding-right: 20px;
+	filter: drop-shadow(0px 1px 1px #000);
+}
+.barTitle
+{
+	display: inline-block;
+	vertical-align: middle;
+	font-weight: bold;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	text-shadow: 0px 1px 1px #000000;
+	font-size: 16pt;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	width: calc(100% - 110px);
+	
+}
+.barRefresh
+{
+	vertical-align: middle;
+	display: inline-block;
+	width: 30px;
+	font-size: 22pt;
+	cursor: pointer;
+}
+.barRefresh svg
+{
+	filter: drop-shadow(0px 1px 1px #000);
+}
+.mainBody
+{
+	width: 100%;
+}
+.mainBodyPadding
+{
+	height: 75px;
+}
+.sideBar
+{
+	position: fixed;
+	width: 300px;
+	height: 100%;
+	z-index: 25;
+	top: 0px;
+	left: 0px;
+	transform: translateX(-305px);
+	box-shadow: 0px 0px 5px #000000;
+	background: #333333;
+	-webkit-transition-duration: 0.33s;
+	transition-duration: 0.33s;
+	overflow-y: auto;
+}
+.sideBar::-webkit-scrollbar 
+{
+	width: 0px;
+}
+.menuItem
+{
+	padding: 10%;
+	height: 20px;
+	width: 80%;
+	font-size: 12pt;
+	cursor: pointer;
+	vertical-align: middle;
+	line-height: 20px; 
+	font-weight: bold;
+	color: #eeeeee;
+	-webkit-transition-duration: default;
+	transition-duration: default;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none; 
+}
+.menuItemIconHolder
+{
+	display: inline-block;
+	width: 40px;
+	vertical-align: middle;
+	font-size: 18pt;
+}
+.menuItem:hover
+{
+	background: #777777;
+}
+.menuItem.selected
+{
+	color: white;
+	background: #007797;
+}
+.menuItem.selected:hover
+{
+	color: white;
+	background: #005066;
+}
+.mainContent
+{
+	column-count: 3;
+	column-width: 400px;
+	column-gap: 20px;
+	width: calc(100% - 20px);
+	margin: 0 auto;
+	max-height: 100%;
+}
+.mainContent.singleCard
+{
+	column-count: auto;
+	column-width: auto;
+	column-gap: normal;
+	width: 500px;
+	max-width: calc(100% - 20px);
+}
+.prettyBox:only-child
+{
+	margin-bottom: 30px;
+}
+.prettyBox.weatherAlert:only-child
+{
+	margin-bottom: 10px;
+}
+.prettyBox
+{
+	background: #333333;
+	color: #efefef;
+	box-shadow: 0px 1px 1px 1px #000000;
+	border-radius: 10px;
+	display: inline-block;
+	margin: 10px 0;
+	width: 100%;
+}
+.prettyBoxList
+{
+	border-bottom: 1px solid #888888;
+	margin-bottom: 10px;
+	padding: 20px;
+}
+.prettyBoxList:last-child
+{
+	border-bottom: 0;
+}
+.weatherAlert
+{
+	border-radius: 10px;
+}
+.weatherAlert.red
+{
+	color: #ff6666;
+	background-color: #660000;
+	border: 1px solid #cc0000;
+	font-size: 10pt;
+}
+.weatherAlert.blue
+{
+	color: #dbe1fb;
+	background-color: #001ea0;
+	border: 1px solid #002cee;
+}
+.weatherAlert.amber
+{
+	color: #ffecbb;
+	background-color: #896711;
+	border: 1px solid #d09500;
+}
+.weatherAlert.green
+{
+	color: #e4ffe5;
+	background-color: #00690b;
+	border: 1px solid #00c00b;
+}
+.weatherAlert.purple
+{
+	color: #f6ddff;
+	background-color: #610081;
+	border: 1px solid #8c00bb;
+}
+.weatherAlert.teal
+{
+	color: #c1fbff;
+	background-color: #004e53;
+	border: 1px solid #00aeb9;
+}
+.weatherAlert.brown
+{
+	color: #b59000;
+	background-color: #3b2f00;
+	border: 1px solid #6b5600;
+}
+.weatherAlert.red .prettyBoxContent, .weatherAlert.blue .prettyBoxContent,
+.weatherAlert.amber .prettyBoxContent, .weatherAlert.purple .prettyBoxContent,
+.weatherAlert.brown .prettyBoxContent
+{
+	text-align: left;
+	font-family: monospace;
+}
+.prettyBoxHeader
+{
+	font-weight: bold;
+	padding: 10px;
+	cursor: pointer;
+	user-select: none;
+	font-size: 10pt;
+}
+.weatherHeader
+{
+	font-weight: bold;
+	padding-bottom: 15px;
+}
+.weatherBody
+{
+	font-size: 10pt;
+	text-align: left;
+}
+.weatherLeft
+{
+	float: left;
+	font-weight: bold;
+	padding-bottom: 5px;
+}
+.weatherRight
+{
+	float: right;
+	text-align: right;
+	padding-bottom: 5px;
+}
+.weatherRight select
+{
+	max-width: 200px;
+}
+.otherEmwinBody
+{
+	font-size: 9pt;
+	text-align: left;
+	font-family: monospace;
+	white-space: pre;
+	overflow-x: auto;
+}
+.otherEmwinBody::-webkit-scrollbar 
+{
+	height: 10px;
+}
+.otherEmwinBody::-webkit-scrollbar-track
+{
+	background: #444444;
+}
+.otherEmwinBody::-webkit-scrollbar-thumb
+{
+	background: #888888;
+}
+.prettyBoxContent
+{
+	padding: 20px 20px 0px 20px;
+	border-top: 1px solid #aaaaaa;
+	text-align: center;
+}
+.prettyBoxContent:only-child
+{
+	border-top: none;
+}
+.prettyBoxContent:last-child
+{
+	padding: 20px;
+}
+.prettyBoxContent.noPadding
+{
+	padding: 0;
+}
+.goesimg
+{
+	width: 100%;
+	cursor: pointer;
+}
+.goeslabel
+{
+	font-style: oblique;
+	text-align: center;
+	margin-top: 5px;
+	font-size: 8pt;
+}
+.gl-overlay
+{
+	margin-bottom: 5px;
+}
+.forcastCardHolder
+{
+	overflow-x: scroll;
+	white-space: nowrap;
+	padding-bottom: 10px;
+	user-select: none;
+	margin-bottom: 10px;
+}
+.forcastCardHolder::-webkit-scrollbar 
+{
+	height: 10px;
+}
+.forcastCardHolder::-webkit-scrollbar-track
+{
+	background: #444444;
+}
+.forcastCardHolder::-webkit-scrollbar-thumb
+{
+	background: #888888;
+}
+.forecastCard
+{
+	width: 150px;
+	display: inline-block;
+	border-left: solid 1px #888888;
+	padding: 0 10px;
+	text-align: center;
+	vertical-align: top;
+}
+.forecastCard:last-child
+{
+	border-right: solid 1px #888888;
+	margin-right: 1px;
+}
+.mapLinks
+{
+	text-align: center;
+	padding: 5px;
+	user-select: none;
+}
+.spanLink.selected
+{
+	font-weight: bold;
+	color: #cccccc;
+	text-decoration: none;
+}
+.spanLink
+{
+	cursor: pointer;
+	color: #888888;
+	font-size: 10pt;
+	margin-right: 5px;
+}
+.spanLink:after
+{
+	content: "|";
+	font-weight: inherit;
+	color: #888888;
+}
+.spanLink:last-child:after
+{
+	content: none;
+}
+@media (max-height: 600px)
+{
+	.menuItem
+	{
+		font-size: 10pt;
+		padding: 15px 10%;
+	}
+}
