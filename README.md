@@ -44,11 +44,36 @@ Once configured, any modern web browser can connect to Vitality GOES and view th
 
 ### Graphite/statsd
 
-Goesrecv supports logging information about error correction rate, packet drop rates, and so on to a statsd server. This information is invaluble to ground station operators, so it should be made easily accessible. This project accomplishes this by staging the information in a Graphite database, which Vitality GOES can then query and present to the user. Configuring Graphite is not necessary to use Vitality GOES, but no graphs will be available if you don't set it up. If Vitality GOES is on a different machine from goestools, graphite/statsd can be installed on either machine.
+Goesrecv supports logging information about error correction rate, packet drop rates, and so on to a statsd server. This information is invaluble to ground station operators, so it should be made easily accessible. This project accomplishes this by staging the information in a Graphite database, which Vitality GOES can then query and present to the user.
 
-To configure graphits/statsd:
+Configuring Graphite is not necessary to use Vitality GOES, but no graphs will be available if you don't set it up. If Vitality GOES is on a different machine from goestools, graphite/statsd can be installed on either machine. To configure graphits/statsd:
 
-TODO
+1. Install Docker on the target machine. This varies by distro, but you can find instructions for Ubuntu and its varients [here](https://docs.docker.com/engine/install/ubuntu/) and Raspberry Pi OS [here](https://dev.to/elalemanyo/how-to-install-docker-and-docker-compose-on-raspberry-pi-1mo). Docker Compose is not required.
+2. As root, run the following commands to create a storage area for graphite.
+    ```
+    mkdir -p /var/lib/graphite/config
+    mkdir -p /var/lib/graphite/data
+    mkdir -p /var/lib/graphite/statsd_config
+    mkdir -p /var/lib/graphite/log
+    ```
+3. Download graphite/statsd by running `docker pull graphiteapp/graphite-statsd`
+4. Run the following command to configure graphite/statsd, start it up, and set it to start at system boot:
+    ```
+    docker run -d\
+     --name graphite\
+     --restart=always\
+     -p 8080:80\
+     -p 8125:8125/udp\
+     -p 8126:8126\
+     -v /var/lib/graphite/config:/opt/graphite/conf\
+     -v /var/lib/graphite/data:/opt/graphite/storage\
+     -v /var/lib/graphite/statsd_config:/opt/statsd/config\
+     -v /var/lib/graphite/log:/var/log\
+     graphiteapp/graphite-statsd
+     ```
+That's it! To verify it's working, go to http://graphitehost:8080/ and make sure you see something that looks like this:
+
+
 
 ### goestools
 To assist you in configuring goestools for Vitality GOES, sample `goesrecv.conf` and `goesproc-goesr.conf` files have been included in the goestools-conf folder of this repository. These files are pretty close to "stock" suggested files. You do not need to use these exact configs. You might want to remove sections you won't be using. In the end, your setup should be configured as follows:
