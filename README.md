@@ -91,7 +91,7 @@ Assuming you're on a Debian-based server, the following commands command should 
 ```
 sudo apt update
 sudo apt upgrade
-sudo apt install apache2 php libapache2-mod-php7.4 lm-sensors
+sudo apt install apache2 php libapache2-mod-php lm-sensors
 ```
 
 Afterwards, Verify your web server is working. You should see something that looks like this:
