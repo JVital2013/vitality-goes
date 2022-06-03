@@ -83,6 +83,8 @@ To assist you in configuring goestools for Vitality GOES, sample `goesrecv.conf`
 * If you are going to enable EMWIN information, make sure you have the emwin handler enabled in `goesproc-goesr.conf` and it's not ignoring text files.
 * In goesproc-goesr.conf, image handlers should have the filename end in `{time:%Y%m%dT%H%M%SZ}` and the file format should be jpg.
 
+TODO: Talk about patch for admin text
+
 ### Vitality GOES Dependencies
 Vitality GOES itself is a set of PHP, HTML, JavaScript, and CSS files. As such, it needs to run on a web server stack. For this tutorial, I'm going to assume you're not running another web server on the same machine.
 
