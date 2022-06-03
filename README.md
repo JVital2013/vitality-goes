@@ -6,7 +6,7 @@ A simple Progressive Web App for showcasing Geostationary Weather Satellite Data
 2. [System Requirements](#system-requirements)
 3. [Preparing your system for Vitality GOES](#preparing-your-system-for-vitality-goes)
 4. [Installing Vitality GOES](#installing-vitality-goes)
-5. [Configuring Vitality GOES](#configuring-vitality-goes)
+5. [Advanced Configuration](#advanced-configuration)
 6. [Additional Script Setup](#additional-script-setup)
 7. [Troubleshooting](#troubleshooting)
 8. [Credits](#credits)
@@ -33,7 +33,7 @@ To put it simply: goestools and secondary scripts dump data to a folder on the g
 
 ## System Requirements
 
-There are different ways to set up the Vitality GOES server. It is recommended that you run Vitality GOES on your ground station itself for the most up-to-date information and to simplify setup/maintenance, but it can be run on another machine if you have a sync process set up between the ground station and the Vitality GOES server.
+There are different ways to set up the Vitality GOES server. **It is recommended that you run Vitality GOES on your ground station itself** for the most up-to-date information and to simplify setup/maintenance, but it can be run on another machine if you have a sync process set up between the ground station and the Vitality GOES server.
 
 It is recommended that you use a Debian-based Linux distro to run the Vitality GOES server - something like Raspberry Pi OS, Ubuntu, or Debian itself. Running the server on Windows is untested, but should work.
 
@@ -94,15 +94,44 @@ sudo apt upgrade
 sudo apt install apache2 php libapache2-mod-php lm-sensors
 ```
 
-Afterwards, Verify your web server is working. You should see something that looks like this:
+Afterwards, verify your web server is working. When you navigate to the the IP of your Vitality GOES server, you should see something that looks like this:
+
+![Demo Apache2 Page](resources/apache.png)
 
 ## Installing Vitality GOES
+It's time to actually install the software! In a command line, run the following commands:
 
-## Configuring Vitality GOES
+```
+sudo rm -rf /var/www/html
+git clone https://github.com/JVital2013/vitality-goes
+cd vitality-goes
+cp -r html /var/www/html
+```
+
+Wow, that was easy.
+
+### Basic Configuration
+Before doing anything else, it's time to set up the Vitality GOES config file so it knows where to read its data. Edit /var/www/html/config/config.ini and tweak the following lines:
+
+#### General
+* `graphiteAPI`: Change this line to point to your graphite host. It must include the `/render/` path at the end to work properly. If you're not using Graphite, comment this line out with a ;
+* `emwinPath`: Change this line to point to the emwin repository of your choice. If you're picking up both GOES West and East, you can use either EMWIN locaiton. Comment this line out with a ; to disable EMWIN data
+* `adminPath`: Change this line to point to the directory with admin text you want to display. Comment this line out with a ; to disable admin text
+* `showSysInfo`: Change this to false if Vitality GOES is on a different system than goestools. Otherwise, leave it to True
+
+#### Paths
+The Paths section is unnecessary, but it is recommended that you set up a path for each satellite you're receiving. There's more about that in the Wiki (TODO). If you're only picking up GOES 16, you can leave this alone.
+
+#### Location
+This section contains information about your physical location. If you're not displaying EMWIN data, the only thing you need to configure is timezone. A list of supported timezones can be found [here](https://www.php.net/manual/en/timezones.php).
+
+TODO: More here
 
 ## Additional Script Setup
 
 A number of Bash scripts are included in the scripts directory of this repository. It is optional to implement any of these scripts, but some like Cleanup-EmwinText are highly encouraged.
+
+TODO: More here
 
 ## Troubleshooting
 
