@@ -5,11 +5,12 @@ A simple Progressive Web App for showcasing Geostationary Weather Satellite Data
 1. [What does Vitality GOES do?](#what-does-vitality-goes-do)
 2. [System Requirements](#system-requirements)
 3. [Preparing your system for Vitality GOES](#preparing-your-system-for-vitality-goes)
-4. [Configuring Vitality GOES](#configuring-vitality-goes)
-5. [Additional Script Setup](#additional-script-setup)
-6. [Troubleshooting](#troubleshooting)
-7. [Credits](#credits)
-8. [Additional Resources](#additional-resources)
+4. [Installing Vitality GOES](#installing-vitality-goes)
+5. [Configuring Vitality GOES](#configuring-vitality-goes)
+6. [Additional Script Setup](#additional-script-setup)
+7. [Troubleshooting](#troubleshooting)
+8. [Credits](#credits)
+9. [Additional Resources](#additional-resources)
 
 ## What does Vitality GOES do?
 
@@ -82,9 +83,26 @@ To assist you in configuring goestools for Vitality GOES, sample `goesrecv.conf`
 * If you are going to enable EMWIN information, make sure you have the emwin handler enabled in `goesproc-goesr.conf` and it's not ignoring text files.
 * In goesproc-goesr.conf, image handlers should have the filename end in `{time:%Y%m%dT%H%M%SZ}` and the file format should be jpg.
 
+### Vitality GOES Dependencies
+Vitality GOES itself is a set of PHP, HTML, JavaScript, and CSS files. As such, it needs to run on a web server stack. For this tutorial, I'm going to assume you're not running another web server on the same machine.
+
+Assuming you're on a Debian-based server, the following commands command should install all the dependencies you need:
+
+```
+sudo apt update
+sudo apt upgrade
+sudo apt install apache2 php libapache2-mod-php7.4 lm-sensors
+```
+
+Afterwards, Verify your web server is working. You should see something that looks like this:
+
+## Installing Vitality GOES
+
 ## Configuring Vitality GOES
 
 ## Additional Script Setup
+
+A number of Bash scripts are included in the scripts directory of this repository. It is optional to implement any of these scripts, but some like Cleanup-EmwinText are highly encouraged.
 
 ## Troubleshooting
 
