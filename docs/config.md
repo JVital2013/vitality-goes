@@ -17,7 +17,7 @@ This is the main config file, which is broken out into the following sections:
 ### General
 * `graphiteAPI`: Points to your graphite host. It must include the `/render/` path at the end to work properly. If you're not using Graphite, comment this line out
 * `emwinPath`: Point to the emwin repository of your choice. If you're picking up both GOES West and East, you can use either EMWIN locaiton. Comment this line out to completely disable emwin data (text and images)
-* `adminPath`: The directory with admin text you want to display. Comment to disable
+* `adminPath`: The directory with admin text you want to display. Goestools must be patched with [this patch anyway for it to show up](https://github.com/pietern/goestools/pull/105/files), so comment it to disable.
 * `showSysInfo`: True if on the same system as goestools. Otherwise, set it to false
 
 ### Paths
@@ -73,3 +73,9 @@ videoPath = GOES16FalseColor.mp4
 * `path`: The folder that holds all the images for a particular GOES product. In this example, it uses the `{GOES16}` variable defined in the `Paths` section of config.ini
 * `title`: How the image will be labeled in Vitality GOES
 * `videoPath`: the name of the video file that contains the timelapse of this product. Videos must be rendered seperately (ex. by the provided script), and they must be kept in the `html/videos` folder of Vitality GOES. If you're not rendering timelapse videos, comment or remove this line.
+
+## emwin.ini
+
+emwin.ini contains information about the EMWIN image products you want to display. This config file works the same as the abi.ini, meso.ini, and l2.ini files with one exception: `path` is just the file name (including extension) for the product you want to display. No paths are included in this config file.
+
+A complete list of EMWIN image products can be found at [https://www.weather.gov/media/emwin/EMWIN_Image_and_Text_Data_Capture_Catalog_v1.3h.pdf](https://www.weather.gov/media/emwin/EMWIN_Image_and_Text_Data_Capture_Catalog_v1.3h.pdf). Use the GOES-N FN, but it must be in all caps in this config.
