@@ -20,7 +20,7 @@ Vitality GOES has the following features:
 
 * Once set up by the ground station technician (you!), Vitality GOES is easily usable by anyone with no knowledge of radio, satellites, or programming.
 * It presents all full-disk, Level 2 products, and mesoscale imagery in a user friendly and easily navigatable way.
-* Pertinent EMWIN data (which includes current weather conditions, forecasts, watches, and warnings) are presented to the user in a way that is appealing and easy to read. There is no need to parse through data for other locations: your configured location's data is the only thing you're shown. For a writeup on the data Vitality GOES pulls and how it's used, see [here](docs/used-emwin-data.md).
+* Pertinent EMWIN data (which includes current weather conditions, forecasts, watches, and warnings) are presented to the user in a way that is appealing and easy to read. There is no need to parse through data for other locations: your configured location's data is the only thing you're shown. For a writeup on the EMWIN data Vitality GOES pulls and how it's used, see [here](docs/used-emwin-data.md).
 * It is able to monitor the status of the underlying goestools stack, including systems temps, error correction rates, and packet drop rates.
 
 ### How does it work?
@@ -37,7 +37,7 @@ There are different ways to set up the Vitality GOES server. **It is recommended
 
 It is recommended that you use a Debian-based Linux distro to run the Vitality GOES server - something like Raspberry Pi OS, Ubuntu, or Debian itself. Running the server on Windows is untested, but should work.
 
-If you enable the video rendering scripts, keep in mind that these scripts may take more power than a low-end machine, like a Raspberry Pi, can provide. You may need to offload these tasks to another machine or upgrade your server to something beefier. I'm using an old Dell Latitude laptop, which has more than enough power to run goestools and all secondary scripts.
+If you enable the video rendering scripts, keep in mind that these scripts may take more power than a low-end machine, like a Raspberry Pi, can provide. You may need to offload these tasks to another machine or upgrade your server to something beefier. I'm using an old Dell Latitude laptop, which has more than enough power to run goestools, Vitality GOES, and all secondary scripts.
 
 Once configured, any modern web browser can connect to Vitality GOES and view the data.
 
