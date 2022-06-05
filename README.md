@@ -20,7 +20,7 @@ Vitality GOES has the following features:
 
 * Once set up by the ground station technician (you!), Vitality GOES is easily usable by anyone with no knowledge of radio, satellites, or programming.
 * It presents all full-disk, Level 2 products, and mesoscale imagery in a user friendly and easily navigatable way.
-* Pertinent EMWIN data (which includes current weather conditions, forecasts, watches, and warnings) are presented to the user in a way that is appealing and easy to read. There is no need to parse through data for other locations: your configured location's data is the only thing you're shown.
+* Pertinent EMWIN data (which includes current weather conditions, forecasts, watches, and warnings) are presented to the user in a way that is appealing and easy to read. There is no need to parse through data for other locations: your configured location's data is the only thing you're shown. For a writeup on the data Vitality GOES pulls and how it's used, see [here](docs/used-emwin-data.md).
 * It is able to monitor the status of the underlying goestools stack, including systems temps, error correction rates, and packet drop rates.
 
 ### How does it work?
@@ -84,7 +84,7 @@ To assist you in configuring goestools for Vitality GOES, sample `goesrecv.conf`
 * In goesproc-goesr.conf, image handlers should have the filename end in `{time:%Y%m%dT%H%M%SZ}` and the file format should be jpg.
 * While all EMWIN information will be in the same folder, other product types must each have their own folder. For example, Channel 2 images must be in their own folder and not co-mingled with false color images. It is not standard to mix product types in the same folder so this should not be an issue.
 
-TODO: Talk about patch for admin text
+Additionally, "Admin Text" does not get saved by goestools due to a change in how the GOES satellites send the file down. For this text to get displayed, recompile goestools with this patch: [https://github.com/pietern/goestools/pull/105/files](https://github.com/pietern/goestools/pull/105/files).
 
 ### Vitality GOES Dependencies
 Vitality GOES itself is a set of PHP, HTML, JavaScript, and CSS files. As such, it needs to run on a web server stack. For this tutorial, I'm going to assume you're not running another web server on the same machine.
