@@ -82,6 +82,7 @@ To assist you in configuring goestools for Vitality GOES, sample `goesrecv.conf`
 * If you plan on tracking satellite decoding statistics, make sure your `goesrecv.conf` file has a `statsd_address` defined where you are hosting Graphite/statsd
 * If you are going to enable EMWIN information, make sure you have the emwin handler enabled in `goesproc-goesr.conf` and it's not ignoring text files.
 * In goesproc-goesr.conf, image handlers should have the filename end in `{time:%Y%m%dT%H%M%SZ}` and the file format should be jpg.
+* While all EMWIN information will be in the same folder, other product types must each have their own folder. For example, Channel 2 images must be in their own folder and not co-mingled with false color images. It is not standard to mix product types in the same folder so this should not be an issue.
 
 TODO: Talk about patch for admin text
 
