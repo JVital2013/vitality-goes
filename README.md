@@ -110,28 +110,11 @@ cd vitality-goes
 cp -r html /var/www/html
 ```
 
-Wow, that was easy.
-
-### Basic Configuration
-Before doing anything else, it's time to set up the Vitality GOES config file so it knows where to read its data. Edit /var/www/html/config/config.ini and tweak the following lines:
-
-#### General
-* `graphiteAPI`: Change this line to point to your graphite host. It must include the `/render/` path at the end to work properly. If you're not using Graphite, comment this line out with a ;
-* `emwinPath`: Change this line to point to the emwin repository of your choice. If you're picking up both GOES West and East, you can use either EMWIN locaiton. Comment this line out with a ; to disable EMWIN data
-* `adminPath`: Change this line to point to the directory with admin text you want to display. Comment this line out with a ; to disable admin text
-* `showSysInfo`: Change this to false if Vitality GOES is on a different system than goestools. Otherwise, leave it to True
-
-#### Paths
-The Paths section is unnecessary, but it is recommended that you set up a path for each satellite you're receiving. There's more about that in the Wiki (TODO). If you're only picking up GOES 16, you can leave this alone.
-
-#### Location
-This section contains information about your physical location. If you're not displaying EMWIN data, the only thing you need to configure is timezone. A list of supported timezones can be found [here](https://www.php.net/manual/en/timezones.php).
-
-TODO: More here
+Finally, take a look at the [config readme](docs/config.md) to configure Vitality GOES.
 
 ## Additional Script Setup
 
-A number of Bash scripts are included in the scripts directory of this repository. It is optional to implement any of these scripts, but some like Cleanup-EmwinText are highly encouraged.
+Now that Vitality GOES is configured, let's extend it with additional scripts. A number of Bash scripts are included in the scripts directory of this repository. It is optional to implement any of these scripts, but some like Cleanup-EmwinText are highly encouraged.
 
 TODO: More here
 
