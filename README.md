@@ -1,6 +1,8 @@
 # Vitality GOES
 A simple Progressive Web App for showcasing Geostationary Weather Satellite Data. The software is designed to showcase text and image received from GOES satellites via goestools, but other data sources may work.
 
+![Series of Screenshots of Vitality GOES](resources/banner.png)
+
 ### Table of Contents
 1. [What does Vitality GOES do?](#what-does-vitality-goes-do)
 2. [System Requirements](#system-requirements)
