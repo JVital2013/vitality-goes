@@ -20,7 +20,7 @@ else
 	$sendCookie = true;
 }
 
-if(count(array_diff($currentSettings[0],  $config['location']))) $sendCookie = true;
+if(count($currentSettings) == 0 || count(array_diff($currentSettings[0],  $config['location']))) $sendCookie = true;
 
 //Overwrite first setting profile in array with all other settings on server
 $currentSettings[0] = $config['location'];
@@ -127,7 +127,7 @@ if($_GET['type'] == "preload")
 	$preloadData['localRadarVideo'] = "";
 	foreach($config['emwin'] as $value)
 	{
-		if(explode("*", $value['path'])[1] == "RAD" . $currentSettings[$selectedProfile]['radarCode'] . ".GIF")
+		if(explode("*", $value['path'])[1] == "RAD" . $currentSettings[$selectedProfile]['radarCode'] . ".GIF" && isset($value["videoPath"]))
 		{
 			$preloadData['localRadarVideo'] = $value["videoPath"];
 			break;
