@@ -34,7 +34,7 @@ To put it simply: goestools and secondary scripts dump data to a folder on the g
 
 ## System Requirements
 
-There are different ways to set up the Vitality GOES server. **It is recommended that you run Vitality GOES on your ground station itself** for the most up-to-date information and to simplify setup/maintenance, but it can be run on another machine if you have a sync process set up between the ground station and the Vitality GOES server.
+There are different ways to set up the Vitality GOES server. **It is recommended that you run Vitality GOES on your ground station itself** for the most up-to-date information and to simplify setup/maintenance, but it can be run on another machine if you have a sync process set up between the ground station and the Vitality GOES server. *Syncing received images from another machine is outside the scope of Vitality GOES.*
 
 It is recommended that you use a Debian-based Linux distro to run the Vitality GOES server - something like Raspberry Pi OS, Ubuntu, or Debian itself. Running the server on Windows is untested, but should work.
 
