@@ -8,8 +8,8 @@ A simple Progressive Web App for showcasing Geostationary Weather Satellite Data
 2. [System Requirements](#system-requirements)
 3. [Preparing your system for Vitality GOES](#preparing-your-system-for-vitality-goes)
 4. [Installing Vitality GOES](#installing-vitality-goes)
-5. [Advanced Configuration](#advanced-configuration)
-6. [Additional Script Setup](#additional-script-setup)
+5. [Additional Scripts](#additional-scripts)
+6. [Other Tidbits](#other-tidbits)
 7. [Credits](#credits)
 8. [Additional Resources](#additional-resources)
 
@@ -134,6 +134,13 @@ If anyone gets this working, I'd love to hear about it! I'm also open to pull re
 If anyone would like to take a stab at automating Vitality GOES installation, or converting it into something like a Docker container, I'm open to a pull request or new repo that achieves these ends. While I recognize the value of making Vitality GOES more easily deployable, I have little incentive to do it myself.
 
 I would love to see how the community can make HRIT/EMWIN data even more accessible through the easy deployment of this software package.
+
+### Sharing Vitality GOES across the internet
+Technically speaking, there should be no problem with opening a port on your router so that Vitality GOES can be accessed across the internet. In practice, I **do not** recommend it. For one, Vitality GOES has not been vetted by security professionals. I did keep security in mind when coding it, but I'm giving making no promises. If you do share it across the internet, make sure your web server is honoring `.htaccess` files. Not all web servers do by default.
+
+Additionally, some files produced by goestools can be extremely large. Make sure your internet has sufficient upload speed to handle it, and that your firewall rules are properly configured. The last thing you want is for someone to DDoS you by querying 1,000 full disk images at once...
+
+Personally, I VPN into my home network to access Vitality GOES. Let OpenVPN figure out all the security mumbo-jumbo.
 
 ## Credits
 Special thanks to [Pieter Noordhuis for his amazing goestools package](https://pietern.github.io/goestools/). Without him, Vitality GOES would be nothing, and the GOES HRIT/EMWIN feed would remain out of reach for a large number of amateur satellite operators.
