@@ -47,11 +47,11 @@ Once configured, any modern web browser can connect to Vitality GOES and view th
 
 ### Graphite/statsd
 
-Goesrecv supports logging information about error correction rate, packet drop rates, and so on to a statsd server. This information is invaluble to ground station operators, so it should be made easily accessible. This project accomplishes this by staging the information in a Graphite database, which Vitality GOES can then query and present to the user.
+Goesrecv supports logging information about error correction rate, packet drop rates, and so on to a statsd server. This information is invaluable to ground station operators, so it should be made easily accessible. This project accomplishes this by staging the information in a Graphite database, which Vitality GOES can then query and present to the user.
 
 Configuring Graphite is not necessary to use Vitality GOES, but no graphs will be available if you don't set it up. If Vitality GOES is on a different machine from goestools, graphite/statsd can be installed on either machine. To configure graphits/statsd:
 
-1. Install Docker on the target machine. This varies by distro, but you can find instructions for Ubuntu and its varients [here](https://docs.docker.com/engine/install/ubuntu/) and Raspberry Pi OS [here](https://dev.to/elalemanyo/how-to-install-docker-and-docker-compose-on-raspberry-pi-1mo). Docker Compose is not required.
+1. Install Docker on the target machine. This varies by distro, but you can find instructions for Ubuntu and its variants [here](https://docs.docker.com/engine/install/ubuntu/) and Raspberry Pi OS [here](https://dev.to/elalemanyo/how-to-install-docker-and-docker-compose-on-raspberry-pi-1mo). Docker Compose is not required.
 2. As root, run the following commands to create a storage area for graphite.
     ```
     mkdir -p /var/lib/graphite/config
@@ -99,7 +99,7 @@ sudo apt upgrade
 sudo apt install apache2 php libapache2-mod-php lm-sensors
 ```
 
-Afterwards, verify your web server is working. When you navigate to the the IP of your Vitality GOES server, you should see something that looks like this:
+Afterwards, verify your web server is working. When you navigate to the IP of your Vitality GOES server, you should see something that looks like this:
 
 ![Demo Apache2 Page](resources/apache.png)
 
