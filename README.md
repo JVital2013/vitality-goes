@@ -10,9 +10,8 @@ A simple Progressive Web App for showcasing Geostationary Weather Satellite Data
 4. [Installing Vitality GOES](#installing-vitality-goes)
 5. [Advanced Configuration](#advanced-configuration)
 6. [Additional Script Setup](#additional-script-setup)
-7. [Troubleshooting](#troubleshooting)
-8. [Credits](#credits)
-9. [Additional Resources](#additional-resources)
+7. [Credits](#credits)
+8. [Additional Resources](#additional-resources)
 
 ## What does Vitality GOES do?
 
@@ -120,8 +119,6 @@ Finally, take a look at the [config readme](docs/config.md) to configure Vitalit
 Now that Vitality GOES is configured, let's extend it with additional scripts. A number of Bash scripts are included in the scripts directory of this repository. It is optional to implement any of these scripts, but some like Cleanup-EmwinText are highly encouraged.
 
 TODO: More here
-
-## Troubleshooting
 
 ## Credits
 Special thanks to [Pieter Noordhuis for his amazing goestools package](https://pietern.github.io/goestools/). Without him, Vitality GOES would be nothing, and the GOES HRIT/EMWIN feed would remain out of reach for a large number of amateur satellite operators.
