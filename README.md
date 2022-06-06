@@ -114,11 +114,26 @@ cp -r html /var/www/html
 
 Finally, take a look at the [config readme](docs/config.md) to configure Vitality GOES.
 
-## Additional Script Setup
+## Additional Scripts
 
-Now that Vitality GOES is configured, let's extend it with additional scripts. A number of Bash scripts are included in the scripts directory of this repository. It is optional to implement any of these scripts, but some like Cleanup-EmwinText are highly encouraged.
+Vitality GOES comes with a number of scripts to enhance and extend its functionality. It is optional to implement any of these scripts, but some like Cleanup-EmwinText are highly encouraged.
 
-TODO: More here
+For information on setting up these scripts, [look here](docs/scripts.md).
+
+## Other Tidbits
+
+### Displaying data from other satellites
+While this program is centered around data from GOES-R satellites, it is theoretically possible to display data from other satellites. To do so:
+
+* In the config files, disable `emwinPath`, `adminPath`, and `graphiteAPI`.
+* Make sure your images end in the `{time:%Y%m%dT%H%M%SZ}` format, and configure them in the `abi.ini` config file (even if your sat of choice doesn't technically use an ABI). Depending on the satellite/software, you may need to rewrite the file names after receiving them to match the expected format.
+
+If anyone gets this working, I'd love to hear about it! I'm also open to pull requests to improve support for other satellites in Vitality GOES.
+
+### Automating Vitality GOES installation
+If anyone would like to take a stab at automating Vitality GOES installation, or converting it into something like a Docker container, I'm open to a pull request or new repo that achieves these ends. While I recognize the value of making Vitality GOES more easily deployable, I have little incentive to do it myself.
+
+I would love to see how the community can make HRIT/EMWIN data even more accessible through the easy deployment of this software package.
 
 ## Credits
 Special thanks to [Pieter Noordhuis for his amazing goestools package](https://pietern.github.io/goestools/). Without him, Vitality GOES would be nothing, and the GOES HRIT/EMWIN feed would remain out of reach for a large number of amateur satellite operators.
@@ -127,8 +142,6 @@ The following software packages are included in Vitality GOES:
 * **FontAwesome Free** ([https://fontawesome.com](https://fontawesome.com/)): made available under the Creative Commons License
 * **LightGallery** ([https://www.lightgalleryjs.com](https://www.lightgalleryjs.com/)): made available under the GPLv3 License
 * **OpenSans** ([https://fonts.google.com/specimen/Open+Sans](https://fonts.google.com/specimen/Open+Sans)): made available under the Apache License
-
-An additional thank you to my parents, who changed my diaper for the first 2 years of my life. I'm now a father of two, so I realize how instrumental diaper changes were in me being able to create Vitality GOES (although a few events might have happened between...)
 
 ## Additional Resources
 Here are a few tools that may help you with picking up the HRIT/EMWIN Feed
