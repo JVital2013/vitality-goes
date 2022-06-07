@@ -41,3 +41,34 @@ To setup this script, it's important to understand how the `codeName`, `videoNam
 * `codeName`: Specifies the EMWIN file name of the frames for each video. This should be similar to [`path` in your emwin.ini config file](config.md#emwinini), just without the file extension
 * `videoName`: Specifies the name of the MP4 you want to create, without the MP4 extension. Other than the missing extension, this should match the [`videoPath` in your emwin.ini config files](config.md#emwinini).
 * `imgconvert`: Specifies the file format of the source frames. This should match the extension of the source frames
+
+## Sanchez.sh
+* *Additional required system packages: `xplanet`*
+* *Additional required software (non-system): [sanchez](https://github.com/nullpainter/sanchez)*
+* *Modify lines 2-7 before running, which set the `srcPath16`, `srcPath17`, `dstPath16`, `dstPath17`, `dstPathComposite`, and `sanchezPath` variables*
+
+Sanchez.sh is a script that automates Sanchez renders of your geostationary captures. To use it, xplanet must first be configred. Install xplanet as you typically would for your distro, and download/extract Sanchez. Next, edit the xplanet default config file (at `/var/share/xplanet/config/config` in most distros). Change the `[earth]` section to only say this:
+
+```ini
+[earth]
+"Earth"
+map=/path/to/sanchez/Resources/world.200411.3x10848x5424.jpg
+night_map=/path/to/sanchez/Resources/world.lights.3x10848x5424.jpg
+```
+
+The script currently creates 3 things: GOES-16 false color images, GOES-17 false color images, and composites of GOES-16 and 17. The script will also do any "back" renders that it may have missed due to the script being disabled, failing to run, or other issues. This script will need updated once GOES-18 takes the GOES West spot.
+
+When done, enable the Sanchez sections in your [abi.ini config file](config.md#abiini-mesoini-and-l2ini) to display your fancy new renders.
+
+## Delete-Old.sh
+*Modify line 2 before running, which sets the location of your GOES files.*
+
+Delete-Old.sh deletes all ABI, EMWIN, NWS, and admin text files that are older than 2 weeks old. I run this on my ground station manually after I verify my offline archives are up-to-date.
+
+## Monitor-Recordings.sh
+* *Additional required system package: `inotify-tools`*
+* *Modify line 2 to set the location of your GOES files before running
+
+Monitor-Recordings.sh file barely constitutes a script, but it can be used to monitor files as they are saved by goestools. Goesproc does output this information, but if you're running goesproc as a service, the information is hidden. I find that this script does a good job at verifying that goesproc is actually processing data.
+
+Run manually as needed.
