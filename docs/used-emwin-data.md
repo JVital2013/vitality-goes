@@ -1,2 +1,2 @@
-# Data pared from EMWIN, and how it's used
+# Data parsed from EMWIN and how it's used
 TODO
