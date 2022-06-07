@@ -6,13 +6,13 @@ The Vitality GOES config is stored in `html/config` and is broken out into these
 * **emwin.ini**: Stores information about the emwin images you want to display. This file has no effect on emwin text that is displayed
 * **abi.ini**: Contains information about your full-disk images. If you're doing any Sanchez renders, I'd put them in this file as well
 * **meso.ini**: Contains information about your mesoscale images.
-* **l2.ini**: Contains infromation about your ABI level 2 products. These images contain information about estimated rainfall, land surface temp, sea surface temp, and more. Note that goestools does not receive these unless your goesproc config is set up to do so. The sample config in this repository is configured correctly, but if you're not saving these files, simply leave l2.ini empty.
+* **l2.ini**: Contains infromation about your ABI Level 2 products. These images contain information about estimated rainfall, land surface temp, sea surface temp, and more. Note that goestools does not receive these unless your goesproc config is set up to do so. The sample config in this repository is configured correctly, but if you're not saving these files, simply leave l2.ini empty.
 
 These ini files are parsed with the php [parse_ini_file](https://www.php.net/manual/en/function.parse-ini-file.php) function, so any comments must begin with a semicolon (;).
 
 ## config.ini
 
-This is the main config file, which is broken out into the following sections:
+This is the main config file. It will likely need configured when you first deploy Vitality GOES. It is broken out into the following sections:
 
 ### General
 * `graphiteAPI`: Points to your graphite host. It must include the `/render/` path at the end to work properly. If you're not using Graphite, comment this line out
@@ -58,7 +58,7 @@ You may find that the location section is the hardest part of the config to set 
 
 ## abi.ini, meso.ini, and l2.ini
 
-abi.ini, meso.ini, and l2.ini all work the same. These files specify which images you want to display in the "Full Disk", "Mesoscale Images", and "Level 2 Graphics" sections of Vitality GOES, respectively. If a file contains no configured images, its section will be hidden in Vitality GOES.
+abi.ini, meso.ini, and l2.ini all work the same. These files specify which images you want to display in the "Full Disk", "Mesoscale Images", and "Level 2 Graphics" sections of Vitality GOES, respectively. If a file contains no configured images, its section will be hidden in Vitality GOES. *If you're receiving GOES-16, you can probably use this file as-is*
 
 To understand how these config files work, let's look at an example section:
 
@@ -76,6 +76,6 @@ videoPath = GOES16FalseColor.mp4
 
 ## emwin.ini
 
-emwin.ini contains information about the EMWIN image products you want to display. This config file works the same as the abi.ini, meso.ini, and l2.ini files with one exception: `path` is just the file name (including extension) for the product you want to display. No paths are included in this config file.
+emwin.ini contains information about the EMWIN image products you want to display. This config file works the same as the abi.ini, meso.ini, and l2.ini files with one exception: `path` is just the file name (including extension) for the product you want to display. No paths are included in this config file. *This file will probably not need to be configured by you, unless you're customizing what gets displayed*
 
 A complete list of EMWIN image products can be found at [https://www.weather.gov/media/emwin/EMWIN_Image_and_Text_Data_Capture_Catalog_v1.3h.pdf](https://www.weather.gov/media/emwin/EMWIN_Image_and_Text_Data_Capture_Catalog_v1.3h.pdf). Use the GOES-N FN, but it must be in all caps in this config.
