@@ -29,3 +29,15 @@ To setup this script, it's important to understand how the `imgSource`, `vidName
   * 1: Resize images to 1000x1000. Good for some Level-II Non-CMIP Images and Mesoscale images
   * 2: Resize images to 1402x954. Good for Sanchez composites
   * 3: Do not resize the image. 
+
+## CreateVideos-EMWIN.sh
+* *Additional required system packages: `ffmpeg imagemagick rename`*
+* *Modify lines 2-6 before running, which set the `srcDir`, `videoDir`, `codeName`, `videoName`, and `imgconvert` variables*
+
+CreateVideos-EMWIN.sh creates timelapse videos of EMWIN image products. By default, they render timelapses of the last week at 15 frames per second. Videos are stored in the `html/videos` folder of Vitality GOES so they can be viewed in the web client.
+
+To setup this script, it's important to understand how the `codeName`, `videoName`, and `imgconvert` variables interact with each other. These variables are arrays, and each of the arrays are "lined up" with each other. For example, the first element in `codeName`, `videoName`, and `imgconvert` are the configs for the first video. The second element of each array is the config for the next video, the third element of each array is the config for the third video, and so on.
+
+* `codeName`: Specifies the EMWIN file name of the frames for each video. This should be similar to [`path` in your emwin.ini config file](config.md#emwinini), just without the file extension
+* `videoName`: Specifies the name of the MP4 you want to create, without the MP4 extension. Other than the missing extension, this should match the [`videoPath` in your emwin.ini config files](config.md#emwinini).
+* `imgconvert`: Specifies the file format of the source frames. This should match the extension of the source frames
