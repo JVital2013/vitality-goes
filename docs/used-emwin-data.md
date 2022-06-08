@@ -6,7 +6,10 @@ Vitality GOES solves this by parsing the data and presenting pertinent informati
 ## Alerts
 Active alerts and warnings will show at the top of the Current Weather tab, if there are any.
 
-### Weather Warning Alert
+### Weather Watch
+Weather watches are included at the top of the Zone Forecast Product (GOES-N name - `ZFP*****.TXT`). These warnings are teal at the top of the Current Weather Screen
+
+### Weather Warning
 The following weather warnings are parsed and included at the top of the page Current Weather screen in red. The full text of these alerts are displayed. The geofencing information is parsed, which Vitality GOES checks against your configured latitude/longitude to see if you're within the warning area. It will also look for the `UNTIL` line so it can properly hide expired alerts.
 
 | GOES-N File name part | Type of Warning | 
@@ -33,4 +36,5 @@ A number of local non-weather-related emergencies are boradcast across EMWIN and
 ## Other Resources
 * [https://www.weather.gov/media/emwin/EMWIN_GOES-R_filename_convention.pdf](https://www.weather.gov/media/emwin/EMWIN_GOES-R_filename_convention.pdf): Breakdown of what EMWIN file names mean
 * [https://www.weather.gov/media/emwin/EMWIN_Text_Product_Catalog_220214-1357.pdf](https://www.weather.gov/media/emwin/EMWIN_Text_Product_Catalog_220214-1357.pdf): List of EMWIN products (put here for reference, but I did not find it useful).
+* [http://www.fireline.org/skywarn/emwin/products.html](http://www.fireline.org/skywarn/emwin/products.html): Information about some EMWIN products. The page was made specifically for Alachua SKYWARN, but it contains a lot of good general information
 * [https://docs.google.com/spreadsheets/d/1Q1Vnk5Z028LEoY5JGHqZl42itHzmeV2QtGY6Ob_eTc4](https://docs.google.com/spreadsheets/d/1Q1Vnk5Z028LEoY5JGHqZl42itHzmeV2QtGY6Ob_eTc4): List of EMWIN products made by me, based on what I actually received on the GOES-16 downlink. This is broken down to only show one of each "Product Category" - **you can pretty much ignore all columns other than this and the description**. The rest if the columns are there to give an example of what I spot checked to determine what a given category contains. This file may not be completely accurate since there can be more than one type of data within a category. Since I produced this entirely by observation, categories may be missing or inaccurate. It was used to create Vitality GOES, so there's some level of accuracy. Please take this with a grain of salt.
