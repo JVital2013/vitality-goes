@@ -7,7 +7,7 @@ Vitality GOES solves this by parsing the data and presenting pertinent informati
 Active alerts and warnings will show at the top of the Current Weather tab, if there are any.
 
 ### Weather Warning Alert
-The following weather warnings are parsed and included in  at the top of the page Current Weather screen in red. The full text of these alerts are displayed. The geofencing information is parsed, which Vitality GOES checks against your configured latitude/longitude to see if you're within the warning area. It will also look for the UNTIL like so it can properly hide expired alerts.
+The following weather warnings are parsed and included at the top of the page Current Weather screen in red. The full text of these alerts are displayed. The geofencing information is parsed, which Vitality GOES checks against your configured latitude/longitude to see if you're within the warning area. It will also look for the `UNTIL` line so it can properly hide expired alerts.
 
 | GOES-N File name part | Type of Warning | 
 |-----------------------|-----------------|
@@ -18,6 +18,17 @@ The following weather warnings are parsed and included in  at the top of the pag
 | FLW*****.TXT          | Flood Warning   |
 | SVR*****.TXT          | Thunderstorms   |
 | TOR*****.TXT          | Tornado Warning |
+
+### Local Emergencies
+A number of local non-weather-related emergencies are boradcast across EMWIN and are shown at the top of the current weather screen. The full text of these alerts are shown. All alerts for the state you are in, plus the state in which your forecast office resides to ensure you don't miss any critical messages.
+
+| GOES-N File name part | Type of Warning      | Color on Current Weather Screen |
+|-----------------------|----------------------|---------------------------------|
+| LAE*****.TXT          | Local Area Emergency | Red                             |
+| BLU*****.TXT          | Blue Alert           | Blue                            |
+| CAE*****.TXT          | Amber Alert          | Amber                           |
+| CDW*****.TXT          | Civil Danger Warning | Purple                          |
+| EVI*****.TXT          | Evacuation Warning   | Brown                           |
 
 ## Other Resources
 * [https://www.weather.gov/media/emwin/EMWIN_GOES-R_filename_convention.pdf](https://www.weather.gov/media/emwin/EMWIN_GOES-R_filename_convention.pdf): Breakdown of what EMWIN file names mean
