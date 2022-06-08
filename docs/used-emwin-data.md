@@ -6,12 +6,18 @@ Vitality GOES solves this by parsing the data and presenting pertinent informati
 ## Alerts
 Active alerts and warnings will show at the top of the Current Weather tab, if there are any.
 
-### Weather Warnings
-The following weather warnings are parsed and included in  at the top of the page Current Weather screen in red. The full text of these alerts are displayed, other than the geofencing information at the bottom. The geofencing information is parsed, which Vitality GOES checks against your configured latitude/longitude to see if you're within the warning area. Areas issued by your forecast office but for a different geographical area are not shown.
+### Weather Warning Alert
+The following weather warnings are parsed and included in  at the top of the page Current Weather screen in red. The full text of these alerts are displayed. The geofencing information is parsed, which Vitality GOES checks against your configured latitude/longitude to see if you're within the warning area. It will also look for the UNTIL like so it can properly hide expired alerts.
 
 | GOES-N File name part | Type of Warning | 
 |-----------------------|-----------------|
 | SQW*****.TXT          | Snow Squall     |
+| DSW*****.TXT          | Dust Storm      |
+| FRW*****.TXT          | Fire Weather    |
+| FFW*****.TXT          | Flash Flood     |
+| FLW*****.TXT          | Flood Warning   |
+| SVR*****.TXT          | Thunderstorms   |
+| TOR*****.TXT          | Tornado Warning |
 
 ## Other Resources
 * [https://www.weather.gov/media/emwin/EMWIN_GOES-R_filename_convention.pdf](https://www.weather.gov/media/emwin/EMWIN_GOES-R_filename_convention.pdf): Breakdown of what EMWIN file names mean
