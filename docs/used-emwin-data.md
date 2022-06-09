@@ -43,7 +43,8 @@ The Current Weather tab of Vitality GOES shows current weather conditions and fo
 | RWR*****.TXT         | Regional Weather Roundup | Current Weather             | |
 | RAD*****.GIF         | *Radar Image*            | Current Radar               | The radar code must be specified in config.ini, and the same radar image must be available in emwin.ini. [See the config documentation for more info](config.md) |
 | RWS*****.TXT         | Regional Weather Summary | Weather Summary             | |
-| AFD*****.TXT         | Area Forecast Discussion | Weather Summary             | Only the short/near term of the file, and it's only used if the Regional Weather Summary is not available for your area |
+| AFD*****.TXT         | Area Forecast Discussion | Weather Summary             | Only the short/near term section of the file, and it's only used if the Regional Weather Summary is not available for your area |
+| PFM*****.TXT         | Point Forecast Matrix    | 7-Day Forecast              | Only querying daily highs and lows, humidity, chance of precipitation, and cloud cover information. Note that humidity is not given for days 4-7, so it is estimated based on dewpoint and temp |
 
 ## Other Resources
 * [https://www.weather.gov/media/emwin/EMWIN_GOES-R_filename_convention.pdf](https://www.weather.gov/media/emwin/EMWIN_GOES-R_filename_convention.pdf): Breakdown of what EMWIN file names mean
