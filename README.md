@@ -8,10 +8,11 @@ A Web App for showcasing Geostationary Weather Satellite Data. The software is d
 2. [System Requirements](#system-requirements)
 3. [Preparing your system for Vitality GOES](#preparing-your-system-for-vitality-goes)
 4. [Installing Vitality GOES](#installing-vitality-goes)
-5. [Additional Scripts](#additional-scripts)
-6. [Other Tidbits](#other-tidbits)
-7. [Credits](#credits)
-8. [Additional Resources](#additional-resources)
+5. [Configuring Vitality GOES](#configuring-vitality-goes)
+6. [Additional Scripts](#additional-scripts)
+7. [Other Tidbits](#other-tidbits)
+8. [Credits](#credits)
+9. [Additional Resources](#additional-resources)
 
 ## What does Vitality GOES do?
 
@@ -111,7 +112,9 @@ Afterwards, verify your web server is working. When you navigate to the IP of yo
 ![Demo Apache2 Page](resources/apache.png)
 
 ## Installing Vitality GOES
-It's time to actually install the software! In a command line, run the following commands:
+
+### Linux
+In a command line, run the following commands:
 
 ```
 sudo rm -rf /var/www/html
@@ -120,7 +123,11 @@ cd vitality-goes
 cp -r html /var/www/html
 ```
 
-Finally, take a look at the [config readme](docs/config.md) to configure Vitality GOES.
+### Windows
+TODO
+
+## Configuring Vitality GOES
+Take a look at the [config readme](docs/config.md) to configure Vitality GOES.
 
 ## Additional Scripts
 
