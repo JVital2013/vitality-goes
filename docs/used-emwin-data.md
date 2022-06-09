@@ -62,7 +62,8 @@ The Other EMWIN tab of Vitality GOES shows miscellaneous data that may be useful
 | ADA*****.TXT         | Administrative Message     | EMWIN Admin Alerts           | All Available        | |
 | ADR*****.TXT         | NWS Admin Message          | EMWIN Regional Admin Message | All Available        |  |
 | FEEBAC1S.TXT         | ?                          | EMWIN Licensing Info         | Latest               | Issued daily around 15:30 UTC |
-| EPHTWOUS.TXT         | ?                          | Weather Satellite TLE        | Latest               | Issued several times daily and can be used to track other satellites, including Polar orbiting satellites commonly tracked by amateurs. There are other EPH*****.TXT files that contain operational information of other NOAA-operated satellites
+| EPHTWOUS.TXT         | ?                          | Weather Satellite TLE        | Latest               | Issued several times daily and can be used to track other satellites, including Polar orbiting satellites commonly tracked by amateurs. There are other EPH*****.TXT files that contain operational information of other NOAA-operated satellites |
+| N/A                  | Admin Text (HRIT VCID 0)   | Latest Admin Message         | Latest               | Only visible if [adminPath is configured in your config.ini](config.md#configini), and you patched goesproc [with this patch](https://github.com/pietern/goestools/pull/105/files) |
 
 ## Other Resources
 * [https://www.weather.gov/media/emwin/EMWIN_GOES-R_filename_convention.pdf](https://www.weather.gov/media/emwin/EMWIN_GOES-R_filename_convention.pdf): Breakdown of what EMWIN file names mean
