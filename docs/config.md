@@ -30,7 +30,7 @@ This section contains information about your physical location. If you're not di
 
 If you are displaying EMWIN/local weather data, here's what each of the other options mean. Note that these options can also be changed per client web browser by using the "configure location" screen in Vitality GOES.
 
-* `radarCode`: The last 5 letters of the radar file for your region. In the emwin directory, all radar files end with RAD{radarCode}.GIF. At the time of writing, valid radarCodes are:
+* `radarCode`: The last 5 letters of the radar file for your region. In the emwin directory, all radar files end with RAD{radarCode}.GIF. **In order for the radar to be displayed on the Current Weather page, it must be configured as an available image file in emwin.ini** At the time of writing, valid radarCodes are:
   *  ALLAK (Alaska)
   *  ALLGU (Guam)
   *  ALLHU (Hawaii)
