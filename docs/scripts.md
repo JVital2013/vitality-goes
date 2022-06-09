@@ -72,3 +72,13 @@ Delete-Old.sh deletes all ABI, EMWIN, NWS, and admin text files that are older t
 Monitor-Recordings.sh file barely constitutes a script, but it can be used to monitor files as they are saved by goestools. Goesproc does output this information, but if you're running goesproc as a service, the information is hidden. I find that this script does a good job at verifying that goesproc is actually processing data.
 
 Run manually as needed.
+
+# Sample cron.d file
+Linux systems allow you to schedule tasks by creating a file under `/etc/cron.d/` with a list of tasks to execute. Here's how I have my cron file set up, at `/etc/cron.d/goes`:
+
+```
+0 0 * * * youruser /path/to/vitality-goes/scripts/CreateVideos-ABI.sh
+0 5 * * * youruser /path/to/vitality-goes/scripts/CreateVideos-EMWIN.sh
+55 11 * * * youruser /path/to/vitality-goes/scripts/Cleanup-EmwinText.sh
+25,55 5-23 * * * youruser /path/to/vitality-goes/scripts/Sanchez.sh
+```
