@@ -48,6 +48,11 @@ The Current Weather tab of Vitality GOES shows current weather conditions and fo
 | AFM*****.TXT         | Area Forecast Matrix     | 7-Day Forecast              | Works the same as the Point Forecast Matrix. Only used if the PFM is not available |
 | ZFP*****.TXT         | Zone Forecast Product    | Forecast (text)             | |
 
+## EMWIN Imagery
+[EMWIN Imagery is configured in the emwin.ini config file](config.ini)
+
+## Other EMWIN
+
 ## Other Resources
 * [https://www.weather.gov/media/emwin/EMWIN_GOES-R_filename_convention.pdf](https://www.weather.gov/media/emwin/EMWIN_GOES-R_filename_convention.pdf): Breakdown of what EMWIN file names mean
 * [https://www.weather.gov/media/emwin/EMWIN_Text_Product_Catalog_220214-1357.pdf](https://www.weather.gov/media/emwin/EMWIN_Text_Product_Catalog_220214-1357.pdf): List of EMWIN products (put here for reference, but I did not find it useful).
