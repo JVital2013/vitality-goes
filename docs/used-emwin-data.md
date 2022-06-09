@@ -49,7 +49,7 @@ The Current Weather tab of Vitality GOES shows current weather conditions and fo
 | ZFP*****.TXT         | Zone Forecast Product    | Forecast (text)             | |
 
 ## EMWIN Imagery
-[EMWIN Imagery is configured in the emwin.ini config file](config.ini)
+[EMWIN Imagery is configured in the emwin.ini config file](config.md)
 
 ## Other EMWIN
 
