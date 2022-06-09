@@ -35,6 +35,11 @@ A number of local non-weather-related emergencies are boradcast across EMWIN and
 | CDW*****.TXT          | Civil Danger Warning | Purple                          |
 | EVI*****.TXT          | Evacuation Warning   | Brown                           |
 
+## Current Weather
+The Current Weather tab of Vitality GOES shows current weather conditions and forecasts for your configured location. The data comes from a number of seperate EMWIN text sources.
+
+### Current Weather Card
+
 ## Other Resources
 * [https://www.weather.gov/media/emwin/EMWIN_GOES-R_filename_convention.pdf](https://www.weather.gov/media/emwin/EMWIN_GOES-R_filename_convention.pdf): Breakdown of what EMWIN file names mean
 * [https://www.weather.gov/media/emwin/EMWIN_Text_Product_Catalog_220214-1357.pdf](https://www.weather.gov/media/emwin/EMWIN_Text_Product_Catalog_220214-1357.pdf): List of EMWIN products (put here for reference, but I did not find it useful).
