@@ -20,9 +20,8 @@ else
 	$sendCookie = true;
 }
 
-if(count($currentSettings) == 0 || count(array_diff($currentSettings[0],  $config['location']))) $sendCookie = true;
-
 //Overwrite first setting profile in array with all other settings on server
+if(count($currentSettings) == 0 || count(array_diff($currentSettings[0],  $config['location'])) != 0) $sendCookie = true;
 $currentSettings[0] = $config['location'];
 
 //Load selected profile; make sure cookie is set and not malformed
