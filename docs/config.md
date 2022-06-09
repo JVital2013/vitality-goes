@@ -1,6 +1,6 @@
 # How to Configure Vitality GOES
 
-The Vitality GOES config is stored in `html/config` and is broken out into these files:
+The Vitality GOES config is stored in `html/config` and is broken out into several files. The config files in this repo give a good starting point, from which you can change them to best suit your needs. The configuration is broken out into the following files:
 
 * **config.ini**: The main configuration file
 * **emwin.ini**: Stores information about the emwin images you want to display. This file has no effect on emwin text that is displayed
