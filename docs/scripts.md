@@ -67,7 +67,7 @@ Delete-Old.sh deletes all ABI, EMWIN, NWS, and admin text files that are older t
 
 ## Monitor-Recordings.sh
 * *Additional required system package: `inotify-tools`*
-* *Modify line 2 to set the location of your GOES files before running
+* *Modify line 2 to set the location of your GOES files before running*
 
 Monitor-Recordings.sh file barely constitutes a script, but it can be used to monitor files as they are saved by goestools. Goesproc does output this information, but if you're running goesproc as a service, the information is hidden. I find that this script does a good job at verifying that goesproc is actually processing data.
 
