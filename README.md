@@ -90,6 +90,9 @@ Additionally, "Admin Text" does not get saved by goestools due to a change in ho
 ### Vitality GOES Dependencies
 Vitality GOES itself is a set of PHP, HTML, JavaScript, and CSS files. As such, it needs to run on a web server stack. For this tutorial, I'm going to assume you're not running another web server on the same machine.
 
+---
+
+#### Linux
 Assuming you're on a Debian-based server, the following commands command should install all the dependencies you need:
 
 ```
@@ -97,6 +100,11 @@ sudo apt update
 sudo apt upgrade
 sudo apt install apache2 php libapache2-mod-php lm-sensors
 ```
+
+#### Windows
+To host Vitality GOES on Windows, TODO
+
+---
 
 Afterwards, verify your web server is working. When you navigate to the IP of your Vitality GOES server, you should see something that looks like this:
 
