@@ -45,6 +45,8 @@ The Current Weather tab of Vitality GOES shows current weather conditions and fo
 | RWS*****.TXT         | Regional Weather Summary | Weather Summary             | |
 | AFD*****.TXT         | Area Forecast Discussion | Weather Summary             | Only the short/near term section of the file, and it's only used if the Regional Weather Summary is not available for your area |
 | PFM*****.TXT         | Point Forecast Matrix    | 7-Day Forecast              | Only querying daily highs and lows, humidity, chance of precipitation, and cloud cover information. Note that humidity is not given for days 4-7, so it is estimated based on dewpoint and temp |
+| AFM*****.TXT         | Area Forecast Matrix     | 7-Day Forecast              | Works the same as the Point Forecast Matrix. Only used if the PFM is not available |
+| ZFP*****.TXT         | Zone Forecast Product    | Forecast (text)             | |
 
 ## Other Resources
 * [https://www.weather.gov/media/emwin/EMWIN_GOES-R_filename_convention.pdf](https://www.weather.gov/media/emwin/EMWIN_GOES-R_filename_convention.pdf): Breakdown of what EMWIN file names mean
