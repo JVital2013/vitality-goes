@@ -25,7 +25,7 @@ The following weather warnings are parsed and included at the top of the page Cu
 | TOR*****.TXT         | Tornado Warning |
 
 ### Local Emergencies
-A number of local non-weather-related emergencies are boradcast across EMWIN and are shown at the top of the current weather screen. The full text of these alerts are shown. All alerts for the state you are in, plus the state in which your forecast office resides to ensure you don't miss any critical messages.
+A number of local non-weather-related emergencies are broadcast across EMWIN and are shown at the top of the current weather screen. The full text of these alerts are shown. All alerts for the state you are in, plus the state in which your forecast office resides to ensure you don't miss any critical messages.
 
 | GOES-N Filename Part | Type of Warning      | Color on Current Weather Screen |
 |----------------------|----------------------|---------------------------------|
