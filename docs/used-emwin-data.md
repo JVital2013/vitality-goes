@@ -49,9 +49,20 @@ The Current Weather tab of Vitality GOES shows current weather conditions and fo
 | ZFP*****.TXT         | Zone Forecast Product    | Forecast (text)             | |
 
 ## EMWIN Imagery
-[EMWIN Imagery is configured in the emwin.ini config file](config.md)
+[EMWIN Imagery is configured in the emwin.ini config file](config.md#emwinini)
 
 ## Other EMWIN
+The Other EMWIN tab of Vitality GOES shows miscellaneous data that may be useful to you (read: information I found interesting and felt like including in the web interface. If you're interested in other info, feel free to open a pull request)
+
+| GOES-N Filename Part | Product Name               | Card Title in Vitality GOES  | Latest/All Available | Notes |
+|----------------------|----------------------------|------------------------------|----------------------|-------|
+| ALT*****.TXT         | Space Environment Alert    | Space Weather Messages       | All Available        | |
+| WAT*****.TXT         | Space Environment Watch    | Space Weather Messages       | All Available        | |
+| FTM*****.TXT         | Radar Outage Notifications | Local Radar Outages          | All Available        | Filtered by your state/state of your local issuing office |
+| ADA*****.TXT         | Administrative Message     | EMWIN Admin Alerts           | All Available        | |
+| ADR*****.TXT         | NWS Admin Message          | EMWIN Regional Admin Message | All Available        |  |
+| FEEBAC1S.TXT         | ?                          | EMWIN Licensing Info         | Latest               | Issued daily around 15:30 UTC |
+| EPHTWOUS.TXT         | ?                          | Weather Satellite TLE        | Latest               | Issued several times daily and can be used to track other satellites, including Polar orbiting satellites commonly tracked by amateurs. There are other EPH*****.TXT files that contain operational information of other NOAA-operated satellites
 
 ## Other Resources
 * [https://www.weather.gov/media/emwin/EMWIN_GOES-R_filename_convention.pdf](https://www.weather.gov/media/emwin/EMWIN_GOES-R_filename_convention.pdf): Breakdown of what EMWIN file names mean
