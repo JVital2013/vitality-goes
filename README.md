@@ -35,7 +35,7 @@ To put it simply: goestools and secondary scripts dump data to a folder on the g
 
 ## System Requirements
 
-There are different ways to set up the Vitality GOES server. No matter the method you choose, you must already have a ground station set up that receives imagery from a geostationary weather satellite. Vitality GOES was designed to handle HRIT/EMWIN data processed by goestools, but other data sources may work. [See below](#displaying-data-from-other-satellites) for more details.
+There are different ways to set up the Vitality GOES server. No matter the method you choose, you must already have a ground station set up that receives imagery from a geostationary weather satellite. Vitality GOES was designed to handle HRIT/EMWIN data processed by goestools, but other data sources may work. See the [additional resources section](#additional-resources) for info on how to set up a ground station with goestools, and [the tidbits section](#displaying-data-from-other-satellites) for more on other satellites.
 
 It is recommended that you host Vitality GOES on your ground station itself for the most up-to-date information and to simplify setup/maintenance. If you choose, it can be hosted on another machine if you have a sync process set up between the ground station and the Vitality GOES server. *Syncing received images from another machine is outside the scope of Vitality GOES.*
 
