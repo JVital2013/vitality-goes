@@ -37,7 +37,7 @@ To put it simply: goestools and secondary scripts dump data to a folder on the g
 
 There are different ways to set up the Vitality GOES server. **It is recommended that you host Vitality GOES on your ground station itself** for the most up-to-date information and to simplify setup/maintenance, but it can be hosted on another machine if you have a sync process set up between the ground station and the Vitality GOES server. *Syncing received images from another machine is outside the scope of Vitality GOES.*
 
-It is recommended that you use a Debian-based Linux distro to host the Vitality GOES server - something like Raspberry Pi OS, Ubuntu, or Debian itself. Hosting the server on Windows will work as well.
+It is recommended that you use a Debian-based Linux distro to host the Vitality GOES server - something like Raspberry Pi OS, Ubuntu, or Debian itself. Hosting the server on Windows will work, but it is in beta. **Windows-hosted Vitality GOES runs much slower than on Linux, especially when displaying current weather information.**
 
 If you enable the video rendering scripts, keep in mind that these scripts may take more power than a low-end machine, like a Raspberry Pi, can provide. You may need to offload these tasks to another machine or upgrade your server to something beefier. I'm using a laptop laptop with a 4th generation Core i5 processor, and it has more than enough power to run goestools, Vitality GOES, and all secondary scripts.
 
