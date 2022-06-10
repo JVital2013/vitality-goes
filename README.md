@@ -89,7 +89,7 @@ To assist you in configuring goestools for Vitality GOES, sample `goesrecv.conf`
 Additionally, "Admin Text" does not get saved by goestools due to a change in how the GOES satellites send the file down. For this text to get displayed, recompile goestools with this patch: [https://github.com/pietern/goestools/pull/105/files](https://github.com/pietern/goestools/pull/105/files).
 
 ### Vitality GOES Dependencies
-Vitality GOES itself is a set of PHP, HTML, JavaScript, and CSS files. As such, it needs to run on a web server stack. For this tutorial, I'm going to assume you're not running another web server on the same machine.
+Vitality GOES itself is a set of PHP, HTML, JavaScript, and CSS files. As such, it needs to be hosted on a web server stack. For this tutorial, I'm going to assume you're not running another web server on the same machine.
 
 ---
 
@@ -103,7 +103,7 @@ sudo apt install apache2 php libapache2-mod-php lm-sensors
 ```
 
 #### Windows
-The easiest way to host Vitality GOES on a Windows box is to use XAMPP [https://www.apachefriends.org/](https://www.apachefriends.org/). Download and install this software. When prompted, the only parts that are needed are Apache and PHP. Don't forget to start the Apache service in the XAMPP control panel before continuing.
+The easiest way to host Vitality GOES on a Windows box is to use XAMPP ([https://www.apachefriends.org/](https://www.apachefriends.org/)). Download and install this software. When prompted, the only parts that are needed are Apache and PHP. Don't forget to start the Apache service in the XAMPP control panel before continuing.
 
 ---
 
@@ -126,8 +126,10 @@ cp -r html /var/www/html
 ### Windows
 To start hosing Vitality GOES in Windows:
 
-1. Download a zip of the Vitality GOES git repository [link for the lazy](https://github.com/JVital2013/vitality-goes/archive/refs/heads/main.zip)
-2. TODO
+1. Download a zip of the Vitality GOES git repository ([link for the lazy](https://github.com/JVital2013/vitality-goes/archive/refs/heads/main.zip))
+2. Extract the zip
+3. Delete the contents of C:\xampp\htdocs\
+4. Copy the contents of vitality-goes\html into C:\xampp\htdocs\
 
 ## Configuring Vitality GOES
 Take a look at the [config readme](docs/config.md) to configure Vitality GOES.
