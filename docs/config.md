@@ -25,6 +25,8 @@ The Paths section is unnecessary, but it is recommended that you set up a path f
 
 Example: `GOES16 = /path/to/goestoolsdata` allows `{GOES16}` to be used in the `path` of any image in the abi, meso, and l2 ini files.
 
+If hosted on Windows, this would bes something like `GOES16 = C:\path\to\goestoolsdata`
+
 ### Location
 This section contains information about your physical location. If you're not displaying EMWIN data, the only thing you need to configure is `timezone`. A list of supported timezones can be found [here](https://www.php.net/manual/en/timezones.php).
 
