@@ -1,5 +1,5 @@
 # Vitality GOES
-A Web App for showcasing Geostationary Weather Satellite Data. The software is designed to showcase text and image received from GOES satellites via goestools, but other data sources may work.
+A Web App for showcasing Geostationary Weather Satellite Data. The software is designed to showcase text and images received from GOES satellites via goestools, but other data sources may work.
 
 ![Series of Screenshots of Vitality GOES](resources/banner.png)
 
@@ -27,7 +27,7 @@ Vitality GOES has the following features:
 
 ### How does it work?
 
-The following diagram shows how data flows from a GOES satellite through to Vitality GOES, and ultimately your end users:
+The following diagram shows how data flows from a GOES satellite, through Vitality GOES, and to your end users:
 
 ![Vitality GOES reads data saved to disk that came from goestools and secondary processing scripts](resources/data-flow-diagram.png)
 
@@ -35,11 +35,11 @@ To put it simply: goestools and secondary scripts dump data to a folder on the g
 
 ## System Requirements
 
-There are different ways to set up the Vitality GOES server. **It is recommended that you run Vitality GOES on your ground station itself** for the most up-to-date information and to simplify setup/maintenance, but it can be run on another machine if you have a sync process set up between the ground station and the Vitality GOES server. *Syncing received images from another machine is outside the scope of Vitality GOES.*
+There are different ways to set up the Vitality GOES server. **It is recommended that you host Vitality GOES on your ground station itself** for the most up-to-date information and to simplify setup/maintenance, but it can be hosted on another machine if you have a sync process set up between the ground station and the Vitality GOES server. *Syncing received images from another machine is outside the scope of Vitality GOES.*
 
-It is recommended that you use a Debian-based Linux distro to run the Vitality GOES server - something like Raspberry Pi OS, Ubuntu, or Debian itself. Running the server on Windows is untested, but should work.
+It is recommended that you use a Debian-based Linux distro to host the Vitality GOES server - something like Raspberry Pi OS, Ubuntu, or Debian itself. Hosting the server on Windows will work as well.
 
-If you enable the video rendering scripts, keep in mind that these scripts may take more power than a low-end machine, like a Raspberry Pi, can provide. You may need to offload these tasks to another machine or upgrade your server to something beefier. I'm using an old Dell Latitude laptop, which has more than enough power to run goestools, Vitality GOES, and all secondary scripts.
+If you enable the video rendering scripts, keep in mind that these scripts may take more power than a low-end machine, like a Raspberry Pi, can provide. You may need to offload these tasks to another machine or upgrade your server to something beefier. I'm using a laptop laptop with a 4th generation Core i5 processor, and it has more than enough power to run goestools, Vitality GOES, and all secondary scripts.
 
 Once configured, any modern web browser can connect to Vitality GOES and view the data.
 
@@ -94,7 +94,7 @@ Vitality GOES itself is a set of PHP, HTML, JavaScript, and CSS files. As such, 
 ---
 
 #### Linux
-Assuming you're on a Debian-based server, the following commands command should install all the dependencies you need:
+Assuming you're on a Debian/Ubuntu-based server, the following commands command should install all the dependencies you need:
 
 ```
 sudo apt update
@@ -103,7 +103,7 @@ sudo apt install apache2 php libapache2-mod-php lm-sensors
 ```
 
 #### Windows
-To host Vitality GOES on Windows, TODO
+The easiest way to host Vitality GOES on a Windows box is to use XAMPP [https://www.apachefriends.org/](https://www.apachefriends.org/). Download and install this software. When prompted, the only parts that are needed are Apache and PHP. Don't forget to start the Apache service in the XAMPP control panel before continuing.
 
 ---
 
@@ -124,7 +124,10 @@ cp -r html /var/www/html
 ```
 
 ### Windows
-TODO
+To start hosing Vitality GOES in Windows:
+
+1. Download a zip of the Vitality GOES git repository [link for the lazy](https://github.com/JVital2013/vitality-goes/archive/refs/heads/main.zip)
+2. TODO
 
 ## Configuring Vitality GOES
 Take a look at the [config readme](docs/config.md) to configure Vitality GOES.
@@ -151,7 +154,7 @@ If anyone would like to take a stab at automating Vitality GOES installation, or
 I would love to see how the community can make HRIT/EMWIN data even more accessible through the easy deployment of this software package.
 
 ### Sharing Vitality GOES across the internet
-Technically speaking, there should be no problem with opening a port on your router so that Vitality GOES can be accessed across the internet. In practice, I **do not** recommend it. For one, Vitality GOES has not been vetted by security professionals. I did keep security in mind when coding it, but I'm giving making no promises. If you do share it across the internet, make sure your web server is honoring `.htaccess` files. Not all web servers do by default.
+Technically speaking, there should be no problem with opening a port on your router so that Vitality GOES can be accessed across the internet. In practice, I **do not** recommend it. For one, Vitality GOES has not been vetted by security professionals. I did keep security in mind when coding it, but I'm making no promises. If you do share it across the internet, make sure your web server is honoring `.htaccess` files. Not all web servers do by default.
 
 Additionally, some files produced by goestools can be extremely large. Make sure your internet has sufficient upload speed to handle it, and that your firewall rules are properly configured. The last thing you want is for someone to DDoS you by querying 1,000 full disk images at once...
 
