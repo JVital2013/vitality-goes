@@ -16,7 +16,7 @@ A Web App for showcasing Geostationary Weather Satellite Data. The software is d
 
 ## What does Vitality GOES do?
 
-Vitality GOES makes data from the GOES HRIT/EMWIN feed easily accessible, through a web browser, from anywhere on your local network. Even if the internet goes down for any reason, people on your local LAN can still access real-time weather information.
+Vitality GOES makes data from the GOES HRIT/EMWIN feed easily accessible, through a web browser, from anywhere on your local network. Even if the internet goes down, people on your local LAN can still access real-time weather information.
 
 Vitality GOES has the following features:
 
