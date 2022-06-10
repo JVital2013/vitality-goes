@@ -1,6 +1,6 @@
 # How to Configure Vitality GOES
 
-The Vitality GOES config is stored in `html/config` and is broken out into several files. The config files in this repo give a good starting point, from which you can change them to best suit your needs. The configuration is broken out into the following files:
+The Vitality GOES config is stored in `html/config`. You can start with the configs provided, then change them as necessary. The configuration is broken out into the following files:
 
 * **config.ini**: The main configuration file
 * **emwin.ini**: Stores information about the emwin images you want to display. This file has no effect on emwin text that is displayed
@@ -23,7 +23,7 @@ This is the main config file. It will likely need configured when you first depl
 ### Paths
 The Paths section is unnecessary, but it is recommended that you set up a path for each satellite you're receiving. Each path defined in this section creates a variable that can be used in the abi, meso, and l2 ini files. 
 
-Example: `GOES16 = /home/jamie/Desktop/sdr-recordings` allows `{GOES16}` to be used in the `path` of any image in the abi, meso, and l2 ini files.
+Example: `GOES16 = /path/to/goestoolsdata` allows `{GOES16}` to be used in the `path` of any image in the abi, meso, and l2 ini files.
 
 ### Location
 This section contains information about your physical location. If you're not displaying EMWIN data, the only thing you need to configure is `timezone`. A list of supported timezones can be found [here](https://www.php.net/manual/en/timezones.php).
@@ -51,7 +51,7 @@ If you are displaying EMWIN/local weather data, here's what each of the other op
   *  UMSVY (Upper Mississippi Valley)
 *  `stateAbbr`: The post office abbreviation of your state. Also includes things like PR for Puerto Rico, AS for American Samoa, etc.
 *  `wxZone`: The weather zone of your location. This is typically your state abbreviation, a Z, and a 3 digit number. Example: PAZ066. You can either use the "Configure Location" section of Vitality GOES to figure this out, or use [this site](https://pnwpest.org/cgi-bin/wea3/wea3) to search for your town. "Weather Zone" shows up in the upper-right of that page.
-*  `orig`: The National Weather Service Forecast Office for your local weather information. The code needs to be the office call sign, plus the 2-letter state abbreviation. You can either use the "Configure Location" section of Vitality GOES to figure this out, or look at [https://en.wikipedia.org/wiki/List_of_National_Weather_Service_Weather_Forecast_Offices](https://en.wikipedia.org/wiki/List_of_National_Weather_Service_Weather_Forecast_Offices). For example, State College PA is "CTP", so orig needs to be set to `CTPPPA`
+*  `orig`: The National Weather Service Forecast Office for your local weather information. The code needs to be the office call sign, plus the 2-letter state abbreviation. You can either use the "Configure Location" section of Vitality GOES to figure this out, or look at [https://en.wikipedia.org/wiki/List_of_National_Weather_Service_Weather_Forecast_Offices](https://en.wikipedia.org/wiki/List_of_National_Weather_Service_Weather_Forecast_Offices). For example, State College PA is "CTP", so orig needs to be set to `CTPPA`
 *  `rwrOrig`: Accepts the same type of code as `orig`, but specifically for the Regional Weather Roundup information (RWR; current conditions in the Vitality GOES interface). It appears that the weather roundup is sometimes issued by a different office than the rest of your forecast. Use the "Configure Location" section within Vitality GOES to figure this out.
 *  `city`: Your city/town name, exactly as it appears in the Regional Weather Roundup (RWR). This must be in all caps. The "Configure Location" screen in Vitality GOES can help you figure this out.
 *  `lat` and `lon`: Your exact latitude and longitude. This is only used to determine if you're within an alert area as issued by the NWS. It must contain 2 decimal points to work correctly
