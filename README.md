@@ -1,5 +1,5 @@
 # Vitality GOES
-A Web App for showcasing Geostationary Weather Satellite Data. The software is designed to showcase text and images received from GOES satellites via goestools, but other data sources may work.
+A Web App for showcasing Geostationary Weather Satellite Data. The software is designed to display text and images received from GOES satellites via goestools, but other data sources may work.
 
 ![Series of Screenshots of Vitality GOES](resources/banner.png)
 
@@ -16,7 +16,7 @@ A Web App for showcasing Geostationary Weather Satellite Data. The software is d
 
 ## What does Vitality GOES do?
 
-Vitality GOES makes data from the GOES HRIT/EMWIN feed easily accessible, through a web browser, from anywhere on your local network. Even if the internet goes down due to a weather emergency, people on your local LAN can still access real-time emergency weather information.
+Vitality GOES makes data from the GOES HRIT/EMWIN feed easily accessible, through a web browser, from anywhere on your local network. Even if the internet goes down for any reason, people on your local LAN can still access real-time weather information.
 
 Vitality GOES has the following features:
 
@@ -37,7 +37,7 @@ To put it simply: goestools and secondary scripts dump data to a folder on the g
 
 There are different ways to set up the Vitality GOES server. **It is recommended that you host Vitality GOES on your ground station itself** for the most up-to-date information and to simplify setup/maintenance, but it can be hosted on another machine if you have a sync process set up between the ground station and the Vitality GOES server. *Syncing received images from another machine is outside the scope of Vitality GOES.*
 
-It is recommended that you use a Debian-based Linux distro to host the Vitality GOES server - something like Raspberry Pi OS, Ubuntu, or Debian itself. Hosting the server on Windows will work, but it is in beta. **Windows-hosted Vitality GOES runs much slower than on Linux, especially when displaying current weather information.**
+It is recommended that you use a Debian-based Linux distro to host the Vitality GOES server. Something like Raspberry Pi OS, Ubuntu, or Debian is preferred. Windows-hosted Vitality GOES runs slower than it does when hosted on Linux - displaying EMWIN information can be extremely slow, but other parts of the software are more usable. See [this issue for more](https://github.com/JVital2013/vitality-goes/issues/2).
 
 If you enable the video rendering scripts, keep in mind that these scripts may take more power than a low-end machine, like a Raspberry Pi, can provide. You may need to offload these tasks to another machine or upgrade your server to something beefier. I'm using a laptop laptop with a 4th generation Core i5 processor, and it has more than enough power to run goestools, Vitality GOES, and all secondary scripts.
 
