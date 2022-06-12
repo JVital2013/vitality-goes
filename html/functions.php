@@ -29,6 +29,22 @@ function loadConfig()
 	return $config;
 }
 
+function scandir_recursive($dir, &$results = array())
+{
+	$dirHandle = opendir($dir);
+	while(($currentFile = readdir($dirHandle)) !== false)
+	{
+		if($currentFile == '.' or $currentFile == '..') continue;
+		
+		$path = realpath($dir . DIRECTORY_SEPARATOR . $currentFile);
+		if(is_dir($path)) scandir_recursive($path, $results);
+        else $results[] = $path;
+	}
+	closedir($dirHandle);
+	
+    return $results;
+}
+
 function sortByTimestamp($a, $b)
 {
     return $a['timestamp'] - $b['timestamp'];
@@ -49,6 +65,11 @@ function sortByCity($a, $b)
 function sortEMWIN($a, $b)
 {
 	return explode("_", basename($b))[4] - explode("_", basename($a))[4];
+}
+
+function sortABI($a, $b)
+{
+	return strcmp(basename($a), basename($b));
 }
 
 function findNewestEMWIN($glob)
@@ -105,11 +126,11 @@ function findMetadataABI($path, $title)
 	if(!is_dir($path)) return array();
 	
 	$retVal = [];
-	$fileList = scandir($path, SCANDIR_SORT_ASCENDING);
+	$fileList = scandir_recursive($path);
+	usort($fileList, "sortABI");
+	
 	foreach($fileList as $file)
 	{
-		if(is_dir($file)) continue;
-		
 		$splitName = explode("_", $file);
 		$timestamp = strtotime(explode(".", $splitName[count($splitName) - 1])[0]);
 		$date = date("F j, Y g:i A", $timestamp);
@@ -126,7 +147,9 @@ function findImageABI($path, $timestamp)
 {
 	$DateTime = new DateTime("now", new DateTimeZone("UTC"));
 	$DateTime->setTimestamp($timestamp);
-	return glob("$path*" . $DateTime->format('Ymd\THis\Z'). "*")[0];
+	
+	$fileList = scandir_recursive($path);
+	foreach($fileList as $thisFile) if(strpos($thisFile, $DateTime->format('Ymd\THis\Z'))) return $thisFile;
 }
 
 function linesToParagraphs($lineArray, $linesToSkip)
