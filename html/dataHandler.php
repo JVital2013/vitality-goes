@@ -126,7 +126,7 @@ if($_GET['type'] == "preload")
 	$preloadData['localRadarVideo'] = "";
 	foreach($config['emwin'] as $value)
 	{
-		if(explode("*", $value['path'])[1] == "RAD" . $currentSettings[$selectedProfile]['radarCode'] . ".GIF" && isset($value["videoPath"]))
+		if($value['path'] == "RAD" . $currentSettings[$selectedProfile]['radarCode'] . ".GIF" && isset($value["videoPath"]))
 		{
 			$preloadData['localRadarVideo'] = $value["videoPath"];
 			break;
@@ -176,12 +176,12 @@ elseif($_GET['type'] == "emwinMetadata")
 {
 	if(!array_key_exists($_GET['id'], $config['emwin'])) die();
 	header('Content-Type: application/json; charset=utf-8');
-	echo json_encode(findMetadataEMWIN($config['emwin'][$_GET['id']]['path'], $config['emwin'][$_GET['id']]['title']));
+	echo json_encode(findMetadataEMWIN(scandir_recursive($config['general']['emwinPath']), $config['emwin'][$_GET['id']]['path'], $config['emwin'][$_GET['id']]['title']));
 }
 elseif($_GET['type'] == "localRadarMetadata")
 {
 	header('Content-Type: application/json; charset=utf-8');
-	echo json_encode(findMetadataEMWIN($config['general']['emwinPath']."/*RAD" . $currentSettings[$selectedProfile]['radarCode'] . ".GIF", "Local Composite Weather Radar"));
+	echo json_encode(findMetadataEMWIN(scandir_recursive($config['general']['emwinPath']), "RAD" . $currentSettings[$selectedProfile]['radarCode'] . ".GIF", "Local Composite Weather Radar"));
 }
 elseif($_GET['type'] == "metadata")
 {
@@ -304,7 +304,7 @@ elseif($_GET['type'] == "metadata")
 				$metadata['satelliteTle'] = [];
 				for($i = 0; $i < count($latestTleArray); $i += 3) $metadata['satelliteTle'][] = trim($latestTleArray[$i]);
 				sort($metadata['satelliteTle']);
-				$metadata['satelliteTleDate'] = date("M d, Y Hi", findMetadataEMWIN($latestTleFile, "")[0]['timestamp']) . " " . $DateTime->format('T');
+				$metadata['satelliteTleDate'] = date("M d, Y Hi", findMetadataEMWIN($allEmwinFiles, $latestTleFile, "")[0]['timestamp']) . " " . $DateTime->format('T');
 				
 				//EMWIN Administrative Alerts
 				$adminAlertList = glob($config['general']['emwinPath']."/*-ADA*.TXT");
@@ -330,7 +330,7 @@ elseif($_GET['type'] == "metadata")
 				else
 				{
 					$metadata['emwinLicense'] = linesToParagraphs(file($emwinLicenseFile), 4);
-					$metadata['emwinLicenseDate'] = date("M d, Y Hi", findMetadataEMWIN($emwinLicenseFile, "")[0]['timestamp']) . " " . $DateTime->format('T');
+					$metadata['emwinLicenseDate'] = date("M d, Y Hi", findMetadataEMWIN($allEmwinFiles, $emwinLicenseFile, "")[0]['timestamp']) . " " . $DateTime->format('T');
 				}
 			}
 			
@@ -439,7 +439,7 @@ elseif($_GET['type'] == "mesoData")
 elseif($_GET['type'] == "emwinData")
 {
 	if(!array_key_exists($_GET['id'], $config['emwin']) || !array_key_exists('timestamp', $_GET)) die();
-	$path = findSpecificEMWIN($config['emwin'][$_GET['id']]['path'], $_GET['timestamp']);
+	$path = findSpecificEMWIN(scandir_recursive($config['general']['emwinPath']), $config['emwin'][$_GET['id']]['path'], $_GET['timestamp']);
 	header('Content-Type: ' . mime_content_type($path));
 	header('Content-Length: ' . filesize($path));
 	readfile($path);
@@ -447,7 +447,7 @@ elseif($_GET['type'] == "emwinData")
 elseif($_GET['type'] == "localRadarData")
 {
 	if(!array_key_exists('timestamp', $_GET)) die();
-	$path = findSpecificEMWIN($config['general']['emwinPath']."/*RAD" . $currentSettings[$selectedProfile]['radarCode'] . ".GIF", $_GET['timestamp']);
+	$path = findSpecificEMWIN(scandir_recursive($config['general']['emwinPath']), "RAD" . $currentSettings[$selectedProfile]['radarCode'] . ".GIF", $_GET['timestamp']);
 	header('Content-Type: ' . mime_content_type($path));
 	header('Content-Length: ' . filesize($path));
 	readfile($path);

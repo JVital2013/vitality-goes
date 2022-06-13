@@ -23,8 +23,7 @@ function loadConfig()
 		unset($config['paths']);
 	}
 	
-	if(array_key_exists('emwinPath', $config['general'])) for($i = 0; $i < count($config['emwin']); $i++) $config['emwin'][$emwinSlugs[$i]]['path'] = $config['general']['emwinPath']."/*" . $config['emwin'][$emwinSlugs[$i]]['path'];
-	else $config['emwin'] = [];
+	if(!array_key_exists('emwinPath', $config['general'])) $config['emwin'] = [];
 	
 	return $config;
 }
@@ -54,7 +53,7 @@ function sortOrig($a, $b)
 {
 	$subReturn = strcmp($a['state'], $b['state']);
 	if($subReturn === 0) return strcmp($a['orig'], $b['orig']);
-    else return $subReturn;
+	else return $subReturn;
 }
 
 function sortByCity($a, $b)
@@ -93,32 +92,40 @@ function findNewestEMWIN($allEmwinFiles, $product)
 	return $path;
 }
 
-function findSpecificEMWIN($path, $timestamp)
+function findSpecificEMWIN($allEmwinFiles, $product, $timestamp)
 {
 	$DateTime = new DateTime("now", new DateTimeZone(date_default_timezone_get()));
 	$DateTime->setTimestamp($timestamp);
 	$DateTime->setTimezone(new DateTimeZone("UTC"));
 	
-	$splitPath = explode("*", $path);
-	return glob($splitPath[0] . "*" . $DateTime->format('YmdHis') . "*" . $splitPath[1])[0];
+	foreach($allEmwinFiles as $thisFile)
+	{
+		if(strpos($thisFile, $DateTime->format('YmdHis')) !== false && strpos($thisFile, $product) !== false)
+		{
+			return $thisFile;
+		}
+	}
+	
+	return false;
 }
 
-function findMetadataEMWIN($path, $title)
+function findMetadataEMWIN($allEmwinFiles, $product, $title)
 {
 	$retVal = [];
 	
-	$fileList = glob($path);
-	foreach($fileList as $file)
+	foreach($allEmwinFiles as $thisFile)
 	{
-		$fileNameParts = explode("_", $file);
-		$DateTime = new DateTime($fileNameParts[4], new DateTimeZone("UTC"));
-		$DateTime->setTimezone(new DateTimeZone(date_default_timezone_get()));
-		$date = $DateTime->format("F j, Y g:i A");
-		$retVal[]['subHtml'] = "<b>$title</b><div class='goeslabel gl-overlay'>Rendered: $date " . $DateTime->format('T') . "</div>";
-		$retVal[count($retVal) - 1]['description'] = "Rendered: $date " . $DateTime->format('T');
-		$retVal[count($retVal) - 1]['timestamp'] = $DateTime->getTimestamp();
-	}
-	
+		if(strpos($thisFile, $product) !== false)
+		{
+			$fileNameParts = explode("_", $thisFile);
+			$DateTime = new DateTime($fileNameParts[4], new DateTimeZone("UTC"));
+			$DateTime->setTimezone(new DateTimeZone(date_default_timezone_get()));
+			$date = $DateTime->format("F j, Y g:i A");
+			$retVal[]['subHtml'] = "<b>$title</b><div class='goeslabel gl-overlay'>Rendered: $date " . $DateTime->format('T') . "</div>";
+			$retVal[count($retVal) - 1]['description'] = "Rendered: $date " . $DateTime->format('T');
+			$retVal[count($retVal) - 1]['timestamp'] = $DateTime->getTimestamp();
+		}
+	}	
 	usort($retVal, 'sortByTimestamp');
 	return $retVal;
 }
