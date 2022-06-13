@@ -281,6 +281,9 @@ elseif($_GET['type'] == "metadata")
 			
 			if(array_key_exists('emwinPath', $config['general']) &&  is_dir($config['general']['emwinPath']))
 			{
+				//Get all emwin files
+				$allEmwinFiles = scandir_recursive($config['general']['emwinPath']);
+				
 				//Space Weather Messages
 				$spaceWeatherMessages = glob($config['general']['emwinPath']."/*-{ALT,WAT}*.TXT", GLOB_BRACE);
 				usort($spaceWeatherMessages, "sortEMWIN");
@@ -296,7 +299,7 @@ elseif($_GET['type'] == "metadata")
 				foreach($radarOutages as $radarOutage) $metadata['radarOutages'][] = linesToParagraphs(file($radarOutage), 3);
 				
 				//Satellite TLE
-				$latestTleFile = findNewestEmwin($config['general']['emwinPath']."/*EPHTWOUS.TXT");
+				$latestTleFile = findNewestEmwin($allEmwinFiles, "EPHTWOUS");
 				$latestTleArray = file($latestTleFile);
 				$metadata['satelliteTle'] = [];
 				for($i = 0; $i < count($latestTleArray); $i += 3) $metadata['satelliteTle'][] = trim($latestTleArray[$i]);
@@ -318,7 +321,7 @@ elseif($_GET['type'] == "metadata")
 				foreach($adminRegionalList as $adminRegional) $metadata['adminRegional'][] = linesToParagraphs(file($adminRegional), 4);
 				
 				//EMWIN License
-				$emwinLicenseFile = findNewestEmwin($config['general']['emwinPath']."/*FEEBAC1S.TXT");
+				$emwinLicenseFile = findNewestEmwin($allEmwinFiles, "FEEBAC1S");
 				if($emwinLicenseFile == "")
 				{
 					$metadata['emwinLicense'] = "None Found";
@@ -451,7 +454,7 @@ elseif($_GET['type'] == "localRadarData")
 }
 elseif($_GET['type'] == "tle")
 {
-	$path = findNewestEmwin($config['general']['emwinPath']."/*EPHTWOUS.TXT");
+	$path = findNewestEmwin(scandir_recursive($config['general']['emwinPath']), "EPHTWOUS");
 	header("Pragma: no-cache");
 	header('Content-Type: ' . mime_content_type($path));
 	header("Cache-Control: max-age=0, no-cache, no-store, must-revalidate");
@@ -509,7 +512,7 @@ elseif($_GET['type'] == "settings")
 			
 		case "wxZone":
 			if(!preg_match("/^[A-Z0-9]{5}$/", $_GET['orig'])) break;
-			$localZfpPath = findNewestEMWIN($config['general']['emwinPath']."/*-ZFP" . $_GET['orig'] . ".TXT");
+			$localZfpPath = findNewestEMWIN(scandir_recursive($config['general']['emwinPath']), "ZFP".$_GET['orig']);
 			if($localZfpPath == "") break;
 			
 			$localZfpArr = file($localZfpPath);
@@ -536,7 +539,7 @@ elseif($_GET['type'] == "settings")
 			
 		case "city":
 			if(!preg_match("/^[A-Z0-9]{5}$/", $_GET['rwrOrig'])) break;
-			$localRwrPath = findNewestEMWIN($config['general']['emwinPath']."/*-RWR" . $_GET['rwrOrig'] . ".TXT");
+			$localRwrPath = findNewestEMWIN(scandir_recursive($config['general']['emwinPath']), "RWR".$_GET['rwrOrig']);
 			if($localRwrPath == "") break;
 			
 			$localRwrArr = file($localRwrPath);
@@ -679,8 +682,11 @@ elseif($_GET['type'] == "weatherJSON")
 	$returnData['city'] = $currentSettings[$selectedProfile]['city'];
 	$returnData['state'] = $currentSettings[$selectedProfile]['stateAbbr'];
 	
+	//Get all EMWIN files for use later
+	$allEmwinFiles = scandir_recursive($config['general']['emwinPath']);
+	
 	//Current Weather Conditions
-	$data = file(findNewestEMWIN($config['general']['emwinPath']."/*RWR" . $currentSettings[$selectedProfile]['rwrOrig'] . ".TXT"));
+	$data = file(findNewestEMWIN($allEmwinFiles, "RWR".$currentSettings[$selectedProfile]['rwrOrig']));
 	$gotWeatherTime = false;
 	foreach($data as $thisLine)
 	{
@@ -749,10 +755,10 @@ elseif($_GET['type'] == "weatherJSON")
 	}
 	
 	//Regional Weather Summary, or current conditions in Area Forecast Discussion
-	$dataPath = findNewestEMWIN($config['general']['emwinPath']."/*RWS" . $currentSettings[$selectedProfile]['orig'] . ".TXT");
+	$dataPath = findNewestEMWIN($allEmwinFiles, "RWS".$currentSettings[$selectedProfile]['orig']);
 	if($dataPath == "")
 	{
-		$data = file(findNewestEMWIN($config['general']['emwinPath']."/*AFD" . $currentSettings[$selectedProfile]['orig'] . ".TXT"));
+		$data = file(findNewestEMWIN($allEmwinFiles, "AFD".$currentSettings[$selectedProfile]['orig']));
 		$dataBuffer = [];
 		$decodingLine = -1;
 		foreach($data as $rawLine)
@@ -785,7 +791,7 @@ elseif($_GET['type'] == "weatherJSON")
 	//7-day Forecast
 	$forcastData = [];
 	$decodingLine = -1;
-	$data = file(findNewestEMWIN($config['general']['emwinPath']."/*PFM" . $currentSettings[$selectedProfile]['orig'] . ".TXT"));
+	$data = file(findNewestEMWIN($allEmwinFiles, "PFM".$currentSettings[$selectedProfile]['orig']));
 	
 	foreach($data as $rawLine)
 	{
@@ -804,7 +810,7 @@ elseif($_GET['type'] == "weatherJSON")
 	//Check if data was found in this file. If not, switch to AFM
 	if($decodingLine == -1)
 	{
-		$data = file(findNewestEMWIN($config['general']['emwinPath']."/*AFM" . $currentSettings[$selectedProfile]['orig'] . ".TXT"));
+		$data = file(findNewestEMWIN($allEmwinFiles, "AFM".$currentSettings[$selectedProfile]['orig']));
 		foreach($data as $rawLine)
 		{
 			$thisLine = trim($rawLine);
@@ -910,7 +916,7 @@ elseif($_GET['type'] == "weatherJSON")
 	for($i = 0; $i < count($returnData['sevenDayForcast']); $i++) $returnData['sevenDayForcast'][$i]['date'] = date("l, M j", strtotime("+$i day", strtotime(preg_split("/\s{2,}/", $dateLine)[1])));
 	
 	//Text Forecast
-	$data = file(findNewestEMWIN($config['general']['emwinPath']."/*ZFP" . $currentSettings[$selectedProfile]['orig'] . ".TXT"));
+	$data = file(findNewestEMWIN($allEmwinFiles, "ZFP".$currentSettings[$selectedProfile]['orig']));
 	$returnData['alert'] = "";
 	$returnData['forecast'] = [];
 	$decodingLine = -1;

@@ -36,7 +36,7 @@ function scandir_recursive($dir, &$results = array())
 	{
 		if($currentFile == '.' or $currentFile == '..') continue;
 		
-		$path = realpath($dir . DIRECTORY_SEPARATOR . $currentFile);
+		$path = $dir . DIRECTORY_SEPARATOR . $currentFile;
 		if(is_dir($path)) scandir_recursive($path, $results);
         else $results[] = $path;
 	}
@@ -72,19 +72,21 @@ function sortABI($a, $b)
 	return strcmp(basename($a), basename($b));
 }
 
-function findNewestEMWIN($glob)
+function findNewestEMWIN($allEmwinFiles, $product)
 {
-	$candidateFiles = glob($glob);
 	$highestImage = 0;
 	$path = "";
 	
-	foreach($candidateFiles as $thisCandidate)
+	foreach($allEmwinFiles as $thisFile)
 	{
-		$fileNameParts = explode("_", $thisCandidate);
-		if($fileNameParts[4] > $highestImage)
+		if(strpos($thisFile, $product) !== false)
 		{
-			$path = $thisCandidate;
-			$highestImage = $fileNameParts[4];
+			$fileNameParts = explode("_", basename($thisFile));
+			if($fileNameParts[4] > $highestImage)
+			{
+				$path = $thisFile;
+				$highestImage = $fileNameParts[4];
+			}
 		}
 	}
 	
