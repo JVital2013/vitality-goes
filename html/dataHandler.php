@@ -284,19 +284,39 @@ elseif($_GET['type'] == "metadata")
 				//Get all emwin files
 				$allEmwinFiles = scandir_recursive($config['general']['emwinPath']);
 				
+				//Load pertinent pieces of information where for cards with all available information
+				$spaceWeatherMessages = $radarOutages = $adminAlertList = $adminRegionalList = [];
+				foreach($allEmwinFiles as $thisFile)
+				{
+					if(strpos($thisFile, "-ALT") !== false || strpos($thisFile, "-WAT") !== false) $spaceWeatherMessages[] = $thisFile;
+					if(strpos($thisFile, "-FTM") !== false) $radarOutages[] = $thisFile;
+					if(strpos($thisFile, "-ADA") !== false) $adminAlertList[] = $thisFile;
+					if(strpos($thisFile, "-ADR") !== false) $adminRegionalList[] = $thisFile;
+				}
+				
 				//Space Weather Messages
-				$spaceWeatherMessages = glob($config['general']['emwinPath']."/*-{ALT,WAT}*.TXT", GLOB_BRACE);
 				usort($spaceWeatherMessages, "sortEMWIN");
 				$metadata['spaceWeatherMessages'] = [];
 				if(count($spaceWeatherMessages) == 0) $metadata['spaceWeatherMessages'][] = "<div style='text-align: center; font-weight: bold; font-size: 13pt;'>No Messages</div>";
 				foreach($spaceWeatherMessages as $spaceWeatherMessage) $metadata['spaceWeatherMessages'][] = linesToParagraphs(file($spaceWeatherMessage), 3);
 				
 				//Radar Outages
-				$radarOutages = glob($config['general']['emwinPath']."/*-FTM*$alertStateAbbrs.TXT", GLOB_BRACE);
 				usort($radarOutages, "sortEMWIN");
 				$metadata['radarOutages'] = [];
 				if(count($radarOutages) == 0) $metadata['radarOutages'][] = "<div style='text-align: center; font-weight: bold; font-size: 13pt;'>No Messages</div>";
 				foreach($radarOutages as $radarOutage) $metadata['radarOutages'][] = linesToParagraphs(file($radarOutage), 3);
+				
+				//EMWIN Administrative Alerts
+				usort($adminAlertList, "sortEMWIN");
+				$metadata['adminAlerts'] = [];
+				if(count($adminAlertList) == 0) $metadata['adminAlerts'][] = "<div style='text-align: center; font-weight: bold; font-size: 13pt;'>No Alerts</div>";
+				foreach($adminAlertList as $adminAlert) $metadata['adminAlerts'][] = linesToParagraphs(file($adminAlert), 3);
+				
+				//EMWIN Administrative (Regional)
+				usort($adminRegionalList, "sortEMWIN");
+				$metadata['adminRegional'] = [];
+				if(count($adminRegionalList) == 0) $metadata['adminRegional'][] = "<div style='text-align: center; font-weight: bold; font-size: 13pt;'>No Alerts</div>";
+				foreach($adminRegionalList as $adminRegional) $metadata['adminRegional'][] = linesToParagraphs(file($adminRegional), 4);
 				
 				//Satellite TLE
 				$latestTleFile = findNewestEmwin($allEmwinFiles, "EPHTWOUS");
@@ -305,20 +325,6 @@ elseif($_GET['type'] == "metadata")
 				for($i = 0; $i < count($latestTleArray); $i += 3) $metadata['satelliteTle'][] = trim($latestTleArray[$i]);
 				sort($metadata['satelliteTle']);
 				$metadata['satelliteTleDate'] = date("M d, Y Hi", findMetadataEMWIN($allEmwinFiles, $latestTleFile, "")[0]['timestamp']) . " " . $DateTime->format('T');
-				
-				//EMWIN Administrative Alerts
-				$adminAlertList = glob($config['general']['emwinPath']."/*-ADA*.TXT");
-				usort($adminAlertList, "sortEMWIN");
-				$metadata['adminAlerts'] = [];
-				if(count($adminAlertList) == 0) $metadata['adminAlerts'][] = "<div style='text-align: center; font-weight: bold; font-size: 13pt;'>No Alerts</div>";
-				foreach($adminAlertList as $adminAlert) $metadata['adminAlerts'][] = linesToParagraphs(file($adminAlert), 3);
-				
-				//EMWIN Administrative (Regional)
-				$adminRegionalList = glob($config['general']['emwinPath']."/*-ADR*.TXT");
-				usort($adminRegionalList, "sortEMWIN");
-				$metadata['adminRegional'] = [];
-				if(count($adminRegionalList) == 0) $metadata['adminRegional'][] = "<div style='text-align: center; font-weight: bold; font-size: 13pt;'>No Alerts</div>";
-				foreach($adminRegionalList as $adminRegional) $metadata['adminRegional'][] = linesToParagraphs(file($adminRegional), 4);
 				
 				//EMWIN License
 				$emwinLicenseFile = findNewestEmwin($allEmwinFiles, "FEEBAC1S");
@@ -337,9 +343,10 @@ elseif($_GET['type'] == "metadata")
 			if(array_key_exists('adminPath', $config['general']) &&  is_dir($config['general']['adminPath']))
 			{
 				//Admin update
-				$lastAdminFilename = scandir($config['general']['adminPath'], SCANDIR_SORT_DESCENDING)[0];
-				$metadata['latestAdminDate'] = date("M d, Y Hi", strtotime(explode("_", $lastAdminFilename)[0])) . " " . $DateTime->format('T');
-				$metadata['latestAdmin'] = str_replace("?", "-", utf8_decode(file_get_contents($config['general']['adminPath']."/$lastAdminFilename")));
+				$allAdminFiles = scandir_recursive($config['general']['adminPath']);
+				usort($allAdminFiles, "sortABI");
+				$metadata['latestAdminDate'] = date("M d, Y Hi", strtotime(explode("_", basename($allAdminFiles[count($allAdminFiles) - 1]))[0])) . " " . $DateTime->format('T');
+				$metadata['latestAdmin'] = str_replace("?", "-", utf8_decode(file_get_contents($allAdminFiles[count($allAdminFiles) - 1])));
 			}
 			
 			break;

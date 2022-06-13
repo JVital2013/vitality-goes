@@ -34,10 +34,9 @@ function scandir_recursive($dir, &$results = array())
 	while(($currentFile = readdir($dirHandle)) !== false)
 	{
 		if($currentFile == '.' or $currentFile == '..') continue;
-		
 		$path = $dir . DIRECTORY_SEPARATOR . $currentFile;
 		if(is_dir($path)) scandir_recursive($path, $results);
-        else $results[] = $path;
+		else $results[] = $path;
 	}
 	closedir($dirHandle);
 	
