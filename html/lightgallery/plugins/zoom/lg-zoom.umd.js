@@ -278,19 +278,12 @@
             var offsetY = this.containerRect.height / 2 +
                 this.containerRect.top +
                 this.scrollTop;
-            // (this.containerRect.height -
-            //     this.imageYSize -
-            //     topBottomSpacing * this.modifierX) /
-            //     2 +
-            // this.scrollTop +
-            // this.containerRect.top;
             var originalX;
             var originalY;
             if (scale === 1) {
                 this.positionChanged = false;
             }
             var dragAllowedAxises = this.getDragAllowedAxises(scale);
-            console.log('dragAllowedAxises', dragAllowedAxises);
             var allowY = dragAllowedAxises.allowY, allowX = dragAllowedAxises.allowX;
             if (this.positionChanged) {
                 originalX = this.left / this.scale;
@@ -304,12 +297,8 @@
             var _y = offsetY - this.pageY;
             var x = (scale - 1) * _x;
             var y = (scale - 1) * _y;
-            console.log('possibleSwipeCords', possibleSwipeCords);
-            console.log('y', y);
             if (allowX) {
-                console.log('allox x');
                 if (this.isBeyondPossibleLeft(x, possibleSwipeCords.minX)) {
-                    console.log('allox x min');
                     x = possibleSwipeCords.minX;
                 }
                 else if (this.isBeyondPossibleRight(x, possibleSwipeCords.maxX)) {
@@ -317,41 +306,32 @@
                 }
             }
             else {
-                console.log('!allox');
                 if (scale > 1) {
                     if (x < possibleSwipeCords.minX) {
-                        console.log('!allox x min');
                         x = possibleSwipeCords.minX;
                     }
                     else if (x > possibleSwipeCords.maxX) {
-                        console.log('!allox x max');
                         x = possibleSwipeCords.maxX;
                     }
                 }
             }
             // @todo fix this
             if (allowY) {
-                console.log('alloy y');
                 if (this.isBeyondPossibleTop(y, possibleSwipeCords.minY)) {
-                    console.log('alloy y min');
                     y = possibleSwipeCords.minY;
                 }
                 else if (this.isBeyondPossibleBottom(y, possibleSwipeCords.maxY)) {
-                    console.log('alloy y max');
                     y = possibleSwipeCords.maxY;
                 }
             }
             else {
                 // If the translate value based on index of beyond the viewport, utilize the available space to prevent image being cut out
                 if (scale > 1) {
-                    console.log('!alloy y');
                     //If image goes beyond viewport top, use the minim possible translate value
                     if (y < possibleSwipeCords.minY) {
-                        console.log('!alloy y min');
                         y = possibleSwipeCords.minY;
                     }
                     else if (y > possibleSwipeCords.maxY) {
-                        console.log('!alloy y max');
                         y = possibleSwipeCords.maxY;
                     }
                 }
@@ -361,38 +341,6 @@
                 y: y,
                 scale: scale,
             }, possibleSwipeCords, dragAllowedAxises);
-            // if (scale === actualSizeScale) {
-            //     setTimeout(() => {
-            //         if (possibleSwipeCords) {
-            //             this.previousScale = scale;
-            //             const $image = this.core
-            //                 .getSlideItem(this.core.index)
-            //                 .find('.lg-image')
-            //                 .first();
-            //             $image.addClass('reset-transition');
-            //             setTimeout(() => {
-            //                 if (allowX) {
-            //                     x = Math.abs(possibleSwipeCords.minX);
-            //                 } else {
-            //                     x = Math.abs(possibleSwipeCords.minX)
-            //                 }
-            //                 if (allowY) {
-            //                     const { top } = this.core.mediaContainerPosition;
-            //                     y = Math.abs(possibleSwipeCords.minY) - top;
-            //                 }
-            //                 $image
-            //                     .css('maxHeight', 'none')
-            //                     .css('maxWidth', 'none')
-            //                     .css(
-            //                         'transform',
-            //                         `translate3d(${Math.abs(x)}px, ${Math.abs(
-            //                             y,
-            //                         )}px, 0px)`,
-            //                     );
-            //             }, 10);
-            //         }
-            //     }, 600);
-            // }
         };
         Zoom.prototype.resetImageTranslate = function () {
             var $image = this.core
@@ -417,17 +365,6 @@
             }, 500);
             setTimeout(function () {
                 var dragAllowedAxises = _this.getDragAllowedAxises(_this.scale);
-                // const translateX = dragAllowedAxises.allowX ? 50 : 0;
-                // const translateY = dragAllowedAxises.allowY ? 50 : 0;
-                // const resetTransformStyle = `scale3d(1, 1, 1) translate3d(-${translateX}%, -${translateY}%, 0px)`;
-                // const leftStyle = `${translateX}%`;
-                // const topStyle = `${translateY}%`;
-                // $image
-                //     .css('width', ($image.get() as any).naturalWidth + 'px')
-                //     .css('height', ($image.get() as any).naturalHeight + 'px')
-                //     .css('transform', resetTransformStyle)
-                //     .css('left', leftStyle)
-                //     .css('top', topStyle);
                 $image
                     .css('width', $image.get().naturalWidth + 'px')
                     .css('height', $image.get().naturalHeight + 'px');
@@ -1082,4 +1019,3 @@
     return Zoom;
 
 })));
-//# sourceMappingURL=lg-zoom.umd.js.map
