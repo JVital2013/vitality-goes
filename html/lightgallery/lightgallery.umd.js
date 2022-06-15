@@ -950,7 +950,7 @@
                 console.error('Please provide a valid license key');
             }
             else if (this.settings.licenseKey === '0000-0000-000-0000') {
-                console.warn("lightGallery: " + this.settings.licenseKey + " license key is not valid for production use");
+                //console.warn("lightGallery: " + this.settings.licenseKey + " license key is not valid for production use");
             }
         };
         LightGallery.prototype.getSlideItem = function (index) {
@@ -2655,4 +2655,3 @@
     return lightGallery;
 
 })));
-//# sourceMappingURL=lightgallery.umd.js.map
