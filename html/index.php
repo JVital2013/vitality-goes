@@ -19,8 +19,8 @@
 		<link href="splashscreens/iphonex_splash.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" rel="apple-touch-startup-image" />
 		<link href="splashscreens/iphonexr_splash.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
 		<link href="splashscreens/iphonexsmax_splash.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)" rel="apple-touch-startup-image" />
-		<script src='/lightgallery/lightgallery.umd.js?v=6'></script>
-		<script src="/lightgallery/plugins/zoom/lg-zoom.umd.js?v=6"></script>
+		<script src='/lightgallery/lightgallery.umd.js'></script>
+		<script src="/lightgallery/plugins/zoom/lg-zoom.umd.js"></script>
 		<script src="/all.js"></script>
 		<script src='/script.js?v=20220527'></script>
 	</head>
