@@ -1,7 +1,7 @@
 <?php
 //Load External Functions
 require_once($_SERVER['DOCUMENT_ROOT'] . "/functions.php");
-$config = loadConfig();
+$config = loadConfig(); //TODO: Handle errors here
 
 //Load Current User Settings from Cookie
 $sendCookie = false;
@@ -284,10 +284,11 @@ elseif($_GET['type'] == "metadata")
 				
 				//Load pertinent pieces of information where for cards with all available information
 				$spaceWeatherMessages = $radarOutages = $adminAlertList = $adminRegionalList = [];
+				$alertStateAbbrs = "(" . implode('|', array_unique(array($currentSettings[$selectedProfile]['stateAbbr'], substr($currentSettings[$selectedProfile]['orig'], -2), substr($currentSettings[$selectedProfile]['rwrOrig'], -2)))) . ")";
 				foreach($allEmwinFiles as $thisFile)
 				{
 					if(strpos($thisFile, "-ALT") !== false || strpos($thisFile, "-WAT") !== false) $spaceWeatherMessages[] = $thisFile;
-					if(strpos($thisFile, "-FTM") !== false) $radarOutages[] = $thisFile;
+					if(preg_match("/-FTM.*$alertStateAbbrs\.TXT$/", $thisFile)) $radarOutages[] = $thisFile;
 					if(strpos($thisFile, "-ADA") !== false) $adminAlertList[] = $thisFile;
 					if(strpos($thisFile, "-ADR") !== false) $adminRegionalList[] = $thisFile;
 				}
