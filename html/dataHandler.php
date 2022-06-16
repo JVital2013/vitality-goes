@@ -351,6 +351,8 @@ elseif($_GET['type'] == "metadata")
 			break;
 			
 		case "sysInfo":
+			if(!$config['general']['showSysInfo']) die();
+			
 			//Kernel Info
 			$metadata['osVersion'] = trim(shell_exec("lsb_release -ds"));
 			$metadata['kernelVersion'] = php_uname('s') . " " . php_uname('r');
@@ -366,9 +368,10 @@ elseif($_GET['type'] == "metadata")
 			$metadata['uptime'] = intdiv($num, 24) . " days, " . $metadata['uptime'];
 			
 			//goestools info
+			$runningProcesses = shell_exec("ps acxo command");
+			$metadata['goesrecvStatus'] = (stripos($runningProcesses, "goesrecv") !== false ? "Running" : "<span style='color: red;'>Not Running</span>");
+			$metadata['goesprocStatus'] = (stripos($runningProcesses, "goesproc") !== false ? "Running" : "<span style='color: red;'>Not Running</span>");
 			$metadata['goestoolsVersion'] = explode(" ", str_replace("goesrecv -- ", "", explode(PHP_EOL, shell_exec("goesrecv --version"))[0]))[0];
-			$metadata['goesrecvStatus'] = ucfirst(trim(shell_exec("systemctl show -p SubState --value goesrecv")));
-			$metadata['goesprocStatus'] = ucfirst(trim(shell_exec("systemctl show -p SubState --value goesproc")));
 			
 			//CPU Load
 			$loadAvg = sys_getloadavg();
