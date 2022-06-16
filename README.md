@@ -39,7 +39,9 @@ There are different ways to set up the Vitality GOES server. No matter the metho
 
 It is recommended that you host Vitality GOES on your ground station itself for the most up-to-date information and to simplify setup/maintenance. If you choose, it can be hosted on another machine if you have a sync process set up between the ground station and the Vitality GOES server. *Syncing received images from another machine is outside the scope of Vitality GOES.*
 
-It is recommended that you use a Debian-based Linux distro to host the Vitality GOES server. Something like Raspberry Pi OS, Ubuntu, or Debian is preferred. Windows-hosted Vitality GOES runs slower than it does when hosted on Linux - displaying EMWIN information can be extremely slow, but other parts of the software are more usable. See [this issue for more](https://github.com/JVital2013/vitality-goes/issues/2).
+It is recommended that you use a Debian-based Linux distro to host the Vitality GOES server. Something like Raspberry Pi OS, Ubuntu, or Debian is preferred.
+
+Windows-hosted Vitality GOES runs slower than it does when hosted on Linux, and your datastore must be kept on an NTFS partition if you want weather information to load at all. It's a known issue in PHP that file operations are slower on Windows, [and they marked it as "not a bug"](https://bugs.php.net/bug.php?id=80695&edit=1).
 
 If you enable the video rendering scripts, keep in mind that these scripts may take more power than a low-end machine, like a Raspberry Pi, can provide. You may need to offload these tasks to another machine or upgrade your server to something beefier. I'm using a laptop laptop with a 4th generation Core i5 processor, and it has more than enough power to run goestools, Vitality GOES, and all secondary scripts.
 
