@@ -608,7 +608,7 @@ elseif($_GET['type'] == "alertJSON")
 			for($i = 0; $i < count($weatherData); $i++)
 			{
 				//Get Header Information about weather warning, and beginning of message
-				if(strpos($weatherData[$i], "BULLETIN - ") === 0)
+				if(stripos($weatherData[$i], "BULLETIN - ") === 0)
 				{
 					$alertType = trim($weatherData[++$i]);
 					$issuingOffice = trim($weatherData[++$i]);
@@ -625,7 +625,7 @@ elseif($_GET['type'] == "alertJSON")
 				}
 				
 				//Get expiry time
-				if(strpos($weatherData[$i], "* Until") === 0)
+				if(stripos($weatherData[$i], "* Until") === 0)
 				{
 					//Convert issue time to something PHP can understand
 					$DateTime = new DateTime("now", new DateTimeZone(date_default_timezone_get()));
@@ -638,7 +638,7 @@ elseif($_GET['type'] == "alertJSON")
 				}
 				
 				//Get geofencing of warning
-				if(strpos($weatherData[$i], "LAT...LON") === 0)
+				if(stripos($weatherData[$i], "LAT...LON") === 0)
 				{
 					$nextString = trim(str_replace("LAT...LON", "", $weatherData[$i]));
 					$geoLat = [];
@@ -654,7 +654,7 @@ elseif($_GET['type'] == "alertJSON")
 						
 						//Get next line of geofence (if any)
 						$nextString = trim($weatherData[++$i]);
-						if(strpos($nextString, "TIME...MOT...LOC") === 0 || trim($nextString) == "&&") break 2;
+						if(stripos($nextString, "TIME...MOT...LOC") === 0 || trim($nextString) == "&&") break 2;
 					}
 				}
 			}
@@ -695,7 +695,7 @@ elseif($_GET['type'] == "weatherJSON")
 			$gotWeatherTime = true;
 		}
 		
-		if(strpos($thisLine, $currentSettings[$selectedProfile]['city']) === 0)
+		if(stripos($thisLine, $currentSettings[$selectedProfile]['city']) === 0)
 		{
 			$returnData['weatherDesc'] = trim(substr($thisLine, 15, 10));
 			if($returnData['weatherDesc'] == "NOT AVBL")
@@ -794,7 +794,7 @@ elseif($_GET['type'] == "weatherJSON")
 	foreach($data as $rawLine)
 	{
 		$thisLine = trim($rawLine);
-		if(strpos($thisLine, $currentSettings[$selectedProfile]['wxZone']) === 0)
+		if(stripos($thisLine, $currentSettings[$selectedProfile]['wxZone']) === 0)
 		{
 			$decodingLine = 0;
 			continue;
@@ -812,7 +812,7 @@ elseif($_GET['type'] == "weatherJSON")
 		foreach($data as $rawLine)
 		{
 			$thisLine = trim($rawLine);
-			if(strpos($thisLine, $currentSettings[$selectedProfile]['wxZone']) === 0)
+			if(stripos($thisLine, $currentSettings[$selectedProfile]['wxZone']) === 0)
 			{
 				$decodingLine = 0;
 				continue;
@@ -866,14 +866,14 @@ elseif($_GET['type'] == "weatherJSON")
 		if(stripos($thisLine, "Avg Clouds") === 0) $forecastClouds = array_merge($forecastClouds, parseFmLine($thisLine, $forecastLTBreaks));
 		
 		//Probability of Precipitation
-		if(strpos($thisLine, "PoP 12hr") === 0) $forecastPop = array_merge($forecastPop, parseFmLine($thisLine, $forecastLTBreaks));
+		if(stripos($thisLine, "PoP 12hr") === 0) $forecastPop = array_merge($forecastPop, parseFmLine($thisLine, $forecastLTBreaks));
 		
 		//Relative Humidity and Dewpoint (for calculating RH in days 4-7)
 		if(stripos($thisLine, "RH") === 0) $forecastRh = parseFmLine($thisLine, $forecastLTBreaks);
 		if(stripos($thisLine, "Dewpt") === 0 && count($forecastRh) > 0) $forecastDewpt = parseFmLine($thisLine, $forecastLTBreaks);
 		
 		//6-Hour Temps (Days 4-7 for calculating RH Only)
-		if(strpos($thisLine, "Temp") === 0)
+		if(stripos($thisLine, "Temp") === 0)
 		{
 			if($skippedTemp) $forecastTemp = parseFmLine($thisLine, $forecastLTBreaks);
 			$skippedTemp = !$skippedTemp;
@@ -922,7 +922,7 @@ elseif($_GET['type'] == "weatherJSON")
 	foreach($data as $rawLine)
 	{
 		$thisLine = trim($rawLine);
-		if(strpos($thisLine, $currentSettings[$selectedProfile]['wxZone']) === 0)
+		if(stripos($thisLine, $currentSettings[$selectedProfile]['wxZone']) === 0)
 		{
 			$decodingLine = 0;
 			continue;
