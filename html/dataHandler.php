@@ -3,6 +3,9 @@
 require_once($_SERVER['DOCUMENT_ROOT'] . "/functions.php");
 $config = loadConfig(); //TODO: Handle errors here
 
+//Only display errors if set to in the config
+ini_set("display_errors", ($config['general']['debug'] ? "On" : "Off"));
+
 //Load Current User Settings from Cookie
 $sendCookie = false;
 if(array_key_exists('currentSettings', $_COOKIE))

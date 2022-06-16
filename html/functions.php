@@ -2,7 +2,8 @@
 function loadConfig()
 {
 	$config = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini", true, INI_SCANNER_RAW);
-	$config['general']['showSysInfo'] = $config['general']['showSysInfo'] == "true";
+	$config['general']['showSysInfo'] = (stripos($config['general']['showSysInfo'], "true") !== false);
+	$config['general']['debug'] = (stripos($config['general']['debug'], "true") !== false);
 	$config['abi'] = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/abi.ini", true, INI_SCANNER_RAW);
 	$config['meso'] = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/meso.ini", true, INI_SCANNER_RAW);
 	$config['l2'] = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/l2.ini", true, INI_SCANNER_RAW);
