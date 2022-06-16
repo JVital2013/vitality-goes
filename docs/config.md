@@ -19,6 +19,7 @@ This is the main config file. It will likely need configured when you first depl
 * `emwinPath`: Point to the emwin repository of your choice. If you're picking up both GOES West and East, you can use either EMWIN locaiton. Comment this line out to completely disable emwin data (text and images)
 * `adminPath`: The directory with admin text you want to display. Goestools must be patched with [this patch anyway for it to show up](https://github.com/pietern/goestools/pull/105/files), so comment it to disable.
 * `showSysInfo`: True if on the same system as goestools. Otherwise, set it to false
+* `debug`: Set to true to enable PHP errors. This breaks the AJAX requests within Vitality GOES if there are any errors, so only set this to true if you're debugging data returned by the DataHandler (advanced users only).
 
 ### Paths
 The Paths section is unnecessary, but it is recommended that you set up a path for each satellite you're receiving. Each path defined in this section creates a variable that can be used in the abi, meso, and l2 ini files. 
