@@ -103,7 +103,7 @@ Assuming you're on a Debian/Ubuntu-based server, the following commands command 
 ```
 sudo apt update
 sudo apt upgrade
-sudo apt install apache2 php libapache2-mod-php lm-sensors
+sudo apt install apache2 php libapache2-mod-php
 ```
 
 #### Windows
