@@ -389,14 +389,17 @@ function menuSelect(menuNumber)
 				//Render Weather Card
 				target = document.getElementById("currentWeatherCardBody");
 				target.previousSibling.innerHTML += " - " + toTitleCase(weatherInfo.city) + ", " + weatherInfo.state;
-				target.innerHTML = "<div class='weatherLeft'>Weather</div><div class='weatherRight'>" + conditions + "</div><div style='clear: both;'>";
-				target.innerHTML += "<div class='weatherLeft'>Temperature</div><div class='weatherRight'>" + weatherInfo.temp + "&deg; F</div><div style='clear: both;'>";
-				target.innerHTML += "<div class='weatherLeft'>Humidity</div><div class='weatherRight'>" + weatherInfo.humidity + " %</div><div style='clear: both;'>";
-				target.innerHTML += "<div class='weatherLeft'>Dew Point</div><div class='weatherRight'>" + weatherInfo.dewPoint + "&deg; F</div><div style='clear: both;'>";
-				target.innerHTML += "<div class='weatherLeft'>Barometric Pressure</div><div class='weatherRight'>" + weatherInfo.pressure + "</div><div style='clear: both;'>";
-				target.innerHTML += "<div class='weatherLeft'>Wind</div><div class='weatherRight'>" + (weatherInfo.wind == 0 ? "" : weatherInfo.windDirection + ", ") + weatherInfo.wind + " MPH</div><div style='clear: both;'>";
-				target.innerHTML += "<div class='weatherLeft'>Wind Gust</div><div class='weatherRight'>" + weatherInfo.windGust + "</div><div style='clear: both;'>";
-				target.innerHTML += "<div class='weatherLeft'>Remarks</div><div class='weatherRight'>" + (weatherInfo.remarks == "" ? "N/A" : weatherInfo.remarks) + "</div><div style='clear: both;'>";
+				target.innerHTML = "";
+				
+				renderTempsLine(target, "Weather", conditions);
+				renderTempsLine(target, "Temperature", weatherInfo.temp + "&deg; F");
+				renderTempsLine(target, "Humidity", weatherInfo.humidity + "%");
+				renderTempsLine(target, "Dew Point", weatherInfo.dewPoint + "&deg; F");
+				renderTempsLine(target, "Barometric Pressure", weatherInfo.pressure);
+				renderTempsLine(target, "Wind", (weatherInfo.wind == 0 ? "" : weatherInfo.windDirection + ", ") + weatherInfo.wind + " MPH");
+				if(weatherInfo.windGust != "N/A") renderTempsLine(target, "Wind Gust", weatherInfo.windGust);
+				if(weatherInfo.remarks != "") renderTempsLine(target, "Remarks", weatherInfo.remarks);
+				
 				target.innerHTML += "<div class='goeslabel'>Last Update: " + weatherInfo.weatherTime + "</div>";
 				
 				//Weather Summary
