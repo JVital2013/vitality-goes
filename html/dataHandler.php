@@ -589,7 +589,7 @@ elseif($_GET['type'] == "settings")
 					$currentlyDecoding = true;
 					continue;
 				}
-				if(stripos($thisLine, "$$") === 0)
+				if(strpos($thisLine, "$$") === 0 || stripos($thisLine, "STATION/POSITION") === 0)
 				{
 					$currentlyDecoding = false;
 					continue;
