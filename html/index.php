@@ -22,7 +22,7 @@
 		<script src='/lightgallery/lightgallery.umd.js'></script>
 		<script src="/lightgallery/plugins/zoom/lg-zoom.umd.js"></script>
 		<script src="/all.js"></script>
-		<script src='/script.js?v=20220616'></script>
+		<script src='/script.js?v=20220616a'></script>
 	</head>
 	<body>
 		<div class='topBar'>
