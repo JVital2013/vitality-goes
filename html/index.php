@@ -8,8 +8,8 @@
 		<meta name="apple-mobile-web-app-capable" content="yes">
 
 		<link rel="apple-touch-icon" href="/icon-512x512.png">
-		<link rel="manifest" href="/manifest.json?v=20220529">
-		<link rel="stylesheet" href="/styles.css?v=20220527">
+		<link rel="manifest" href="/manifest.json?v=20220616">
+		<link rel="stylesheet" href="/styles.css?v=20220616">
 		<link rel="stylesheet" href="/opensans.css">
 		<link rel="stylesheet" href="/lightgallery/css/lightgallery.css?v=6">
 		<link rel="stylesheet" href="/lightgallery/css/lg-zoom.css?v=6">
@@ -22,7 +22,7 @@
 		<script src='/lightgallery/lightgallery.umd.js'></script>
 		<script src="/lightgallery/plugins/zoom/lg-zoom.umd.js"></script>
 		<script src="/all.js"></script>
-		<script src='/script.js?v=20220527'></script>
+		<script src='/script.js?v=20220616'></script>
 	</head>
 	<body>
 		<div class='topBar'>

@@ -406,15 +406,41 @@ elseif($_GET['type'] == "metadata")
 			if(file_exists("/sys/class/power_supply/BAT0/capacity")) $metadata['batteryPercentage'] = trim(file_get_contents("/sys/class/power_supply/BAT0/capacity"));
 			
 			//System Temps
-			$tempdata = JSON_decode(shell_exec("sensors -j"));
-			$metadata['cpuPackage'] = $tempdata->{'coretemp-isa-0000'}->{'Package id 0'}->temp1_input;
-			$metadata['core0'] = $tempdata->{'coretemp-isa-0000'}->{'Core 0'}->temp2_input;
-			$metadata['core1'] = $tempdata->{'coretemp-isa-0000'}->{'Core 1'}->temp3_input;
-			$metadata['core2'] = $tempdata->{'coretemp-isa-0000'}->{'Core 2'}->temp4_input;
-			$metadata['core3'] = $tempdata->{'coretemp-isa-0000'}->{'Core 3'}->temp5_input;
-			$metadata['wifi'] = $tempdata->{'iwlwifi_1-virtual-0'}->temp1->temp1_input;
-			$metadata['fan'] = $tempdata->{'dell_smm-virtual-0'}->{'Processor Fan'}->fan1_input;
-			$metadata['chipset'] = $tempdata->{'pch_skylake-virtual-0'}->temp1->temp1_input;
+			$hwmonDirs = scandir("/sys/class/hwmon/");
+			$metadata['tempData'] = [];
+			foreach($hwmonDirs as $thisHwmon)
+			{
+				if($thisHwmon == "." || $thisHwmon == "..") continue;
+				$thisDevicesSensors = glob("/sys/class/hwmon/" . $thisHwmon . "/{temp,fan}*_input", GLOB_BRACE);
+				if(count($thisDevicesSensors) == 0) continue;
+				
+				$tempBaseName = ucfirst(str_replace("_", " ", trim(file_get_contents("/sys/class/hwmon/" . $thisHwmon . "/name"))));
+				$tempCount = $fanCount = 1;
+				foreach($thisDevicesSensors as $thisSensor)
+				{
+					$metadata['tempData'][] = [];
+					
+					if(strpos($thisSensor, "temp") !== false)
+					{
+						if(file_exists(str_replace("input", "label", $thisSensor))) $thisSensorName = trim(file_get_contents(str_replace("input", "label", $thisSensor))) . " Temp";
+						else $thisSensorName = "$tempBaseName Temp" . (count($thisDevicesSensors) > 1 ? " $tempCount" : "");
+						
+						$metadata['tempData'][count($metadata['tempData']) - 1]['name'] = $thisSensorName;
+						$metadata['tempData'][count($metadata['tempData']) - 1]['value'] = intval(trim(file_get_contents($thisSensor))) / 1000 . "&deg; C";
+						$tempCount++;
+					}
+					
+					else
+					{
+						if(file_exists(str_replace("input", "label", $thisSensor))) $thisSensorName = trim(file_get_contents(str_replace("input", "label", $thisSensor)));
+						else $thisSensorName = "$tempBaseName Fan" . (count($thisDevicesSensors) > 1 ? " $fanCount" : "");
+						
+						$metadata['tempData'][count($metadata['tempData']) - 1]['name'] = $thisSensorName . " Speed";
+						$metadata['tempData'][count($metadata['tempData']) - 1]['value'] = trim(file_get_contents($thisSensor)) . " RPM";
+						$fanCount++;
+					}
+				}
+			}
 			break;
 			
 		default:

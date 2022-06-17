@@ -941,11 +941,8 @@ function menuSelect(menuNumber)
 					if("batteryPercentage" in sysInfo) renderTempsLine(target, "Battery", sysInfo['batteryPercentage'] + "%");
 
 					target = document.getElementById('sysTempCardBody');
-					target.innerHTML = "<div class='weatherLeft'>CPU Package</div><div class='weatherRight'>" + sysInfo['cpuPackage'] + " &deg;C</div><div style='clear: both;'>";
-					target.innerHTML += "<div class='weatherLeft'>CPU Core 1, 2, 3, 4</div><div class='weatherRight'>" + sysInfo['core0'] + ", " + sysInfo['core1'] + ", " + sysInfo['core2'] + ", " + sysInfo['core3'] + " &deg;C</div><div style='clear: both;'>";
-					target.innerHTML += "<div class='weatherLeft'>WiFi Adapter</div><div class='weatherRight'>" + sysInfo['wifi'] + " &deg;C</div><div style='clear: both;'>";
-					target.innerHTML += "<div class='weatherLeft'>Chipset</div><div class='weatherRight'>" + sysInfo['chipset'] + " &deg;C</div><div style='clear: both;'>";
-					target.innerHTML += "<div class='weatherLeft'>Fan Speed</div><div class='weatherRight'>" + sysInfo['fan'] + " RPM</div><div style='clear: both;'>";
+					target.innerHTML = "";
+					sysInfo.tempData.forEach((tempValue) => {renderTempsLine(target, tempValue.name, tempValue.value);});
 				}
 			}
 			
