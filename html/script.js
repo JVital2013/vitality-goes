@@ -597,35 +597,37 @@ function menuSelect(menuNumber)
 					
 					//Weather Satellite TLE
 					target = document.getElementById('satelliteTleContent').firstChild;
-					target.innerHTML = "<p style='font-weight: bold;'>TLEs for the following satellites are available from GOES</p>";
-					
-					otherEmwinInfo.satelliteTle.forEach((element) => {
-						newSatellite = document.createElement('div');
-						newSatellite.style.width = 'calc(49% - 10px)';
-						newSatellite.style.display = 'inline-block';
-						newSatellite.style.verticalAlign = 'top';
-						newSatellite.style.marginRight = '5px';
-						newSatellite.style.marginBottom = '5px';
-						newSatellite.innerHTML = "&#8226; " + element;
-						target.appendChild(newSatellite);
-					});
-					
-					downloadButtonHolder = document.createElement('div');
-					downloadButtonHolder.style.textAlign = 'center';
-					downloadButton = document.createElement('input');
-					downloadButton.type = 'button';
-					downloadButton.value = "Download TLE";
-					downloadButton.style.width = "50%";
-					downloadButton.style.minWidth = "120px";
-					downloadButton.style.marginBottom = "5px";
-					downloadButton.addEventListener('click', function(){window.location = '/dataHandler.php?type=tle';});
-					downloadButtonHolder.appendChild(downloadButton);
-					target.appendChild(downloadButtonHolder);
-					
-					satelliteTleLastUpdate = document.createElement('div');
-					satelliteTleLastUpdate.className = "goeslabel";
-					satelliteTleLastUpdate.innerHTML = "Last Broadcast: " + otherEmwinInfo.satelliteTleDate;
-					target.parentElement.appendChild(satelliteTleLastUpdate);
+					if(otherEmwinInfo.satelliteTle.length == 0) target.innerHTML = "<p style='font-weight: bold; text-align: center;'>Satellite TLEs are currently unavailable</p>";
+					else
+					{
+						otherEmwinInfo.satelliteTle.forEach((element) => {
+							newSatellite = document.createElement('div');
+							newSatellite.style.width = 'calc(49% - 10px)';
+							newSatellite.style.display = 'inline-block';
+							newSatellite.style.verticalAlign = 'top';
+							newSatellite.style.marginRight = '5px';
+							newSatellite.style.marginBottom = '5px';
+							newSatellite.innerHTML = "&#8226; " + element;
+							target.appendChild(newSatellite);
+						});
+						
+						downloadButtonHolder = document.createElement('div');
+						downloadButtonHolder.style.textAlign = 'center';
+						downloadButton = document.createElement('input');
+						downloadButton.type = 'button';
+						downloadButton.value = "Download TLE";
+						downloadButton.style.width = "50%";
+						downloadButton.style.minWidth = "120px";
+						downloadButton.style.marginBottom = "5px";
+						downloadButton.addEventListener('click', function(){window.location = '/dataHandler.php?type=tle';});
+						downloadButtonHolder.appendChild(downloadButton);
+						target.appendChild(downloadButtonHolder);
+						
+						satelliteTleLastUpdate = document.createElement('div');
+						satelliteTleLastUpdate.className = "goeslabel";
+						satelliteTleLastUpdate.innerHTML = "Last Broadcast: " + otherEmwinInfo.satelliteTleDate;
+						target.parentElement.appendChild(satelliteTleLastUpdate);
+					}
 					
 					//EMWIN Licensing Info
 					target = document.getElementById('emwinLicenseContent').firstChild;

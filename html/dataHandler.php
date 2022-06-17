@@ -322,11 +322,14 @@ elseif($_GET['type'] == "metadata")
 				
 				//Satellite TLE
 				$latestTleFile = findNewestEmwin($allEmwinFiles, "EPHTWOUS");
-				$latestTleArray = file($latestTleFile);
 				$metadata['satelliteTle'] = [];
-				for($i = 0; $i < count($latestTleArray); $i += 3) $metadata['satelliteTle'][] = trim($latestTleArray[$i]);
-				sort($metadata['satelliteTle']);
-				$metadata['satelliteTleDate'] = date("M d, Y Hi", findMetadataEMWIN($allEmwinFiles, $latestTleFile, "")[0]['timestamp']) . " " . $DateTime->format('T');
+				if($latestTleFile != "")
+				{
+					$latestTleArray = file($latestTleFile);
+					for($i = 0; $i < count($latestTleArray); $i += 3) $metadata['satelliteTle'][] = trim($latestTleArray[$i]);
+					sort($metadata['satelliteTle']);
+					$metadata['satelliteTleDate'] = date("M d, Y Hi", findMetadataEMWIN($allEmwinFiles, $latestTleFile, "")[0]['timestamp']) . " " . $DateTime->format('T');
+				}
 				
 				//EMWIN License
 				$emwinLicenseFile = findNewestEmwin($allEmwinFiles, "FEEBAC1S");
