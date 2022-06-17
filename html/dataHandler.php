@@ -799,7 +799,7 @@ elseif($_GET['type'] == "weatherJSON")
 				continue;
 			}
 			if($decodingLine == -1) continue;
-			if(strpos($thisLine, "&&") === 0) break;
+			if(strpos($thisLine, "&&") === 0 || stripos($thisLine, ".LONG TERM...") === 0) break;
 			
 			if($decodingLine > 0) $dataBuffer[] = $thisLine;
 			else $dataBuffer[0] .= " ".$thisLine;
