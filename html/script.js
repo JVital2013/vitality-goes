@@ -183,7 +183,7 @@ function renderAlert(content, color)
 	//Extra Element to Help with Card Flow
 	mainContent.appendChild(document.createElement('div'));
 }
-function renderTempsLine(target, tempsName, tempsValue)
+function renderLeftRightLine(target, tempsName, tempsValue)
 {
 	nameSide = document.createElement('div');
 	nameSide.className = "weatherLeft";
@@ -391,14 +391,14 @@ function menuSelect(menuNumber)
 				target.previousSibling.innerHTML += " - " + toTitleCase(weatherInfo.city) + ", " + weatherInfo.state;
 				target.innerHTML = "";
 				
-				renderTempsLine(target, "Weather", conditions);
-				renderTempsLine(target, "Temperature", weatherInfo.temp + "&deg; F");
-				renderTempsLine(target, "Humidity", weatherInfo.humidity + "%");
-				renderTempsLine(target, "Dew Point", weatherInfo.dewPoint + "&deg; F");
-				renderTempsLine(target, "Barometric Pressure", weatherInfo.pressure);
-				renderTempsLine(target, "Wind", (weatherInfo.wind == 0 ? "" : weatherInfo.windDirection + ", ") + weatherInfo.wind + " MPH");
-				if(weatherInfo.windGust != "N/A") renderTempsLine(target, "Wind Gust", weatherInfo.windGust);
-				if(weatherInfo.remarks != "") renderTempsLine(target, "Remarks", weatherInfo.remarks);
+				renderLeftRightLine(target, "Weather", conditions);
+				renderLeftRightLine(target, "Temperature", weatherInfo.temp + "&deg; F");
+				renderLeftRightLine(target, "Humidity", weatherInfo.humidity + "%");
+				renderLeftRightLine(target, "Dew Point", weatherInfo.dewPoint + "&deg; F");
+				renderLeftRightLine(target, "Barometric Pressure", weatherInfo.pressure);
+				renderLeftRightLine(target, "Wind", (weatherInfo.wind == 0 ? "" : weatherInfo.windDirection + ", ") + weatherInfo.wind + " MPH");
+				if(weatherInfo.windGust != "N/A") renderLeftRightLine(target, "Wind Gust", weatherInfo.windGust);
+				if(weatherInfo.remarks != "") renderLeftRightLine(target, "Remarks", weatherInfo.remarks);
 				
 				target.innerHTML += "<div class='goeslabel'>Last Update: " + weatherInfo.weatherTime + "</div>";
 				
@@ -435,9 +435,9 @@ function menuSelect(menuNumber)
 						forcastCard.innerHTML += "<div style='height: 10px;'></div>";
 					}
 					
-					if("maxTemp" in todaysForcast) forcastCard.innerHTML += "<div class='weatherLeft'>High</div><div class='weatherRight'>" + todaysForcast.maxTemp + "&deg; F</div><div style='clear: both;'></div>";
-					if("amPrecip" in todaysForcast) forcastCard.innerHTML += "<div class='weatherLeft'>Precipitation</div><div class='weatherRight'>" + todaysForcast.amPrecip + "%</div><div style='clear: both;'></div>";
-					if("amHumidity" in todaysForcast) forcastCard.innerHTML += "<div class='weatherLeft'>Humidity</div><div class='weatherRight'>" + todaysForcast.amHumidity + "%</div><div style='clear: both;'></div>";
+					if("maxTemp" in todaysForcast) renderLeftRightLine(forcastCard, "High", todaysForcast.maxTemp + "&deg; F");
+					if("amPrecip" in todaysForcast) renderLeftRightLine(forcastCard, "Precipitation", todaysForcast.amPrecip + "%");
+					if("amHumidity" in todaysForcast) renderLeftRightLine(forcastCard, "Humidity", todaysForcast.amHumidity + "%");
 					
 					if((("amClouds" in todaysForcast && "amPrecip" in todaysForcast) || "maxTemp" in todaysForcast || "amPrecip" in todaysForcast || "amHumidity" in todaysForcast) && (("pmClouds" in todaysForcast && "pmPrecip" in todaysForcast) || "minTemp" in todaysForcast || "pmPrecip" in todaysForcast || "pmHumidity" in todaysForcast)) forcastCard.innerHTML += "<div style='font-weight: bold; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #888888; margin-top: 25px;'>Evening</div>";
 					if("pmClouds" in todaysForcast && "pmPrecip" in todaysForcast)
@@ -459,9 +459,9 @@ function menuSelect(menuNumber)
 						forcastCard.innerHTML += "<div style='height: 10px;'></div>";
 					}
 					
-					if("minTemp" in todaysForcast) forcastCard.innerHTML += "<div class='weatherLeft'>Low</div><div class='weatherRight'>" + todaysForcast.minTemp + "&deg; F</div><div style='clear: both;'></div>";
-					if("pmPrecip" in todaysForcast) forcastCard.innerHTML += "<div class='weatherLeft'>Precipitation</div><div class='weatherRight'>" + todaysForcast.pmPrecip + "%</div><div style='clear: both;'></div>";
-					if("pmHumidity" in todaysForcast) forcastCard.innerHTML += "<div class='weatherLeft'>Humidity</div><div class='weatherRight'>" + todaysForcast.pmHumidity + "%</div><div style='clear: both;'></div>";
+					if("minTemp" in todaysForcast) renderLeftRightLine(forcastCard, "Low", todaysForcast.minTemp + "&deg; F");
+					if("pmPrecip" in todaysForcast) renderLeftRightLine(forcastCard, "Precipitation", todaysForcast.pmPrecip + "%");
+					if("pmHumidity" in todaysForcast) renderLeftRightLine(forcastCard, "Humidity", todaysForcast.pmHumidity + "%");
 					
 					sevenDayForcastContainer.appendChild(forcastCard);
 				});
@@ -731,27 +731,27 @@ function menuSelect(menuNumber)
 		generalSettingsHolder.className = 'prettyBoxList';
 		generalSettingsHolder.style.padding = 0;
 		generalSettingsHolder.style.paddingBottom = "10px";
-		generalSettingsHolder.innerHTML += "<div class='weatherLeft'>Timezone</div><div class='weatherRight'><select id='timezone'></select></div><div style='clear: both;'>";
-		generalSettingsHolder.innerHTML += "<div class='weatherLeft'>Radar Code</div><div class='weatherRight'><select id='radarCode'></select></div><div style='clear: both;'>";
-		generalSettingsHolder.innerHTML += "<div class='weatherLeft'>State/Territory</div><div class='weatherRight'><select id='stateAbbr'></select></div><div style='clear: both;'>";
-		generalSettingsHolder.innerHTML += "<div class='weatherLeft'>Latitude</div><div class='weatherRight'><input style='width: 40px;' type='text' id='lat' /></div><div style='clear: both;'>";
-		generalSettingsHolder.innerHTML += "<div class='weatherLeft'>Longitude</div><div class='weatherRight'><input style='width: 40px;' type='text' id='lon' /></div><div style='clear: both;'>";
+		renderLeftRightLine(generalSettingsHolder, "Timezone", "<select id='timezone'></select>");
+		renderLeftRightLine(generalSettingsHolder, "Radar Code", "<select id='radarCode'></select>");
+		renderLeftRightLine(generalSettingsHolder, "State/Territory", "<select id='stateAbbr'></select>");
+		renderLeftRightLine(generalSettingsHolder, "Latitude", "<input style='width: 40px;' type='text' id='lat' />");
+		renderLeftRightLine(generalSettingsHolder, "Longitude", "<input style='width: 40px;' type='text' id='lon' />");
 		target.appendChild(generalSettingsHolder);
 		
 		origSettingsHolder = document.createElement('div');
 		origSettingsHolder.className = 'prettyBoxList';
 		origSettingsHolder.style.padding = 0;
 		origSettingsHolder.style.paddingBottom = "10px";
-		origSettingsHolder.innerHTML += "<div class='weatherLeft'>NWS Office</div><div class='weatherRight'><select id='orig'></select></div><div style='clear: both;'>";
-		origSettingsHolder.innerHTML += "<div class='weatherLeft'>Weather Zone</div><div class='weatherRight'><select id='wxZone'></select></div><div style='clear: both;'>";
+		renderLeftRightLine(origSettingsHolder, "NWS Office", "<select id='orig'></select>");
+		renderLeftRightLine(origSettingsHolder, "Weather Zone", "<select id='wxZone'></select>");
 		target.appendChild(origSettingsHolder);
 		
 		rwrOrigSettingsHolder = document.createElement('div');
 		rwrOrigSettingsHolder.className = 'prettyBoxList';
 		rwrOrigSettingsHolder.style.padding = 0;
 		rwrOrigSettingsHolder.style.paddingBottom = "10px";
-		rwrOrigSettingsHolder.innerHTML += "<div class='weatherLeft'>NWS Office (Weather Roundup)</div><div class='weatherRight'><select id='rwrOrig'></select></div><div style='clear: both;'>";
-		rwrOrigSettingsHolder.innerHTML += "<div class='weatherLeft'>City</div><div class='weatherRight'><select id='city'></select></div><div style='clear: both;'>";
+		renderLeftRightLine(rwrOrigSettingsHolder, "NWS Office (Weather Roundup)", "<select id='rwrOrig'></select>");
+		renderLeftRightLine(rwrOrigSettingsHolder, "City", "<select id='city'></select>");
 		target.appendChild(rwrOrigSettingsHolder);
 		
 		document.getElementById('orig').addEventListener('change', function(evt) {getForecastZone(evt.target.value);});
@@ -929,20 +929,20 @@ function menuSelect(menuNumber)
 					target = document.getElementById('sysCardBody');
 					
 					target.innerHTML = "";
-					renderTempsLine(target, "OS Version", sysInfo['osVersion']);
-					renderTempsLine(target, "Kernel Version", sysInfo['kernelVersion']);
-					renderTempsLine(target, "Goestools Version", sysInfo['goestoolsVersion']);
-					renderTempsLine(target, "Uptime", sysInfo['uptime']);
-					renderTempsLine(target, "Goesrecv Status", sysInfo['goesrecvStatus']);
-					renderTempsLine(target, "CPU Load (1min, 5min, 15min)", sysInfo['cpuLoad']);
-					renderTempsLine(target, "Memory Used", sysInfo['memUsage']);
-					renderTempsLine(target, "Disk Used", sysInfo['diskUsage']);
-					if("powerStatus" in sysInfo) renderTempsLine(target, "Power Status", sysInfo['powerStatus']);
-					if("batteryPercentage" in sysInfo) renderTempsLine(target, "Battery", sysInfo['batteryPercentage'] + "%");
+					renderLeftRightLine(target, "OS Version", sysInfo['osVersion']);
+					renderLeftRightLine(target, "Kernel Version", sysInfo['kernelVersion']);
+					renderLeftRightLine(target, "Goestools Version", sysInfo['goestoolsVersion']);
+					renderLeftRightLine(target, "Uptime", sysInfo['uptime']);
+					renderLeftRightLine(target, "Goesrecv Status", sysInfo['goesrecvStatus']);
+					renderLeftRightLine(target, "CPU Load (1min, 5min, 15min)", sysInfo['cpuLoad']);
+					renderLeftRightLine(target, "Memory Used", sysInfo['memUsage']);
+					renderLeftRightLine(target, "Disk Used", sysInfo['diskUsage']);
+					if("powerStatus" in sysInfo) renderLeftRightLine(target, "Power Status", sysInfo['powerStatus']);
+					if("batteryPercentage" in sysInfo) renderLeftRightLine(target, "Battery", sysInfo['batteryPercentage'] + "%");
 
 					target = document.getElementById('sysTempCardBody');
 					target.innerHTML = "";
-					sysInfo.tempData.forEach((tempValue) => {renderTempsLine(target, tempValue.name, tempValue.value);});
+					sysInfo.tempData.forEach((tempValue) => {renderLeftRightLine(target, tempValue.name, tempValue.value);});
 				}
 			}
 			
