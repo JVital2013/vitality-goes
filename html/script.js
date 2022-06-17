@@ -597,7 +597,7 @@ function menuSelect(menuNumber)
 					
 					//Weather Satellite TLE
 					target = document.getElementById('satelliteTleContent').firstChild;
-					if(otherEmwinInfo.satelliteTle.length == 0) target.innerHTML = "<p style='font-weight: bold; text-align: center;'>Satellite TLEs are currently unavailable</p>";
+					if(otherEmwinInfo.satelliteTle.length == 0) target.innerHTML = "<div style='text-align: center; font-weight: bold; font-size: 13pt;'>Satellite TLEs are currently unavailable</div>";
 					else
 					{
 						otherEmwinInfo.satelliteTle.forEach((element) => {
