@@ -183,6 +183,22 @@ function renderAlert(content, color)
 	//Extra Element to Help with Card Flow
 	mainContent.appendChild(document.createElement('div'));
 }
+function renderTempsLine(target, tempsName, tempsValue)
+{
+	nameSide = document.createElement('div');
+	nameSide.className = "weatherLeft";
+	nameSide.innerHTML = tempsName;
+	target.appendChild(nameSide);
+	
+	valueSide = document.createElement('div');
+	valueSide.className = "weatherRight";
+	valueSide.innerHTML = tempsValue;
+	target.appendChild(valueSide);
+	
+	clearDiv = document.createElement('div');
+	clearDiv.style.clear = 'both';
+	target.appendChild(clearDiv);
+}
 function getForecastZone(orig)
 {
 	xhttp = new XMLHttpRequest();
@@ -908,18 +924,19 @@ function menuSelect(menuNumber)
 				{
 					sysInfo = JSON.parse(this.responseText);
 					target = document.getElementById('sysCardBody');
-					target.innerHTML = "<div class='weatherLeft'>OS Version</div><div class='weatherRight'>" + sysInfo['osVersion'] + "</div><div style='clear: both;'>";
-					target.innerHTML += "<div class='weatherLeft'>Kernel Version</div><div class='weatherRight'>" + sysInfo['kernelVersion'] + "</div><div style='clear: both;'>";
-					target.innerHTML += "<div class='weatherLeft'>Goestools Version</div><div class='weatherRight'>" + sysInfo['goestoolsVersion'] + "</div><div style='clear: both;'>";
-					target.innerHTML += "<div class='weatherLeft'>Uptime</div><div class='weatherRight'>" + sysInfo['uptime'] + "</div><div style='clear: both;'>";
-					target.innerHTML += "<div class='weatherLeft'>Goesrecv Status</div><div class='weatherRight'>" + sysInfo['goesrecvStatus'] + "</div><div style='clear: both;'>";
-					target.innerHTML += "<div class='weatherLeft'>Goesproc Status</div><div class='weatherRight'>" + sysInfo['goesprocStatus'] + "</div><div style='clear: both;'>";
-					target.innerHTML += "<div class='weatherLeft'>CPU Load (1min, 5min, 15min)</div><div class='weatherRight'>" + sysInfo['cpuLoad'] + "</div><div style='clear: both;'>";
-					target.innerHTML += "<div class='weatherLeft'>Memory Used</div><div class='weatherRight'>" + sysInfo['memUsage'] + "</div><div style='clear: both;'>";
-					target.innerHTML += "<div class='weatherLeft'>Disk Used</div><div class='weatherRight'>" + sysInfo['diskUsage'] + "</div><div style='clear: both;'>";
-					target.innerHTML += "<div class='weatherLeft'>Power Status</div><div class='weatherRight'>" + sysInfo['powerStatus'] + "</div><div style='clear: both;'>";
-					if(typeof sysInfo['batteryPercentage'] !== 'undefined') target.innerHTML += "<div class='weatherLeft'>Battery</div><div class='weatherRight'>" + sysInfo['batteryPercentage'] + "%</div><div style='clear: both;'>";
 					
+					target.innerHTML = "";
+					renderTempsLine(target, "OS Version", sysInfo['osVersion']);
+					renderTempsLine(target, "Kernel Version", sysInfo['kernelVersion']);
+					renderTempsLine(target, "Goestools Version", sysInfo['goestoolsVersion']);
+					renderTempsLine(target, "Uptime", sysInfo['uptime']);
+					renderTempsLine(target, "Goesrecv Status", sysInfo['goesrecvStatus']);
+					renderTempsLine(target, "CPU Load (1min, 5min, 15min)", sysInfo['cpuLoad']);
+					renderTempsLine(target, "Memory Used", sysInfo['memUsage']);
+					renderTempsLine(target, "Disk Used", sysInfo['diskUsage']);
+					if("powerStatus" in sysInfo) renderTempsLine(target, "Power Status", sysInfo['powerStatus']);
+					if("batteryPercentage" in sysInfo) renderTempsLine(target, "Battery", sysInfo['batteryPercentage'] + "%");
+
 					target = document.getElementById('sysTempCardBody');
 					target.innerHTML = "<div class='weatherLeft'>CPU Package</div><div class='weatherRight'>" + sysInfo['cpuPackage'] + " &deg;C</div><div style='clear: both;'>";
 					target.innerHTML += "<div class='weatherLeft'>CPU Core 1, 2, 3, 4</div><div class='weatherRight'>" + sysInfo['core0'] + ", " + sysInfo['core1'] + ", " + sysInfo['core2'] + ", " + sysInfo['core3'] + " &deg;C</div><div style='clear: both;'>";

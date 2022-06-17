@@ -399,7 +399,8 @@ elseif($_GET['type'] == "metadata")
 			$metadata['diskUsage'] = $usedDiskSpace . "GB / " . $totalDiskSpace . "GB  - " . round(($usedDiskSpace / $totalDiskSpace) * 100, 2) . "%";
 			
 			//Power Status
-			$metadata['powerStatus'] = (file_get_contents("/sys/class/power_supply/AC/online") == 1 ? "Plugged In" : "<span style='color: red;'>Unplugged</span>");
+			if(file_exists("/sys/class/power_supply/AC/online"))
+				$metadata['powerStatus'] = (file_get_contents("/sys/class/power_supply/AC/online") == 1 ? "Plugged In" : "<span style='color: red;'>Unplugged</span>");
 			
 			//Battery
 			if(file_exists("/sys/class/power_supply/BAT0/capacity")) $metadata['batteryPercentage'] = trim(file_get_contents("/sys/class/power_supply/BAT0/capacity"));
