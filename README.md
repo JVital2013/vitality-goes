@@ -156,7 +156,7 @@ If you still have your cloned vitality-goes repo from last time, you can also ju
 
 1. Download a zip of the most recent Vitality GOES repository ([link for the lazy](https://github.com/JVital2013/vitality-goes/archive/refs/heads/main.zip))
 2. Extract the zip
-3. Open a command line within the extracted zip
+3. Open a command line within the extracted zip's vitality-goes-main directory
 4. Run the following command: `robocopy html C:\xampp\htdocs /MIR /R:0 /W:0 /XD videos config`
 
 ## Additional Scripts
