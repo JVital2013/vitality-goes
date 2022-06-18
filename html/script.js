@@ -600,6 +600,7 @@ function menuSelect(menuNumber)
 					if(otherEmwinInfo.satelliteTle.length == 0) target.innerHTML = "<div style='text-align: center; font-weight: bold; font-size: 13pt;'>Satellite TLEs are currently unavailable</div>";
 					else
 					{
+						target.innerHTML = "<p style='font-weight: bold;'>TLEs for the following satellites are available from GOES</p>";
 						otherEmwinInfo.satelliteTle.forEach((element) => {
 							newSatellite = document.createElement('div');
 							newSatellite.style.width = 'calc(49% - 10px)';
