@@ -9,10 +9,11 @@ A Web App for showcasing Geostationary Weather Satellite Data. The software is d
 3. [Preparing your system for Vitality GOES](#preparing-your-system-for-vitality-goes)
 4. [Installing Vitality GOES](#installing-vitality-goes)
 5. [Configuring Vitality GOES](#configuring-vitality-goes)
-6. [Additional Scripts](#additional-scripts)
-7. [Other Tidbits](#other-tidbits)
-8. [Credits](#credits)
-9. [Additional Resources](#additional-resources)
+6. [Updating Vitality GOES](#updating-vitality-goes)
+7. [Additional Scripts](#additional-scripts)
+8. [Other Tidbits](#other-tidbits)
+9. [Credits](#credits)
+10. [Additional Resources](#additional-resources)
 
 ## What does Vitality GOES do?
 
@@ -137,6 +138,26 @@ To start hosing Vitality GOES in Windows:
 
 ## Configuring Vitality GOES
 Take a look at the [config readme](docs/config.md) to configure Vitality GOES.
+
+## Updating Vitality GOES
+
+### Linux
+Run the following commands in a terminal:
+
+```
+git clone https://github.com/JVital2013/vitality-goes
+cd vitality-goes
+rsync -av --exclude 'config' --exclude 'videos' html/ /var/www/html/
+```
+
+If you still have your cloned vitality-goes repo from last time, you can also just run `git pull` before running rsync.
+
+### Windows
+
+1. Download a zip of the most recent Vitality GOES repository ([link for the lazy](https://github.com/JVital2013/vitality-goes/archive/refs/heads/main.zip))
+2. Extract the zip
+3. Open a command line within the extracted zip
+4. Run the following command: `robocopy html C:\xampp\htdocs /MIR /R:0 /W:0 /XD videos config`
 
 ## Additional Scripts
 
