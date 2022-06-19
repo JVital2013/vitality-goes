@@ -81,7 +81,7 @@ Configuring Graphite is not necessary to use Vitality GOES, but no graphs will b
      -v /var/lib/graphite/log:/var/log\
      graphiteapp/graphite-statsd
      ```
-That's it! To verify it's working, go to http://graphitehost:8080/ and make sure you see something that looks like this:
+That's it! To verify it's working, go to http://graphiteip:8080/ (example: http://192.168.1.123:8080/) and make sure you see something that looks like this:
 
 ![Example of what Graphite should look like when installed](resources/graphite.png)
 
