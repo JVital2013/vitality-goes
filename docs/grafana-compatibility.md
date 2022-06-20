@@ -34,7 +34,7 @@ The solution is to use an alternative configuration for graphite/statsd, along w
 
 ## How does it work?
 
-Goesrecv sends statsd statistics to the StatsD Duplicator service on port 8325. StatsD Duplicator then sends the statistics both to graphite/statsd (and therefore, Vitality GOES) on port 8225, as well as Grafana on port 8125.
+Goesrecv sends statsd statistics to the StatsD Duplicator service on port 8325. StatsD Duplicator then sends the statistics both to Grafana on port 8125, as well as graphite/statsd (and therefore, Vitality GOES) on port 8225.
 
 ## Other Tidbits
 
