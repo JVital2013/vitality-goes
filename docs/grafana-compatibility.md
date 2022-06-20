@@ -17,7 +17,7 @@ The solution is to use an alternative configuration for graphite/statsd, along w
     systemctl enable statsdduplicator
     systemctl start statsdduplicator
     ```
-6. Follow the normal steps in the readme under [Preparing your system for Vitality GOES > Graphite/statsd](/readme.md#graphitestatsd). The only difference is that you will want to use this command instead for step 4:
+6. Follow the normal steps in the readme under [Preparing your system for Vitality GOES > Graphite/statsd](/README.md#graphitestatsd). The only difference is that you will want to use this command instead for step 4:
    ```
    docker run -d\
     --name graphite\
