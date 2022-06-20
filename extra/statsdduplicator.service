@@ -1,0 +1,16 @@
+# Receive statsd stats, and send them to 2 services
+
+[Unit]
+Description=StatsD Statistics Duplicator
+Documentation=https://www.github.com/JVital2013/vitality-goes/docs/grafana-compatibility.md
+Wants=network.target
+
+[Service]
+ExecStart=/bin/bash -c 'socat -U - udp4-recv:8325 | tee >(socat -u - udp4-datagram:127.0.0.1:8225) | socat -u - udp4-datagram:127.0.0.1:8125'
+StandardOutput=null
+Type=simple
+Restart=on-failure
+RestartSec=30
+
+[Install]
+WantedBy=default.target
