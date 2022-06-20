@@ -10,7 +10,7 @@ The solution is to use an alternative configuration for graphite/statsd, along w
    [monitor]
    statsd_address = "udp4://127.0.0.1:8325"
    ```
-3. Copy [extra/statsdduplicator.service](/extra/statsdduplicator.service) from this repo to /usr/lib/systemd/system/statsdsplitter.service on your ground station machine
+3. Copy [extra/statsdduplicator.service](/extra/statsdduplicator.service) from this repo to /usr/lib/systemd/system/statsdduplicator.service on your ground station machine
 4. Run the following commands **as root**:
     ```
     systemctl daemon-reload
