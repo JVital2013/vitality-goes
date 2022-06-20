@@ -937,6 +937,7 @@ function menuSelect(menuNumber)
 					renderLeftRightLine(target, "Goestools Version", sysInfo['goestoolsVersion']);
 					renderLeftRightLine(target, "Uptime", sysInfo['uptime']);
 					renderLeftRightLine(target, "Goesrecv Status", sysInfo['goesrecvStatus']);
+					renderLeftRightLine(target, "Goesproc Status", sysInfo['goesprocStatus']);
 					renderLeftRightLine(target, "CPU Load (1min, 5min, 15min)", sysInfo['cpuLoad']);
 					renderLeftRightLine(target, "Memory Used", sysInfo['memUsage']);
 					renderLeftRightLine(target, "Disk Used", sysInfo['diskUsage']);
