@@ -10,7 +10,7 @@ The solution is to use an alternative configuration for graphite/statsd, along w
    [monitor]
    statsd_address = "udp4://127.0.0.1:8325"
    ```
-3. Copy [extra/statsdduplicator.service](/extra/statsdduplicator.service) from this repo to /usr/lib/systemd/system/statsdduplicator.service on your ground station machine
+3. Copy [extra/statsdduplicator.service](/extra/statsdduplicator.service) from this repo to /lib/systemd/system/statsdduplicator.service on your ground station machine
 4. Run the following commands **as root**:
     ```
     systemctl daemon-reload
@@ -42,6 +42,6 @@ Goesrecv sends statsd statistics to the StatsD Duplicator service on port 8325. 
 As root, run `docker stop graphite && docker rm graphite`. Then `docker run...` command above to make it use the custom port.
 
 #### I'm an advanced user, and I have graphite and Grafana running on different machines. How do I make this work for me?
-After creating the file at /usr/lib/systemd/system/statsdsplitter.service on your ground station, edit it (ex. `sudo nano /usr/lib/systemd/system/statsdsplitter.service`). Edit the IPs and ports after each `udp4-datagram` to match your Grafana and graphite/statsd instances.
+After creating the file at /lib/systemd/system/statsdduplicator.service on your ground station, edit it (ex. `sudo nano /lib/systemd/system/statsdduplicator.service`). Edit the IPs and ports after each `udp4-datagram` to match your Grafana and graphite/statsd instances.
 
-Afterwards, run `systemctl daemon-reload && systemctl restart statsdsplitter`
+Afterwards, run `systemctl daemon-reload && systemctl restart statsdduplicator`
