@@ -22,11 +22,17 @@ This is the main config file. It will likely need configured when you first depl
 * `debug`: Set to true to enable PHP errors. This breaks the AJAX requests within Vitality GOES if there are any errors, so only set this to true if you're debugging data returned by the DataHandler (advanced users only).
 
 ### Paths
-The Paths section is unnecessary, but it is recommended that you set up a path for each satellite you're receiving. Each path defined in this section creates a variable that can be used in the abi, meso, and l2 ini files. 
+A path should be set up for each satellite downlink you're receiving. Each path defined in this section creates a variable that can be used in the `path` options of your abi, meso, and l2 ini files. By default GOES16 is included, but you can add others as necessary.
 
-Example: `GOES16 = /path/to/goestoolsdata` allows `{GOES16}` to be used in the `path` of any image in the abi, meso, and l2 ini files.
+**NOTE:** This does not define the path of the images from a particular satellite, but rather the path for the entire downlink. For example, let's assume you're receiving GOES16, and your images are at `/home/pi/goes/goes16/fc/fc/...`. The `goes16` setting under `[paths]` would be set to `/home/pi/goes` (the parent path for the entire satellite downlink), not `/home/pi/goes/goes16` (the path just for the images from GOES16).
 
-If hosted on Windows, this would be something like `GOES16 = C:\path\to\goestoolsdata`
+**Example** Let's say you have:
+- `GOES16 = /path/to/goestoolsdata` under `[paths]` of your config.ini
+- `path = {GOES16}/goes16/fd/fc/` is set under an image handler like `[fdfc_16]` in your abi.ini file
+
+With this configuration, Vitality GOES will expect your images to be at `/path/to/goestoolsdata/goes16/fd/fc/`. Images may be in a dated subfolder.
+
+If hosted on Windows, set your paths to something like `GOES16 = C:\path\to\goestoolsdata`
 
 ### Location
 This section contains information about your physical location. If you're not displaying EMWIN data, the only thing you need to configure is `timezone`. A list of supported timezones can be found [here](https://www.php.net/manual/en/timezones.php).
