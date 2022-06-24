@@ -86,7 +86,9 @@ In a normal setup, here's how to configure graphits/statsd:
      -v /var/lib/graphite/log:/var/log\
      graphiteapp/graphite-statsd
      ```
-That's it! To verify it's working, go to http://graphiteip:8080/ (example: http://192.168.1.123:8080/) and make sure you see something that looks like the screenshot below. If you get an Error 502, wait 2 minutes and check again - graphite can take a minute to start on slower machines like a Raspberry Pi.
+That's it! To verify it's working, go to http://graphiteip:8080/ (example: http://192.168.1.123:8080/) and make sure you see something that looks like the screenshot below.
+
+**If you get an Error 502**, wait 2 minutes and check again - graphite can take a minute to start on slower machines like a Raspberry Pi.
 
 ![Example of what Graphite should look like when installed](resources/graphite.png)
 
