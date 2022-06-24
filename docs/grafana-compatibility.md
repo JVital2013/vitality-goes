@@ -22,6 +22,7 @@ The solution is to use an alternative configuration for graphite/statsd, along w
    docker run -d\
     --name graphite\
     --restart=always\
+    --privileged\
     -p 8080:80\
     -p 8225:8125/udp\
     -p 8126:8126\
