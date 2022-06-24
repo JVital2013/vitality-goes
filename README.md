@@ -76,6 +76,7 @@ In a normal setup, here's how to configure graphits/statsd:
     docker run -d\
      --name graphite\
      --restart=always\
+     --privileged\
      -p 8080:80\
      -p 8125:8125/udp\
      -p 8126:8126\
