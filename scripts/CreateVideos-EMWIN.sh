@@ -1,5 +1,5 @@
 #!/bin/bash
-srcDir="/path/to/goestoolsrepo/emwin/emwin"
+srcDir="/path/to/goestoolsrepo/emwin"
 videoDir="/var/www/html/videos"
 codeName=("RADNTHES" "RADREFUS" "GMS008JA" "G16CIRUS" "G10CIRUS" "INDCIRUS")
 videoName=("LocalRadar" "USRadar" "HIMAWARI8" "GOES16EMWIN" "GOES17EMWIN" "METEOSAT")
@@ -20,7 +20,7 @@ do
 	
 	for dateStamp in `seq $oneDayStartTime $oneDayEndTime`
 	do
-		cp /home/jamie/Desktop/sdr-recordings/emwin/*_$dateStamp*${codeName[$i]}.${imgconvert[$i]} .  > /dev/null 2>&1
+		cp $srcDir/*_$dateStamp*${codeName[$i]}.${imgconvert[$i]} .  > /dev/null 2>&1
 	done
 	
 	rename 's/^..........................//g' *
