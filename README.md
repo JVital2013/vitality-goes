@@ -56,9 +56,13 @@ Once configured, any modern web browser can connect to Vitality GOES and view th
 
 Goesrecv supports logging information about error correction rate, packet drop rates, and so on to a statsd server. This information is invaluable to ground station operators, so it should be made easily accessible. This project accomplishes this by staging the information in a Graphite database, which Vitality GOES can then query and present to the user.
 
-Configuring Graphite is not necessary to use Vitality GOES, but no graphs will be available if you don't set it up. If Vitality GOES is on a different machine from goestools, graphite/statsd can be installed on either machine. To configure graphits/statsd:
+Configuring Graphite is not necessary to use Vitality GOES, but no graphs will be available if you don't set it up. If Vitality GOES is on a different machine from goestools, graphite/statsd can be installed on either machine.
 
-1. Install Docker on the target machine. This varies by distro, but you can find instructions for Ubuntu and its variants [here](https://docs.docker.com/engine/install/ubuntu/) and Raspberry Pi OS [here](https://dev.to/elalemanyo/how-to-install-docker-and-docker-compose-on-raspberry-pi-1mo). Docker Compose is not required.
+**If you're currently using Grafana, you'll need to follow extra steps to keep using it.** [See here for more details](docs/grafana-compatibility.md). Alternatively, you can choose to stop using Grafana, or disable graphs within Vitality GOES.
+
+In a normal setup, here's how to configure graphits/statsd:
+
+1. If you're not using it already, install Docker on the target machine. This varies by distro, but you can find instructions for Ubuntu and its variants [here](https://docs.docker.com/engine/install/ubuntu/) and Raspberry Pi OS [here](https://dev.to/elalemanyo/how-to-install-docker-and-docker-compose-on-raspberry-pi-1mo). Docker Compose is not required.
 2. As root, run the following commands to create a storage area for graphite.
     ```
     mkdir -p /var/lib/graphite/config
@@ -72,6 +76,7 @@ Configuring Graphite is not necessary to use Vitality GOES, but no graphs will b
     docker run -d\
      --name graphite\
      --restart=always\
+     --privileged\
      -p 8080:80\
      -p 8125:8125/udp\
      -p 8126:8126\
@@ -81,7 +86,9 @@ Configuring Graphite is not necessary to use Vitality GOES, but no graphs will b
      -v /var/lib/graphite/log:/var/log\
      graphiteapp/graphite-statsd
      ```
-That's it! To verify it's working, go to http://graphiteip:8080/ (example: http://192.168.1.123:8080/) and make sure you see something that looks like this:
+That's it! To verify it's working, go to http://graphiteip:8080/ (example: http://192.168.1.123:8080/) and make sure you see something that looks like the screenshot below.
+
+**If you get an Error 502**, wait 2 minutes and check again - graphite can take a minute to start on slower machines like a Raspberry Pi.
 
 ![Example of what Graphite should look like when installed](resources/graphite.png)
 
