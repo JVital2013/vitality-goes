@@ -4,7 +4,8 @@ Within the community, it's popular to run Grafana to track statsd statistcs from
 
 The solution is to use an alternative configuration for graphite/statsd, along with a helper service. No changes are needed to your Grafana setup. For simplicity, these instructions assume you have goesrecv, Grafana, and graphite/statsd all running on the same machine. Here are the steps:
 
-1. Modify the `[monitor]` section of your goesrecv.conf file to look like this (don't forget to restart goesrecv afterwards):
+1. Make sure `socat` is installed on your system. If it's not, run `sudo apt install socat`.
+2. Modify the `[monitor]` section of your goesrecv.conf file to look like this (don't forget to restart goesrecv afterwards):
 
    ```
    [monitor]
