@@ -3,6 +3,8 @@ A Web App for showcasing Geostationary Weather Satellite Data. The software is d
 
 **[Click here to watch a feature overview on YouTube](https://www.youtube.com/watch?v=o5ISR0bBFo0)**
 
+**[Traducción al español por XQ6DLW, Demys](docs/Vitality-Goes-traduccion-al-español.pdf)**
+
 ![Series of Screenshots of Vitality GOES](resources/banner.png)
 
 ### Table of Contents
@@ -37,6 +39,8 @@ The following diagram shows how data flows from a GOES satellite, through Vitali
 To put it simply: goestools and secondary scripts dump data to a folder on the ground station computer. From there, Vitality GOES reads the data and presents it to the user on their device across the local network.
 
 ## System Requirements
+
+**The most important system requirement is the one that is most often overlooked:** you, the ground station administrator. It is expected that the ground station administrator has the ability to research, learn, and understand what computer software is actually doing. You don't need to be a Linux or Satellite expert, but you will need a working understanding of the linux filesystem, how to reconfigure conf files for goestools, and how to manipulate the Viitality GOES ini files to match your needs. Don't be afraid to reach out for help if you need it, but we appreciate it if you try to solve the problem yourself first. Support will be limited as this is a volunteer project.
 
 There are different ways to set up the Vitality GOES server. No matter the method you choose, you must already have a ground station set up that receives imagery from a geostationary weather satellite. Vitality GOES was designed to handle HRIT/EMWIN data processed by goestools, but other data sources may work. See the [additional resources section](#additional-resources) for info on how to set up a ground station with goestools, and [the tidbits section](#displaying-data-from-other-satellites) for more on other satellites.
 
