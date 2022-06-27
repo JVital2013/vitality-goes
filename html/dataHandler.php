@@ -730,7 +730,10 @@ elseif($_GET['type'] == "weatherJSON")
 		
 		if(stripos($thisLine, $currentSettings[$selectedProfile]['city']) === 0)
 		{
-			$currentConditionParts = preg_split("/[ ]+/", preg_split("/[ ]{2,}/", trim($thisLine), 2)[1]);
+			$currentConditionParts = preg_split("/[ ]{2,}/", trim($thisLine), 3);
+			$remainingConditionParts = array_pop($currentConditionParts);
+			array_shift($currentConditionParts);
+			$currentConditionParts = array_merge($currentConditionParts, preg_split("/[ ]+/", $remainingConditionParts));
 			
 			$returnData['weatherDesc'] = $currentConditionParts[0];
 			if($returnData['weatherDesc'] == "NOT AVBL")
