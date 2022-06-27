@@ -597,7 +597,7 @@ elseif($_GET['type'] == "settings")
 					$currentlyDecoding = false;
 					continue;
 				}
-				if(trim($thisLine) == "" || stripos($thisLine, "...") === 0) continue;
+				if(trim($thisLine) == "" || stripos($thisLine, "...") === 0 || stripos($thisLine, "6HR ") === 0) continue;
 				
 				if($currentlyDecoding) $dropdownList[] = trim(preg_replace("/[^A-Za-z0-9 \-.]/", "", substr($thisLine, 0, 15)));
 			}
