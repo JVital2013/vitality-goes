@@ -383,6 +383,7 @@ function menuSelect(menuNumber)
 					case "HVY RAIN": conditions = "Heavy Rain"; break;
 					case "SNOW": conditions = "Snow"; break;
 					case "FAIR": conditions = "Fair"; break;
+					case "FOG": conditions = "Fog"; break;
 					case "TSTM": conditions = "Thunderstorms"; break;
 				}
 				
