@@ -730,7 +730,9 @@ elseif($_GET['type'] == "weatherJSON")
 		
 		if(stripos($thisLine, $currentSettings[$selectedProfile]['city']) === 0)
 		{
-			$returnData['weatherDesc'] = trim(substr($thisLine, 15, 10));
+			$currentConditionParts = preg_split("/[ ]+/", preg_split("/[ ]{2,}/", trim($thisLine), 2)[1]);
+			
+			$returnData['weatherDesc'] = $currentConditionParts[0];
 			if($returnData['weatherDesc'] == "NOT AVBL")
 			{
 				$returnData['weatherDesc'] = "Not Available";
@@ -745,13 +747,13 @@ elseif($_GET['type'] == "weatherJSON")
 				break;
 			}
 			
-			$returnData['temp'] = trim(substr($thisLine, 25, 4));
-			$returnData['dewPoint'] = trim(substr($thisLine, 29, 2));
-			$returnData['humidity'] = trim(substr($thisLine, 32, 3));
-			$returnData['pressure'] = trim(substr($thisLine, 46, 6));
-			$returnData['remarks'] = trim(substr($thisLine, 53));
+			$returnData['temp'] = $currentConditionParts[1];
+			$returnData['dewPoint'] = $currentConditionParts[2];
+			$returnData['humidity'] = $currentConditionParts[3];
+			$returnData['pressure'] = $currentConditionParts[5];
+			$returnData['remarks'] = (count($currentConditionParts) > 6 ? $currentConditionParts[6] : "");
 			
-			$windPart = trim(substr($thisLine, 36, 10));
+			$windPart = $currentConditionParts[4];
 			if($windPart == "CALM")
 			{
 				$returnData['wind'] = 0;
