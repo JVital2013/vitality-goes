@@ -93,17 +93,17 @@
 			
             var _this = this;
 			var _maxZ = Math.max(...Array.from(document.querySelectorAll('body *'), el => parseFloat(window.getComputedStyle(el).zIndex),).filter(zIndex => !Number.isNaN(zIndex)), 0,);
-			var _simplePicker = new SimplePicker(_this.core.$content.firstElement, {zIndex: _maxZ, compactMode: true});
+			var _simplerPicker = new SimplerPicker(_this.core.$content.firstElement, {zIndex: _maxZ, compactMode: true});
 			var _timestamps = _this.core.galleryItems.map(item => item.timestamp);
 			
-			_simplePicker.on('submit', function(date, readableDate) {
+			_simplerPicker.on('submit', function(date, readableDate) {
 				var dateToFind = date.getTime() / 1000;
 				_this.core.slide(_timestamps.indexOf(_timestamps.reduce(function(prev, curr) {return (Math.abs(curr - dateToFind) < Math.abs(prev - dateToFind) ? curr : prev);})));
 			});
 			
             this.core.getElementById('lg-jumpto').on('click.lg', function () {
-				_simplePicker.reset(new Date(_this.core.galleryItems[_this.core.index].timestamp * 1000));
-				_simplePicker.open();
+				_simplerPicker.reset(new Date(_this.core.galleryItems[_this.core.index].timestamp * 1000));
+				_simplerPicker.open();
             });
         };
         

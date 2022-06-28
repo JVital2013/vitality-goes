@@ -11,7 +11,7 @@
 		<link rel="manifest" href="/manifest.json?v=20220616">
 		<link rel="stylesheet" href="/styles.css?v=20220627">
 		<link rel="stylesheet" href="/opensans.css">
-		<link rel="stylesheet" href="/simplepicker/simplepicker.css">
+		<link rel="stylesheet" href="/simplerpicker/simplerpicker.css">
 		<link rel="stylesheet" href="/fontawesome/css/all.css">
 		<link rel="stylesheet" href="/lightgallery/css/lightgallery.css">
 		<link rel="stylesheet" href="/lightgallery/css/lg-zoom.css">
@@ -25,7 +25,7 @@
 		<script src='/lightgallery/lightgallery.umd.js'></script>
 		<script src="/lightgallery/plugins/zoom/lg-zoom.umd.js"></script>
 		<script src="/lightgallery/plugins/jumpto/lg-jumpto.umd.js"></script>
-		<script src="/simplepicker/simplepicker.js"></script>
+		<script src="/simplerpicker/simplerpicker.js"></script>
 		<script src='/script.js?v=20220627'></script>
 	</head>
 	<body>
