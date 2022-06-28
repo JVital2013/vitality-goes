@@ -1,0 +1,238 @@
+.simplepicker-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow: auto;
+  background-color: #4c4c4c7d;
+  width: 100vw;
+  height: 100vh;
+  display: none;
+}
+
+.simplepicker-wrapper.active {
+  display: block;
+}
+
+.simpilepicker-date-picker {
+  width: 326px;
+  cursor: initial;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 14px;
+  background-color: #444444;
+  margin: 0;
+  position: absolute;
+  color: #efefef;
+  top: 50%;
+  left: 50%;
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  box-shadow: 1px 2px 4px 0.5px rgba(0, 0, 0, 0.22),
+              1px 2px 4px 0.5px rgba(0, 0, 0, 0.);
+}
+
+.simplepicker-day-header {
+  color: #fff;
+  background-color: #222222;
+  text-align: center;
+  padding: 4px 0;
+}
+
+.simplepicker-date-section {
+  text-align: center;
+  background-color: #333333;
+  color: #fff;
+}
+
+.simplepicker-date-section .simplepicker-month-and-year {
+  font-size: 22px;
+  padding: 14px 0 7px 0;
+  font-weight: 200;
+}
+
+.simplepicker-date-section .simplepicker-date {
+  font-size: 35px;
+  padding: 2px;
+  margin-bottom: 12px;
+}
+
+.simplepicker-select-pane {
+  display: flex;
+  width: 100%;
+}
+
+.simplepicker-select-pane .simplepicker-time,
+.simplepicker-selected-date {
+  text-align: center;
+  flex: 2;
+}
+
+.simplepicker-icon, .simplepicker-time,
+.simplepicker-selected-date {
+  border: none;
+  background: transparent;
+  padding: 2px;
+  margin: 4px 6px;
+  width: 25px;
+  height: 25px;
+  opacity: 0.5;
+}
+
+.simplepicker-time, .simplepicker-selected-date {
+  opacity: 1;
+}
+
+.simplepicker-month-switcher {
+  margin-top: 5px;
+}
+
+.simplepicker-icon:hover {
+  opacity: 0.8;
+}
+
+.simplepicker-icon:active, .simplepicker-icon.active {
+  opacity: 1;
+}
+
+.simplepicker-icon:focus {
+  outline: none;
+}
+
+.simplepicker-icon-next {
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgY2xhc3M9ImZlYXRoZXIgZmVhdGhlci1hcnJvdy1yaWdodCI+PGxpbmUgeDE9IjUiIHkxPSIxMiIgeDI9IjE5IiB5Mj0iMTIiPjwvbGluZT48cG9seWxpbmUgcG9pbnRzPSIxMiA1IDE5IDEyIDEyIDE5Ij48L3BvbHlsaW5lPjwvc3ZnPg==);
+}
+
+.simplepicker-icon-previous {
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgY2xhc3M9ImZlYXRoZXIgZmVhdGhlci1hcnJvdy1sZWZ0Ij48bGluZSB4MT0iMTkiIHkxPSIxMiIgeDI9IjUiIHkyPSIxMiI+PC9saW5lPjxwb2x5bGluZSBwb2ludHM9IjEyIDE5IDUgMTIgMTIgNSI+PC9wb2x5bGluZT48L3N2Zz4=);
+}
+
+.simplepicker-icon-calender {
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgY2xhc3M9ImZlYXRoZXIgZmVhdGhlci1jYWxlbmRhciI+PHJlY3QgeD0iMyIgeT0iNCIgd2lkdGg9IjE4IiBoZWlnaHQ9IjE4IiByeD0iMiIgcnk9IjIiPjwvcmVjdD48bGluZSB4MT0iMTYiIHkxPSIyIiB4Mj0iMTYiIHkyPSI2Ij48L2xpbmU+PGxpbmUgeDE9IjgiIHkxPSIyIiB4Mj0iOCIgeTI9IjYiPjwvbGluZT48bGluZSB4MT0iMyIgeTE9IjEwIiB4Mj0iMjEiIHkyPSIxMCI+PC9saW5lPjwvc3ZnPg==);
+}
+
+.simplepicker-icon-time {
+  background-image: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgY2xhc3M9ImZlYXRoZXIgZmVhdGhlci1jbG9jayI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiPjwvY2lyY2xlPjxwb2x5bGluZSBwb2ludHM9IjEyIDYgMTIgMTIgMTYgMTQiPjwvcG9seWxpbmU+PC9zdmc+);
+}
+
+.simplepicker-bottom-part {
+  padding-top: 6px;
+  padding-bottom: 12px;
+  padding-left: 48%;
+}
+
+.simplepicker-calender table {
+  width: 100%;
+  font-size: 13px;
+}
+
+.simplepicker-calender thead th {
+  font-weight: normal;
+  font-size: 15px;
+  padding-bottom: 6px;
+  width: 14.28%;
+  height: 30px;
+  text-align: center;
+}
+
+.simplepicker-calender tbody td {
+  position: relative;
+  text-align: center;
+  vertical-align: middle;
+  padding: 12px;
+  z-index: 1;
+}
+
+.simplepicker-calender tbody td::after {
+  content: " ";
+  visibility: hidden;
+  display: block;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: 35px;
+  width: 35px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.simplepicker-calender tbody td:hover::after {
+  visibility: visible;
+}
+
+.simplepicker-calender tbody td:active,
+.simplepicker-calender tbody td.active {
+  color: #fff;
+}
+
+.simplepicker-calender tbody td:active::after,
+.simplepicker-calender tbody .active::after {
+  visibility: visible;
+  background-color: #777777;
+  z-index: -1;
+}
+
+.simplepicker-calender tbody td[data-empty] {
+  pointer-events: none;
+}
+
+.simplepicker-time-section {
+  display: none;
+  height: 120px;
+}
+
+.simplepicker-time-section input {
+  box-sizing: border-box;
+  width: 120px;
+  height: 32px;
+  max-width: 120px;
+  max-height: 32px;
+  padding: 4px 3px;
+  border: none;
+  border-bottom: 2px solid #ccc;
+  font-size: 14px;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  display: block;
+  margin: 25% auto;
+}
+
+.simplepicker-time-section input:focus {
+  outline: none;
+  border-bottom-color: #888888;
+}
+
+.simplepicker-picker-section {
+  width: 100%;
+  height: auto;
+}
+
+.simplepicker-btn {
+  border: none;
+  background: transparent;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 16px;
+  padding: 7px 14px;
+  border: 1px solid #ddd;
+  margin: 0 5px;
+  border-color: #888888;
+  color: #efefef;
+  font-size: 13px;
+}
+
+.simplepicker-btn:hover, .simplepicker-btn:active {
+  color: white;
+  background-color: #666666;
+}
+
+.simplepicker-fade {
+  color: rgba(225, 225, 225, 0.95);
+}
+
+.simplepicker-wrapper, .simplepicker-icon,
+.simplepicker-btn {
+  cursor: pointer;
+}
+
+.simplepicker-time-section input[type=time] {
+	background-color: #444444;
+	color: #efefef;
+}

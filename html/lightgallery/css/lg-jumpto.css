@@ -1,0 +1,33 @@
+.lg-jumptobutton {
+  font-family: 'Font Awesome 5 Free' !important;
+  speak: never;
+  font-style: normal;
+  font-variant: normal;
+  color: #999;
+  cursor: pointer;
+  float: right;
+  font-size: 19px;
+  height: 47px;
+  line-height: 27px;
+  padding: 10px 0;
+  text-align: center;
+  width: 50px;
+  text-rendering: auto;
+  will-change: color;
+  -webkit-transition: color 0.2s linear;
+  -o-transition: color 0.2s linear;
+  transition: color 0.2s linear;
+  background: none;
+  border: none;
+  box-shadow: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 400;
+}
+.lg-jumptobutton::after {
+  content: "\f073";
+}
+
+.lg-jumptobutton:hover {
+  color: #fff;
+}

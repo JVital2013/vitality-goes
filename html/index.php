@@ -8,11 +8,14 @@
 		<meta name="apple-mobile-web-app-capable" content="yes">
 
 		<link rel="apple-touch-icon" href="/icon-512x512.png">
-		<link rel="manifest" href="/manifest.json?v=20220616">
-		<link rel="stylesheet" href="/styles.css?v=20220616">
+		<link rel="manifest" href="/manifest.json?v=20220529">
+		<link rel="stylesheet" href="/styles.css?v=20220627">
 		<link rel="stylesheet" href="/opensans.css">
-		<link rel="stylesheet" href="/lightgallery/css/lightgallery.css?v=6">
-		<link rel="stylesheet" href="/lightgallery/css/lg-zoom.css?v=6">
+		<link rel="stylesheet" href="/simplepicker/simplepicker.css">
+		<link rel="stylesheet" href="/fontawesome/css/all.css">
+		<link rel="stylesheet" href="/lightgallery/css/lightgallery.css">
+		<link rel="stylesheet" href="/lightgallery/css/lg-zoom.css">
+		<link rel="stylesheet" href="/lightgallery/css/lg-jumpto.css">
 		<link href="splashscreens/iphone5_splash.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
 		<link href="splashscreens/iphone6_splash.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
 		<link href="splashscreens/iphoneplus_splash.png" media="(device-width: 621px) and (device-height: 1104px) and (-webkit-device-pixel-ratio: 3)" rel="apple-touch-startup-image" />
@@ -21,8 +24,9 @@
 		<link href="splashscreens/iphonexsmax_splash.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)" rel="apple-touch-startup-image" />
 		<script src='/lightgallery/lightgallery.umd.js'></script>
 		<script src="/lightgallery/plugins/zoom/lg-zoom.umd.js"></script>
-		<script src="/all.js"></script>
-		<script src='/script.js?v=20220616a'></script>
+		<script src="/lightgallery/plugins/jumpto/lg-jumpto.umd.js"></script>
+		<script src="/simplepicker/simplepicker.js"></script>
+		<script src='/script.js?v=20220627'></script>
 	</head>
 	<body>
 		<div class='topBar'>
