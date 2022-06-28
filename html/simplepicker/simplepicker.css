@@ -32,14 +32,14 @@
 
 .simplepicker-day-header {
   color: #fff;
-  background-color: #222222;
+  background-color: #333333;
   text-align: center;
   padding: 4px 0;
 }
 
 .simplepicker-date-section {
   text-align: center;
-  background-color: #333333;
+  background-color: #222222;
   color: #fff;
 }
 
@@ -116,7 +116,8 @@
 .simplepicker-bottom-part {
   padding-top: 6px;
   padding-bottom: 12px;
-  padding-left: 48%;
+  padding-right: 10px;
+  text-align: right;
 }
 
 .simplepicker-calender table {
@@ -235,4 +236,9 @@
 .simplepicker-time-section input[type=time] {
 	background-color: #444444;
 	color: #efefef;
+	border: solid 1px #888888;
+}
+
+.simplepicker-time-section input[type="time"]::-webkit-calendar-picker-indicator {
+	filter: invert(0.5);
 }
