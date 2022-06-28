@@ -207,6 +207,7 @@ The following software packages are included in Vitality GOES:
 * **FontAwesome Free** ([https://fontawesome.com](https://fontawesome.com/)): made available under the Creative Commons License
 * **LightGallery by Sachin Neravath** ([https://www.lightgalleryjs.com](https://www.lightgalleryjs.com/)): made available under the GPLv3 License. *Modified for use in Vitality GOES*
 * **OpenSans** ([https://fonts.google.com/specimen/Open+Sans](https://fonts.google.com/specimen/Open+Sans)): made available under the Apache License
+* **SimplePicker** ([https://github.com/priyank-p/simplepicker](https://github.com/priyank-p/simplepicker)): made available under the MIT License *Modified for use in Vitality GOES*
 
 ## Additional Resources
 Here are a few tools that may help you with picking up the HRIT/EMWIN Feed
