@@ -8,7 +8,7 @@
 		<meta name="apple-mobile-web-app-capable" content="yes">
 
 		<link rel="apple-touch-icon" href="/icon-512x512.png">
-		<link rel="manifest" href="/manifest.json?v=20220529">
+		<link rel="manifest" href="/manifest.json?v=20220616">
 		<link rel="stylesheet" href="/styles.css?v=20220627">
 		<link rel="stylesheet" href="/opensans.css">
 		<link rel="stylesheet" href="/simplepicker/simplepicker.css">
