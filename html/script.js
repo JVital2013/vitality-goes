@@ -1072,7 +1072,8 @@ function loadLocalRadar(targetedContent)
 					plugins: [lgZoom, lgJumpTo],
 					dynamic: true,
 					speed: (matchMedia('(hover: none)').matches ? 250 : 0),
-					dynamicEl: dynamicEl
+					dynamicEl: dynamicEl,
+					mobileSettings: {download: true, controls: false, showCloseIcon: false}
 				});
 			}
 		}
@@ -1126,7 +1127,8 @@ function loadImage(targetedContent)
 					plugins: [lgZoom, lgJumpTo],
 					dynamic: true,
 					speed: (matchMedia('(hover: none)').matches ? 250 : 0),
-					dynamicEl: dynamicEl
+					dynamicEl: dynamicEl,
+					mobileSettings: {download: true, controls: false, showCloseIcon: false}
 				});
 			}
 		}
