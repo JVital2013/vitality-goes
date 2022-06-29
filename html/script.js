@@ -1067,9 +1067,9 @@ function loadLocalRadar(targetedContent)
 				
 				
 				dynamicEl = [];
-				metadata.forEach(thisImg => {dynamicEl.push({src: "/dataHandler.php?type=localRadarData&timestamp=" + thisImg['timestamp'], subHtml: thisImg['subHtml']});});
+				metadata.forEach(thisImg => {dynamicEl.push({src: "/dataHandler.php?type=localRadarData&timestamp=" + thisImg['timestamp'], subHtml: thisImg['subHtml'], timestamp: thisImg['timestamp']});});
 				window['lightbox-localRadar'] = lightGallery(goesImg, {
-					plugins: [lgZoom],
+					plugins: [lgZoom, lgJumpTo],
 					dynamic: true,
 					speed: (matchMedia('(hover: none)').matches ? 250 : 0),
 					dynamicEl: dynamicEl
@@ -1121,9 +1121,9 @@ function loadImage(targetedContent)
 				targetedContent.appendChild(goesLabel);
 				
 				dynamicEl = [];
-				metadata.forEach(thisImg => {dynamicEl.push({src: "/dataHandler.php?type=" + imageType + "Data&id=" + contentId + "&timestamp=" + thisImg['timestamp'], subHtml: thisImg['subHtml']});});
+				metadata.forEach(thisImg => {dynamicEl.push({src: "/dataHandler.php?type=" + imageType + "Data&id=" + contentId + "&timestamp=" + thisImg['timestamp'], subHtml: thisImg['subHtml'], timestamp: thisImg['timestamp']});});
 				window['lightbox-' + contentId] = lightGallery(goesImg, {
-					plugins: [lgZoom],
+					plugins: [lgZoom, lgJumpTo],
 					dynamic: true,
 					speed: (matchMedia('(hover: none)').matches ? 250 : 0),
 					dynamicEl: dynamicEl
