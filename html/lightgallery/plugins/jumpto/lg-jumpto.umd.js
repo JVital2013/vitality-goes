@@ -99,7 +99,7 @@
         	this.buildTemplates();
         	
         	//Calculate Necessary Variables
-		var _maxZ = Math.max(...Array.from(document.querySelectorAll('body *'), el => parseFloat(window.getComputedStyle(el).zIndex),).filter(zIndex => !Number.isNaN(zIndex)), 0,);
+		var _maxZ = Math.max(...Array.from(document.querySelectorAll('body *'), el => parseFloat(window.getComputedStyle(el).zIndex),).filter(zIndex => !Number.isNaN(zIndex)), 0,) + 1;
 		var _simplerPicker = new SimplerPicker(_this.core.$content.firstElement, {zIndex: _maxZ, compactMode: true});
 		var _timestamps = _this.core.galleryItems.map(item => item.timestamp);
 		
