@@ -54,10 +54,12 @@ function renderMenuItem(index, icon, name)
 	newMenuItem.innerHTML = "<div class='menuItemIconHolder'><i class='fa fa-" + icon + "' aria-hidden='true'></i></div><div style='vertical-align: middle; display: inline-block;'>" + name + "</div>";
 	document.getElementById('sideBar').appendChild(newMenuItem);
 }
-function renderImageCard(slug)
+function renderImageCard(slug, color)
 {
 	card = document.createElement('div');
 	card.className = "prettyBox";
+	if(color != null) card.style.backgroundColor = color;
+	
 	header = document.createElement('div');
 	header.className = "prettyBoxHeader";
 	header.innerHTML = "<i class='fa fa-chevron-" + (expandedCards.includes(slug + "Content") ? "down" : "right") + "' aria-hidden='true'></i>&nbsp;&nbsp;&nbsp;&nbsp;" + config[imageType][slug].title;
@@ -511,25 +513,25 @@ function menuSelect(menuNumber)
 		case 1:
 		barTitle.innerHTML = "Full Disk";
 		mainContent.innerHTML = "";
-		Object.keys(config.abi).forEach(function(key){renderImageCard(key);});
+		Object.keys(config.abi).forEach(function(key){renderImageCard(key, config.abi[key].color);});
 		break;
 		
 		case 2:
 		barTitle.innerHTML = "Level 2 Imagery";
 		mainContent.innerHTML = "";
-		Object.keys(config.l2).forEach(function(key){renderImageCard(key);});
+		Object.keys(config.l2).forEach(function(key){renderImageCard(key, config.abi[key].color);});
 		break;
 		
 		case 3:
 		barTitle.innerHTML = "Mesoscale Imagery";
 		mainContent.innerHTML = "";
-		Object.keys(config.meso).forEach(function(key){renderImageCard(key);});
+		Object.keys(config.meso).forEach(function(key){renderImageCard(key, config.abi[key].color);});
 		break;
 
 		case 4:
 		barTitle.innerHTML = "EMWIN Imagery";
 		mainContent.innerHTML = "";
-		Object.keys(config.emwin).forEach(function(key){renderImageCard(key);});
+		Object.keys(config.emwin).forEach(function(key){renderImageCard(key, config.abi[key].color);});
 		break;
 		
 		case 5:
