@@ -1070,6 +1070,7 @@ function loadLocalRadar(targetedContent)
 				metadata.forEach(thisImg => {dynamicEl.push({src: "/dataHandler.php?type=localRadarData&timestamp=" + thisImg['timestamp'], subHtml: thisImg['subHtml'], timestamp: thisImg['timestamp']});});
 				window['lightbox-localRadar'] = lightGallery(goesImg, {
 					plugins: [lgZoom, lgJumpTo],
+					loop: false,
 					dynamic: true,
 					speed: (matchMedia('(hover: none)').matches ? 250 : 0),
 					dynamicEl: dynamicEl,
@@ -1126,6 +1127,7 @@ function loadImage(targetedContent)
 				window['lightbox-' + contentId] = lightGallery(goesImg, {
 					plugins: [lgZoom, lgJumpTo],
 					dynamic: true,
+					loop: false,
 					speed: (matchMedia('(hover: none)').matches ? 250 : 0),
 					dynamicEl: dynamicEl,
 					mobileSettings: {download: true, controls: false, showCloseIcon: false}
