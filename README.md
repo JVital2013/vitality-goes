@@ -160,7 +160,7 @@ Run the following commands in a terminal:
 ```
 git clone https://github.com/JVital2013/vitality-goes
 cd vitality-goes
-rsync -av --exclude 'config' --exclude 'videos' html/ /var/www/html/
+rsync -av --exclude 'config' --exclude 'videos' html/ /var/www/html/ --delete
 ```
 
 If you still have your cloned vitality-goes repo from last time, you can also just run `git pull` before running rsync.
