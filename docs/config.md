@@ -77,13 +77,15 @@ To understand how these config files work, let's look at an example section:
 [fdfc_16]
 path = {GOES16}/goes16/fd/fc/
 title = "GOES 16 - Color"
+color = #003241
 videoPath = GOES16FalseColor.mp4
 ```
 
 * `[fdfc_16]`: A unique identifier for the image. This can be anything, but it must be unique and contain no spaces
 * `path`: The folder that holds all the images for a particular GOES product. In this example, it uses the `{GOES16}` variable defined in the `Paths` section of config.ini
 * `title`: How the image will be labeled in Vitality GOES
-* `videoPath`: the name of the video file that contains the timelapse of this product. Videos must be rendered seperately (by the [provided script](scripts.md#createvideos-abish) or any other means), and they must be kept in the `html/videos` folder of Vitality GOES. If you're not rendering timelapse videos, comment or remove this line.
+* `color` *(Optional)*: Color of the image's card in the web interface. Any CSS color code can be used. The color setting is optional and is not configured by default.
+* `videoPath` *(Optional)*: the name of the video file that contains the timelapse of this product. Videos must be rendered seperately (by the [provided script](scripts.md#createvideos-abish) or any other means), and they must be kept in the `html/videos` folder of Vitality GOES. If you're not rendering timelapse videos, comment or remove this line.
 
 ## emwin.ini
 
