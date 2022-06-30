@@ -519,19 +519,19 @@ function menuSelect(menuNumber)
 		case 2:
 		barTitle.innerHTML = "Level 2 Imagery";
 		mainContent.innerHTML = "";
-		Object.keys(config.l2).forEach(function(key){renderImageCard(key, config.abi[key].color);});
+		Object.keys(config.l2).forEach(function(key){renderImageCard(key, config.l2[key].color);});
 		break;
 		
 		case 3:
 		barTitle.innerHTML = "Mesoscale Imagery";
 		mainContent.innerHTML = "";
-		Object.keys(config.meso).forEach(function(key){renderImageCard(key, config.abi[key].color);});
+		Object.keys(config.meso).forEach(function(key){renderImageCard(key, config.meso[key].color);});
 		break;
 
 		case 4:
 		barTitle.innerHTML = "EMWIN Imagery";
 		mainContent.innerHTML = "";
-		Object.keys(config.emwin).forEach(function(key){renderImageCard(key, config.abi[key].color);});
+		Object.keys(config.emwin).forEach(function(key){renderImageCard(key, config.emwin[key].color);});
 		break;
 		
 		case 5:
