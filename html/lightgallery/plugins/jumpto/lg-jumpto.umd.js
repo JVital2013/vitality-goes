@@ -75,35 +75,56 @@
     };
 
     var JumpTo = /** @class */ (function () {
+    	//Initialize Core Plugin
         function JumpTo(instance, $LG) {
-            // get lightGallery core plugin instance
-            this.core = instance;
-            this.$LG = $LG;
-            this.settings = __assign(__assign({}, jumptoSettings), this.core.settings);
-            return this;
+		this.core = instance;
+		this.$LG = $LG;
+		this.settings = __assign(__assign({}, jumptoSettings), this.core.settings);
+		return this;
         }
         // Append Jump to control
         JumpTo.prototype.buildTemplates = function () {
-            var jumptoIcons = "<button id=\"" + this.core.getIdName('lg-jumpto') + "\" type=\"button\" aria-label=\"Jump to...\" class=\"lg-jumptobutton\"></button>";
-            this.core.$toolbar.first().append(jumptoIcons);
+		var jumptoIcons = "<button id=\"" + this.core.getIdName('lg-jumpto') + "\" type=\"button\" aria-label=\"Jump to...\" class=\"lg-jumptobutton\"></button>";
+		var dayJumpIcons = '';
+		if(this.settings.controls) dayJumpIcons = "<button type=\"button\" id=\"" + this.core.getIdName('lg-dayprev') + "\" aria-label=\"Previous Day\" class=\"lg-dayprev lg-icon\"></button>\n                <button type=\"button\" id=\"" + this.core.getIdName('lg-daynext') + "\" aria-label=\"Next Day\" class=\"lg-daynext lg-icon\"></button>";
+		this.core.$content.first().append(dayJumpIcons);
+		this.core.$toolbar.first().append(jumptoIcons);
         };
         
+        //On launch...
         JumpTo.prototype.init = function () {
-			this.buildTemplates();
-			
-            var _this = this;
-			var _maxZ = Math.max(...Array.from(document.querySelectorAll('body *'), el => parseFloat(window.getComputedStyle(el).zIndex),).filter(zIndex => !Number.isNaN(zIndex)), 0,);
-			var _simplerPicker = new SimplerPicker(_this.core.$content.firstElement, {zIndex: _maxZ, compactMode: true});
-			var _timestamps = _this.core.galleryItems.map(item => item.timestamp);
-			
-			_simplerPicker.on('submit', function(date, readableDate) {
-				var dateToFind = date.getTime() / 1000;
-				_this.core.slide(_timestamps.indexOf(_timestamps.reduce(function(prev, curr) {return (Math.abs(curr - dateToFind) < Math.abs(prev - dateToFind) ? curr : prev);})));
-			});
-			
-            this.core.getElementById('lg-jumpto').on('click.lg', function () {
-				_simplerPicker.reset(new Date(_this.core.galleryItems[_this.core.index].timestamp * 1000));
-				_simplerPicker.open();
+        	var _this = this;
+        	
+        	//Append Controls to interface
+        	this.buildTemplates();
+        	
+        	//Calculate Necessary Variables
+		var _maxZ = Math.max(...Array.from(document.querySelectorAll('body *'), el => parseFloat(window.getComputedStyle(el).zIndex),).filter(zIndex => !Number.isNaN(zIndex)), 0,);
+		var _simplerPicker = new SimplerPicker(_this.core.$content.firstElement, {zIndex: _maxZ, compactMode: true});
+		var _timestamps = _this.core.galleryItems.map(item => item.timestamp);
+		
+		//Change image to closest specified by the date picker
+		_simplerPicker.on('submit', function(date, readableDate) {
+			var dateToFind = date.getTime() / 1000;
+			_this.core.slide(_timestamps.indexOf(_timestamps.reduce(function(prev, curr) {return (Math.abs(curr - dateToFind) < Math.abs(prev - dateToFind) ? curr : prev);})));
+		});
+		
+		//Jump back one day when tapping previous
+		this.core.getElementById('lg-dayprev').on('click.lg', function() {
+			var dateToFind = _this.core.galleryItems[_this.core.index].timestamp - 86400;
+			_this.core.slide(_timestamps.indexOf(_timestamps.reduce(function(prev, curr) {return (Math.abs(curr - dateToFind) < Math.abs(prev - dateToFind) ? curr : prev);})));
+		});
+		
+		//Jump back one day when tapping previous
+		this.core.getElementById('lg-daynext').on('click.lg', function() {
+			var dateToFind = _this.core.galleryItems[_this.core.index].timestamp + 86400;
+			_this.core.slide(_timestamps.indexOf(_timestamps.reduce(function(prev, curr) {return (Math.abs(curr - dateToFind) < Math.abs(prev - dateToFind) ? curr : prev);})));
+		});
+		
+		//Open date picker when calendar icon is tapped
+		this.core.getElementById('lg-jumpto').on('click.lg', function () {
+			_simplerPicker.reset(new Date(_this.core.galleryItems[_this.core.index].timestamp * 1000));
+			_simplerPicker.open();
             });
         };
         

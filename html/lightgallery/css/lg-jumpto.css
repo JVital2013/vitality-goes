@@ -31,3 +31,66 @@
 .lg-jumptobutton:hover {
   color: #fff;
 }
+.lg-next, .lg-prev, .lg-daynext, .lg-dayprev {
+  font-family: 'Font Awesome 5 Free' !important;
+  speak: never;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: 900;
+  width: 40px;
+}
+.lg-next, .lg-prev {
+  top: calc(50% - 20px);
+}
+.lg-daynext, .lg-dayprev {
+  top: calc(50% + 20px);
+  background-color: rgba(0, 0, 0, 0.45);
+  border-radius: 2px;
+  color: #999;
+  cursor: pointer;
+  display: block;
+  font-size: 22px;
+  margin-top: -10px;
+  padding: 8px 10px 9px;
+  position: absolute;
+  z-index: 1080;
+  outline: none;
+  border: none;
+}
+.lg-next:before {
+  content: '\f105';
+}
+.lg-prev:after {
+  content: '\f104';
+}
+.lg-daynext.disabled,
+.lg-dayprev.disabled {
+  opacity: 0 !important;
+  cursor: default;
+}
+
+.lg-daynext:hover:not(.disabled),
+.lg-dayprev:hover:not(.disabled) {
+  color: #fff;
+}
+
+.lg-single-item .lg-daynext, .lg-single-item
+.lg-dayprev {
+  display: none;
+}
+
+.lg-daynext {
+  right: 20px;
+}
+
+.lg-daynext:before {
+  content: '\f101';
+}
+
+.lg-dayprev {
+  left: 20px;
+}
+
+.lg-dayprev:after {
+  content: '\f100';
+}
