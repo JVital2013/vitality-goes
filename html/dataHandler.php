@@ -754,7 +754,7 @@ elseif($_GET['type'] == "weatherJSON")
 			$returnData['dewPoint'] = $currentConditionParts[2];
 			$returnData['humidity'] = $currentConditionParts[3];
 			$returnData['pressure'] = $currentConditionParts[5];
-			$returnData['remarks'] = (count($currentConditionParts) > 6 ? $currentConditionParts[6] : "");
+			$returnData['remarks'] = (count($currentConditionParts) > 6 ? implode(" ", array_slice($currentConditionParts, 6)) : "");
 			
 			$windPart = $currentConditionParts[4];
 			if($windPart == "CALM")
