@@ -756,8 +756,7 @@ elseif($_GET['type'] == "weatherJSON")
 			$returnData['pressure'] = $currentConditionParts[5];
 			$returnData['remarks'] = (count($currentConditionParts) > 6 ? implode(" ", array_slice($currentConditionParts, 6)) : "");
 			
-			$windPart = $currentConditionParts[4];
-			if($windPart == "CALM")
+			if($currentConditionParts[4] == "CALM")
 			{
 				$returnData['wind'] = 0;
 				$returnData['windGust'] = 0;
@@ -765,25 +764,18 @@ elseif($_GET['type'] == "weatherJSON")
 			}
 			else
 			{
-				$windParts = str_split($windPart);
 				$returnData['windDirection'] = "";
-				
-				if(is_numeric($windParts[1]))
+				for($i = strlen($currentConditionParts[4]) - 1; $i >= 0; $i--)
 				{
-					$returnData['windDirection'] = substr($windPart, 0, 1);
-					$noGust = explode("G", substr($windPart, 1));
-					$returnData['wind'] = $noGust[0];
-				}
-				else
-				{
-					$returnData['windDirection'] = substr($windPart, 0, 2);
-					$noGust = explode("G", substr($windPart, 2));
-					$returnData['wind'] = $noGust[0];
+					if(preg_match("/[0-9]+/", substr($currentConditionParts[4], 0, $i)) === 1) continue;
+					$returnData['windDirection'] = substr($currentConditionParts[4], 0, $i);
+					$noGust = explode("G", substr($currentConditionParts[4], $i));
+					break;
 				}
 				
+				$returnData['wind'] = $noGust[0];
 				if(count($noGust) == 1) $returnData['windGust'] = "N/A";
 				else $returnData['windGust'] = $noGust[1] . " MPH";
-				
 			}
 			
 			break;
