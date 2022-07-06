@@ -9,7 +9,7 @@
 
 		<link rel="apple-touch-icon" href="/icon-512x512.png">
 		<link rel="manifest" href="/manifest.json?v=20220616">
-		<link rel="stylesheet" href="/styles.css?v=20220627">
+		<link rel="stylesheet" href="/styles.css?v=20220706">
 		<link rel="stylesheet" href="/opensans.css">
 		<link rel="stylesheet" href="/simplerpicker/simplerpicker.css">
 		<link rel="stylesheet" href="/fontawesome/css/all.css">
@@ -26,7 +26,7 @@
 		<script src="/lightgallery/plugins/zoom/lg-zoom.umd.js"></script>
 		<script src="/lightgallery/plugins/jumpto/lg-jumpto.umd.js"></script>
 		<script src="/simplerpicker/simplerpicker.js"></script>
-		<script src='/script.js?v=20220627'></script>
+		<script src='/script.js?v=20220706'></script>
 	</head>
 	<body>
 		<div class='topBar'>

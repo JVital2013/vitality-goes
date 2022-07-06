@@ -263,7 +263,7 @@ function menuSelect(menuNumber)
 	if(document.getElementById('sideBar').childElementCount < 2)
 	{
 		mainContent.innerHTML = "<div style='height: 30px;'></div><div style='color: white; text-align: center;'>No data found to display! Please verify the server config</div>";
-		mainContent.className = "mainContent singleCard";
+		mainContent.className = "singleCard";
 		return;
 	}
 	
@@ -305,7 +305,7 @@ function menuSelect(menuNumber)
 	if(typeof(EventSource) == "undefined")
 	{
 		mainContent.innerHTML = "<div style='height: 30px;'></div><div style='color: white; text-align: center;'>Sorry! Internet Explorer does not support this site. Please use a real browser.</div>";
-		mainContent.className = "mainContent singleCard";
+		mainContent.className = "singleCard";
 		return;
 	}
 	
@@ -970,7 +970,7 @@ function menuSelect(menuNumber)
 	}
 	
 	//Change styling for specific screens
-	if(mainContent.childElementCount <= 2) mainContent.className = "mainContent singleCard";
+	if(mainContent.childElementCount <= 2) mainContent.className = "singleCard";
 	else mainContent.className = "mainContent";
 }
 
