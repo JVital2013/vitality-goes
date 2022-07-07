@@ -812,8 +812,11 @@ elseif($_GET['type'] == "weatherJSON")
 	else
 	{
 		$data = file($dataPath);
-		$returnData['summaryTime'] = trim($data[7]);
-		$returnData['summary'] = linesToParagraphs($data, 9);
+		$startOfSummary = 0;
+		while(stripos($data[$startOfSummary], "SUMMARY") === false) $startOfSummary++;
+		
+		$returnData['summaryTime'] = trim($data[$startOfSummary + 2]);
+		$returnData['summary'] = linesToParagraphs($data, $startOfSummary + 4);
 	}
 	
 	//7-day Forecast
