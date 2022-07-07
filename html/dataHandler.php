@@ -786,28 +786,37 @@ elseif($_GET['type'] == "weatherJSON")
 	$dataPath = findNewestEMWIN($allEmwinFiles, "RWS".$currentSettings[$selectedProfile]['orig']);
 	if($dataPath == "")
 	{
-		$data = file(findNewestEMWIN($allEmwinFiles, "AFD".$currentSettings[$selectedProfile]['orig']));
-		$dataBuffer = [];
-		$decodingLine = -1;
-		foreach($data as $rawLine)
+		$dataPath = findNewestEMWIN($allEmwinFiles, "AFD".$currentSettings[$selectedProfile]['orig']);
+		if($dataPath == "")
 		{
-			$thisLine = trim($rawLine);
-			if(stripos($thisLine, ".DISCUSSION...") === 0 || stripos($thisLine, ".NEAR TERM") === 0 || stripos($thisLine, ".SHORT TERM") === 0)
-			{
-				$decodingLine = 0;
-				$dataBuffer[] = substr($thisLine, strrpos($thisLine, "...") + 3);
-				continue;
-			}
-			if($decodingLine == -1) continue;
-			if(strpos($thisLine, "&&") === 0 || stripos($thisLine, ".LONG TERM...") === 0) break;
-			
-			if($decodingLine > 0) $dataBuffer[] = $thisLine;
-			else $dataBuffer[0] .= " ".$thisLine;
-			$decodingLine++;
+			$returnData['summaryTime'] = "";
+			$returnData['summary'] = "";
 		}
-		
-		$returnData['summaryTime'] = trim($data[5]);
-		$returnData['summary'] = linesToParagraphs($dataBuffer, 0);
+		else
+		{
+			$data = file($dataPath);
+			$dataBuffer = [];
+			$decodingLine = -1;
+			foreach($data as $rawLine)
+			{
+				$thisLine = trim($rawLine);
+				if(stripos($thisLine, ".DISCUSSION...") === 0 || stripos($thisLine, ".NEAR TERM") === 0 || stripos($thisLine, ".SHORT TERM") === 0)
+				{
+					$decodingLine = 0;
+					$dataBuffer[] = substr($thisLine, strrpos($thisLine, "...") + 3);
+					continue;
+				}
+				if($decodingLine == -1) continue;
+				if(strpos($thisLine, "&&") === 0 || stripos($thisLine, ".LONG TERM...") === 0) break;
+				
+				if($decodingLine > 0) $dataBuffer[] = $thisLine;
+				else $dataBuffer[0] .= " ".$thisLine;
+				$decodingLine++;
+			}
+			
+			$returnData['summaryTime'] = trim($data[5]);
+			$returnData['summary'] = linesToParagraphs($dataBuffer, 0);
+		}
 	}
 	else
 	{
