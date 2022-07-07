@@ -164,7 +164,7 @@ function findImageABI($path, $timestamp)
 function linesToParagraphs($lineArray, $linesToSkip)
 {
 	$startingParagraph = false;
-	$retVal = "<p style='font-weight: bold;'>";
+	$retVal = (count($lineArray) > 0 ? "<p style='font-weight: bold;'>" : "");
 	foreach($lineArray as $key => $line)
 	{
 		if($key < $linesToSkip) continue;
