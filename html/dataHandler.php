@@ -717,68 +717,72 @@ elseif($_GET['type'] == "weatherJSON")
 	$allEmwinFiles = scandir_recursive($config['general']['emwinPath']);
 	
 	//Current Weather Conditions
-	$data = file(findNewestEMWIN($allEmwinFiles, "RWR".$currentSettings[$selectedProfile]['rwrOrig']));
-	$gotWeatherTime = false;
-	foreach($data as $thisLine)
+	$rwrFile = findNewestEMWIN($allEmwinFiles, "RWR".$currentSettings[$selectedProfile]['rwrOrig']);
+	if($rwrFile != "")
 	{
-		//The first line that starts with a number is the time of the report
-		if(!$gotWeatherTime && is_numeric($thisLine[0]))
+		$data = file($rwrFile);
+		$gotWeatherTime = false;
+		foreach($data as $thisLine)
 		{
-			$returnData['weatherTime'] = trim($thisLine);
-			$gotWeatherTime = true;
-		}
-		
-		if(stripos($thisLine, $currentSettings[$selectedProfile]['city']) === 0)
-		{
-			$currentConditionParts = preg_split("/[ ]{2,}/", trim($thisLine), 3);
-			$remainingConditionParts = array_pop($currentConditionParts);
-			array_shift($currentConditionParts);
-			$currentConditionParts = array_merge($currentConditionParts, preg_split("/[ ]+/", $remainingConditionParts));
-			
-			$returnData['weatherDesc'] = $currentConditionParts[0];
-			if($returnData['weatherDesc'] == "NOT AVBL")
+			//The first line that starts with a number is the time of the report
+			if(!$gotWeatherTime && is_numeric($thisLine[0]))
 			{
-				$returnData['weatherDesc'] = "Not Available";
-				$returnData['temp'] = "N/A";
-				$returnData['dewPoint'] = "N/A";
-				$returnData['humidity'] = "N/A";
-				$returnData['pressure'] = "N/A";
-				$returnData['remarks'] = "N/A";
-				$returnData['wind'] = "N/A";
-				$returnData['windGust'] = "N/A";
-				$returnData['windDirection'] = "N/A";
-				break;
+				$returnData['weatherTime'] = trim($thisLine);
+				$gotWeatherTime = true;
 			}
 			
-			$returnData['temp'] = $currentConditionParts[1];
-			$returnData['dewPoint'] = $currentConditionParts[2];
-			$returnData['humidity'] = $currentConditionParts[3];
-			$returnData['pressure'] = $currentConditionParts[5];
-			$returnData['remarks'] = (count($currentConditionParts) > 6 ? implode(" ", array_slice($currentConditionParts, 6)) : "");
-			
-			if($currentConditionParts[4] == "CALM")
+			if(stripos($thisLine, $currentSettings[$selectedProfile]['city']) === 0)
 			{
-				$returnData['wind'] = 0;
-				$returnData['windGust'] = 0;
-				$returnData['windDirection'] = "";
-			}
-			else
-			{
-				$returnData['windDirection'] = "";
-				for($i = strlen($currentConditionParts[4]) - 1; $i >= 0; $i--)
+				$currentConditionParts = preg_split("/[ ]{2,}/", trim($thisLine), 3);
+				$remainingConditionParts = array_pop($currentConditionParts);
+				array_shift($currentConditionParts);
+				$currentConditionParts = array_merge($currentConditionParts, preg_split("/[ ]+/", $remainingConditionParts));
+				
+				$returnData['weatherDesc'] = $currentConditionParts[0];
+				if($returnData['weatherDesc'] == "NOT AVBL")
 				{
-					if(preg_match("/[0-9]+/", substr($currentConditionParts[4], 0, $i)) === 1) continue;
-					$returnData['windDirection'] = substr($currentConditionParts[4], 0, $i);
-					$noGust = explode("G", substr($currentConditionParts[4], $i));
+					$returnData['weatherDesc'] = "Not Available";
+					$returnData['temp'] = "N/A";
+					$returnData['dewPoint'] = "N/A";
+					$returnData['humidity'] = "N/A";
+					$returnData['pressure'] = "N/A";
+					$returnData['remarks'] = "N/A";
+					$returnData['wind'] = "N/A";
+					$returnData['windGust'] = "N/A";
+					$returnData['windDirection'] = "N/A";
 					break;
 				}
 				
-				$returnData['wind'] = $noGust[0];
-				if(count($noGust) == 1) $returnData['windGust'] = "N/A";
-				else $returnData['windGust'] = $noGust[1] . " MPH";
+				$returnData['temp'] = $currentConditionParts[1];
+				$returnData['dewPoint'] = $currentConditionParts[2];
+				$returnData['humidity'] = $currentConditionParts[3];
+				$returnData['pressure'] = $currentConditionParts[5];
+				$returnData['remarks'] = (count($currentConditionParts) > 6 ? implode(" ", array_slice($currentConditionParts, 6)) : "");
+				
+				if($currentConditionParts[4] == "CALM")
+				{
+					$returnData['wind'] = 0;
+					$returnData['windGust'] = 0;
+					$returnData['windDirection'] = "";
+				}
+				else
+				{
+					$returnData['windDirection'] = "";
+					for($i = strlen($currentConditionParts[4]) - 1; $i >= 0; $i--)
+					{
+						if(preg_match("/[0-9]+/", substr($currentConditionParts[4], 0, $i)) === 1) continue;
+						$returnData['windDirection'] = substr($currentConditionParts[4], 0, $i);
+						$noGust = explode("G", substr($currentConditionParts[4], $i));
+						break;
+					}
+					
+					$returnData['wind'] = $noGust[0];
+					if(count($noGust) == 1) $returnData['windGust'] = "N/A";
+					else $returnData['windGust'] = $noGust[1] . " MPH";
+				}
+				
+				break;
 			}
-			
-			break;
 		}
 	}
 	
