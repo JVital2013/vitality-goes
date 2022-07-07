@@ -24,7 +24,7 @@ else
 }
 
 //Overwrite first setting profile in array with all other settings on server
-if(count($currentSettings) == 0 || count(array_diff($currentSettings[0],  $config['location'])) != 0) $sendCookie = true;
+if(count($currentSettings) == 0 || count(array_diff($config['location'], $currentSettings[0])) != 0) $sendCookie = true;
 $currentSettings[0] = $config['location'];
 
 //Load selected profile; make sure cookie is set and not malformed
@@ -710,7 +710,7 @@ elseif($_GET['type'] == "alertJSON")
 elseif($_GET['type'] == "weatherJSON")
 {
 	$returnData = [];
-	$returnData['city'] = $currentSettings[$selectedProfile]['city'];
+	$returnData['city'] = ($currentSettings[$selectedProfile]['city'] == '' ? $currentSettings[$selectedProfile]['wxZone'] : $currentSettings[$selectedProfile]['city']);
 	$returnData['state'] = $currentSettings[$selectedProfile]['stateAbbr'];
 	
 	//Get all EMWIN files for use later

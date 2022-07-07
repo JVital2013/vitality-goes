@@ -24,6 +24,7 @@ function loadConfig()
 		unset($config['paths']);
 	}
 	
+	if(!array_key_exists('city', $config['location'])) $config['location']['city'] = "";
 	if(!array_key_exists('emwinPath', $config['general'])) $config['emwin'] = [];
 	
 	return $config;

@@ -367,34 +367,36 @@ function menuSelect(menuNumber)
 					document.getElementById('mainContent').prepend(weatherAlert);
 				}
 				
-				//Weather Conditions
-				conditions = weatherInfo.weatherDesc;
-				switch(weatherInfo.weatherDesc)
-				{
-					case "CLEAR": conditions = "Clear"; break;
-					case "SUNNY": conditions = "Sunny"; break;
-					case "PTSUNNY": conditions = "Partly Sunny"; break;
-					case "MOSUNNY": conditions = "Mostly Sunny"; break;
-					case "MOSUNNY": conditions = "Mostly Sunny"; break;
-					case "PTCLDY": conditions = "Partly Cloudy"; break;
-					case "MOCLDY": conditions = "Mostly Cloudy"; break;
-					case "CLOUDY": conditions = "Cloudy"; break;
-					case "LGT SNOW": conditions = "Light Snow"; break;
-					case "LGT RAIN": conditions = "Light Rain"; break;
-					case "RAIN": conditions = "Rain"; break;
-					case "HVY RAIN": conditions = "Heavy Rain"; break;
-					case "SNOW": conditions = "Snow"; break;
-					case "FAIR": conditions = "Fair"; break;
-					case "FOG": conditions = "Fog"; break;
-					case "TSTM": conditions = "Thunderstorms"; break;
-				}
-				
 				//Render Weather Card
 				target = document.getElementById("currentWeatherCardBody");
 				target.previousSibling.innerHTML += " - " + toTitleCase(weatherInfo.city) + ", " + weatherInfo.state;
 				target.innerHTML = "";
 				
-				if("conditions" in weatherInfo) renderLeftRightLine(target, "Weather", conditions);
+				if("weatherDesc" in weatherInfo)
+				{
+					conditions = weatherInfo.weatherDesc;
+					switch(weatherInfo.weatherDesc)
+					{
+						case "CLEAR": conditions = "Clear"; break;
+						case "SUNNY": conditions = "Sunny"; break;
+						case "PTSUNNY": conditions = "Partly Sunny"; break;
+						case "MOSUNNY": conditions = "Mostly Sunny"; break;
+						case "MOSUNNY": conditions = "Mostly Sunny"; break;
+						case "PTCLDY": conditions = "Partly Cloudy"; break;
+						case "MOCLDY": conditions = "Mostly Cloudy"; break;
+						case "CLOUDY": conditions = "Cloudy"; break;
+						case "LGT SNOW": conditions = "Light Snow"; break;
+						case "LGT RAIN": conditions = "Light Rain"; break;
+						case "RAIN": conditions = "Rain"; break;
+						case "HVY RAIN": conditions = "Heavy Rain"; break;
+						case "SNOW": conditions = "Snow"; break;
+						case "FAIR": conditions = "Fair"; break;
+						case "FOG": conditions = "Fog"; break;
+						case "TSTM": conditions = "Thunderstorms"; break;
+					}
+					renderLeftRightLine(target, "Weather", conditions);
+				}
+				
 				if("temp" in weatherInfo) renderLeftRightLine(target, "Temperature", weatherInfo.temp + "&deg; F");
 				if("humidity" in weatherInfo) renderLeftRightLine(target, "Humidity", weatherInfo.humidity + "%");
 				if("dewPoint" in weatherInfo) renderLeftRightLine(target, "Dew Point", weatherInfo.dewPoint + "&deg; F");
@@ -687,7 +689,7 @@ function menuSelect(menuNumber)
 		currentSettings.forEach(profile => {
 			newOption = document.createElement('option');
 			newOption.value = thisProfile;
-			newOption.text = (thisProfile == 0 ? "Ground Station Defaults" : toTitleCase(profile.city) + ", " + profile.stateAbbr);
+			newOption.text = (thisProfile == 0 ? "Ground Station Defaults" : (profile.city == "" ? profile.wxZone : toTitleCase(profile.city)) + ", " + profile.stateAbbr);
 			profileSelector.appendChild(newOption);
 			thisProfile++;
 		});
