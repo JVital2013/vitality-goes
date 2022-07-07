@@ -406,7 +406,8 @@ function menuSelect(menuNumber)
 				target.innerHTML += "<div class='goeslabel'>Last Update: " + weatherInfo.weatherTime + "</div>";
 				
 				//Weather Summary
-				document.getElementById("summaryWeatherCardBody").innerHTML = weatherInfo.summary + "<div class='goeslabel'>Last Update: " + weatherInfo.summaryTime + "</div>";
+				if(weatherInfo.summary == "") document.getElementById("summaryWeatherCardBody").parentElement.parentElement.style.display = 'none';
+				else document.getElementById("summaryWeatherCardBody").innerHTML = weatherInfo.summary + "<div class='goeslabel'>Last Update: " + weatherInfo.summaryTime + "</div>";
 				
 				//7 day forcast
 				target = document.getElementById("sevenDayWeatherCardBody");
