@@ -410,71 +410,75 @@ function menuSelect(menuNumber)
 				
 				//7 day forcast
 				target = document.getElementById("sevenDayWeatherCardBody");
-				target.innerHTML = "";
-				sevenDayForcastContainer = document.createElement('div');
-				sevenDayForcastContainer.className = "forcastCardHolder";
-				
-				weatherInfo.sevenDayForcast.forEach(todaysForcast => {
-					forcastCard = document.createElement('div');
-					forcastCard.className = 'forecastCard';
-					forcastCard.innerHTML = "<div style='font-weight: bold; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #888888;'>" + todaysForcast.date + "</div>";
+				if(weatherInfo.sevenDayForcast.length == 0) target.parentElement.style.display = 'none';
+				else
+				{
+					target.innerHTML = "";
+					sevenDayForcastContainer = document.createElement('div');
+					sevenDayForcastContainer.className = "forcastCardHolder";
 					
-					if("amClouds" in todaysForcast && "amPrecip" in todaysForcast)
-					{
-						//Probably not raining
-						if(todaysForcast.amClouds == "CL" || todaysForcast.amClouds == "FW") forcastCard.innerHTML += "<i class='fa fa-sun fa-4x'></i><br />";
-						else if(todaysForcast.amClouds == "SC" || todaysForcast.amClouds == "B1")
-						{
-							if(todaysForcast.amPrecip < 50) forcastCard.innerHTML += "<i class='fa fa-cloud-sun fa-4x'></i><br />";
-							else forcastCard.innerHTML += "<i class='fa fa-cloud-sun-rain fa-4x'></i><br />";
-						}
-						else if(todaysForcast.amClouds == "B2" || todaysForcast.amClouds == "OV")
-						{
-							if(todaysForcast.amPrecip < 50) forcastCard.innerHTML += "<i class='fa fa-cloud fa-4x'></i><br />";
-							else forcastCard.innerHTML += "<i class='fa fa-cloud-showers-heavy fa-4x'></i><br />";
-						}
-						else forcastCard.innerHTML += "<i class='fa fa-question-circle fa-4x'></i><br />";
+					weatherInfo.sevenDayForcast.forEach(todaysForcast => {
+						forcastCard = document.createElement('div');
+						forcastCard.className = 'forecastCard';
+						forcastCard.innerHTML = "<div style='font-weight: bold; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #888888;'>" + todaysForcast.date + "</div>";
 						
-						forcastCard.innerHTML += "<div style='height: 10px;'></div>";
-					}
-					
-					if("maxTemp" in todaysForcast) renderLeftRightLine(forcastCard, "High", todaysForcast.maxTemp + "&deg; F");
-					if("amPrecip" in todaysForcast) renderLeftRightLine(forcastCard, "Precipitation", todaysForcast.amPrecip + "%");
-					if("amHumidity" in todaysForcast) renderLeftRightLine(forcastCard, "Humidity", todaysForcast.amHumidity + "%");
-					
-					if((("amClouds" in todaysForcast && "amPrecip" in todaysForcast) || "maxTemp" in todaysForcast || "amPrecip" in todaysForcast || "amHumidity" in todaysForcast) && (("pmClouds" in todaysForcast && "pmPrecip" in todaysForcast) || "minTemp" in todaysForcast || "pmPrecip" in todaysForcast || "pmHumidity" in todaysForcast)) forcastCard.innerHTML += "<div style='font-weight: bold; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #888888; margin-top: 25px;'>Evening</div>";
-					if("pmClouds" in todaysForcast && "pmPrecip" in todaysForcast)
-					{
-						//Probably not raining
-						if(todaysForcast.pmClouds == "CL" || todaysForcast.pmClouds == "FW") forcastCard.innerHTML += "<i class='fa fa-moon fa-4x'></i><br />";
-						else if(todaysForcast.pmClouds == "SC" || todaysForcast.pmClouds == "B1")
+						if("amClouds" in todaysForcast && "amPrecip" in todaysForcast)
 						{
-							if(todaysForcast.pmPrecip < 50) forcastCard.innerHTML += "<i class='fa fa-cloud-moon fa-4x'></i><br />";
-							else forcastCard.innerHTML += "<i class='fa fa-cloud-moon-rain fa-4x'></i><br />";
+							//Probably not raining
+							if(todaysForcast.amClouds == "CL" || todaysForcast.amClouds == "FW") forcastCard.innerHTML += "<i class='fa fa-sun fa-4x'></i><br />";
+							else if(todaysForcast.amClouds == "SC" || todaysForcast.amClouds == "B1")
+							{
+								if(todaysForcast.amPrecip < 50) forcastCard.innerHTML += "<i class='fa fa-cloud-sun fa-4x'></i><br />";
+								else forcastCard.innerHTML += "<i class='fa fa-cloud-sun-rain fa-4x'></i><br />";
+							}
+							else if(todaysForcast.amClouds == "B2" || todaysForcast.amClouds == "OV")
+							{
+								if(todaysForcast.amPrecip < 50) forcastCard.innerHTML += "<i class='fa fa-cloud fa-4x'></i><br />";
+								else forcastCard.innerHTML += "<i class='fa fa-cloud-showers-heavy fa-4x'></i><br />";
+							}
+							else forcastCard.innerHTML += "<i class='fa fa-question-circle fa-4x'></i><br />";
+							
+							forcastCard.innerHTML += "<div style='height: 10px;'></div>";
 						}
-						else if(todaysForcast.pmClouds == "B2" || todaysForcast.pmClouds == "OV")
-						{
-							if(todaysForcast.pmPrecip < 50) forcastCard.innerHTML += "<i class='fa fa-cloud fa-4x'></i><br />";
-							else forcastCard.innerHTML += "<i class='fa fa-cloud-showers-heavy fa-4x'></i><br />";
-						}
-						else forcastCard.innerHTML += "<i class='fa fa-question-circle fa-4x'></i><br />";
 						
-						forcastCard.innerHTML += "<div style='height: 10px;'></div>";
-					}
+						if("maxTemp" in todaysForcast) renderLeftRightLine(forcastCard, "High", todaysForcast.maxTemp + "&deg; F");
+						if("amPrecip" in todaysForcast) renderLeftRightLine(forcastCard, "Precipitation", todaysForcast.amPrecip + "%");
+						if("amHumidity" in todaysForcast) renderLeftRightLine(forcastCard, "Humidity", todaysForcast.amHumidity + "%");
+						
+						if((("amClouds" in todaysForcast && "amPrecip" in todaysForcast) || "maxTemp" in todaysForcast || "amPrecip" in todaysForcast || "amHumidity" in todaysForcast) && (("pmClouds" in todaysForcast && "pmPrecip" in todaysForcast) || "minTemp" in todaysForcast || "pmPrecip" in todaysForcast || "pmHumidity" in todaysForcast)) forcastCard.innerHTML += "<div style='font-weight: bold; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #888888; margin-top: 25px;'>Evening</div>";
+						if("pmClouds" in todaysForcast && "pmPrecip" in todaysForcast)
+						{
+							//Probably not raining
+							if(todaysForcast.pmClouds == "CL" || todaysForcast.pmClouds == "FW") forcastCard.innerHTML += "<i class='fa fa-moon fa-4x'></i><br />";
+							else if(todaysForcast.pmClouds == "SC" || todaysForcast.pmClouds == "B1")
+							{
+								if(todaysForcast.pmPrecip < 50) forcastCard.innerHTML += "<i class='fa fa-cloud-moon fa-4x'></i><br />";
+								else forcastCard.innerHTML += "<i class='fa fa-cloud-moon-rain fa-4x'></i><br />";
+							}
+							else if(todaysForcast.pmClouds == "B2" || todaysForcast.pmClouds == "OV")
+							{
+								if(todaysForcast.pmPrecip < 50) forcastCard.innerHTML += "<i class='fa fa-cloud fa-4x'></i><br />";
+								else forcastCard.innerHTML += "<i class='fa fa-cloud-showers-heavy fa-4x'></i><br />";
+							}
+							else forcastCard.innerHTML += "<i class='fa fa-question-circle fa-4x'></i><br />";
+							
+							forcastCard.innerHTML += "<div style='height: 10px;'></div>";
+						}
+						
+						if("minTemp" in todaysForcast) renderLeftRightLine(forcastCard, "Low", todaysForcast.minTemp + "&deg; F");
+						if("pmPrecip" in todaysForcast) renderLeftRightLine(forcastCard, "Precipitation", todaysForcast.pmPrecip + "%");
+						if("pmHumidity" in todaysForcast) renderLeftRightLine(forcastCard, "Humidity", todaysForcast.pmHumidity + "%");
+						
+						sevenDayForcastContainer.appendChild(forcastCard);
+					});
 					
-					if("minTemp" in todaysForcast) renderLeftRightLine(forcastCard, "Low", todaysForcast.minTemp + "&deg; F");
-					if("pmPrecip" in todaysForcast) renderLeftRightLine(forcastCard, "Precipitation", todaysForcast.pmPrecip + "%");
-					if("pmHumidity" in todaysForcast) renderLeftRightLine(forcastCard, "Humidity", todaysForcast.pmHumidity + "%");
+					target.appendChild(sevenDayForcastContainer);
 					
-					sevenDayForcastContainer.appendChild(forcastCard);
-				});
-				
-				target.appendChild(sevenDayForcastContainer);
-				
-				sevenDayForecastLastUpdate = document.createElement('div');
-				sevenDayForecastLastUpdate.className = "goeslabel";
-				sevenDayForecastLastUpdate.innerHTML = "Last Update: " + weatherInfo.sevenDayForecastDate;
-				target.appendChild(sevenDayForecastLastUpdate);
+					sevenDayForecastLastUpdate = document.createElement('div');
+					sevenDayForecastLastUpdate.className = "goeslabel";
+					sevenDayForecastLastUpdate.innerHTML = "Last Update: " + weatherInfo.sevenDayForecastDate;
+					target.appendChild(sevenDayForecastLastUpdate);
+				}
 				
 				
 				//Forecast

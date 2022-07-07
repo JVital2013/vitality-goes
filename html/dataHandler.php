@@ -819,26 +819,11 @@ elseif($_GET['type'] == "weatherJSON")
 	//7-day Forecast
 	$forcastData = [];
 	$decodingLine = -1;
-	$data = file(findNewestEMWIN($allEmwinFiles, "PFM".$currentSettings[$selectedProfile]['orig']));
 	
-	foreach($data as $rawLine)
+	$sevenDayFile = findNewestEMWIN($allEmwinFiles, "PFM".$currentSettings[$selectedProfile]['orig']);
+	if($sevenDayFile != "")
 	{
-		$thisLine = trim($rawLine);
-		if(stripos($thisLine, $currentSettings[$selectedProfile]['wxZone']) === 0)
-		{
-			$decodingLine = 0;
-			continue;
-		}
-		if($decodingLine == -1) continue;
-		if(strpos($thisLine, "$$") === 0) break;
-		
-		$forcastData[] = $thisLine;
-	}
-	
-	//Check if data was found in this file. If not, switch to AFM
-	if($decodingLine == -1)
-	{
-		$data = file(findNewestEMWIN($allEmwinFiles, "AFM".$currentSettings[$selectedProfile]['orig']));
+		$data = file($sevenDayFile);
 		foreach($data as $rawLine)
 		{
 			$thisLine = trim($rawLine);
@@ -851,6 +836,29 @@ elseif($_GET['type'] == "weatherJSON")
 			if(strpos($thisLine, "$$") === 0) break;
 			
 			$forcastData[] = $thisLine;
+		}
+	}
+	
+	//Check if data was found in this file. If not, switch to AFM
+	if($decodingLine == -1)
+	{
+		$sevenDayFile = findNewestEMWIN($allEmwinFiles, "AFM".$currentSettings[$selectedProfile]['orig']);
+		if($sevenDayFile != "")
+		{
+			$data = file($sevenDayFile);
+			foreach($data as $rawLine)
+			{
+				$thisLine = trim($rawLine);
+				if(stripos($thisLine, $currentSettings[$selectedProfile]['wxZone']) === 0)
+				{
+					$decodingLine = 0;
+					continue;
+				}
+				if($decodingLine == -1) continue;
+				if(strpos($thisLine, "$$") === 0) break;
+				
+				$forcastData[] = $thisLine;
+			}
 		}
 	}
 	
