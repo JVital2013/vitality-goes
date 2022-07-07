@@ -394,16 +394,17 @@ function menuSelect(menuNumber)
 				target.previousSibling.innerHTML += " - " + toTitleCase(weatherInfo.city) + ", " + weatherInfo.state;
 				target.innerHTML = "";
 				
-				renderLeftRightLine(target, "Weather", conditions);
-				renderLeftRightLine(target, "Temperature", weatherInfo.temp + "&deg; F");
-				renderLeftRightLine(target, "Humidity", weatherInfo.humidity + "%");
-				renderLeftRightLine(target, "Dew Point", weatherInfo.dewPoint + "&deg; F");
-				renderLeftRightLine(target, "Barometric Pressure", weatherInfo.pressure);
-				renderLeftRightLine(target, "Wind", (weatherInfo.wind == 0 ? "" : weatherInfo.windDirection + ", ") + weatherInfo.wind + " MPH");
-				if(weatherInfo.windGust != "N/A") renderLeftRightLine(target, "Wind Gust", weatherInfo.windGust);
-				if(weatherInfo.remarks != "") renderLeftRightLine(target, "Remarks", weatherInfo.remarks);
+				if("conditions" in weatherInfo) renderLeftRightLine(target, "Weather", conditions);
+				if("temp" in weatherInfo) renderLeftRightLine(target, "Temperature", weatherInfo.temp + "&deg; F");
+				if("humidity" in weatherInfo) renderLeftRightLine(target, "Humidity", weatherInfo.humidity + "%");
+				if("dewPoint" in weatherInfo) renderLeftRightLine(target, "Dew Point", weatherInfo.dewPoint + "&deg; F");
+				if("pressure" in weatherInfo) renderLeftRightLine(target, "Barometric Pressure", weatherInfo.pressure);
+				if("wind" in weatherInfo && "windDirection" in weatherInfo) renderLeftRightLine(target, "Wind", (weatherInfo.wind == 0 ? "" : weatherInfo.windDirection + ", ") + weatherInfo.wind + " MPH");
+				if("windGust" in weatherInfo && weatherInfo.windGust != "N/A") renderLeftRightLine(target, "Wind Gust", weatherInfo.windGust);
+				if("remarks" in weatherInfo && weatherInfo.remarks != "") renderLeftRightLine(target, "Remarks", weatherInfo.remarks);
 				
-				target.innerHTML += "<div class='goeslabel'>Last Update: " + weatherInfo.weatherTime + "</div>";
+				if(target.innerHTML == "") target.parentElement.parentElement.style.display = 'none';
+				else target.innerHTML += "<div class='goeslabel'>Last Update: " + weatherInfo.weatherTime + "</div>";
 				
 				//Weather Summary
 				if(weatherInfo.summary == "") document.getElementById("summaryWeatherCardBody").parentElement.parentElement.style.display = 'none';
