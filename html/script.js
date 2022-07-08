@@ -1207,7 +1207,15 @@ window.addEventListener("load", function()
 	{
 		if(this.readyState == 4 && this.status == 200)
 		{
-			config = JSON.parse(this.responseText);
+			try {config = JSON.parse(this.responseText);}
+			catch(error)
+			{
+				renderCollapsingCard("serverError", "The server returned bad data. Click to expand", "prettyBoxContent", "otherEmwinBody");
+				target = document.getElementById('serverErrorContent').firstChild;
+				target.innerHTML = this.responseText;
+				mainContent.className = "singleCard";
+				return;
+			}
 
 			if(config.showEmwinInfo) renderMenuItem(0, 'cloud', 'Current Weather');
 			if(Object.keys(config.abi).length > 0) renderMenuItem(1, 'globe-americas', 'Full Disk');

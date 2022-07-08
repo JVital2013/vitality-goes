@@ -153,7 +153,7 @@ if($_GET['type'] == "preload")
 	$preloadData['showAdminInfo'] = array_key_exists('adminPath', $config['general']) &&  is_dir($config['general']['adminPath']);
 	
 	header('Content-Type: application/json; charset=utf-8');
-	echo json_encode($preloadData);
+	echo json_encode($preloadData, JSON_PRETTY_PRINT);
 }
 elseif($_GET['type'] == "abiMetadata")
 {
@@ -967,62 +967,66 @@ elseif($_GET['type'] == "weatherJSON")
 	for($i = 0; $i < count($returnData['sevenDayForcast']); $i++) $returnData['sevenDayForcast'][$i]['date'] = date("l, M j", strtotime("+$i day", strtotime(preg_split("/\s{2,}/", $dateLine)[1])));
 	
 	//Text Forecast
-	$data = file(findNewestEMWIN($allEmwinFiles, "ZFP".$currentSettings[$selectedProfile]['orig']));
+	$textForecastFile = findNewestEMWIN($allEmwinFiles, "ZFP".$currentSettings[$selectedProfile]['orig']);
 	$returnData['alert'] = "";
 	$returnData['forecast'] = [];
-	$decodingLine = -1;
-	$gettingAlert = false;
-	foreach($data as $rawLine)
+	if($textForecastFile != "")
 	{
-		$thisLine = trim($rawLine);
-		if(stripos($thisLine, $currentSettings[$selectedProfile]['wxZone']) === 0)
+		$data = file($textForecastFile);
+		$decodingLine = -1;
+		$gettingAlert = false;
+		foreach($data as $rawLine)
 		{
-			$decodingLine = 0;
-			continue;
-		}
-		if($decodingLine == -1) continue;
-		if(strpos($thisLine, "$$") === 0 || strpos($thisLine, "&&") === 0) break;
-		
-		$decodingLine++;
-		
-		if(!array_key_exists("forecastTime", $returnData))
-		{
-			if(is_numeric($thisLine[0])) $returnData['forecastTime'] = $thisLine;
-			continue;
-		}
-		
-		if(strpos($thisLine, "...") === 0)
-		{
-			if(substr($thisLine, -3) == "...")
+			$thisLine = trim($rawLine);
+			if(stripos($thisLine, $currentSettings[$selectedProfile]['wxZone']) === 0)
 			{
-				$returnData['alert'] = str_replace("...", "", $thisLine);
+				$decodingLine = 0;
+				continue;
+			}
+			if($decodingLine == -1) continue;
+			if(strpos($thisLine, "$$") === 0 || strpos($thisLine, "&&") === 0) break;
+			
+			$decodingLine++;
+			
+			if(!array_key_exists("forecastTime", $returnData))
+			{
+				if(is_numeric($thisLine[0])) $returnData['forecastTime'] = $thisLine;
+				continue;
+			}
+			
+			if(strpos($thisLine, "...") === 0)
+			{
+				if(substr($thisLine, -3) == "...")
+				{
+					$returnData['alert'] = str_replace("...", "", $thisLine);
+				}
+				else
+				{
+					$gettingAlert = true;
+					$returnData['alert'] = substr($thisLine, 3);
+				}
+			}
+			elseif(strpos($thisLine, ".") === 0)
+			{
+				$newForecast = explode("...", $thisLine);
+				$lastForecastName = ucfirst(strtolower(substr($newForecast[0], 1)));
+				$returnData['forecast'][$lastForecastName] = $newForecast[1];
 			}
 			else
 			{
-				$gettingAlert = true;
-				$returnData['alert'] = substr($thisLine, 3);
-			}
-		}
-		elseif(strpos($thisLine, ".") === 0)
-		{
-			$newForecast = explode("...", $thisLine);
-			$lastForecastName = ucfirst(strtolower(substr($newForecast[0], 1)));
-			$returnData['forecast'][$lastForecastName] = $newForecast[1];
-		}
-		else
-		{
-			if($gettingAlert)
-			{
-				if(strpos($thisLine, "...") === false) $returnData['alert'] .= " ".$thisLine;
-				else
+				if($gettingAlert)
 				{
-					$gettingAlert = false;
-					$returnData['alert'] .= " ".substr($thisLine, 0, strlen($thisLine) - 3);
+					if(strpos($thisLine, "...") === false) $returnData['alert'] .= " ".$thisLine;
+					else
+					{
+						$gettingAlert = false;
+						$returnData['alert'] .= " ".substr($thisLine, 0, strlen($thisLine) - 3);
+					}
 				}
-			}
-			elseif($thisLine != "")
-			{
-				$returnData['forecast'][$lastForecastName] .= " ".$thisLine;
+				elseif($thisLine != "")
+				{
+					$returnData['forecast'][$lastForecastName] .= " ".$thisLine;
+				}
 			}
 		}
 	}
