@@ -401,7 +401,7 @@ function menuSelect(menuNumber)
 				if("humidity" in weatherInfo) renderLeftRightLine(target, "Humidity", weatherInfo.humidity + "%");
 				if("dewPoint" in weatherInfo) renderLeftRightLine(target, "Dew Point", weatherInfo.dewPoint + "&deg; F");
 				if("pressure" in weatherInfo) renderLeftRightLine(target, "Barometric Pressure", weatherInfo.pressure);
-				if("wind" in weatherInfo && "windDirection" in weatherInfo) renderLeftRightLine(target, "Wind", (weatherInfo.wind == 0 ? "" : weatherInfo.windDirection + ", ") + weatherInfo.wind + " MPH");
+				if("wind" in weatherInfo && "windDirection" in weatherInfo) renderLeftRightLine(target, "Wind", (weatherInfo.wind == 0 ? "Calm" : weatherInfo.windDirection + ", " + weatherInfo.wind + " MPH"));
 				if("windGust" in weatherInfo && weatherInfo.windGust != "N/A") renderLeftRightLine(target, "Wind Gust", weatherInfo.windGust);
 				if("remarks" in weatherInfo && weatherInfo.remarks != "") renderLeftRightLine(target, "Remarks", weatherInfo.remarks);
 				

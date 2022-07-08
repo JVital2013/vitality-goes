@@ -762,7 +762,6 @@ elseif($_GET['type'] == "weatherJSON")
 				if($currentConditionParts[4] == "CALM")
 				{
 					$returnData['wind'] = 0;
-					$returnData['windGust'] = 0;
 					$returnData['windDirection'] = "";
 				}
 				else
