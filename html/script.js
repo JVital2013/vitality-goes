@@ -487,10 +487,14 @@ function menuSelect(menuNumber)
 				
 				//Forecast
 				target = document.getElementById("forecastWeatherCardBody");
-				target.previousSibling.innerHTML += " - " + toTitleCase(weatherInfo.city) + ", " + weatherInfo.state;
-				target.innerHTML = "";
-				Object.keys(weatherInfo.forecast).forEach((key) => {target.innerHTML += "<p><b>" + key + ": </b>" + weatherInfo.forecast[key] + "</p>";});
-				target.innerHTML += "<div class='goeslabel'>Last Update: " + weatherInfo.forecastTime + "</div>";
+				if(weatherInfo.forecast.length == 0) target.parentElement.parentElement.style.display = 'none';
+				else
+				{
+					target.previousSibling.innerHTML += " - " + toTitleCase(weatherInfo.city) + ", " + weatherInfo.state;
+					target.innerHTML = "";
+					Object.keys(weatherInfo.forecast).forEach((key) => {target.innerHTML += "<p><b>" + key + ": </b>" + weatherInfo.forecast[key] + "</p>";});
+					target.innerHTML += "<div class='goeslabel'>Last Update: " + weatherInfo.forecastTime + "</div>";
+				}
 			}
 		}
 		
