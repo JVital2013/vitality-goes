@@ -414,7 +414,7 @@ function menuSelect(menuNumber)
 				
 				//7 day forcast
 				target = document.getElementById("sevenDayWeatherCardBody");
-				if(weatherInfo.sevenDayForcast.length == 0) target.parentElement.style.display = 'none';
+				if(weatherInfo.sevenDayForcast.length == 0) target.parentElement.parentElement.style.display = 'none';
 				else
 				{
 					target.innerHTML = "";
