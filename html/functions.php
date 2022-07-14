@@ -136,7 +136,7 @@ function findMetadataEMWIN($allEmwinFiles, $product, $title)
 	{
 		if(strpos($thisFile, $product) !== false)
 		{
-			$fileNameParts = explode("_", $thisFile);
+			$fileNameParts = explode("_", basename($thisFile));
 			$DateTime = new DateTime($fileNameParts[4], new DateTimeZone("UTC"));
 			$DateTime->setTimezone(new DateTimeZone(date_default_timezone_get()));
 			$date = $DateTime->format("F j, Y g:i A");
