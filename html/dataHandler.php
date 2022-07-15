@@ -478,6 +478,7 @@ elseif($_GET['type'] == "abiData")
 	if(!array_key_exists($_GET['id'], $config['abi']) || !array_key_exists('timestamp', $_GET)) die();
 	$path = findImageABI($config['abi'][$_GET['id']]['path'], $_GET['timestamp']);
 	header('Content-Type: ' . mime_content_type($path));
+	header('Content-Disposition: inline; filename=' . basename($path));
 	header('Content-Length: ' . filesize($path));
 	readfile($path);
 }
@@ -486,6 +487,7 @@ elseif($_GET['type'] == "l2Data")
 	if(!array_key_exists($_GET['id'], $config['l2']) || !array_key_exists('timestamp', $_GET)) die();
 	$path = findImageABI($config['l2'][$_GET['id']]['path'], $_GET['timestamp']);
 	header('Content-Type: ' . mime_content_type($path));
+	header('Content-Disposition: inline; filename=' . basename($path));
 	header('Content-Length: ' . filesize($path));
 	readfile($path);
 }
@@ -494,6 +496,7 @@ elseif($_GET['type'] == "mesoData")
 	if(!array_key_exists($_GET['id'], $config['meso']) || !array_key_exists('timestamp', $_GET)) die();
 	$path = findImageABI($config['meso'][$_GET['id']]['path'], $_GET['timestamp']);
 	header('Content-Type: ' . mime_content_type($path));
+	header('Content-Disposition: inline; filename=' . basename($path));
 	header('Content-Length: ' . filesize($path));
 	readfile($path);
 }
@@ -502,6 +505,7 @@ elseif($_GET['type'] == "emwinData")
 	if(!array_key_exists($_GET['id'], $config['emwin']) || !array_key_exists('timestamp', $_GET)) die();
 	$path = findSpecificEMWIN(scandir_recursive($config['general']['emwinPath']), $config['emwin'][$_GET['id']]['path'], $_GET['timestamp']);
 	header('Content-Type: ' . mime_content_type($path));
+	header('Content-Disposition: inline; filename=' . basename($path));
 	header('Content-Length: ' . filesize($path));
 	readfile($path);
 }
@@ -510,6 +514,7 @@ elseif($_GET['type'] == "localRadarData")
 	if(!array_key_exists('timestamp', $_GET)) die();
 	$path = findSpecificEMWIN(scandir_recursive($config['general']['emwinPath']), "RAD" . $currentSettings[$selectedProfile]['radarCode'] . ".GIF", $_GET['timestamp']);
 	header('Content-Type: ' . mime_content_type($path));
+	header('Content-Disposition: inline; filename=' . basename($path));
 	header('Content-Length: ' . filesize($path));
 	readfile($path);
 }
