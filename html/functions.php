@@ -82,7 +82,11 @@ function sortByCity($a, $b)
 
 function sortEMWIN($a, $b)
 {
-	return explode("_", basename($b))[4] - explode("_", basename($a))[4];
+	$explodedA = explode("_", basename($a));
+	$explodedB = explode("_", basename($b));
+	
+	if(count($explodedA) != 6 || count($explodedB) != 6) return 0;
+	return $explodedB[4] - $explodedA[4];
 }
 
 function sortABI($a, $b)
@@ -100,6 +104,8 @@ function findNewestEMWIN($allEmwinFiles, $product)
 		if(strpos($thisFile, $product) !== false)
 		{
 			$fileNameParts = explode("_", basename($thisFile));
+			if(count($fileNameParts) != 6) continue;
+			
 			if($fileNameParts[4] > $highestImage)
 			{
 				$path = $thisFile;
@@ -137,6 +143,8 @@ function findMetadataEMWIN($allEmwinFiles, $product, $title)
 		if(strpos($thisFile, $product) !== false)
 		{
 			$fileNameParts = explode("_", basename($thisFile));
+			if(count($fileNameParts) != 6) continue;
+			
 			$DateTime = new DateTime($fileNameParts[4], new DateTimeZone("UTC"));
 			$DateTime->setTimezone(new DateTimeZone(date_default_timezone_get()));
 			$date = $DateTime->format("F j, Y g:i A");
@@ -155,10 +163,12 @@ function findMetadataABI($path, $title)
 	
 	$retVal = [];
 	$fileList = scandir_recursive($path);
+	$fileList = preg_grep("/_[0-9]{8}T[0-9]{6}Z\..{3}$/", $fileList);
 	usort($fileList, "sortABI");
 	
 	foreach($fileList as $file)
 	{
+		
 		$splitName = explode("_", $file);
 		$timestamp = strtotime(explode(".", $splitName[count($splitName) - 1])[0]);
 		$date = date("F j, Y g:i A", $timestamp);
