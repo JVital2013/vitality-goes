@@ -197,11 +197,6 @@ elseif($_GET['type'] == "emwinMetadata")
 	header('Content-Type: application/json; charset=utf-8');
 	echo json_encode(findMetadataEMWIN(scandir_recursive($config['general']['emwinPath']), $config['emwin'][$_GET['id']]['path'], $config['emwin'][$_GET['id']]['title']));
 }
-elseif($_GET['type'] == "localRadarMetadata")
-{
-	header('Content-Type: application/json; charset=utf-8');
-	echo json_encode(findMetadataEMWIN(scandir_recursive($config['general']['emwinPath']), "RAD" . $currentSettings[$selectedProfile]['radarCode'] . ".GIF", "Local Composite Weather Radar"));
-}
 elseif($_GET['type'] == "metadata")
 {
 	$metadata = [];
@@ -739,6 +734,9 @@ elseif($_GET['type'] == "weatherJSON")
 	
 	//Get all EMWIN files for use later
 	$allEmwinFiles = scandir_recursive($config['general']['emwinPath']);
+	
+	//Current Radar
+	$returnData['localRadarMetadata'] = findMetadataEMWIN($allEmwinFiles, "RAD" . $currentSettings[$selectedProfile]['radarCode'] . ".GIF", "Local Composite Weather Radar");
 	
 	//Current Weather Conditions
 	$rwrFile = findNewestEMWIN($allEmwinFiles, "RWR".$currentSettings[$selectedProfile]['rwrOrig']);

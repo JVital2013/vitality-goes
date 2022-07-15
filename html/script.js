@@ -361,7 +361,6 @@ function menuSelect(menuNumber)
 			target.parentElement.style.paddingBottom = 0;
 			target.parentElement.appendChild(links);
 		}
-		loadLocalRadar(target);
 		
 		//AJAX load weather information
 		xhttp = new XMLHttpRequest();
@@ -384,6 +383,9 @@ function menuSelect(menuNumber)
 					document.getElementById('mainContent').prepend(document.createElement('div'));
 					document.getElementById('mainContent').prepend(weatherAlert);
 				}
+				
+				//Render Radar Card
+				loadLocalRadar(document.getElementById("radarWeatherCardBody"), weatherInfo.localRadarMetadata);
 				
 				//Render Weather Card
 				target = document.getElementById("currentWeatherCardBody");
@@ -1065,55 +1067,41 @@ function loadStats(targetedContent)
 	xhttp.open("GET", "dataHandler.php?type=metadata&id=" + targetedContent.id, true);
 	xhttp.send();
 }
-function loadLocalRadar(targetedContent)
+function loadLocalRadar(targetedContent, metadata)
 {
-	if(targetedContent.innerHTML == "Loading, please wait...")
-	{
-		xhttp = new XMLHttpRequest();
-		xhttp.onreadystatechange = function()
-		{
-			if(this.readyState == 4 && this.status == 200)
-			{
-				metadata = JSON.parse(this.responseText);
-				targetedContent.innerHTML = "";
-				goesImg = document.createElement('img');
-				goesImg.className = "goesimg";
-				goesImg.id = 'lightbox-localRadar';
-				goesImg.src = "/dataHandler.php?type=localRadarData&timestamp=" + metadata[metadata.length - 1]['timestamp'];
-				goesImg.addEventListener('click', function(event){window[event.target.id].openGallery(window[event.target.id].galleryItems.length - 1);});
-				goesImg.addEventListener('lgBeforeOpen', function(event){
-					document.getElementsByTagName('body')[0].style.overflow = "hidden";
-					document.getElementsByTagName('html')[0].style.touchAction = "none";
-				});
-				goesImg.addEventListener('lgAfterClose', function(event){
-					document.getElementsByTagName('body')[0].style.overflow = "";
-					document.getElementsByTagName('html')[0].style.touchAction = "";
-				});
-				
-				targetedContent.appendChild(goesImg);
-				
-				goesLabel = document.createElement('div');
-				goesLabel.className = "goeslabel";
-				goesLabel.innerHTML = metadata[metadata.length - 1]['description'];
-				targetedContent.appendChild(goesLabel);
-				
-				
-				dynamicEl = [];
-				metadata.forEach(thisImg => {dynamicEl.push({src: "/dataHandler.php?type=localRadarData&timestamp=" + thisImg['timestamp'], subHtml: thisImg['subHtml'], timestamp: thisImg['timestamp']});});
-				window['lightbox-localRadar'] = lightGallery(goesImg, {
-					plugins: [lgZoom, lgJumpTo],
-					loop: false,
-					dynamic: true,
-					speed: (matchMedia('(hover: none)').matches ? 250 : 0),
-					dynamicEl: dynamicEl,
-					mobileSettings: {download: true, controls: false, showCloseIcon: false}
-				});
-			}
-		}
-		
-		xhttp.open("GET", "dataHandler.php?type=localRadarMetadata", true);
-		xhttp.send();
-	}
+	targetedContent.innerHTML = "";
+	goesImg = document.createElement('img');
+	goesImg.className = "goesimg";
+	goesImg.id = 'lightbox-localRadar';
+	goesImg.src = "/dataHandler.php?type=localRadarData&timestamp=" + metadata[metadata.length - 1]['timestamp'];
+	goesImg.addEventListener('click', function(event){window[event.target.id].openGallery(window[event.target.id].galleryItems.length - 1);});
+	goesImg.addEventListener('lgBeforeOpen', function(event){
+		document.getElementsByTagName('body')[0].style.overflow = "hidden";
+		document.getElementsByTagName('html')[0].style.touchAction = "none";
+	});
+	goesImg.addEventListener('lgAfterClose', function(event){
+		document.getElementsByTagName('body')[0].style.overflow = "";
+		document.getElementsByTagName('html')[0].style.touchAction = "";
+	});
+
+	targetedContent.appendChild(goesImg);
+
+	goesLabel = document.createElement('div');
+	goesLabel.className = "goeslabel";
+	goesLabel.innerHTML = metadata[metadata.length - 1]['description'];
+	targetedContent.appendChild(goesLabel);
+
+
+	dynamicEl = [];
+	metadata.forEach(thisImg => {dynamicEl.push({src: "/dataHandler.php?type=localRadarData&timestamp=" + thisImg['timestamp'], subHtml: thisImg['subHtml'], timestamp: thisImg['timestamp']});});
+	window['lightbox-localRadar'] = lightGallery(goesImg, {
+		plugins: [lgZoom, lgJumpTo],
+		loop: false,
+		dynamic: true,
+		speed: (matchMedia('(hover: none)').matches ? 250 : 0),
+		dynamicEl: dynamicEl,
+		mobileSettings: {download: true, controls: false, showCloseIcon: false}
+	});
 }
 function loadImage(targetedContent)
 {
@@ -1213,7 +1201,7 @@ function switchRadarView(event)
 	if(me.id.endsWith("-Recent"))
 	{
 		me.parentNode.previousSibling.innerHTML = "Loading, please wait...";
-		loadLocalRadar(me.parentNode.previousSibling);
+		loadLocalRadar(me.parentNode.previousSibling, weatherInfo.localRadarMetadata);
 	}
 	else me.parentNode.previousSibling.innerHTML = "<video controls loop autoplay playsinline style='width: 100%;'><source src='/videos/" + config.localRadarVideo + "' type='video/mp4' /></video>";
 }
