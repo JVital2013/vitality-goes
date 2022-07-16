@@ -18,6 +18,7 @@
 
 //Global variables
 var sideBar = false;
+var lightGalleries = [];
 var config;
 var imageType;
 
@@ -310,6 +311,10 @@ function menuSelect(menuNumber)
 	
 	mainContent = document.getElementById('mainContent');
 	barTitle = document.getElementById('barTitle');
+	
+	//Clear any remaining lightGalleries
+	Object.keys(lightGalleries).forEach(thisGallery => {lightGalleries[thisGallery].destroy();});
+	lightGalleries = [];
 	
 	switch(selectedMenu)
 	{
@@ -1074,7 +1079,7 @@ function loadLocalRadar(targetedContent, metadata)
 	goesImg.className = "goesimg";
 	goesImg.id = 'lightbox-localRadar';
 	goesImg.src = "/dataHandler.php?type=localRadarData&timestamp=" + metadata[metadata.length - 1]['timestamp'];
-	goesImg.addEventListener('click', function(event){window[event.target.id].openGallery(window[event.target.id].galleryItems.length - 1);});
+	goesImg.addEventListener('click', function(event){lightGalleries[event.target.id].openGallery(lightGalleries[event.target.id].galleryItems.length - 1);});
 	goesImg.addEventListener('lgBeforeOpen', function(event){
 		document.getElementsByTagName('body')[0].style.overflow = "hidden";
 		document.getElementsByTagName('html')[0].style.touchAction = "none";
@@ -1094,7 +1099,7 @@ function loadLocalRadar(targetedContent, metadata)
 
 	dynamicEl = [];
 	metadata.forEach(thisImg => {dynamicEl.push({src: "/dataHandler.php?type=localRadarData&timestamp=" + thisImg['timestamp'], subHtml: thisImg['subHtml'], timestamp: thisImg['timestamp']});});
-	window['lightbox-localRadar'] = lightGallery(goesImg, {
+	lightGalleries['lightbox-localRadar'] = lightGallery(goesImg, {
 		plugins: [lgZoom, lgJumpTo],
 		loop: false,
 		dynamic: true,
@@ -1111,7 +1116,6 @@ function loadImageMetadata(targetedContent)
 		if(this.readyState == 4 && this.status == 200)
 		{
 			metadata = JSON.parse(this.responseText);
-			console.log(metadata);
 			loadImage(targetedContent, metadata);
 		}
 	}
@@ -1133,7 +1137,7 @@ function loadImage(targetedContent, metadata)
 	goesImg.className = "goesimg";
 	goesImg.id = 'lightbox-' + contentId;
 	goesImg.src = "/dataHandler.php?type=" + imageType + "Data&id=" + contentId + "&timestamp=" + metadata[metadata.length - 1]['timestamp'];
-	goesImg.addEventListener('click', function(event){window[event.target.id].openGallery(window[event.target.id].galleryItems.length - 1);});
+	goesImg.addEventListener('click', function(event){lightGalleries[event.target.id].openGallery(lightGalleries[event.target.id].galleryItems.length - 1);});
 	goesImg.addEventListener('lgBeforeOpen', function(event){
 		document.getElementsByTagName('body')[0].style.overflow = "hidden";
 		document.getElementsByTagName('html')[0].style.touchAction = "none";
@@ -1152,7 +1156,7 @@ function loadImage(targetedContent, metadata)
 	
 	dynamicEl = [];
 	metadata.forEach(thisImg => {dynamicEl.push({src: "/dataHandler.php?type=" + imageType + "Data&id=" + contentId + "&timestamp=" + thisImg['timestamp'], description: thisImg['description'], subHtml: thisImg['subHtml'], timestamp: thisImg['timestamp']});});
-	window['lightbox-' + contentId] = lightGallery(goesImg, {
+	lightGalleries["lightbox-" + contentId] = lightGallery(goesImg, {
 		plugins: [lgZoom, lgJumpTo],
 		dynamic: true,
 		loop: false,
@@ -1180,7 +1184,7 @@ function switchCardView(event)
 	if(me.id.endsWith("-Recent"))
 	{
 		me.parentNode.previousSibling.innerHTML = "Loading, please wait...";
-		loadImage(me.parentNode.previousSibling, window['lightbox-' + me.id.replace("-Recent", "")].galleryItems);
+		loadImage(me.parentNode.previousSibling, lightGalleries['lightbox-' + me.id.replace("-Recent", "")].galleryItems);
 	}
 	else me.parentNode.previousSibling.innerHTML = "<video controls loop autoplay playsinline style='width: 100%;'><source src='/videos/" + config[imageType][me.id.replace("-timelapse", "")].videoPath + "' type='video/mp4' /></video>";
 }
