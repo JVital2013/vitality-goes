@@ -1204,8 +1204,12 @@ function switchCardView(event)
 	
 	if(me.id.endsWith("-Recent"))
 	{
+		replayMetadata = lightGalleries['lightbox-' + me.id.replace("-Recent", "")].galleryItems;
+		lightGalleries['lightbox-' + me.id.replace("-Recent", "")].destroy();
+		delete lightGalleries['lightbox-' + me.id.replace("-Recent", "")];
+		
 		me.parentNode.previousSibling.innerHTML = "Loading, please wait...";
-		loadImage(me.parentNode.previousSibling, lightGalleries['lightbox-' + me.id.replace("-Recent", "")].galleryItems);
+		loadImage(me.parentNode.previousSibling, replayMetadata);
 	}
 	else me.parentNode.previousSibling.innerHTML = "<video controls loop autoplay playsinline style='width: 100%;'><source src='/videos/" + config[imageType][me.id.replace("-timelapse", "")].videoPath + "' type='video/mp4' /></video>";
 }
@@ -1225,12 +1229,13 @@ function switchRadarView(event)
 	} while(sibling != null);
 	me.classList.add("selected");
 	
-	if(me.id.endsWith("-Recent"))
+	if(me.id.endsWith("-Recent")) loadLocalRadar(me.parentNode.previousSibling, weatherInfo.localRadarMetadata);
+	else
 	{
-		me.parentNode.previousSibling.innerHTML = "Loading, please wait...";
-		loadLocalRadar(me.parentNode.previousSibling, weatherInfo.localRadarMetadata);
+		lightGalleries['lightbox-localRadar'].destroy();
+		delete lightGalleries['lightbox-localRadar'];
+		me.parentNode.previousSibling.innerHTML = "<video controls loop autoplay playsinline style='width: 100%;'><source src='/videos/" + config.localRadarVideo + "' type='video/mp4' /></video>";
 	}
-	else me.parentNode.previousSibling.innerHTML = "<video controls loop autoplay playsinline style='width: 100%;'><source src='/videos/" + config.localRadarVideo + "' type='video/mp4' /></video>";
 }
 
 window.addEventListener("load", function()
