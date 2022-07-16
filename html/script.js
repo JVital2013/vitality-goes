@@ -116,7 +116,7 @@ function renderImageCard(slug, color)
 	mainContent.appendChild(document.createElement('div'));
 	
 	//Load image, if necessary
-	if(expandedCards.includes(slug + "Content")) loadImage(content);
+	if(expandedCards.includes(slug + "Content")) loadImageMetadata(content);
 }
 function renderCollapsingCard(slug, name, cardClass, bodyClass)
 {
@@ -1018,7 +1018,7 @@ function showCollapseCard(event)
 		if(event.currentTarget.nextSibling.nextSibling != null) event.currentTarget.nextSibling.nextSibling.style.display = "block";
 		
 		if(selectedMenu == 7) loadStats(event.currentTarget.nextSibling);
-		else loadImage(event.currentTarget.nextSibling);
+		else if(event.currentTarget.nextSibling.innerHTML == "Loading, please wait...") loadImageMetadata(event.currentTarget.nextSibling);
 	}
 	else
 	{
@@ -1103,61 +1103,63 @@ function loadLocalRadar(targetedContent, metadata)
 		mobileSettings: {download: true, controls: false, showCloseIcon: false}
 	});
 }
-function loadImage(targetedContent)
+function loadImageMetadata(targetedContent)
 {
-	if(targetedContent.innerHTML == "Loading, please wait...")
+	xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = function()
 	{
-		xhttp = new XMLHttpRequest();
-		xhttp.onreadystatechange = function()
+		if(this.readyState == 4 && this.status == 200)
 		{
-			if(this.readyState == 4 && this.status == 200)
-			{
-				metadata = JSON.parse(this.responseText);
-				contentId = targetedContent.id.replace('Content', '');
-				if(metadata.length == 0)
-				{
-					targetedContent.innerHTML = "<div style='margin-bottom: 5px;'>No images found</div>";
-					return;
-				}
-				
-				targetedContent.innerHTML = "";
-				goesImg = document.createElement('img');
-				goesImg.className = "goesimg";
-				goesImg.id = 'lightbox-' + contentId;
-				goesImg.src = "/dataHandler.php?type=" + imageType + "Data&id=" + contentId + "&timestamp=" + metadata[metadata.length - 1]['timestamp'];
-				goesImg.addEventListener('click', function(event){window[event.target.id].openGallery(window[event.target.id].galleryItems.length - 1);});
-				goesImg.addEventListener('lgBeforeOpen', function(event){
-					document.getElementsByTagName('body')[0].style.overflow = "hidden";
-					document.getElementsByTagName('html')[0].style.touchAction = "none";
-				});
-				goesImg.addEventListener('lgAfterClose', function(event){
-					document.getElementsByTagName('body')[0].style.overflow = "";
-					document.getElementsByTagName('html')[0].style.touchAction = "";
-				});
-				
-				targetedContent.appendChild(goesImg);
-				
-				goesLabel = document.createElement('div');
-				goesLabel.className = "goeslabel";
-				goesLabel.innerHTML = metadata[metadata.length - 1]['description'];
-				targetedContent.appendChild(goesLabel);
-				
-				dynamicEl = [];
-				metadata.forEach(thisImg => {dynamicEl.push({src: "/dataHandler.php?type=" + imageType + "Data&id=" + contentId + "&timestamp=" + thisImg['timestamp'], subHtml: thisImg['subHtml'], timestamp: thisImg['timestamp']});});
-				window['lightbox-' + contentId] = lightGallery(goesImg, {
-					plugins: [lgZoom, lgJumpTo],
-					dynamic: true,
-					loop: false,
-					speed: (matchMedia('(hover: none)').matches ? 250 : 0),
-					dynamicEl: dynamicEl,
-					mobileSettings: {download: true, controls: false, showCloseIcon: false}
-				});
-			}
+			metadata = JSON.parse(this.responseText);
+			console.log(metadata);
+			loadImage(targetedContent, metadata);
 		}
-		
-		xhttp.open("GET", "dataHandler.php?type=" + imageType + "Metadata&id=" + targetedContent.id.replace('Content', ''), true);
-		xhttp.send();
 	}
+	
+	xhttp.open("GET", "dataHandler.php?type=" + imageType + "Metadata&id=" + targetedContent.id.replace('Content', ''), true);
+	xhttp.send();
+}
+function loadImage(targetedContent, metadata)
+{
+	contentId = targetedContent.id.replace('Content', '');
+	if(metadata.length == 0)
+	{
+		targetedContent.innerHTML = "<div style='margin-bottom: 5px;'>No images found</div>";
+		return;
+	}
+	
+	targetedContent.innerHTML = "";
+	goesImg = document.createElement('img');
+	goesImg.className = "goesimg";
+	goesImg.id = 'lightbox-' + contentId;
+	goesImg.src = "/dataHandler.php?type=" + imageType + "Data&id=" + contentId + "&timestamp=" + metadata[metadata.length - 1]['timestamp'];
+	goesImg.addEventListener('click', function(event){window[event.target.id].openGallery(window[event.target.id].galleryItems.length - 1);});
+	goesImg.addEventListener('lgBeforeOpen', function(event){
+		document.getElementsByTagName('body')[0].style.overflow = "hidden";
+		document.getElementsByTagName('html')[0].style.touchAction = "none";
+	});
+	goesImg.addEventListener('lgAfterClose', function(event){
+		document.getElementsByTagName('body')[0].style.overflow = "";
+		document.getElementsByTagName('html')[0].style.touchAction = "";
+	});
+	
+	targetedContent.appendChild(goesImg);
+	
+	goesLabel = document.createElement('div');
+	goesLabel.className = "goeslabel";
+	goesLabel.innerHTML = metadata[metadata.length - 1]['description'];
+	targetedContent.appendChild(goesLabel);
+	
+	dynamicEl = [];
+	metadata.forEach(thisImg => {dynamicEl.push({src: "/dataHandler.php?type=" + imageType + "Data&id=" + contentId + "&timestamp=" + thisImg['timestamp'], description: thisImg['description'], subHtml: thisImg['subHtml'], timestamp: thisImg['timestamp']});});
+	window['lightbox-' + contentId] = lightGallery(goesImg, {
+		plugins: [lgZoom, lgJumpTo],
+		dynamic: true,
+		loop: false,
+		speed: (matchMedia('(hover: none)').matches ? 250 : 0),
+		dynamicEl: dynamicEl,
+		mobileSettings: {download: true, controls: false, showCloseIcon: false}
+	});
 }
 
 function switchCardView(event)
@@ -1178,7 +1180,7 @@ function switchCardView(event)
 	if(me.id.endsWith("-Recent"))
 	{
 		me.parentNode.previousSibling.innerHTML = "Loading, please wait...";
-		loadImage(me.parentNode.previousSibling);
+		loadImage(me.parentNode.previousSibling, window['lightbox-' + me.id.replace("-Recent", "")].galleryItems);
 	}
 	else me.parentNode.previousSibling.innerHTML = "<video controls loop autoplay playsinline style='width: 100%;'><source src='/videos/" + config[imageType][me.id.replace("-timelapse", "")].videoPath + "' type='video/mp4' /></video>";
 }
