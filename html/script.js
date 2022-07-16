@@ -19,6 +19,7 @@
 //Global variables
 var sideBar = false;
 var lightGalleries = [];
+var xhttp = [];
 var config;
 var imageType;
 
@@ -222,8 +223,8 @@ function renderLeftRightLine(target, tempsName, tempsValue)
 }
 function getForecastZone(orig)
 {
-	xhttp = new XMLHttpRequest();
-	xhttp.onreadystatechange = function()
+	xhttp.getForecastZone = new XMLHttpRequest();
+	xhttp.getForecastZone.onreadystatechange = function()
 	{
 		if(this.readyState == 4 && this.status == 200)
 		{
@@ -238,16 +239,17 @@ function getForecastZone(orig)
 			});
 			
 			target.value = currentSettings[selectedProfile].wxZone;
+			delete xhttp.getForecastZone;
 		}
 	}
 
-	xhttp.open("GET", "dataHandler.php?type=settings&dropdown=wxZone&orig=" + orig, true);
-	xhttp.send();
+	xhttp.getForecastZone.open("GET", "dataHandler.php?type=settings&dropdown=wxZone&orig=" + orig, true);
+	xhttp.getForecastZone.send();
 }
 function getLocations(rwrOrig)
 {
-	xhttp = new XMLHttpRequest();
-	xhttp.onreadystatechange = function()
+	xhttp.getLocations = new XMLHttpRequest();
+	xhttp.getLocations.onreadystatechange = function()
 	{
 		if(this.readyState == 4 && this.status == 200)
 		{
@@ -263,11 +265,12 @@ function getLocations(rwrOrig)
 			});
 			
 			target.value = currentSettings[selectedProfile].city;
+			delete xhttp.getLocations;
 		}
 	}
 	
-	xhttp.open("GET", "dataHandler.php?type=settings&dropdown=city&rwrOrig=" + rwrOrig, true);
-	xhttp.send();
+	xhttp.getLocations.open("GET", "dataHandler.php?type=settings&dropdown=city&rwrOrig=" + rwrOrig, true);
+	xhttp.getLocations.send();
 }
 function toTitleCase(str) {
     return str.replace(/\w\S*/g, function(txt){
@@ -315,6 +318,10 @@ function menuSelect(menuNumber)
 	//Clear any remaining lightGalleries
 	Object.keys(lightGalleries).forEach(thisGallery => {lightGalleries[thisGallery].destroy();});
 	lightGalleries = [];
+	
+	//Stop any running AJAX requests
+	Object.keys(xhttp).forEach(thisxhttp => {xhttp[thisxhttp].abort();});
+	xhttp = [];
 	
 	switch(selectedMenu)
 	{
@@ -368,8 +375,8 @@ function menuSelect(menuNumber)
 		}
 		
 		//AJAX load weather information
-		xhttp = new XMLHttpRequest();
-		xhttp.onreadystatechange = function()
+		xhttp.weatherJSON = new XMLHttpRequest();
+		xhttp.weatherJSON.onreadystatechange = function()
 		{
 			if(this.readyState == 4 && this.status == 200)
 			{
@@ -520,15 +527,17 @@ function menuSelect(menuNumber)
 					Object.keys(weatherInfo.forecast).forEach((key) => {target.innerHTML += "<p><b>" + key + ": </b>" + weatherInfo.forecast[key] + "</p>";});
 					target.innerHTML += "<div class='goeslabel'>Last Update: " + weatherInfo.forecastTime + "</div>";
 				}
+				
+				delete xhttp.weatherJSON;
 			}
 		}
 		
-		xhttp.open("GET", "dataHandler.php?type=weatherJSON", true);
-		xhttp.send();
+		xhttp.weatherJSON.open("GET", "dataHandler.php?type=weatherJSON", true);
+		xhttp.weatherJSON.send();
 		
 		//AJAX load alerts
-		xhttp2 = new XMLHttpRequest();
-		xhttp2.onreadystatechange = function()
+		xhttp.alertJSON = new XMLHttpRequest();
+		xhttp.alertJSON.onreadystatechange = function()
 		{
 			if(this.readyState == 4 && this.status == 200)
 			{
@@ -541,10 +550,12 @@ function menuSelect(menuNumber)
 				alertInfo.blueAlerts.forEach(function(element){renderAlert(element, "blue")});
 				alertInfo.amberAlerts.forEach(function(element){renderAlert(element, "amber")});
 				alertInfo.civilDangerWarnings.forEach(function(element){renderAlert(element, "purple")});
+				
+				delete xhttp.alertJSON;
 			}
 		}
-		xhttp2.open("GET", "dataHandler.php?type=alertJSON", true);
-		xhttp2.send();
+		xhttp.alertJSON.open("GET", "dataHandler.php?type=alertJSON", true);
+		xhttp.alertJSON.send();
 		break;
 		
 		case 1:
@@ -586,8 +597,8 @@ function menuSelect(menuNumber)
 		}
 		if(config.showAdminInfo) renderCollapsingCard("adminMessage", "Latest Admin Message", "prettyBoxContent", "otherEmwinBody");
 		
-		xhttp = new XMLHttpRequest();
-		xhttp.onreadystatechange = function()
+		xhttp.otherEMWIN = new XMLHttpRequest();
+		xhttp.otherEMWIN.onreadystatechange = function()
 		{
 			if(this.readyState == 4 && this.status == 200)
 			{
@@ -691,10 +702,12 @@ function menuSelect(menuNumber)
 					adminMessageLastUpdate.innerHTML = "Last Broadcast: " + otherEmwinInfo.latestAdminDate;
 					target.parentElement.appendChild(adminMessageLastUpdate);
 				}
+				
+				delete xhttp.otherEMWIN;
 			}
 		}
-		xhttp.open("GET", "dataHandler.php?type=metadata&id=otherEmwin", true);
-		xhttp.send();
+		xhttp.otherEMWIN.open("GET", "dataHandler.php?type=metadata&id=otherEmwin", true);
+		xhttp.otherEMWIN.send();
 		break;
 		
 		case 6:
@@ -829,19 +842,21 @@ function menuSelect(menuNumber)
 				setCookie("currentSettings", JSON.stringify(currentSettings));
 				
 				//Make dummy request to dataHandler. This will reset the cookie if it's invalid
-				xhttp = new XMLHttpRequest();
-				xhttp.onreadystatechange = function()
+				xhttp.dummy = new XMLHttpRequest();
+				xhttp.dummy.onreadystatechange = function()
 				{
 					if(this.readyState == 4 && this.status == 200)
 					{
 						//Request complete; reload settings view
 						if(currentSettings[selectedProfile].radarCode != lastRadarCode) location.reload();
 						else menuSelect(selectedMenu);
+						delete xhttp.dummy;
 					}
+					
 				}
 				
-				xhttp.open("GET", "dataHandler.php", true);
-				xhttp.send();
+				xhttp.dummy.open("GET", "dataHandler.php", true);
+				xhttp.dummy.send();
 			}
 		});
 		saveButtonHolder.appendChild(saveButton);
@@ -885,8 +900,8 @@ function menuSelect(menuNumber)
 		getLocations(currentSettings[selectedProfile].rwrOrig);
 		
 		//Load most dropdowns
-		xhttp = new XMLHttpRequest();
-		xhttp.onreadystatechange = function()
+		xhttp.dropdowns = new XMLHttpRequest();
+		xhttp.dropdowns.onreadystatechange = function()
 		{
 			if(this.readyState == 4 && this.status == 200)
 			{
@@ -946,11 +961,12 @@ function menuSelect(menuNumber)
 				});
 				
 				target.value = currentSettings[selectedProfile].timezone;
+				delete xhttp.dropdowns;
 			}
 		}
 
-		xhttp.open("GET", "dataHandler.php?type=settings&dropdown=general", true);
-		xhttp.send();
+		xhttp.dropdowns.open("GET", "dataHandler.php?type=settings&dropdown=general", true);
+		xhttp.dropdowns.send();
 		break;
 		
 		case 7:
@@ -963,8 +979,8 @@ function menuSelect(menuNumber)
 			renderStiffCard("sysTemp", "System Temps");
 			
 			//AJAX load system information
-			xhttp = new XMLHttpRequest();
-			xhttp.onreadystatechange = function()
+			xhttp.sysInfo = new XMLHttpRequest();
+			xhttp.sysInfo.onreadystatechange = function()
 			{
 				if(this.readyState == 4 && this.status == 200)
 				{
@@ -987,11 +1003,13 @@ function menuSelect(menuNumber)
 					target = document.getElementById('sysTempCardBody');
 					target.innerHTML = "";
 					sysInfo.tempData.forEach((tempValue) => {renderLeftRightLine(target, tempValue.name, tempValue.value);});
+					
+					delete xhttp.sysInfo;
 				}
 			}
 			
-			xhttp.open("GET", "dataHandler.php?type=metadata&id=sysInfo", true);
-			xhttp.send();
+			xhttp.sysInfo.open("GET", "dataHandler.php?type=metadata&id=sysInfo", true);
+			xhttp.sysInfo.send();
 		}
 		
 		if(config.showGraphs)
@@ -1041,8 +1059,8 @@ function loadStats(targetedContent)
 {
 	if(targetedContent.innerHTML == "Loading, please wait...")
 	{
-		xhttp = new XMLHttpRequest();
-		xhttp.onreadystatechange = function()
+		xhttp.loadStats = new XMLHttpRequest();
+		xhttp.loadStats.onreadystatechange = function()
 		{
 			if(this.readyState == 4 && this.status == 200)
 			{
@@ -1065,12 +1083,14 @@ function loadStats(targetedContent)
 				description.className = "goeslabel";
 				description.innerHTML = metadata['description'];
 				targetedContent.appendChild(description);
+				
+				delete xhttp.loadStats;
 			}
 		}
+		
+		xhttp.loadStats.open("GET", "dataHandler.php?type=metadata&id=" + targetedContent.id, true);
+		xhttp.loadStats.send();
 	}
-	
-	xhttp.open("GET", "dataHandler.php?type=metadata&id=" + targetedContent.id, true);
-	xhttp.send();
 }
 function loadLocalRadar(targetedContent, metadata)
 {
@@ -1110,18 +1130,19 @@ function loadLocalRadar(targetedContent, metadata)
 }
 function loadImageMetadata(targetedContent)
 {
-	xhttp = new XMLHttpRequest();
-	xhttp.onreadystatechange = function()
+	xhttp.loadImage = new XMLHttpRequest();
+	xhttp.loadImage.onreadystatechange = function()
 	{
 		if(this.readyState == 4 && this.status == 200)
 		{
 			metadata = JSON.parse(this.responseText);
 			loadImage(targetedContent, metadata);
+			delete xhttp.loadImage;
 		}
 	}
 	
-	xhttp.open("GET", "dataHandler.php?type=" + imageType + "Metadata&id=" + targetedContent.id.replace('Content', ''), true);
-	xhttp.send();
+	xhttp.loadImage.open("GET", "dataHandler.php?type=" + imageType + "Metadata&id=" + targetedContent.id.replace('Content', ''), true);
+	xhttp.loadImage.send();
 }
 function loadImage(targetedContent, metadata)
 {
@@ -1214,8 +1235,8 @@ function switchRadarView(event)
 
 window.addEventListener("load", function()
 {
-	xhttp = new XMLHttpRequest();
-	xhttp.onreadystatechange = function()
+	xhttp.preload = new XMLHttpRequest();
+	xhttp.preload.onreadystatechange = function()
 	{
 		if(this.readyState == 4 && this.status == 200)
 		{
@@ -1239,9 +1260,10 @@ window.addEventListener("load", function()
 			if(config.showGraphs || config.showSysInfo) renderMenuItem(7, 'info-circle', 'System Info');
 	
 			menuSelect(selectedMenu);
+			delete xhttp.preload;
 		}
 	}
 	
-	xhttp.open("GET", "dataHandler.php?type=preload", true);
-	xhttp.send();
+	xhttp.preload.open("GET", "dataHandler.php?type=preload", true);
+	xhttp.preload.send();
 });
