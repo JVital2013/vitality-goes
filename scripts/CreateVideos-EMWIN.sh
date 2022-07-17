@@ -1,44 +1,25 @@
 #!/bin/bash
-srcDir="/path/to/goestoolsrepo/emwin"
-videoDir="/var/www/html/videos"
-codeName=("RADNTHES" "RADREFUS" "GMS008JA" "G16CIRUS" "G10CIRUS" "INDCIRUS")
-videoName=("LocalRadar" "USRadar" "HIMAWARI8" "GOES16EMWIN" "GOES17EMWIN" "METEOSAT")
-imgconvert=("GIF" "GIF" "GIF" "JPG" "JPG" "JPG")
+source "$(dirname "$(readlink -fm "$0")")/scriptconfig.ini"
 
 oneDayStartTime=$(date -u --date="-7 days" +"%Y%m%d")
 oneDayEndTime=$(date -u  --date "+1 day" +"%Y%m%d")
 
-cd $videoDir/tmpEMWIN/
-
 #Create Week of EMWIN files
 i=0
-for currentName in ${videoName[@]}
+for currentName in ${emwinVideoName[@]}
 do
 	#Copy down files
 	echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating $currentName..."
-	rm * > /dev/null 2>&1
 	
+	rm /tmp/emwin.txt > /dev/null 2>&1
 	for dateStamp in `seq $oneDayStartTime $oneDayEndTime`
 	do
-		cp $srcDir/*_$dateStamp*${codeName[$i]}.${imgconvert[$i]} .  > /dev/null 2>&1
+		find "$emwinSrcDir" -type f -name "*_$dateStamp*${emwinCodeName[$i]}.${emwinFileExt[$i]}" | sed -r 's/.*\/[A-Z]_[A-Z0-9]{16}_[A-Z]_[A-Z]{4}_([0-9]{14})_[0-9]{6}\-[0-9]\-[A-Z0-9]{8}\.[A-Z0-9]{3}/\1 &/' | sort | sed -r "s/[0-9]{14} (.*)/file '\1'\nduration 0.0666667/" >> /tmp/emwin.txt
 	done
 	
-	rename 's/^..........................//g' *
-	
-	#Convert to jpg if needed
-	if [ ${imgconvert[$i]} = "JPG" ]
-	then
-		imgGlob="*.JPG"
-	elif [ ${imgconvert[$i]} = "GIF" ]
-	then
-		mogrify -format png *.GIF
-		rm *.GIF
-		imgGlob="*.png"
-	fi
-	
 	#Generate MP4
-	rm ../$currentName.mp4 > /dev/null 2>&1
-	ffmpeg -hide_banner -loglevel error -framerate 15 -pattern_type glob -i "$imgGlob" -c:v libx264 -crf 20 -pix_fmt yuv420p -vf pad="width=ceil(iw/2)*2:height=ceil(ih/2)*2" ../$currentName.mp4
+	rm $videoDir/$currentName.mp4 > /dev/null 2>&1
+	ffmpeg -hide_banner -loglevel error -f concat -safe 0 -i /tmp/emwin.txt -c:v libx264 -crf 20 -pix_fmt yuv420p -vf pad="width=ceil(iw/2)*2:height=ceil(ih/2)*2" -r 15 $videoDir/$currentName.mp4
 	
 	i=$((i+1))
 done
