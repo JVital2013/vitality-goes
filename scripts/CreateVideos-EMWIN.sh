@@ -8,9 +8,9 @@ oneDayEndTime=$(date -u  --date "+1 day" +"%Y%m%d")
 i=0
 for currentName in ${emwinVideoName[@]}
 do
-	#Copy down files
 	echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating $currentName..."
 	
+	#Find and order files
 	rm /tmp/emwin.txt > /dev/null 2>&1
 	for dateStamp in `seq $oneDayStartTime $oneDayEndTime`
 	do
