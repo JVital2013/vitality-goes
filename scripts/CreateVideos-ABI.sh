@@ -34,11 +34,11 @@ do
 	
 	#Shrink images if specified
 	if [ ${abiResizeMode[$i]} = 0 ]; then
-		mogrify -resize 1356 /tmp/abi/*.jpg
+		mogrify -scale 1356 /tmp/abi/*.jpg
 	elif [ ${abiResizeMode[$i]} = 1 ]; then
-		mogrify -resize 1000 /tmp/abi/*.jpg
+		mogrify -scale 1000 /tmp/abi/*.jpg
 	elif [ ${abiResizeMode[$i]} = 2 ]; then
-		mogrify -resize 1402x954 /tmp/abi/*.jpg
+		mogrify -scale 1402x954 /tmp/abi/*.jpg
 	fi
 	
 	#Generate MP4
