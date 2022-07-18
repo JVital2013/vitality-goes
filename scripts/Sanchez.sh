@@ -3,12 +3,15 @@ source "$(dirname "$(readlink -fm "$0")")/scriptconfig.ini"
 
 #GOES 16
 echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating GOES 16 Sanchez False Color Images"
-cd $sanchezSrcPath16
-for srcImg in *
+for srcImg in $(find "$sanchezSrcPath16" -type f)
 do
-	newName=$(echo $srcImg | sed 's/CH13/sanchez/')
-	thisDate=$(echo $srcImg | cut -c 16-23)
-	thisTime=$(echo $srcImg | cut -c 25-30)
+	baseName=$(echo $srcImg | awk -F/ '{print $NF}')
+	newName=$(echo $baseName | sed 's/CH13/sanchez/')
+	
+	nameLastPart=$(echo $baseName | awk -F_ '{print $NF}' | cut -d. -f1)
+	thisDate=$(echo $nameLastPart | cut -dT -f1)
+	thisTime=$(echo $nameLastPart | cut -dT -f2)
+	thisTime=${thisTime::-1}
 	
 	if [ ! -f $sanchezDstPath16/$newName ]
 	then
@@ -21,18 +24,21 @@ do
 		fi
 		
 		xplanet -body earth -projection rectangular -num_times 1 -geometry 10848x5424 -date $thisDate.$thisTime -output /tmp/underlay.jpg
-		$sanchezPath -q -s $sanchezSrcPath16/$srcImg -u /tmp/underlay.jpg -o $sanchezDstPath16/$newName
+		$sanchezPath -q -s $srcImg -u /tmp/underlay.jpg -o $sanchezDstPath16/$newName
 	fi
 done
 
 #GOES 17
 echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating GOES 17 Sanchez False Color Images"
-cd $sanchezSrcPath17
-for srcImg in *
+for srcImg in $(find "$sanchezSrcPath17" -type f)
 do
-	newName=$(echo $srcImg | sed 's/CH13/sanchez/')
-	thisDate=$(echo $srcImg | cut -c 16-23)
-	thisTime=$(echo $srcImg | cut -c 25-30)
+	baseName=$(echo $srcImg | awk -F/ '{print $NF}')
+	newName=$(echo $baseName | sed 's/CH13/sanchez/')
+	
+	nameLastPart=$(echo $baseName | awk -F_ '{print $NF}' | cut -d. -f1)
+	thisDate=$(echo $nameLastPart | cut -dT -f1)
+	thisTime=$(echo $nameLastPart | cut -dT -f2)
+	thisTime=${thisTime::-1}
 	
 	if [ ! -f $sanchezDstPath17/$newName ]
 	then
@@ -45,7 +51,7 @@ do
 		fi
 		
 		xplanet -body earth -projection rectangular -num_times 1 -geometry 10848x5424 -date $thisDate.$thisTime -output /tmp/underlay.jpg
-		$sanchezPath -q -s $sanchezSrcPath17/$srcImg -u /tmp/underlay.jpg -o $sanchezDstPath17/$newName
+		$sanchezPath -q -s $srcImg -u /tmp/underlay.jpg -o $sanchezDstPath17/$newName
 	fi
 done
 
@@ -58,26 +64,33 @@ fi
 
 mkdir /tmp/goescomposite
 
-for src17Img in $sanchezSrcPath17/*
+for src17Img in $(find "$sanchezSrcPath17" -type f)
 do
-	newName=$(echo $src17Img | sed 's/goes17\/fd\/ch13/composite/' | sed 's/GOES17_FD_CH13/goes16_17_composite/')
-	if [ ! -f $newName ]
+	baseName17=$(echo $src17Img | awk -F/ '{print $NF}')
+	newName=$(echo $baseName17 | sed 's/GOES17_FD_CH13/goes16_17_composite/')
+	
+	if [ ! -f $dstPathComposite/$newName ]
 	then
-		thisDate=$(echo $src17Img | cut -c 66-73)
-		thisTime=$(echo $src17Img | cut -c 75-80)
-		goes17DateStr=$(echo $src17Img | cut -c 66-80)
-		newestAllowed=$(date -u --date="$thisDate $(echo $src17Img | cut -c 75-76):$(echo $src17Img | cut -c 77-78):$(echo $src17Img | cut -c 79-80) UTC + 15 minutes" +"%Y%m%dT%H%M%S")
-		oldestAllowed=$(date -u --date="$thisDate $(echo $src17Img | cut -c 75-76):$(echo $src17Img | cut -c 77-78):$(echo $src17Img | cut -c 79-80) UTC - 15 minutes" +"%Y%m%dT%H%M%S")
+		nameLastPart17=$(echo $baseName17 | awk -F_ '{print $NF}' | cut -d. -f1)
+		thisDate=$(echo $nameLastPart17 | cut -dT -f1)
+		thisTime=$(echo $nameLastPart17 | cut -dT -f2)
+		thisTime=${thisTime::-1}
+		goes17DateStr=${nameLastPart17::-1}
+		
+		newestAllowed=$(date -u --date="$thisDate $(echo $thisTime | cut -c 1-2):$(echo $thisTime | cut -c 3-4):$(echo $thisTime | cut -c 5-6) UTC + 15 minutes" +"%Y%m%dT%H%M%S")
+		oldestAllowed=$(date -u --date="$thisDate $(echo $thisTime | cut -c 1-2):$(echo $thisTime | cut -c 3-4):$(echo $thisTime | cut -c 5-6) UTC - 15 minutes" +"%Y%m%dT%H%M%S")
 
-		for src16Img in $sanchezSrcPath16/*
+		for src16Img in $(find "$sanchezSrcPath16" -type f)
 		do
-			goes16DateStr=$(echo $src16Img | cut -c 66-80)
+			baseName16=$(echo $src16Img | awk -F/ '{print $NF}')
+			nameLastPart16=$(echo $baseName16 | awk -F_ '{print $NF}' | cut -d. -f1)
+			goes16DateStr=${nameLastPart16::-1}
 			
 			if [[ $goes16DateStr == $goes17DateStr || ( $goes16DateStr > $goes17DateStr && $goes16DateStr < $newestAllowed ) || ( $goes16DateStr < $goes17DateStr && $goes16DateStr > $oldestAllowed ) ]]
 			then
 				echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating $newName..."
-				sanchezTime="$(echo $src16Img | cut -c 66-69)-$(echo $src16Img | cut -c 70-71)-$(echo $src16Img | cut -c 72-76):$(echo $src16Img | cut -c 77-78):$(echo $src16Img | cut -c 79-80)"
-				
+				sanchezTime="$(echo $goes16DateStr | cut -c 1-4)-$(echo $goes16DateStr | cut -c 5-6)-$(echo $goes16DateStr | cut -c 7-11):$(echo $goes16DateStr | cut -c 12-13):$(echo $goes16DateStr | cut -c 14-15)"
+
 				#Build Underlay
 				if [ -d /tmp/underlay.jpg ]
 				then
@@ -90,7 +103,7 @@ do
 				cp $src16Img /tmp/goescomposite/
 				cp $src17Img /tmp/goescomposite/
 				
-				$sanchezPath reproject -q -s /tmp/goescomposite/ -u /tmp/underlay.jpg -o $newName -T $sanchezTime -a
+				$sanchezPath reproject -q -s /tmp/goescomposite/ -u /tmp/underlay.jpg -o $dstPathComposite/$newName -T $sanchezTime -a
 				rm /tmp/goescomposite/*
 				
 				break 
