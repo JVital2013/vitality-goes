@@ -1,21 +1,16 @@
 #!/bin/bash
-srcPath16=/path/to/goestoolsrepo/goes16/fd/ch13
-srcPath17=/path/to/goestoolsrepo/goes17/fd/ch13
-dstPath16=/path/to/goestoolsrepo/goes16/fd/sanchez
-dstPath17=/path/to/goestoolsrepo/goes17/fd/sanchez
-dstPathComposite=/path/to/goestoolsrepo/composite
-sanchezPath=~/Programs/sanchez-v1.0.19-linux-x64/Sanchez
+source "$(dirname "$(readlink -fm "$0")")/scriptconfig.ini"
 
 #GOES 16
 echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating GOES 16 Sanchez False Color Images"
-cd $srcPath16
+cd $sanchezSrcPath16
 for srcImg in *
 do
 	newName=$(echo $srcImg | sed 's/CH13/sanchez/')
 	thisDate=$(echo $srcImg | cut -c 16-23)
 	thisTime=$(echo $srcImg | cut -c 25-30)
 	
-	if [ ! -f $dstPath16/$newName ]
+	if [ ! -f $sanchezDstPath16/$newName ]
 	then
 		echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating $newName..."
 		
@@ -26,20 +21,20 @@ do
 		fi
 		
 		xplanet -body earth -projection rectangular -num_times 1 -geometry 10848x5424 -date $thisDate.$thisTime -output /tmp/underlay.jpg
-		$sanchezPath -q -s $srcPath16/$srcImg -u /tmp/underlay.jpg -o $dstPath16/$newName
+		$sanchezPath -q -s $sanchezSrcPath16/$srcImg -u /tmp/underlay.jpg -o $sanchezDstPath16/$newName
 	fi
 done
 
 #GOES 17
 echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating GOES 17 Sanchez False Color Images"
-cd $srcPath17
+cd $sanchezSrcPath17
 for srcImg in *
 do
 	newName=$(echo $srcImg | sed 's/CH13/sanchez/')
 	thisDate=$(echo $srcImg | cut -c 16-23)
 	thisTime=$(echo $srcImg | cut -c 25-30)
 	
-	if [ ! -f $dstPath17/$newName ]
+	if [ ! -f $sanchezDstPath17/$newName ]
 	then
 		echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating $newName..."
 		
@@ -50,7 +45,7 @@ do
 		fi
 		
 		xplanet -body earth -projection rectangular -num_times 1 -geometry 10848x5424 -date $thisDate.$thisTime -output /tmp/underlay.jpg
-		$sanchezPath -q -s $srcPath17/$srcImg -u /tmp/underlay.jpg -o $dstPath17/$newName
+		$sanchezPath -q -s $sanchezSrcPath17/$srcImg -u /tmp/underlay.jpg -o $sanchezDstPath17/$newName
 	fi
 done
 
@@ -63,7 +58,7 @@ fi
 
 mkdir /tmp/goescomposite
 
-for src17Img in $srcPath17/*
+for src17Img in $sanchezSrcPath17/*
 do
 	newName=$(echo $src17Img | sed 's/goes17\/fd\/ch13/composite/' | sed 's/GOES17_FD_CH13/goes16_17_composite/')
 	if [ ! -f $newName ]
@@ -74,7 +69,7 @@ do
 		newestAllowed=$(date -u --date="$thisDate $(echo $src17Img | cut -c 75-76):$(echo $src17Img | cut -c 77-78):$(echo $src17Img | cut -c 79-80) UTC + 15 minutes" +"%Y%m%dT%H%M%S")
 		oldestAllowed=$(date -u --date="$thisDate $(echo $src17Img | cut -c 75-76):$(echo $src17Img | cut -c 77-78):$(echo $src17Img | cut -c 79-80) UTC - 15 minutes" +"%Y%m%dT%H%M%S")
 
-		for src16Img in $srcPath16/*
+		for src16Img in $sanchezSrcPath16/*
 		do
 			goes16DateStr=$(echo $src16Img | cut -c 66-80)
 			
