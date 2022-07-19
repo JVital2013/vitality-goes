@@ -82,7 +82,7 @@ Linux systems allow you to schedule tasks by creating a file under `/etc/cron.d/
 
 ```
 0 0 * * * youruser /path/to/vitality-goes/scripts/CreateVideos-ABI.sh
-0 5 * * * youruser /path/to/vitality-goes/scripts/CreateVideos-EMWIN.sh
+0 2 * * * youruser /path/to/vitality-goes/scripts/CreateVideos-EMWIN.sh
 55 11 * * * youruser /path/to/vitality-goes/scripts/Cleanup-EmwinText.sh
-25,55 5-23 * * * youruser /path/to/vitality-goes/scripts/Sanchez.sh
+25,55 2-23 * * * youruser /path/to/vitality-goes/scripts/Sanchez.sh
 ```
