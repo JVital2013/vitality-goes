@@ -10,7 +10,7 @@ Some scripts will pull settings from the scriptconfig.ini file. This file must b
 * *Additional required system packages: `ffmpeg imagemagick`*
 * *Set `videoDir`, `abiSrcDir`, `abiImgSource`, `abiVidName`, and `abiResizeMode` in scriptconfig.ini before running*
 
-CreateVideos-ABI.sh creates timelapse videos of ABI image products. By default, they render timelapses of the last week at 15 frames per second. Videos are stored in the `html/videos` folder of Vitality GOES so they can be viewed in the web client.
+CreateVideos-ABI.sh creates timelapse videos of ABI image products. Timelapses are rendered at 15 frames a second from midnight 1 week ago to midnight last night "satellite time". Videos are stored in the `html/videos` folder of Vitality GOES so they can be viewed in the web client.
 
 To setup this script, it's important to understand how the `abiImgSource`, `abiVidName`, and `abiResizeMode` variables interact with each other. These variables are arrays, and each of the arrays are "lined up" with each other. For example, the first element in `abiImgSource`, `abiVidName`, and `abiResizeMode` are the configs for the first video. The second element of each array is the config for the next video, the third element of each array is the config for the third video, and so on.
 
@@ -26,7 +26,7 @@ To setup this script, it's important to understand how the `abiImgSource`, `abiV
 * *Additional required system packages: `ffmpeg imagemagick rename`*
 * *Set `videoDir`, `emwinSrcDir`, `emwinCodeName`, `emwinVideoName`, and `emwinFileExt` in scriptconfig.ini before running*
 
-CreateVideos-EMWIN.sh creates timelapse videos of EMWIN image products. By default, they render timelapses of the last week at 15 frames per second. Videos are stored in the `html/videos` folder of Vitality GOES so they can be viewed in the web client.
+CreateVideos-EMWIN.sh creates timelapse videos of EMWIN image products. Timelapses are rendered at 15 frames a second from 1 week ago to the most recent image. Videos are stored in the `html/videos` folder of Vitality GOES so they can be viewed in the web client.
 
 To setup this script, it's important to understand how the `emwinCodeName`, `emwinVideoName`, and `emwinFileExt` variables interact with each other. These variables are arrays, and each of the arrays are "lined up" with each other. For example, the first element in `emwinCodeName`, `emwinVideoName`, and `emwinFileExt` are the configs for the first video. The second element of each array is the config for the next video, the third element of each array is the config for the third video, and so on.
 
