@@ -3,7 +3,7 @@ The GOES HRIT/EMWIN downlink provides rich weather data, forecasts, and other in
 
 Vitality GOES solves this by parsing the data and presenting pertinent information to you.
 
-**NOTE:** This software assumes you only keep up to 36 hours of EMWIN text data in your emwin data folder. While you probably can keep more than that, you may start to notice that old alerts will stick around longer than they should. To work around this issue, I recommend archiving old alerts in daily zip archives. [See the scripts documentation for an example of how to do that](https://github.com/JVital2013/vitality-goes/blob/readme-drafting/docs/scripts.md#cleanup-emwintextsh).
+**NOTE:** This software assumes you only keep up to 36 hours of EMWIN text data in your emwin data folder. While you probably can keep more than that, you may start to notice that old alerts will stick around longer than they should. To work around this issue, I recommend archiving old alerts in daily zip archives. [See the scripts documentation for an example of how to do that](/docs/scripts.md#cleanup-emwintextsh).
 
 ## Alerts
 Active alerts and warnings will show at the top of the Current Weather tab, if there are any.
