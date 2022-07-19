@@ -19,27 +19,17 @@ do
 	
 	for dateStamp in `seq $oneWeekStartTime $oneWeekEndTime`
 	do
-		find "$currentSource" -type f -name "*_$dateStamp*.jpg" | xargs cp -t /tmp/abi/
+		fileList=$(find "$currentSource" -type f -name "*_$dateStamp*.jpg" | grep -v $oneWeekStartTime"T0[0-4]" | grep -E -v $oneWeekEndTime"T(0[5-9]|1[0-9]|2[0-3])")
+		if [ ${abiResizeMode[$i]} = 0 ]; then
+			echo $fileList | xargs mogrify -scale 1356 -path /tmp/abi
+		elif [ ${abiResizeMode[$i]} = 1 ]; then
+			echo $fileList | xargs mogrify -scale 1000 -path /tmp/abi
+		elif [ ${abiResizeMode[$i]} = 2 ]; then
+			echo $fileList | xargs mogrify -scale 1402x954 -path /tmp/abi
+		else
+			echo $fileList | xargs cp -t /tmp/abi/
+		fi
 	done
-	
-	#Trim off extra frames at the beginning and end
-	for hour in {00..04}
-	do
-		rm /tmp/abi/*${oneWeekStartTime}T$hour*.jpg > /dev/null 2>&1
-	done
-	for hour in {05..23}
-	do
-		rm /tmp/abi/*${oneWeekEndTime}T$hour*.jpg > /dev/null 2>&1
-	done
-	
-	#Shrink images if specified
-	if [ ${abiResizeMode[$i]} = 0 ]; then
-		mogrify -scale 1356 /tmp/abi/*.jpg
-	elif [ ${abiResizeMode[$i]} = 1 ]; then
-		mogrify -scale 1000 /tmp/abi/*.jpg
-	elif [ ${abiResizeMode[$i]} = 2 ]; then
-		mogrify -scale 1402x954 /tmp/abi/*.jpg
-	fi
 	
 	#Generate MP4
 	rm $videoDir/$currentName.mp4 > /dev/null 2>&1
