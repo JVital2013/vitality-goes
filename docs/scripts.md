@@ -25,7 +25,7 @@ To setup this script, it's important to understand how the `abiImgSource`, `abiV
   * 3: Do not resize the image. 
 
 ### CreateVideos-EMWIN.sh
-* *Additional required system packages: `ffmpeg imagemagick rename`*
+* *Additional required system packages: `ffmpeg`*
 * *Set `videoDir`, `emwinSrcDir`, `emwinCodeName`, `emwinVideoName`, and `emwinFileExt` in scriptconfig.ini before running*
 
 CreateVideos-EMWIN.sh creates timelapse videos of EMWIN image products. Timelapses are rendered at 15 frames a second from 1 week ago to the most recent image. Videos are stored in the `html/videos` folder of Vitality GOES so they can be viewed in the web client.
