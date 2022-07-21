@@ -58,7 +58,7 @@ When done, enable the Sanchez sections in your [abi.ini config file](config.md#a
 
 ### Cleanup-EmwinText.sh
 * *Additional required system packages: `zip`*
-* *Set `emwinSrcDir` in scriptconfig.ini before running`*
+* *Set `emwinSrcDir` in scriptconfig.ini before running*
 
 When goesproc is configured to save EMWIN text information, it saves *a lot* of text files - roughly 30,000 a day! While these files probably won't fill up your hard drive, they will slow everything down due to the number of files that need to be parsed.
 
