@@ -362,7 +362,7 @@ elseif($_GET['type'] == "metadata")
 			{
 				//Admin update
 				$allAdminFiles = scandir_recursive($config['general']['adminPath']);
-				$allAdminFiles = preg_grep("/\/[0-9]{8}T[0-9]{6}Z_/", $allAdminFiles);
+				$allAdminFiles = preg_grep("/(\\\\|\/)[0-9]{8}T[0-9]{6}Z_/", $allAdminFiles);
 				usort($allAdminFiles, "sortABI");
 				$metadata['latestAdminDate'] = date("M d, Y Hi", strtotime(explode("_", basename($allAdminFiles[count($allAdminFiles) - 1]))[0])) . " " . $DateTime->format('T');
 				$metadata['latestAdmin'] = str_replace("?", "-", utf8_decode(file_get_contents($allAdminFiles[count($allAdminFiles) - 1])));
