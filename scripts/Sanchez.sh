@@ -18,11 +18,7 @@ do
 		echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating $newName..."
 		
 		#Build Underlay
-		if [ -d /tmp/underlay.jpg ]
-		then
-			rm /tmp/underlay.jpg
-		fi
-		
+		rm /tmp/underlay.jpg > /dev/null 2>&1
 		xplanet -body earth -projection rectangular -num_times 1 -geometry 10848x5424 -date $thisDate.$thisTime -output /tmp/underlay.jpg
 		$sanchezPath -q -s $srcImg -u /tmp/underlay.jpg -o $sanchezDstPath16/$newName
 	fi
@@ -45,11 +41,7 @@ do
 		echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating $newName..."
 		
 		#Build Underlay
-		if [ -d /tmp/underlay.jpg ]
-		then
-			rm /tmp/underlay.jpg
-		fi
-		
+		rm /tmp/underlay.jpg > /dev/null 2>&1
 		xplanet -body earth -projection rectangular -num_times 1 -geometry 10848x5424 -date $thisDate.$thisTime -output /tmp/underlay.jpg
 		$sanchezPath -q -s $srcImg -u /tmp/underlay.jpg -o $sanchezDstPath17/$newName
 	fi
@@ -57,13 +49,8 @@ done
 
 #Composite
 echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating GOES 16/17 Composite False Color Images"
-if [ -d /tmp/goescomposite ]
-then
-	rm -rf /tmp/goescomposite
-fi
 
-mkdir /tmp/goescomposite
-
+mkdir -p /tmp/goescomposite
 for src17Img in $(find "$sanchezSrcPath17" -type f)
 do
 	baseName17=$(echo $src17Img | awk -F/ '{print $NF}')
@@ -92,20 +79,15 @@ do
 				sanchezTime="$(echo $goes16DateStr | cut -c 1-4)-$(echo $goes16DateStr | cut -c 5-6)-$(echo $goes16DateStr | cut -c 7-11):$(echo $goes16DateStr | cut -c 12-13):$(echo $goes16DateStr | cut -c 14-15)"
 
 				#Build Underlay
-				if [ -d /tmp/underlay.jpg ]
-				then
-					rm /tmp/underlay.jpg
-				fi
-				
+				rm /tmp/underlay.jpg > /dev/null 2>&1
 				xplanet -body earth -projection rectangular -num_times 1 -geometry 10848x5424 -date $thisDate.$thisTime -output /tmp/underlay.jpg
 				
 				#Render Composite
+				rm /tmp/goescomposite/* > /dev/null 2>&1
 				cp $src16Img /tmp/goescomposite/
 				cp $src17Img /tmp/goescomposite/
 				
 				$sanchezPath reproject -q -s /tmp/goescomposite/ -u /tmp/underlay.jpg -o $dstPathComposite/$newName -T $sanchezTime -a
-				rm /tmp/goescomposite/*
-				
 				break 
 			fi
 		done
