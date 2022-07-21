@@ -1,6 +1,6 @@
 # Additional Scripts
 
-Vitality GOES comes with a number of scripts to enhance and extend its functionality. All of these scripts are optional, and are included in the `scripts/` folder.
+Vitality GOES comes with a number of scripts to enhance and extend its functionality. All of these scripts are optional, and are included in the `scripts/` folder. `Cleanup-EmwinText.sh` is highly recommended since it keeps your EMWIN folder from getting too full.
 
 Some scripts will pull settings from the `scriptconfig.ini` file. This file must be in the same directory as the script when you run it. Make sure you configure this file before running the scripts!
 
@@ -58,9 +58,7 @@ When done, enable the Sanchez sections in your [abi.ini config file](config.md#a
 
 ### Cleanup-EmwinText.sh
 * *Additional required system packages: `zip`*
-* *Modify line 4 before running: `cd /path/to/goestoolsrepo/emwin`*
-
-**Nnote:** This script does not work if you have dated subdirectories in your EMWIN folder; it expects all files to be directly under the /emwin path. If you need an archival solution for dated subdirectories, a different script is needed.
+* *Set `emwinSrcDir` in scriptconfig.ini before running`*
 
 When goesproc is configured to save EMWIN text information, it saves *a lot* of text files - roughly 30,000 a day! While these files probably won't fill up your hard drive, they will slow everything down due to the number of files that need to be parsed.
 
