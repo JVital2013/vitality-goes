@@ -1,9 +1,9 @@
 # How to Configure Vitality GOES
 
-The Vitality GOES config is stored in `html/config`. You can start with the configs provided, then change them as necessary. The configuration is broken out into the following files:
+The Vitality GOES config is stored in `html/config`. There are additional example configs in the [extra folder](/extra). You can start with the configs provided, then change or combine them as necessary. The configuration is broken out into the following files:
 
 * **config.ini**: The main configuration file
-* **emwin.ini**: Stores information about the emwin images you want to display. This file has no effect on emwin text that is displayed
+* **emwin.ini**: Stores information about the emwin images you want to display. This file has no effect on emwin text that is displayed, and does not need changed if you're switching between GOES-16 and GOES-17.
 * **abi.ini**: Contains information about your full-disk images. If you're doing any Sanchez renders, I'd put them in this file as well
 * **meso.ini**: Contains information about your mesoscale images.
 * **l2.ini**: Contains infromation about your ABI Level 2 products. These images contain information about estimated rainfall, land surface temp, sea surface temp, and more. Note that goestools does not receive these unless your goesproc config is set up to do so. The sample config in this repository is configured correctly, but if you're not saving these files, simply leave l2.ini empty.
@@ -22,7 +22,7 @@ This is the main config file. It will likely need configured when you first depl
 * `debug`: Set to true to enable PHP errors. This breaks the AJAX requests within Vitality GOES if there are any errors, so only set this to true if you're debugging data returned by the DataHandler (advanced users only).
 
 ### Paths
-A path should be set up for each satellite downlink you're receiving. Each path defined in this section creates a variable that can be used in the `path` options of your abi, meso, and l2 ini files. By default GOES16 is included, but you can add others as necessary.
+A path should be set up for each satellite downlink you're receiving. Each path defined in this section creates a variable that can be used in the `path` options of your abi, meso, and l2 ini files. One or more satellite should be listed here.
 
 **NOTE:** This does not define the path of the images from a particular satellite, but rather the path for the entire downlink. For example, let's assume you're receiving GOES16, and your images are at `/home/pi/goes/goes16/fd/fc/...`. The `goes16` setting under `[paths]` would be set to `/home/pi/goes` (the parent path for the entire satellite downlink), not `/home/pi/goes/goes16` (the path just for the images from GOES16).
 
