@@ -1,6 +1,18 @@
 #!/bin/bash
 source "$(dirname "$(readlink -fm "$0")")/scriptconfig.ini"
 
+#Make sure needed commands are available
+if ! command -v xplanet &> /dev/null
+then
+    echo -e "xplanet could not be found, which is required for this script\n\nTry installing it with this command:\nsudo apt install xplanet"
+    exit
+fi
+if ! command -v $sanchezPath &> /dev/null
+then
+    echo -e "Sanchez could not be found at $sanchezPath. Please make sure\nit's downloaded and properly configured in scriptconfig.ini"
+    exit
+fi
+
 #GOES 16
 echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating GOES 16 Sanchez False Color Images"
 for srcImg in $(find "$sanchezSrcPath16" -type f)

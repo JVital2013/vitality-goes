@@ -1,4 +1,15 @@
 #!/bin/bash
+if ! command -v mogrify &> /dev/null
+then
+    echo -e "mogrify could not be found, which is required for this script\n\nTry installing it with this command:\nsudo apt install imagemagick"
+    exit
+fi
+if ! command -v ffmpeg &> /dev/null
+then
+    echo -e "ffmpeg could not be found, which is required for this script\n\nTry installing it with this command:\nsudo apt install ffmpeg"
+    exit
+fi
+
 source "$(dirname "$(readlink -fm "$0")")/scriptconfig.ini"
 
 today=$(date --date="today" +"%F")
