@@ -1,14 +1,12 @@
 #!/bin/bash
-srcDir="/path/to/goestoolsrepo"
-
+source "$(dirname "$(readlink -fm "$0")")/scriptconfig.ini"
 twoWeeksAgoABI=$(date -u --date="-10 days" +"%Y%m%dT%H%M%SZ")
 twoWeeksAgoEMWIN=$(date -u --date="-10 days" +"%Y%m%d%H%M%S")
 
 #NWS, Text
-for file in $(find "$srcDir/nws" "$srcDir/text" -name "*" -type f)
+for file in $(find $abiSrcDir/nws $abiSrcDir/text -name "*" -type f)
 do
-	datestr=$(echo $file | cut -d / -f 7 | cut -d _ -f 1)
-	
+	datestr=$(echo $file | awk -F/ '{print $NF}' | cut -d _ -f 1)
 	if [[ $datestr < $twoWeeksAgoABI ]]
 	then
 		echo "[$(date +"%Y-%m-%d %H:%M:%S")] Deleting $file..."
@@ -17,15 +15,14 @@ do
 done
 
 #EMWIN
-for file in "$srcDir/emwin/*"
+for file in $(find $emwinSrcDir -name "*" -type f)
 do
-	datestr=$(echo $file | cut -d _ -f 5)
-	
 	if [[ $file =~ .*\.zip ]]
 	then
 		continue
 	fi
 	
+	datestr=$(echo $file | awk -F/ '{print $NF}' | cut -d _ -f 5)
 	if [[ $datestr < $twoWeeksAgoEMWIN ]]
 	then
 		echo "[$(date +"%Y-%m-%d %H:%M:%S")] Deleting $file..."
@@ -34,15 +31,10 @@ do
 done
 
 #ABI Imagery
-for file in $(find "$srcDir/goes16" "$srcDir/goes17" -name "*" -type f)
+for file in $(find $abiSrcDir/goes16 $abiSrcDir/goes17 $abiSrcDir/composite -name "*" -type f)
 do
-	if [[ $file =~ .*enhanced.* ]]
-	then
-		datestr=$(echo $file | cut -d _ -f 6 | cut -d . -f 1)
-	else
-		datestr=$(echo $file | cut -d _ -f 4 | cut -d . -f 1)
-	fi
-	
+	datestr=$(echo $file | awk -F/ '{print $NF}' | awk -F_ '{print $NF}' | cut -d . -f 1)
+	echo $datestr
 	if [[ $datestr < $twoWeeksAgoABI ]]
 	then
 		echo "[$(date +"%Y-%m-%d %H:%M:%S")] Deleting $file..."
