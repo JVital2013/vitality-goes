@@ -34,7 +34,6 @@ done
 for file in $(find $abiSrcDir/goes16 $abiSrcDir/goes17 $abiSrcDir/composite -name "*" -type f)
 do
 	datestr=$(echo $file | awk -F/ '{print $NF}' | awk -F_ '{print $NF}' | cut -d . -f 1)
-	echo $datestr
 	if [[ $datestr < $twoWeeksAgoABI ]]
 	then
 		echo "[$(date +"%Y-%m-%d %H:%M:%S")] Deleting $file..."
