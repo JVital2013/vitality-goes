@@ -157,11 +157,9 @@ select, input
 }
 .mainContent
 {
-	display: inline-block;
 	column-count: 3;
 	column-width: 400px;
 	column-gap: 20px;
-	width: calc(100% - 20px);
 	padding: 0 10px;
 }
 .singleCard
