@@ -760,21 +760,13 @@ elseif($_GET['type'] == "weatherJSON")
 				array_shift($currentConditionParts);
 				$currentConditionParts = array_merge($currentConditionParts, preg_split("/[ ]+/", $remainingConditionParts));
 				
-				$returnData['weatherDesc'] = $currentConditionParts[0];
-				if($returnData['weatherDesc'] == "NOT AVBL")
+				if($currentConditionParts[0]." ".$currentConditionParts[1] == "NOT AVBL")
 				{
 					$returnData['weatherDesc'] = "Not Available";
-					$returnData['temp'] = "N/A";
-					$returnData['dewPoint'] = "N/A";
-					$returnData['humidity'] = "N/A";
-					$returnData['pressure'] = "N/A";
-					$returnData['remarks'] = "N/A";
-					$returnData['wind'] = "N/A";
-					$returnData['windGust'] = "N/A";
-					$returnData['windDirection'] = "N/A";
 					break;
 				}
 				
+				$returnData['weatherDesc'] = $currentConditionParts[0];
 				$returnData['temp'] = $currentConditionParts[1];
 				$returnData['dewPoint'] = $currentConditionParts[2];
 				$returnData['humidity'] = $currentConditionParts[3];
