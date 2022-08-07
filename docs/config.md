@@ -3,7 +3,7 @@
 The Vitality GOES config is stored in `html/config`. There are additional example configs in the [extra folder](/extra). You can start with the configs provided, then change or combine them as necessary. The configuration is broken out into the following files:
 
 * **config.ini**: The main configuration file
-* **emwin.ini**: Stores information about the emwin images you want to display. This file has no effect on emwin text that is displayed, and does not need changed if you're switching between GOES-16 and GOES-17.
+* **emwin.ini**: Stores information about the emwin images you want to display. This file has no effect on emwin text that is displayed, and does not need changed if you're switching between GOES-16 and GOES-17/18.
 * **abi.ini**: Contains information about your full-disk images. If you're doing any Sanchez renders, I'd put them in this file as well
 * **meso.ini**: Contains information about your mesoscale images.
 * **l2.ini**: Contains infromation about your ABI Level 2 products. These images contain information about estimated rainfall, land surface temp, sea surface temp, and more. Note that goestools does not receive these unless your goesproc config is set up to do so. The sample config in this repository is configured correctly, but if you're not saving these files, simply leave l2.ini empty.
