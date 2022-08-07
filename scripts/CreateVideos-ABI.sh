@@ -12,6 +12,13 @@ fi
 
 source "$(dirname "$(readlink -fm "$0")")/scriptconfig.ini"
 
+#Verify Config is valid
+if [[ ${#abiImgSource[@]} -ne ${#abiVidName[@]} || ${#abiImgSource[@]} -ne ${#abiResizeMode[@]} ]]
+then
+	echo "abiImgSource, abiVidName, and abiResizeMode must have the same number of elements in scriptconfig.ini"
+	exit
+fi
+
 today=$(date --date="today" +"%F")
 oneWeekStartTime=$(date -u --date="$today - 7 days" +"%Y%m%d")
 oneWeekEndTime=$(date -u --date="$today" +"%Y%m%d")

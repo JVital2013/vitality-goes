@@ -7,6 +7,13 @@ fi
 
 source "$(dirname "$(readlink -fm "$0")")/scriptconfig.ini"
 
+#Verify Config is valid
+if [[ ${#emwinCodeName[@]} -ne ${#emwinVideoName[@]} || ${#emwinCodeName[@]} -ne ${#emwinFileExt[@]} ]]
+then
+	echo "emwinCodeName, emwinVideoName, and emwinFileExt must have the same number of elements in scriptconfig.ini"
+	exit
+fi
+
 oneDayStartTime=$(date -u --date="-7 days" +"%Y%m%d")
 oneDayEndTime=$(date -u  --date "+1 day" +"%Y%m%d")
 
