@@ -52,9 +52,9 @@ map=/path/to/sanchez/Resources/world.200411.3x10848x5424.jpg
 night_map=/path/to/sanchez/Resources/world.lights.3x10848x5424.jpg
 ```
 
-The script currently creates 3 things: GOES-16 false color images, GOES-17 false color images, and composites of GOES-16 and 17. The script will also do any "back" renders that it may have missed due to the script being disabled, failing to run, or other issues. This script will need updated once GOES-18 takes the GOES West spot.
+The script currently creates 4 things: GOES-16, GOES-17, and GOES-18 false color images, along with composites of GOES-16 and 17/18. The script will also do any "back" renders that it may have missed due to the script being disabled, failing to run, or other issues. When done, enable the Sanchez sections in your [abi.ini config file](config.md#abiini-mesoini-and-l2ini) to display your fancy new renders.
 
-When done, enable the Sanchez sections in your [abi.ini config file](config.md#abiini-mesoini-and-l2ini) to display your fancy new renders.
+**Note:** As of this writing, Sanchez does not support GOES-18 out-of-the-box. To fix the issue, replace `Resources\Satellites.json` with [extra/Satellites.json](/extra/Satellites.json) in this repo.
 
 ### Cleanup-EmwinText.sh
 * *Additional required system packages: `zip`*
