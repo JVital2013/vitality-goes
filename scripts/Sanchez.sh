@@ -59,7 +59,30 @@ do
 	fi
 done
 
-#Composite
+#GOES 18
+echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating GOES 18 Sanchez False Color Images"
+for srcImg in $(find "$sanchezSrcPath18" -type f)
+do
+	baseName=$(echo $srcImg | awk -F/ '{print $NF}')
+	newName=$(echo $baseName | sed 's/CH13/sanchez/')
+	
+	nameLastPart=$(echo $baseName | awk -F_ '{print $NF}' | cut -d. -f1)
+	thisDate=$(echo $nameLastPart | cut -dT -f1)
+	thisTime=$(echo $nameLastPart | cut -dT -f2)
+	thisTime=${thisTime::-1}
+	
+	if [ ! -f $sanchezDstPath18/$newName ]
+	then
+		echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating $newName..."
+		
+		#Build Underlay
+		rm /tmp/underlay.jpg > /dev/null 2>&1
+		xplanet -body earth -projection rectangular -num_times 1 -geometry 10848x5424 -date $thisDate.$thisTime -output /tmp/underlay.jpg
+		$sanchezPath -q -s $srcImg -u /tmp/underlay.jpg -o $sanchezDstPath18/$newName
+	fi
+done
+
+#Composite 16/17
 echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating GOES 16/17 Composite False Color Images"
 
 mkdir -p /tmp/goescomposite
@@ -98,6 +121,53 @@ do
 				rm /tmp/goescomposite/* > /dev/null 2>&1
 				cp $src16Img /tmp/goescomposite/
 				cp $src17Img /tmp/goescomposite/
+				
+				$sanchezPath reproject -q -s /tmp/goescomposite/ -u /tmp/underlay.jpg -o $dstPathComposite/$newName -T $sanchezTime -a
+				break 
+			fi
+		done
+	fi
+done
+
+#Composite 16/18
+echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating GOES 16/18 Composite False Color Images"
+
+mkdir -p /tmp/goescomposite
+for src18Img in $(find "$sanchezSrcPath18" -type f)
+do
+	baseName18=$(echo $src18Img | awk -F/ '{print $NF}')
+	newName=$(echo $baseName18 | sed 's/GOES18_FD_CH13/goes16_18_composite/')
+	
+	if [ ! -f $dstPathComposite/$newName ]
+	then
+		nameLastPart18=$(echo $baseName18 | awk -F_ '{print $NF}' | cut -d. -f1)
+		thisDate=$(echo $nameLastPart18 | cut -dT -f1)
+		thisTime=$(echo $nameLastPart18 | cut -dT -f2)
+		thisTime=${thisTime::-1}
+		goes18DateStr=${nameLastPart18::-1}
+		
+		newestAllowed=$(date -u --date="$thisDate $(echo $thisTime | cut -c 1-2):$(echo $thisTime | cut -c 3-4):$(echo $thisTime | cut -c 5-6) UTC + 15 minutes" +"%Y%m%dT%H%M%S")
+		oldestAllowed=$(date -u --date="$thisDate $(echo $thisTime | cut -c 1-2):$(echo $thisTime | cut -c 3-4):$(echo $thisTime | cut -c 5-6) UTC - 15 minutes" +"%Y%m%dT%H%M%S")
+
+		for src16Img in $(find "$sanchezSrcPath16" -type f)
+		do
+			baseName16=$(echo $src16Img | awk -F/ '{print $NF}')
+			nameLastPart16=$(echo $baseName16 | awk -F_ '{print $NF}' | cut -d. -f1)
+			goes16DateStr=${nameLastPart16::-1}
+			
+			if [[ $goes16DateStr == $goes18DateStr || ( $goes16DateStr > $goes18DateStr && $goes16DateStr < $newestAllowed ) || ( $goes16DateStr < $goes18DateStr && $goes16DateStr > $oldestAllowed ) ]]
+			then
+				echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating $newName..."
+				sanchezTime="$(echo $goes16DateStr | cut -c 1-4)-$(echo $goes16DateStr | cut -c 5-6)-$(echo $goes16DateStr | cut -c 7-11):$(echo $goes16DateStr | cut -c 12-13):$(echo $goes16DateStr | cut -c 14-15)"
+
+				#Build Underlay
+				rm /tmp/underlay.jpg > /dev/null 2>&1
+				xplanet -body earth -projection rectangular -num_times 1 -geometry 10848x5424 -date $thisDate.$thisTime -output /tmp/underlay.jpg
+				
+				#Render Composite
+				rm /tmp/goescomposite/* > /dev/null 2>&1
+				cp $src16Img /tmp/goescomposite/
+				cp $src18Img /tmp/goescomposite/
 				
 				$sanchezPath reproject -q -s /tmp/goescomposite/ -u /tmp/underlay.jpg -o $dstPathComposite/$newName -T $sanchezTime -a
 				break 
