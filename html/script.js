@@ -1122,8 +1122,9 @@ function loadLocalRadar(targetedContent, metadata)
 	lightGalleries['lightbox-localRadar'] = lightGallery(goesImg, {
 		plugins: [lgZoom, lgJumpTo],
 		loop: false,
+		mode: "lg-jumptotrans",
+		speed: 0,
 		dynamic: true,
-		speed: (matchMedia('(hover: none)').matches ? 250 : 0),
 		dynamicEl: dynamicEl,
 		mobileSettings: {download: true, controls: false, showCloseIcon: false}
 	});
@@ -1179,9 +1180,10 @@ function loadImage(targetedContent, metadata)
 	metadata.forEach(thisImg => {dynamicEl.push({src: "/dataHandler.php?type=" + imageType + "Data&id=" + contentId + "&timestamp=" + thisImg['timestamp'], description: thisImg['description'], subHtml: thisImg['subHtml'], timestamp: thisImg['timestamp']});});
 	lightGalleries["lightbox-" + contentId] = lightGallery(goesImg, {
 		plugins: [lgZoom, lgJumpTo],
-		dynamic: true,
 		loop: false,
-		speed: (matchMedia('(hover: none)').matches ? 250 : 0),
+		mode: "lg-jumptotrans",
+		speed: 0,
+		dynamic: true,
 		dynamicEl: dynamicEl,
 		mobileSettings: {download: true, controls: false, showCloseIcon: false}
 	});

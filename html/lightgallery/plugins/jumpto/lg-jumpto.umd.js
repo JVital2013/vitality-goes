@@ -86,9 +86,16 @@
         JumpTo.prototype.buildTemplates = function () {
 		var jumptoIcons = "<button id=\"" + this.core.getIdName('lg-jumpto') + "\" type=\"button\" aria-label=\"Jump to...\" class=\"lg-jumptobutton\"></button>";
 		var dayJumpIcons = '';
+		var prevNextIcons = '';
+		
 		if(this.settings.controls) dayJumpIcons = "<button type=\"button\" id=\"" + this.core.getIdName('lg-dayprev') + "\" aria-label=\"Previous Day\" class=\"lg-dayprev lg-icon\"></button>\n                <button type=\"button\" id=\"" + this.core.getIdName('lg-daynext') + "\" aria-label=\"Next Day\" class=\"lg-daynext lg-icon\"></button>";
+		else prevNextIcons = "<button type=\"button\" id=\"" + this.core.getIdName('lg-prev') + "\" aria-label=\"" + this.core.settings.strings['previousSlide'] + "\" class=\"lg-prev lg-icon mobile-arrow\"> " + this.core.settings.prevHtml + " </button>\n                <button type=\"button\" id=\"" + this.core.getIdName('lg-next') + "\" aria-label=\"" + this.core.settings.strings['nextSlide'] + "\" class=\"lg-next lg-icon mobile-arrow\"> " + this.core.settings.nextHtml + " </button>";
+		
 		this.core.$content.first().append(dayJumpIcons);
 		this.core.$toolbar.first().append(jumptoIcons);
+		this.core.$lgComponents.first().append(prevNextIcons);
+		
+		this.core.$inner.css('transition-duration', '250ms');
         };
         
         //On launch...

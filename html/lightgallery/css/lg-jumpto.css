@@ -1,3 +1,24 @@
+.lg-jumptotrans .lg-item {
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.lg-jumptotrans .lg-item.lg-current,
+.lg-jumptotrans .lg-item.lg-next-slide.lg-slide-progress,
+.lg-jumptotrans .lg-item.lg-prev-slide.lg-slide-progress
+{
+  opacity: 1;
+}
+.lg-jumptotrans .lg-item.lg-current,
+.lg-jumptotrans .lg-item.lg-next-slide,
+.lg-jumptotrans .lg-item.lg-prev-slide
+{
+  -webkit-transition: none 0s ease 0s;
+  -moz-transition: none 0s ease 0s;
+  -o-transition: none 0s ease 0s;
+  transition: none 0s ease 0s;
+}
+
 .lg-jumptobutton {
   font-family: 'Font Awesome 5 Free' !important;
   speak: never;
@@ -27,7 +48,6 @@
 .lg-jumptobutton::after {
   content: "\f073";
 }
-
 .lg-jumptobutton:hover {
   color: #fff;
 }
@@ -41,6 +61,16 @@
 }
 .lg-next, .lg-prev {
   top: calc(50% - 20px);
+}
+.lg-next.mobile-arrow, .lg-prev.mobile-arrow {
+  top: calc(50% - 15px);
+  padding: 15px 10px 15px;
+}
+.lg-next.mobile-arrow {
+  right: 0;
+}
+.lg-prev.mobile-arrow {
+  left: 0;
 }
 .lg-daynext, .lg-dayprev {
   top: calc(50% + 20px);
