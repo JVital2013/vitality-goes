@@ -7,11 +7,80 @@ then
     echo -e "xplanet could not be found, which is required for this script\n\nTry installing it with this command:\nsudo apt install xplanet"
     exit
 fi
+if ! command -v identify &> /dev/null
+then
+    echo -e "identify could not be found, which is required for this script\n\nTry installing it with this command:\nsudo apt install imagemagick"
+    exit
+fi
 if ! command -v $sanchezPath &> /dev/null
 then
     echo -e "Sanchez could not be found at $sanchezPath. Please make sure\nit's downloaded and properly configured in scriptconfig.ini"
     exit
 fi
+
+#Only needed sometimes commands
+if ! command -v wget &> /dev/null
+then
+    echo -e "wget could not be found.  This is fine if all underlay\nimages are already downloaded. If not, the script will\ncrash. Please install wget with this command:\n\nsudo apt install wget\n"
+fi
+
+#Check if cached image/config directory is available
+if [[ ! -d "$(dirname "$(readlink -fm "$0")")/Resources" ]]
+then
+	echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating directory for underlay cache..."
+	mkdir -p "$(dirname "$(readlink -fm "$0")")/Resources"
+fi
+
+#Download night map
+if [[ ! -f "$(dirname "$(readlink -fm "$0")")/Resources/dnb_land_ocean_ice.2012.21600x10800_geo.jpg" ]]
+then
+	echo "[$(date +"%Y-%m-%d %H:%M:%S")] Downloading dnb_land_ocean_ice.2012.21600x10800_geo.jpg"
+	wget -q -O "$(dirname "$(readlink -fm "$0")")/Resources/dnb_land_ocean_ice.2012.21600x10800_geo.jpg" https://www.dropbox.com/s/cu4g3sbfngjomgk/dnb_land_ocean_ice.2012.21600x10800_geo.jpg?dl=1
+	
+	#Verify the file downloaded
+	if [[ ! -f "$(dirname "$(readlink -fm "$0")")/Resources/dnb_land_ocean_ice.2012.21600x10800_geo.jpg" ]]
+	then
+		echo "[$(date +"%Y-%m-%d %H:%M:%S")] $(dirname "$(readlink -fm "$0")")/Resources/dnb_land_ocean_ice.2012.21600x10800_geo.jpg could not be found or downloaded. Exiting!"
+		exit
+	fi
+fi
+
+#Generate XPlanet configs and download daytime maps, if needed
+for i in $(seq -w 01 12)
+do
+	if [[ ! -f "$(dirname "$(readlink -fm "$0")")/Resources/world.topo.2004$i.3x21600x10800.jpg" ]]
+	then
+		echo "[$(date +"%Y-%m-%d %H:%M:%S")] Downloading world.topo.2004$i.3x21600x10800.jpg..."
+		case $i in
+			01) wget -q -O "$(dirname "$(readlink -fm "$0")")/Resources/world.topo.200401.3x21600x10800.jpg" https://eoimages.gsfc.nasa.gov/images/imagerecords/74000/74243/world.topo.200401.3x21600x10800.jpg || rm "$(dirname "$(readlink -fm "$0")")/Resources/world.topo.200401.3x21600x10800.jpg" ;;
+			02) wget -q -O "$(dirname "$(readlink -fm "$0")")/Resources/world.topo.200402.3x21600x10800.jpg" https://eoimages.gsfc.nasa.gov/images/imagerecords/74000/74268/world.topo.200402.3x21600x10800.jpg || rm "$(dirname "$(readlink -fm "$0")")/Resources/world.topo.200402.3x21600x10800.jpg" ;;
+			03) wget -q -O "$(dirname "$(readlink -fm "$0")")/Resources/world.topo.200403.3x21600x10800.jpg" https://eoimages.gsfc.nasa.gov/images/imagerecords/74000/74293/world.topo.200403.3x21600x10800.jpg || rm "$(dirname "$(readlink -fm "$0")")/Resources/world.topo.200403.3x21600x10800.jpg" ;;
+			04) wget -q -O "$(dirname "$(readlink -fm "$0")")/Resources/world.topo.200404.3x21600x10800.jpg" https://eoimages.gsfc.nasa.gov/images/imagerecords/74000/74318/world.topo.200404.3x21600x10800.jpg || rm "$(dirname "$(readlink -fm "$0")")/Resources/world.topo.200404.3x21600x10800.jpg" ;;
+			05) wget -q -O "$(dirname "$(readlink -fm "$0")")/Resources/world.topo.200405.3x21600x10800.jpg" https://eoimages.gsfc.nasa.gov/images/imagerecords/74000/74343/world.topo.200405.3x21600x10800.jpg || rm "$(dirname "$(readlink -fm "$0")")/Resources/world.topo.200405.3x21600x10800.jpg" ;;
+			06) wget -q -O "$(dirname "$(readlink -fm "$0")")/Resources/world.topo.200406.3x21600x10800.jpg" https://eoimages.gsfc.nasa.gov/images/imagerecords/74000/74368/world.topo.200406.3x21600x10800.jpg || rm "$(dirname "$(readlink -fm "$0")")/Resources/world.topo.200406.3x21600x10800.jpg" ;;
+			07) wget -q -O "$(dirname "$(readlink -fm "$0")")/Resources/world.topo.200407.3x21600x10800.jpg" https://eoimages.gsfc.nasa.gov/images/imagerecords/74000/74393/world.topo.200407.3x21600x10800.jpg || rm "$(dirname "$(readlink -fm "$0")")/Resources/world.topo.200407.3x21600x10800.jpg" ;;
+			08) wget -q -O "$(dirname "$(readlink -fm "$0")")/Resources/world.topo.200408.3x21600x10800.jpg" https://eoimages.gsfc.nasa.gov/images/imagerecords/74000/74418/world.topo.200408.3x21600x10800.jpg || rm "$(dirname "$(readlink -fm "$0")")/Resources/world.topo.200408.3x21600x10800.jpg" ;;
+			09) wget -q -O "$(dirname "$(readlink -fm "$0")")/Resources/world.topo.200409.3x21600x10800.jpg" https://eoimages.gsfc.nasa.gov/images/imagerecords/74000/74443/world.topo.200409.3x21600x10800.jpg || rm "$(dirname "$(readlink -fm "$0")")/Resources/world.topo.200409.3x21600x10800.jpg" ;;
+			10) wget -q -O "$(dirname "$(readlink -fm "$0")")/Resources/world.topo.200410.3x21600x10800.jpg" https://eoimages.gsfc.nasa.gov/images/imagerecords/74000/74468/world.topo.200410.3x21600x10800.jpg || rm "$(dirname "$(readlink -fm "$0")")/Resources/world.topo.200410.3x21600x10800.jpg" ;;
+			11) wget -q -O "$(dirname "$(readlink -fm "$0")")/Resources/world.topo.200411.3x21600x10800.jpg" https://eoimages.gsfc.nasa.gov/images/imagerecords/74000/74493/world.topo.200411.3x21600x10800.jpg || rm "$(dirname "$(readlink -fm "$0")")/Resources/world.topo.200411.3x21600x10800.jpg" ;;
+			12) wget -q -O "$(dirname "$(readlink -fm "$0")")/Resources/world.topo.200412.3x21600x10800.jpg" https://eoimages.gsfc.nasa.gov/images/imagerecords/74000/74518/world.topo.200412.3x21600x10800.jpg || rm "$(dirname "$(readlink -fm "$0")")/Resources/world.topo.200412.3x21600x10800.jpg" ;;
+		esac
+		
+		#Verify the file downloaded
+		if [[ ! -f "$(dirname "$(readlink -fm "$0")")/Resources/world.topo.2004$i.3x21600x10800.jpg" ]]
+		then
+			echo "[$(date +"%Y-%m-%d %H:%M:%S")] $(dirname "$(readlink -fm "$0")")/Resources/world.topo.2004$i.3x21600x10800.jpg could not be found or downloaded. Exiting!"
+			exit
+		fi
+	fi
+	
+	if [[ ! -f "$(dirname "$(readlink -fm "$0")")/Resources/xplanet-$i" ]]
+	then
+		echo "[$(date +"%Y-%m-%d %H:%M:%S")] Generating XPlanet config for world.topo.2004$i.3x21600x10800.jpg"
+		echo -e "[default]\nbump_scale=1\ncloud_ssec=false\ncloud_threshold=90\ncolor={255,255,255}\nmagnify=1\norbit={-.5,.5,2}\norbit_color={255,255,255}\nrandom_origin=true\nrandom_target=true\nshade=30\ntwilight=6\n" > "$(dirname "$(readlink -fm "$0")")/Resources/xplanet-$i"
+		echo -e "[earth]\nmap=$(dirname "$(readlink -fm "$0")")/Resources/world.topo.2004$i.3x21600x10800.jpg\nnight_map=$(dirname "$(readlink -fm "$0")")/Resources/dnb_land_ocean_ice.2012.21600x10800_geo.jpg" >> "$(dirname "$(readlink -fm "$0")")/Resources/xplanet-$i"
+	fi
+done
 
 #GOES 16
 echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating GOES 16 Sanchez False Color Images"
@@ -31,8 +100,9 @@ do
 		
 		#Build Underlay
 		rm /tmp/underlay.jpg > /dev/null 2>&1
-		xplanet -body earth -projection rectangular -num_times 1 -geometry 10848x5424 -date $thisDate.$thisTime -output /tmp/underlay.jpg
-		$sanchezPath -q -s $srcImg -u /tmp/underlay.jpg -o $sanchezDstPath16/$newName
+		satelliteMonth=$(date -u -d "$thisDate ${thisTime:0:2}:${thisTime:2:2}:${thisTime:4:2} + 5 hour" +"%m")
+		xplanet -config "$(dirname "$(readlink -fm "$0")")/Resources/xplanet-$satelliteMonth" -body earth -projection rectangular -num_times 1 -geometry 21600x10800 -date $thisDate.$thisTime -output /tmp/underlay.jpg
+		$sanchezPath -q -s $srcImg -u /tmp/underlay.jpg -r $((10850/$(identify -format '%w' $srcImg))) -n -o $sanchezDstPath16/$newName
 	fi
 done
 
@@ -54,8 +124,9 @@ do
 		
 		#Build Underlay
 		rm /tmp/underlay.jpg > /dev/null 2>&1
-		xplanet -body earth -projection rectangular -num_times 1 -geometry 10848x5424 -date $thisDate.$thisTime -output /tmp/underlay.jpg
-		$sanchezPath -q -s $srcImg -u /tmp/underlay.jpg -o $sanchezDstPath17/$newName
+		satelliteMonth=$(date -u -d "$thisDate ${thisTime:0:2}:${thisTime:2:2}:${thisTime:4:2} + 8 hour" +"%m")
+		xplanet -config "$(dirname "$(readlink -fm "$0")")/Resources/xplanet-$satelliteMonth" -body earth -projection rectangular -num_times 1 -geometry 21600x10800 -date $thisDate.$thisTime -output /tmp/underlay.jpg
+		$sanchezPath -q -s $srcImg -u /tmp/underlay.jpg -r $((10850/$(identify -format '%w' $srcImg))) -n -o $sanchezDstPath17/$newName
 	fi
 done
 
@@ -77,8 +148,9 @@ do
 		
 		#Build Underlay
 		rm /tmp/underlay.jpg > /dev/null 2>&1
-		xplanet -body earth -projection rectangular -num_times 1 -geometry 10848x5424 -date $thisDate.$thisTime -output /tmp/underlay.jpg
-		$sanchezPath -q -s $srcImg -u /tmp/underlay.jpg -o $sanchezDstPath18/$newName
+		satelliteMonth=$(date -u -d "$thisDate ${thisTime:0:2}:${thisTime:2:2}:${thisTime:4:2} + 8 hour" +"%m")
+		xplanet -config "$(dirname "$(readlink -fm "$0")")/Resources/xplanet-$satelliteMonth" -body earth -projection rectangular -num_times 1 -geometry 21600x10800 -date $thisDate.$thisTime -output /tmp/underlay.jpg
+		$sanchezPath -q -s $srcImg -u /tmp/underlay.jpg -r $((10850/$(identify -format '%w' $srcImg))) -n -o $sanchezDstPath18/$newName
 	fi
 done
 
@@ -99,8 +171,8 @@ do
 		thisTime=${thisTime::-1}
 		goes17DateStr=${nameLastPart17::-1}
 		
-		newestAllowed=$(date -u --date="$thisDate $(echo $thisTime | cut -c 1-2):$(echo $thisTime | cut -c 3-4):$(echo $thisTime | cut -c 5-6) UTC + 15 minutes" +"%Y%m%dT%H%M%S")
-		oldestAllowed=$(date -u --date="$thisDate $(echo $thisTime | cut -c 1-2):$(echo $thisTime | cut -c 3-4):$(echo $thisTime | cut -c 5-6) UTC - 15 minutes" +"%Y%m%dT%H%M%S")
+		newestAllowed=$(date -u --date="$thisDate ${thisTime:0:2}:${thisTime:2:2}:${thisTime:4:2} UTC + 15 minutes" +"%Y%m%dT%H%M%S")
+		oldestAllowed=$(date -u --date="$thisDate ${thisTime:0:2}:${thisTime:2:2}:${thisTime:4:2} UTC - 15 minutes" +"%Y%m%dT%H%M%S")
 
 		for src16Img in $(find "$sanchezSrcPath16" -type f)
 		do
@@ -111,18 +183,19 @@ do
 			if [[ $goes16DateStr == $goes17DateStr || ( $goes16DateStr > $goes17DateStr && $goes16DateStr < $newestAllowed ) || ( $goes16DateStr < $goes17DateStr && $goes16DateStr > $oldestAllowed ) ]]
 			then
 				echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating $newName..."
-				sanchezTime="$(echo $goes16DateStr | cut -c 1-4)-$(echo $goes16DateStr | cut -c 5-6)-$(echo $goes16DateStr | cut -c 7-11):$(echo $goes16DateStr | cut -c 12-13):$(echo $goes16DateStr | cut -c 14-15)"
-
+				sanchezTime="${goes16DateStr:0:4}-${goes16DateStr:4:2}-${goes16DateStr:6:5}:${goes16DateStr:11:2}:${goes16DateStr:13:2}"
+				
 				#Build Underlay
 				rm /tmp/underlay.jpg > /dev/null 2>&1
-				xplanet -body earth -projection rectangular -num_times 1 -geometry 10848x5424 -date $thisDate.$thisTime -output /tmp/underlay.jpg
+				satelliteMonth=$(date -u -d "$thisDate ${thisTime:0:2}:${thisTime:2:2}:${thisTime:4:2} + 6 hour" +"%m")
+				xplanet -config "$(dirname "$(readlink -fm "$0")")/Resources/xplanet-$satelliteMonth" -body earth -projection rectangular -num_times 1 -geometry 21600x10800 -date $thisDate.$thisTime -output /tmp/underlay.jpg
 				
 				#Render Composite
 				rm /tmp/goescomposite/* > /dev/null 2>&1
 				cp $src16Img /tmp/goescomposite/
 				cp $src17Img /tmp/goescomposite/
 				
-				$sanchezPath reproject -q -s /tmp/goescomposite/ -u /tmp/underlay.jpg -o $dstPathComposite/$newName -T $sanchezTime -a
+				$sanchezPath reproject -q -s /tmp/goescomposite/ -u /tmp/underlay.jpg -n -o $dstPathComposite/$newName -T $sanchezTime -a
 				break 
 			fi
 		done
@@ -146,8 +219,8 @@ do
 		thisTime=${thisTime::-1}
 		goes18DateStr=${nameLastPart18::-1}
 		
-		newestAllowed=$(date -u --date="$thisDate $(echo $thisTime | cut -c 1-2):$(echo $thisTime | cut -c 3-4):$(echo $thisTime | cut -c 5-6) UTC + 15 minutes" +"%Y%m%dT%H%M%S")
-		oldestAllowed=$(date -u --date="$thisDate $(echo $thisTime | cut -c 1-2):$(echo $thisTime | cut -c 3-4):$(echo $thisTime | cut -c 5-6) UTC - 15 minutes" +"%Y%m%dT%H%M%S")
+		newestAllowed=$(date -u --date="$thisDate ${thisTime:0:2}:${thisTime:2:2}:${thisTime:4:2} UTC + 15 minutes" +"%Y%m%dT%H%M%S")
+		oldestAllowed=$(date -u --date="$thisDate ${thisTime:0:2}:${thisTime:2:2}:${thisTime:4:2} UTC - 15 minutes" +"%Y%m%dT%H%M%S")
 
 		for src16Img in $(find "$sanchezSrcPath16" -type f)
 		do
@@ -158,18 +231,19 @@ do
 			if [[ $goes16DateStr == $goes18DateStr || ( $goes16DateStr > $goes18DateStr && $goes16DateStr < $newestAllowed ) || ( $goes16DateStr < $goes18DateStr && $goes16DateStr > $oldestAllowed ) ]]
 			then
 				echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating $newName..."
-				sanchezTime="$(echo $goes16DateStr | cut -c 1-4)-$(echo $goes16DateStr | cut -c 5-6)-$(echo $goes16DateStr | cut -c 7-11):$(echo $goes16DateStr | cut -c 12-13):$(echo $goes16DateStr | cut -c 14-15)"
+				sanchezTime="${goes16DateStr:0:4}-${goes16DateStr:4:2}-${goes16DateStr:6:5}:${goes16DateStr:11:2}:${goes16DateStr:13:2}"
 
 				#Build Underlay
 				rm /tmp/underlay.jpg > /dev/null 2>&1
-				xplanet -body earth -projection rectangular -num_times 1 -geometry 10848x5424 -date $thisDate.$thisTime -output /tmp/underlay.jpg
+				satelliteMonth=$(date -u -d "$thisDate ${thisTime:0:2}:${thisTime:2:2}:${thisTime:4:2} + 6 hour" +"%m")
+				xplanet -config "$(dirname "$(readlink -fm "$0")")/Resources/xplanet-$satelliteMonth" -body earth -projection rectangular -num_times 1 -geometry 21600x10800 -date $thisDate.$thisTime -output /tmp/underlay.jpg
 				
 				#Render Composite
 				rm /tmp/goescomposite/* > /dev/null 2>&1
 				cp $src16Img /tmp/goescomposite/
 				cp $src18Img /tmp/goescomposite/
 				
-				$sanchezPath reproject -q -s /tmp/goescomposite/ -u /tmp/underlay.jpg -o $dstPathComposite/$newName -T $sanchezTime -a
+				$sanchezPath reproject -q -s /tmp/goescomposite/ -u /tmp/underlay.jpg -n -o $dstPathComposite/$newName -T $sanchezTime -a
 				break 
 			fi
 		done
