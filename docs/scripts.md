@@ -39,22 +39,13 @@ To setup this script, it's important to understand how the `emwinCodeName`, `emw
 ## Other Scripts
 
 ### Sanchez.sh
-* *Additional required system packages: `xplanet`*
+* *Additional required system packages: `xplanet imagemagick`*
 * *Additional required software (non-system): [sanchez](https://github.com/nullpainter/sanchez)*
-* *Set `sanchezSrcPath16`, `sanchezSrcPath17`, `sanchezDstPath16`, `sanchezDstPath17`, `dstPathComposite`, and `sanchezPath` in scriptconfig.ini before running*
+* *Set `sanchezSrcPath16`, `sanchezSrcPath17`, `sanchezSrcPath18`, `sanchezDstPath16`, `sanchezDstPath17`, `sanchezDstPath18`, `dstPathComposite`, and `sanchezPath` in scriptconfig.ini before running*
 
-Sanchez.sh is a script that automates Sanchez renders of your geostationary captures. To use it, xplanet must first be configred. Install xplanet as you typically would for your distro, and download/extract Sanchez. Next, edit the xplanet default config file (at `/var/share/xplanet/config/config` in most distros). Change the `[earth]` section to only say this:
-
-```ini
-[earth]
-"Earth"
-map=/path/to/sanchez/Resources/world.200411.3x10848x5424.jpg
-night_map=/path/to/sanchez/Resources/world.lights.3x10848x5424.jpg
-```
+Sanchez.sh is a script that automates Sanchez renders of your geostationary captures. The first time this script runs, it will automatically download 13 images to use as an underlay: one for each month, and a night time image with city lights. After the first run, the script will function without internet. You can also manually download the necessary images and save them in the Resources folder with the correct name, found in the same directory as Sanchez.sh.
 
 The script currently creates 4 things: GOES-16, GOES-17, and GOES-18 false color images, along with composites of GOES-16 and 17/18. The script will also do any "back" renders that it may have missed due to the script being disabled, failing to run, or other issues. When done, enable the Sanchez sections in your [abi.ini config file](config.md#abiini-mesoini-and-l2ini) to display your fancy new renders.
-
-**Note:** As of this writing, Sanchez itself does not support GOES-18 out-of-the-box. To fix the issue, replace `Resources\Satellites.json` in your Sanchez folder with [extra/Satellites.json](/extra/Satellites.json) in this repo.
 
 ### Cleanup-EmwinText.sh
 * *Additional required system packages: `zip`*
