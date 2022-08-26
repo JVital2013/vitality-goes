@@ -40,7 +40,7 @@ To setup this script, it's important to understand how the `emwinCodeName`, `emw
 
 ### Sanchez.sh
 * *Additional required system packages: `xplanet imagemagick`*
-* *Additional required software (non-system): [sanchez](https://github.com/nullpainter/sanchez)*
+* *Additional required software (non-system): [sanchez 1.0.21 or newer](https://github.com/nullpainter/sanchez)*
 * *Set `sanchezSrcPath16`, `sanchezSrcPath17`, `sanchezSrcPath18`, `sanchezDstPath16`, `sanchezDstPath17`, `sanchezDstPath18`, `dstPathComposite`, and `sanchezPath` in scriptconfig.ini before running*
 
 Sanchez.sh is a script that automates Sanchez renders of your geostationary captures. The first time this script runs, it will automatically download 13 images to use as an underlay: one for each month, and a night time image with city lights. After the first run, the script will function without internet. You can also manually download the necessary images and save them in the Resources folder with the correct name, found in the same directory as Sanchez.sh.
