@@ -13,9 +13,9 @@ fi
 source "$(dirname "$(readlink -fm "$0")")/scriptconfig.ini"
 
 #Verify Config is valid
-if [[ ${#abiImgSource[@]} -ne ${#abiVidName[@]} || ${#abiImgSource[@]} -ne ${#abiResizeMode[@]} ]]
+if [[ ${#abiImgSource[@]} -ne ${#abiVidName[@]} ]]
 then
-	echo "abiImgSource, abiVidName, and abiResizeMode must have the same number of elements in scriptconfig.ini"
+	echo "abiImgSource and abiVidName must have the same number of elements in scriptconfig.ini"
 	exit
 fi
 
@@ -25,27 +25,39 @@ oneWeekEndTime=$(date -u --date="$today" +"%Y%m%d")
 
 mkdir -p /tmp/abi
 
-#Create 1 Week of Full Disk Videos
+#Create 1 Week of ABI Videos
 i=0
 for currentSource in ${abiImgSource[@]}
 do
-	#Copy down files
+	#Get current image size
 	currentName=${abiVidName[i]}
+	resizeTo=$(find "$currentSource" -type f -name "*.jpg" -print0 -quit | xargs -0 identify -format '%w')
+	if [[ $resizeTo == '' ]]
+	then
+		echo "[$(date +"%Y-%m-%d %H:%M:%S")] No images found for $currentName; skipping"
+		i=$((i+1))
+		continue
+	fi
+	
+	#Calculate necessary scale
+	resizeNeeded=0
+	while [[ $resizeTo -gt 1500 ]]
+	do
+		resizeNeeded=1
+		resizeTo=$(($resizeTo/2))
+	done
 	
 	echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating $currentName..."
 	rm /tmp/abi/* > /dev/null 2>&1
 	
+	#Resize and/or copy file to temporary working directory
 	for dateStamp in `seq $oneWeekStartTime $oneWeekEndTime`
 	do
-		fileList=$(find "$currentSource" -type f -name "*_$dateStamp*.jpg" | grep -v $oneWeekStartTime"T0[0-4]" | grep -E -v $oneWeekEndTime"T(0[5-9]|1[0-9]|2[0-3])")
-		if [ ${abiResizeMode[$i]} = 0 ]; then
-			echo $fileList | xargs mogrify -scale 1356 -path /tmp/abi
-		elif [ ${abiResizeMode[$i]} = 1 ]; then
-			echo $fileList | xargs mogrify -scale 1000 -path /tmp/abi
-		elif [ ${abiResizeMode[$i]} = 2 ]; then
-			echo $fileList | xargs mogrify -scale 1402x954 -path /tmp/abi
+		if [[ $resizeNeeded -eq 0 ]]
+		then
+			find "$currentSource" -type f -regextype posix-extended -name "*_$dateStamp*.jpg" -not -regex ".*"$oneWeekStartTime"T0[0-4].*" -not -regex ".*"$oneWeekEndTime"T(0[5-9]|1[0-9]|2[0-3]).*" -print0 | xargs -0 cp -t /tmp/abi/
 		else
-			echo $fileList | xargs cp -t /tmp/abi/
+			find "$currentSource" -type f -regextype posix-extended -name "*_$dateStamp*.jpg" -not -regex ".*"$oneWeekStartTime"T0[0-4].*" -not -regex ".*"$oneWeekEndTime"T(0[5-9]|1[0-9]|2[0-3]).*" -print0 | xargs -0 mogrify -scale $resizeTo -path /tmp/abi
 		fi
 	done
 	
