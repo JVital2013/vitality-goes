@@ -10,19 +10,14 @@ A sample config for GOES-16 is included in the scripts folder, but additional sa
 
 ### CreateVideos-ABI.sh
 * *Additional required system packages: `ffmpeg imagemagick`*
-* *Set `videoDir`, `abiSrcDir`, `abiImgSource`, `abiVidName`, and `abiResizeMode` in scriptconfig.ini before running*
+* *Set `videoDir`, `abiSrcDir`, `abiImgSource`, and `abiVidName` in scriptconfig.ini before running*
 
 CreateVideos-ABI.sh creates timelapse videos of ABI image products. Timelapses are rendered at 15 frames a second from midnight 1 week ago to midnight last night "satellite time". Videos are stored in the `html/videos` folder of Vitality GOES so they can be viewed in the web client.
 
-To setup this script, it's important to understand how the `abiImgSource`, `abiVidName`, and `abiResizeMode` variables interact with each other. These variables are arrays, and each of the arrays are "lined up" with each other. For example, the first element in `abiImgSource`, `abiVidName`, and `abiResizeMode` are the configs for the first video. The second element of each array is the config for the next video, the third element of each array is the config for the third video, and so on.
+To setup this script, it's important to understand how the `abiImgSource` and `abiVidName` variables interact with each other. These variables are arrays, and each of the arrays are "lined up" with each other. For example, the first element in `abiImgSource` and `abiVidName` are the configs for the first video. The second element of each array is the config for the next video, the third element of each array is the config for the third video, and so on.
 
 * `abiImgSource`: Specifies the source of the frames for each video. This should be similar to [`path` in your abi.ini, meso.ini, and l2.ini config files](config.md#abiini-mesoini-and-l2ini)
 * `abiVidName`: Specifies the name of the MP4 you want to create, without the MP4 extension. Other than the missing extension, this should match the [`videoPath` in your abi.ini, meso.ini, and l2.ini config files](config.md#abiini-mesoini-and-l2ini)
-* `abiResizeMode`: Since the GOES satellites can send very high resolution images, you want to downscale some of them. Resize mode specifies how to resize the images before rendering them into videos:
-  * 0: Resize images to 1356x1356. Good for full-disk images
-  * 1: Resize images to 1000x1000. Good for some Level-II Non-CMIP Images and Mesoscale images
-  * 2: Resize images to 1402x954. Good for Sanchez composites
-  * 3: Do not resize the image. 
 
 ### CreateVideos-EMWIN.sh
 * *Additional required system packages: `ffmpeg`*
