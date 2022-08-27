@@ -10,19 +10,14 @@ A sample config for GOES-16 is included in the scripts folder, but additional sa
 
 ### CreateVideos-ABI.sh
 * *Additional required system packages: `ffmpeg imagemagick`*
-* *Set `videoDir`, `abiSrcDir`, `abiImgSource`, `abiVidName`, and `abiResizeMode` in scriptconfig.ini before running*
+* *Set `videoDir`, `abiSrcDir`, `abiImgSource`, and `abiVidName` in scriptconfig.ini before running*
 
 CreateVideos-ABI.sh creates timelapse videos of ABI image products. Timelapses are rendered at 15 frames a second from midnight 1 week ago to midnight last night "satellite time". Videos are stored in the `html/videos` folder of Vitality GOES so they can be viewed in the web client.
 
-To setup this script, it's important to understand how the `abiImgSource`, `abiVidName`, and `abiResizeMode` variables interact with each other. These variables are arrays, and each of the arrays are "lined up" with each other. For example, the first element in `abiImgSource`, `abiVidName`, and `abiResizeMode` are the configs for the first video. The second element of each array is the config for the next video, the third element of each array is the config for the third video, and so on.
+To setup this script, it's important to understand how the `abiImgSource` and `abiVidName` variables interact with each other. These variables are arrays, and each of the arrays are "lined up" with each other. For example, the first element in `abiImgSource` and `abiVidName` are the configs for the first video. The second element of each array is the config for the next video, the third element of each array is the config for the third video, and so on.
 
-* `abiImgSource`: Specifies the source of the frames for each video. This should be similar to [`path` in your abi.ini, meso.ini, and l2.ini config files](config.md#abiini-mesoini-and-l2ini)
+* `abiImgSource`: Specifies the source of the frames for each video. This should be similar to [`path` in your abi.ini, meso.ini, and l2.ini config files](config.md#abiini-mesoini-and-l2ini), but make sure to match the synax to the example provided in scriptconfig.ini.
 * `abiVidName`: Specifies the name of the MP4 you want to create, without the MP4 extension. Other than the missing extension, this should match the [`videoPath` in your abi.ini, meso.ini, and l2.ini config files](config.md#abiini-mesoini-and-l2ini)
-* `abiResizeMode`: Since the GOES satellites can send very high resolution images, you want to downscale some of them. Resize mode specifies how to resize the images before rendering them into videos:
-  * 0: Resize images to 1356x1356. Good for full-disk images
-  * 1: Resize images to 1000x1000. Good for some Level-II Non-CMIP Images and Mesoscale images
-  * 2: Resize images to 1402x954. Good for Sanchez composites
-  * 3: Do not resize the image. 
 
 ### CreateVideos-EMWIN.sh
 * *Additional required system packages: `ffmpeg`*
@@ -39,22 +34,13 @@ To setup this script, it's important to understand how the `emwinCodeName`, `emw
 ## Other Scripts
 
 ### Sanchez.sh
-* *Additional required system packages: `xplanet`*
-* *Additional required software (non-system): [sanchez](https://github.com/nullpainter/sanchez)*
-* *Set `sanchezSrcPath16`, `sanchezSrcPath17`, `sanchezDstPath16`, `sanchezDstPath17`, `dstPathComposite`, and `sanchezPath` in scriptconfig.ini before running*
+* *Additional required system packages: `xplanet imagemagick`*
+* *Additional required software (non-system): [sanchez 1.0.21 or newer](https://github.com/nullpainter/sanchez)*
+* *Set `sanchezSrcPath16`, `sanchezSrcPath17`, `sanchezSrcPath18`, `sanchezDstPath16`, `sanchezDstPath17`, `sanchezDstPath18`, `dstPathComposite`, and `sanchezPath` in scriptconfig.ini before running*
 
-Sanchez.sh is a script that automates Sanchez renders of your geostationary captures. To use it, xplanet must first be configred. Install xplanet as you typically would for your distro, and download/extract Sanchez. Next, edit the xplanet default config file (at `/var/share/xplanet/config/config` in most distros). Change the `[earth]` section to only say this:
-
-```ini
-[earth]
-"Earth"
-map=/path/to/sanchez/Resources/world.200411.3x10848x5424.jpg
-night_map=/path/to/sanchez/Resources/world.lights.3x10848x5424.jpg
-```
+Sanchez.sh is a script that automates Sanchez renders of your geostationary captures. The first time this script runs, it will automatically download 13 images to use as an underlay: one for each month, and a night time image with city lights. After the first run, the script will function without internet. You can also manually download the necessary images and save them in the Resources folder with the correct name, found in the same directory as Sanchez.sh.
 
 The script currently creates 4 things: GOES-16, GOES-17, and GOES-18 false color images, along with composites of GOES-16 and 17/18. The script will also do any "back" renders that it may have missed due to the script being disabled, failing to run, or other issues. When done, enable the Sanchez sections in your [abi.ini config file](config.md#abiini-mesoini-and-l2ini) to display your fancy new renders.
-
-**Note:** As of this writing, Sanchez itself does not support GOES-18 out-of-the-box. To fix the issue, replace `Resources\Satellites.json` in your Sanchez folder with [extra/Satellites.json](/extra/Satellites.json) in this repo.
 
 ### Cleanup-EmwinText.sh
 * *Additional required system packages: `zip`*
