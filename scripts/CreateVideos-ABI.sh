@@ -47,6 +47,12 @@ do
 		resizeTo=$(($resizeTo/2))
 	done
 	
+	#Prevent scaled image from being an odd width
+	if [[ $(($resizeTo%2)) -eq 1 ]]
+	then
+		resizeTo=$(($resizeTo+1))
+	fi
+	
 	echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating $currentName..."
 	rm /tmp/abi/* > /dev/null 2>&1
 	
