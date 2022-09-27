@@ -817,7 +817,7 @@ elseif($_GET['type'] == "weatherJSON")
 			foreach($data as $rawLine)
 			{
 				$thisLine = trim($rawLine);
-				if(stripos($thisLine, ".DISCUSSION...") === 0 || stripos($thisLine, ".NEAR TERM") === 0 || stripos($thisLine, ".SHORT TERM") === 0)
+				if(stripos($thisLine, ".DISCUSSION...") === 0 || stripos($thisLine, ".NEAR TERM") === 0 || stripos($thisLine, ".SHORT TERM") === 0 || stripos($thisLine, ".UPDATE") === 0)
 				{
 					$decodingLine = 0;
 					$dataBuffer[] = substr($thisLine, strrpos($thisLine, "...") + 3);
@@ -1037,7 +1037,7 @@ elseif($_GET['type'] == "weatherJSON")
 						$returnData['alert'] .= " ".substr($thisLine, 0, strlen($thisLine) - 3);
 					}
 				}
-				elseif($thisLine != "")
+				elseif($thisLine != "" && isset($lastForecastName))
 				{
 					$returnData['forecast'][$lastForecastName] .= " ".$thisLine;
 				}
