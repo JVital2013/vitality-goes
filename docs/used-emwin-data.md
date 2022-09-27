@@ -35,6 +35,9 @@ A number of local non-weather-related emergencies are broadcast across EMWIN and
 | CDW*****.TXT         | Civil Danger Warning | Purple                          |
 | EVI*****.TXT         | Evacuation Warning   | Brown                           |
 
+### Hurricane Local Statement
+Hurricane Local Statements, or HLS, are public releases prepared by local National Weather Service offices in or near a hurricane-threatened area. It gives specific details for its county/parish warning area on (1) weather conditions, (2) evacuation decisions made by local officials, and (3) other precautions necessary to protect life and property. The most recent HLS for your area is shown at the top of the current weather page.
+
 ## Current Weather
 The Current Weather tab of Vitality GOES shows current weather conditions and forecasts for your configured location. The data comes from a number of seperate EMWIN text sources.
 

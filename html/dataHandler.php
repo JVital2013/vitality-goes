@@ -634,8 +634,9 @@ elseif($_GET['type'] == "settings")
 elseif($_GET['type'] == "alertJSON")
 {
 	$returnData = [];
+	$latestHurricaneMessage = 0;
 	$returnData['localEmergencies'] = $returnData['blueAlerts'] = $returnData['amberAlerts'] = $returnData['civilDangerWarnings'] = 
-		$returnData['localEvacuations'] = $returnData['weatherWarnings'] = [];
+		$returnData['localEvacuations'] = $returnData['hurricaneStatement'] = $returnData['weatherWarnings'] = [];
 	
 	//Query all emwin files
 	$allEmwinFiles = scandir_recursive($config['general']['emwinPath']);
@@ -650,6 +651,32 @@ elseif($_GET['type'] == "alertJSON")
 		if(preg_match("/-CAE.*$alertStateAbbrs\.TXT$/", $thisFile)) $returnData['amberAlerts'][] = linesToParagraphs(file($thisFile), 4);
 		if(preg_match("/-CDW.*$alertStateAbbrs\.TXT$/", $thisFile)) $returnData['civilDangerWarnings'][] = linesToParagraphs(file($thisFile), 4);
 		if(preg_match("/-EVI.*$alertStateAbbrs\.TXT$/", $thisFile)) $returnData['localEvacuations'][] = linesToParagraphs(file($thisFile), 4);
+		
+		//Hurricane Statement - Only get most recent
+		if(preg_match("/-HLS.*" . $currentSettings[$selectedProfile]['orig'] . "\.TXT$/", $thisFile))
+		{
+			$hurricaneStatementLines = file($thisFile);
+			foreach($hurricaneStatementLines as $hurricaneStatementLine)
+			{
+				$thisLine = trim($hurricaneStatementLine);
+				if($thisLine != "" && is_numeric($thisLine[0]))
+				{
+					$DateTime = new DateTime("now", new DateTimeZone(date_default_timezone_get()));
+					$issueTimeParts = explode(" " . $DateTime->format('T') . " ", $thisLine);
+					$issueTimeParts[0] = substr_replace($issueTimeParts[0], ":", -5, 0);
+					$thisHurricaneMessageTime = strtotime($issueTimeParts[1] . " " . $issueTimeParts[0]);
+					
+					if($thisHurricaneMessageTime > $latestHurricaneMessage)
+					{
+						$returnData['hurricaneStatement'][0] = linesToParagraphs($hurricaneStatementLines, 4);
+						$latestHurricaneMessage = $thisHurricaneMessageTime;
+					}
+					
+					break;
+				}
+			}
+			
+		}
 		
 		//Weather warnings
 		if(preg_match("/-(SQW|DSW|FRW|FFW|FLW|SVR|TOR)" . $currentSettings[$selectedProfile]['orig'] . "\.TXT$/", $thisFile))

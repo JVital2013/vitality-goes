@@ -545,6 +545,7 @@ function menuSelect(menuNumber)
 				
 				//Weather Warnings
 				alertInfo.weatherWarnings.forEach(function(element){renderAlert(element, "red")});
+				alertInfo.hurricaneStatement.forEach(function(element){renderAlert(element, "red")});
 				alertInfo.localEvacuations.forEach(function(element){renderAlert(element, "brown")});
 				alertInfo.localEmergencies.forEach(function(element){renderAlert(element, "red")});
 				alertInfo.blueAlerts.forEach(function(element){renderAlert(element, "blue")});
