@@ -293,7 +293,7 @@ elseif($_GET['type'] == "metadata")
 		case "otherEmwin":
 			$DateTime = new DateTime("now", new DateTimeZone(date_default_timezone_get()));
 			
-			if(array_key_exists('emwinPath', $config['general']) &&  is_dir($config['general']['emwinPath']))
+			if(array_key_exists('emwinPath', $config['general']) && is_dir($config['general']['emwinPath']))
 			{
 				//Get all emwin files
 				$allEmwinFiles = scandir_recursive($config['general']['emwinPath']);
@@ -748,6 +748,54 @@ elseif($_GET['type'] == "alertJSON")
 				"<b>Issue Time: </b>$issueTime<br />" .
 				linesToParagraphs(array_slice($weatherData, $messageStart, $messageEnd - $messageStart + 1), 0);
 		}
+	}
+	
+	header('Content-Type: application/json; charset=utf-8');
+	echo json_encode($returnData);
+}
+elseif($_GET['type'] == "hurricaneJSON")
+{
+	$returnData = [];
+	
+	if(array_key_exists('emwinPath', $config['general']) && is_dir($config['general']['emwinPath']))
+	{
+		//Get all hurricane emwin files
+		$allEmwinFiles = scandir_recursive($config['general']['emwinPath']);
+		foreach($allEmwinFiles as $thisFile)
+		{
+			//Find Hurricane Imagery
+			if(preg_match("/-(AL|EP)[0-9]{2}[A-Z0-9]{2}(5D|WS|RS)\.PNG$/", $thisFile))
+			{
+				//Skip invalid EMWIN files
+				$fileNameParts = explode("_", basename($thisFile));
+				if(count($fileNameParts) != 6) continue;
+				
+				//Get Storm Identifiers
+				$lastParts = explode("-", $thisFile);
+				$productIdentifier = explode(".", $lastParts[count($lastParts) - 1])[0];
+				$stormIdentifier = substr($productIdentifier, 0, -2);
+				$imageType = substr($productIdentifier, -2);
+				
+				//Get date of product
+				$DateTime = new DateTime($fileNameParts[4], new DateTimeZone("UTC"));
+				$DateTime->setTimezone(new DateTimeZone(date_default_timezone_get()));
+				$date = $DateTime->format("F j, Y g:i A");
+				
+				//First product found for this hurricane; initialize arrays
+				if(!isset($returnData[$stormIdentifier])) $returnData[$stormIdentifier] = [];
+				if(!isset($returnData[$stormIdentifier][$imageType])) $returnData[$stormIdentifier][$imageType] = [];
+				if(!isset($returnData[$stormIdentifier]['title'])) $returnData[$stormIdentifier]['title'] = (substr($stormIdentifier, 0, 2) == "AL" ? "Atlantic" : "Eastern Pacific") . " Basin Tropical Storm #" . (int)substr($stormIdentifier, 2, 2) . ", " . $DateTime->format("Y");
+				
+				//Add product to array
+				$returnData[$stormIdentifier][$imageType][]['description'] = "Rendered: $date " . $DateTime->format('T');
+				$returnData[$stormIdentifier][$imageType][count($returnData[$stormIdentifier][$imageType]) - 1]['timestamp'] = $DateTime->getTimestamp();
+			}
+			
+			//TODO: TCA*; get better title from TCA if available
+		}
+		
+		//TODO: Sort Images, add titles to them
+		//$returnData[$stormIdentifier]['images'][$i]['subHtml'] = "<b>$title</b><div class='goeslabel gl-overlay'>" . $returnData[$stormIdentifier]['images'][$i]['description'] . "</div>";
 	}
 	
 	header('Content-Type: application/json; charset=utf-8');
