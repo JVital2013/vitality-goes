@@ -679,7 +679,7 @@ elseif($_GET['type'] == "alertJSON")
 		}
 		
 		//Weather warnings
-		if(preg_match("/-(SQW|DSW|FRW|FFW|FLW|SVR|TOR)" . $currentSettings[$selectedProfile]['orig'] . "\.TXT$/", $thisFile))
+		if(preg_match("/-(SQW|DSW|FRW|FFW|FLW|SVR|TOR|EWW)" . $currentSettings[$selectedProfile]['orig'] . "\.TXT$/", $thisFile))
 		{
 			//Parse warning data from file
 			$weatherData = file($thisFile);

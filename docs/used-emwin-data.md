@@ -14,15 +14,16 @@ Weather watches are included at the top of the Zone Forecast Product (GOES-N nam
 ### Weather Warning
 The following weather warnings are parsed and included at the top of the page Current Weather screen in red. The full text of these alerts are displayed. The geofencing information is parsed, which Vitality GOES checks against your configured latitude/longitude to see if you're within the warning area. It will also look for the `UNTIL` line so it can properly hide expired alerts.
 
-| GOES-N Filename part | Type of Warning | 
-|----------------------|-----------------|
-| SQW*****.TXT         | Snow Squall     |
-| DSW*****.TXT         | Dust Storm      |
-| FRW*****.TXT         | Fire Weather    |
-| FFW*****.TXT         | Flash Flood     |
-| FLW*****.TXT         | Flood Warning   |
-| SVR*****.TXT         | Thunderstorms   |
-| TOR*****.TXT         | Tornado Warning |
+| GOES-N Filename part | Type of Warning      | 
+|----------------------|----------------------|
+| SQW*****.TXT         | Snow Squall          |
+| DSW*****.TXT         | Dust Storm           |
+| FRW*****.TXT         | Fire Weather         |
+| FFW*****.TXT         | Flash Flood          |
+| FLW*****.TXT         | Flood Warning        |
+| SVR*****.TXT         | Thunderstorms        |
+| TOR*****.TXT         | Tornado Warning      |
+| EWW*****.TXT         | Extreme Wind Warning |
 
 ### Local Emergencies
 A number of local non-weather-related emergencies are broadcast across EMWIN and are shown at the top of the current weather screen. The full text of these alerts are shown. All alerts on disk for the state you are in are shown.
