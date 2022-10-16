@@ -91,4 +91,4 @@ videoPath = GOES16FalseColor.mp4
 
 emwin.ini contains information about the EMWIN image products you want to display. This config file works the same as the abi.ini, meso.ini, and l2.ini files with one exception: `path` is just the file name (including extension) for the product you want to display. No paths are included in this config file. *This file will probably not need to be configured by you, unless you're customizing what gets displayed*
 
-A complete list of EMWIN image products can be found at [https://www.weather.gov/media/emwin/EMWIN_Image_and_Text_Data_Capture_Catalog_v1.3h.pdf](https://www.weather.gov/media/emwin/EMWIN_Image_and_Text_Data_Capture_Catalog_v1.3h.pdf). Use the GOES-N FN, but it must be in all caps in this config.
+A complete list of EMWIN image products can be found at [https://www.weather.gov/media/emwin/EMWIN_Image_and_Text_Data_Capture_Catalog_v1.3j.pdf](https://www.weather.gov/media/emwin/EMWIN_Image_and_Text_Data_Capture_Catalog_v1.3j.pdf). Use the GOES-N FN, but it must be in all caps in this config.
