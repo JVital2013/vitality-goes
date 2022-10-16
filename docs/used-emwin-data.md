@@ -69,6 +69,18 @@ The Other EMWIN tab of Vitality GOES shows miscellaneous data that may be useful
 | EPHTWOUS.TXT         | Weather Satellite Ephemerides | Weather Satellite TLE        | Latest               | Issued several times daily and can be used to track other satellites, including Polar orbiting satellites commonly tracked by amateurs. There are other EPH*****.TXT files that contain operational information of other NOAA-operated satellites |
 | N/A                  | Admin Text (HRIT VCID 0)      | Latest Admin Message         | Latest               | Only visible if [adminPath is configured in your config.ini](config.md#configini), and you patched goesproc [with this patch](https://github.com/pietern/goestools/pull/105/files) |
 
+## Hurricane Center
+Vitality GOES's Hurricane Center displays available data from Tropical Cyclone Advisory files (TCA\*\*\*\*\*.TXT). This includes storm position, direction, air pressure, maximum sustained winds, and whether the storm is strengthening or weakening.
+
+Additionally, graphics of the storm track to date, as well as the current storm forecast, is sourced from the following files:
+
+| GOES-N Filename part | Type of Graphic      | 
+|----------------------|----------------------|
+| AL\*\*YYRS.PNG | Atlantic Basin Storm Track, Watches, and Warnings |
+| EP\*\*YYWS.PNG | Pacific Basin Storm Track, Watches, and Warnings |
+| AL\*\*YY5D.PNG | Atlantic Basin Storm 5-Day Forecast |
+| EP\*\*YY5D.PNG | Pacific Basin Storm 5-Day Forecast |
+
 ## Other Resources
 * [https://www.weather.gov/media/emwin/EMWIN_GOES-R_filename_convention.pdf](https://www.weather.gov/media/emwin/EMWIN_GOES-R_filename_convention.pdf): Breakdown of what EMWIN file names mean
 * [https://www.weather.gov/media/emwin/EMWIN_Text_Product_Catalog_220214-1357.pdf](https://www.weather.gov/media/emwin/EMWIN_Text_Product_Catalog_220214-1357.pdf): List of EMWIN products (put here for reference, but I did not find it useful).
