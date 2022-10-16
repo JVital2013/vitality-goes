@@ -192,7 +192,22 @@ select, input
 	margin-bottom: 10px;
 	padding: 20px;
 }
-.prettyBoxList:last-child
+.stiffBoxList
+{
+	border-bottom: 1px solid #888888;
+	margin-bottom: 10px;
+	padding: 20px 0;
+}
+.stiffBoxList:first-child
+{
+	padding-top: 0px;
+}
+.stiffBoxList:last-child
+{
+	padding-top: 5px;
+	padding-bottom: 0px;
+}
+.stiffBoxList:last-child, .prettyBoxList:last-child
 {
 	border-bottom: 0;
 }
@@ -262,6 +277,13 @@ select, input
 {
 	font-weight: bold;
 	padding-bottom: 15px;
+}
+.hurricaneForecastHeader
+{
+	font-weight: bold;
+	font-size: 12pt;
+	text-align: center;
+	padding-bottom: 10px;
 }
 .weatherBody
 {

@@ -712,6 +712,91 @@ function menuSelect(menuNumber)
 		break;
 		
 		case 6:
+		barTitle.innerHTML = "Hurricane Center";
+		mainContent.innerHTML = "";
+		renderStiffCard("loadingNotice", "Hurricane Info");
+		
+		xhttp.hurricaneInfo = new XMLHttpRequest();
+		xhttp.hurricaneInfo.onreadystatechange = function()
+		{
+			if(this.readyState == 4 && this.status == 200)
+			{
+				hurricaneInfo = JSON.parse(this.responseText);
+				if(Object.keys(hurricaneInfo).length == 0)
+				{
+					document.getElementById('loadingNoticeCardBody').innerHTML = "<div style='text-align: center;'>No tropical activity at this time</div>";
+				}
+				else
+				{
+					mainContent.innerHTML = "";
+					Object.keys(hurricaneInfo).forEach(thisHurricane => {
+						renderStiffCard(thisHurricane, hurricaneInfo[thisHurricane].title);
+						thisCardBody = document.getElementById(thisHurricane + "CardBody");
+						thisCardBody.innerHTML = "";
+						
+						//Display advisory information if we have it
+						if("latestAdvisory" in hurricaneInfo[thisHurricane])
+						{
+							advisoryItem = document.createElement('div');
+							advisoryItem.className = 'stiffBoxList';
+
+							if("latestAdvTime" in hurricaneInfo[thisHurricane]) renderLeftRightLine(advisoryItem, "Advisory Time", hurricaneInfo[thisHurricane].latestAdvTime);
+							renderLeftRightLine(advisoryItem, "Advisory Number", hurricaneInfo[thisHurricane].latestAdvisory);
+							if("position" in hurricaneInfo[thisHurricane]) renderLeftRightLine(advisoryItem, "Position", hurricaneInfo[thisHurricane].position);
+							if("movement" in hurricaneInfo[thisHurricane]) renderLeftRightLine(advisoryItem, "Moving", hurricaneInfo[thisHurricane].movement);
+							if("pressure" in hurricaneInfo[thisHurricane]) renderLeftRightLine(advisoryItem, "Pressure", hurricaneInfo[thisHurricane].pressure);
+							if("maxWind" in hurricaneInfo[thisHurricane]) renderLeftRightLine(advisoryItem, "Max Winds", hurricaneInfo[thisHurricane].maxWind);
+							if("status" in hurricaneInfo[thisHurricane]) renderLeftRightLine(advisoryItem, "Status", hurricaneInfo[thisHurricane].status);
+							if("nextMessage" in hurricaneInfo[thisHurricane]) renderLeftRightLine(advisoryItem, "Next Message", hurricaneInfo[thisHurricane].nextMessage);
+							
+							thisCardBody.appendChild(advisoryItem);
+						}
+						
+						//RS images
+						if("RS" in hurricaneInfo[thisHurricane])
+						{
+							rsItem = document.createElement('div');
+							rsItem.className = 'stiffBoxList';
+							thisCardBody.appendChild(rsItem);
+							loadHurricane(rsItem, "RS", thisHurricane, hurricaneInfo[thisHurricane].RS);
+						}
+						
+						//WS images
+						if("WS" in hurricaneInfo[thisHurricane])
+						{
+							wsItem = document.createElement('div');
+							wsItem.className = 'stiffBoxList';
+							thisCardBody.appendChild(wsItem);
+							loadHurricane(wsItem, "WS", thisHurricane, hurricaneInfo[thisHurricane].WS);
+						}
+						
+						//5D images
+						if("5D" in hurricaneInfo[thisHurricane])
+						{
+							fdItem = document.createElement('div');
+							fdItem.className = 'stiffBoxList';
+							loadHurricane(fdItem, "5D", thisHurricane, hurricaneInfo[thisHurricane]["5D"]);
+							
+							fdHeader = document.createElement('div');
+							fdHeader.className = 'hurricaneForecastHeader';
+							fdHeader.innerHTML = "5-Day Forecast"
+							fdItem.prepend(fdHeader);
+							
+							thisCardBody.appendChild(fdItem);
+						}
+					});
+				}
+				
+				if(mainContent.childElementCount <= 2) mainContent.className = "singleCard";
+				else mainContent.className = "mainContent";
+				delete xhttp.hurricaneInfo;
+			}
+		}
+		xhttp.hurricaneInfo.open("GET", "dataHandler.php?type=hurricaneJSON", true);
+		xhttp.hurricaneInfo.send();
+		break;
+		
+		case 7:
 		barTitle.innerHTML = "Configure Location";
 		mainContent.innerHTML = "";
 		
@@ -970,7 +1055,7 @@ function menuSelect(menuNumber)
 		xhttp.dropdowns.send();
 		break;
 		
-		case 7:
+		case 8:
 		barTitle.innerHTML = "System Info";
 		mainContent.innerHTML = "";
 		
@@ -1041,7 +1126,7 @@ function showCollapseCard(event)
 		event.currentTarget.nextSibling.style.display = "block";
 		if(event.currentTarget.nextSibling.nextSibling != null) event.currentTarget.nextSibling.nextSibling.style.display = "block";
 		
-		if(selectedMenu == 7) loadStats(event.currentTarget.nextSibling);
+		if(selectedMenu == 8) loadStats(event.currentTarget.nextSibling);
 		else if(event.currentTarget.nextSibling.innerHTML == "Loading, please wait...") loadImageMetadata(event.currentTarget.nextSibling);
 	}
 	else
@@ -1121,6 +1206,43 @@ function loadLocalRadar(targetedContent, metadata)
 	dynamicEl = [];
 	metadata.forEach(thisImg => {dynamicEl.push({src: "/dataHandler.php?type=localRadarData&timestamp=" + thisImg['timestamp'], subHtml: thisImg['subHtml'], timestamp: thisImg['timestamp']});});
 	lightGalleries['lightbox-localRadar'] = lightGallery(goesImg, {
+		plugins: [lgZoom, lgJumpTo],
+		loop: false,
+		mode: "lg-jumptotrans",
+		speed: 0,
+		dynamic: true,
+		dynamicEl: dynamicEl,
+		mobileSettings: {download: true, controls: false, showCloseIcon: false}
+	});
+}
+function loadHurricane(targetedContent, id, product, metadata)
+{
+	targetedContent.innerHTML = "";
+	goesImg = document.createElement('img');
+	goesImg.className = "goesimg";
+	goesImg.id = "lightbox-" + product + id;
+	goesImg.src = "/dataHandler.php?type=hurricaneData&id=" + id + "&product=" + product + "&timestamp=" + metadata[metadata.length - 1]['timestamp'];
+	goesImg.addEventListener('click', function(event){lightGalleries[event.target.id].openGallery(lightGalleries[event.target.id].galleryItems.length - 1);});
+	goesImg.addEventListener('lgBeforeOpen', function(event){
+		document.getElementsByTagName('body')[0].style.overflow = "hidden";
+		document.getElementsByTagName('html')[0].style.touchAction = "none";
+	});
+	goesImg.addEventListener('lgAfterClose', function(event){
+		document.getElementsByTagName('body')[0].style.overflow = "";
+		document.getElementsByTagName('html')[0].style.touchAction = "";
+	});
+
+	targetedContent.appendChild(goesImg);
+
+	goesLabel = document.createElement('div');
+	goesLabel.className = "goeslabel";
+	goesLabel.innerHTML = metadata[metadata.length - 1]['description'];
+	targetedContent.appendChild(goesLabel);
+
+
+	dynamicEl = [];
+	metadata.forEach(thisImg => {dynamicEl.push({src: "/dataHandler.php?type=hurricaneData&id=" + id + "&product=" + product + "&timestamp=" + thisImg['timestamp'], subHtml: thisImg['subHtml'], timestamp: thisImg['timestamp']});});
+	lightGalleries["lightbox-" + product + id] = lightGallery(goesImg, {
 		plugins: [lgZoom, lgJumpTo],
 		loop: false,
 		mode: "lg-jumptotrans",
@@ -1264,8 +1386,9 @@ window.addEventListener("load", function()
 			if(Object.keys(config.meso).length > 0) renderMenuItem(3, 'search-plus', 'Mesoscale Imagery');
 			if(Object.keys(config.emwin).length > 0) renderMenuItem(4, 'image', 'EMWIN Imagery');
 			if(config.showAdminInfo || config.showEmwinInfo) renderMenuItem(5, 'align-left', 'Other EMWIN');
-			if(config.showEmwinInfo) renderMenuItem(6, 'cogs', 'Configure Location');
-			if(config.showGraphs || config.showSysInfo) renderMenuItem(7, 'info-circle', 'System Info');
+			if(config.showEmwinInfo) renderMenuItem(6, 'wind', 'Hurricane Center');
+			if(config.showEmwinInfo) renderMenuItem(7, 'cogs', 'Configure Location');
+			if(config.showGraphs || config.showSysInfo) renderMenuItem(8, 'info-circle', 'System Info');
 	
 			menuSelect(selectedMenu);
 			delete xhttp.preload;

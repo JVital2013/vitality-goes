@@ -495,6 +495,17 @@ elseif($_GET['type'] == "mesoData")
 	header('Content-Length: ' . filesize($path));
 	readfile($path);
 }
+elseif($_GET['type'] == "hurricaneData")
+{
+	if(!array_key_exists('timestamp', $_GET) || !array_key_exists('id', $_GET) || preg_match("/^[A-Z0-9]{6}$/", $_GET['id']) === false 
+		|| !array_key_exists('product', $_GET) || preg_match("/^[A-Z0-9]{2}$/", $_GET['product']) === false) die();
+		
+	$path = findSpecificEMWIN(scandir_recursive($config['general']['emwinPath']), $_GET['product'].$_GET['id'], $_GET['timestamp']);
+	header('Content-Type: ' . mime_content_type($path));
+	header('Content-Disposition: inline; filename=' . basename($path));
+	header('Content-Length: ' . filesize($path));
+	readfile($path);
+}
 elseif($_GET['type'] == "emwinData")
 {
 	if(!array_key_exists($_GET['id'], $config['emwin']) || !array_key_exists('timestamp', $_GET)) die();
@@ -880,8 +891,6 @@ elseif($_GET['type'] == "hurricaneJSON")
 						$speedKph = round($speedKnots * 1.852);
 						$returnData[$stormIdentifier]['maxWind'] = $movementParts[0] . ", $speedKnots Knots / $speedMph MPH / $speedKph KPH";
 					}
-					
-					//TODO: Handle Forecast
 					
 					//Next Message
 					if(stripos($thisLine, "NXT MSG:") === 0)
