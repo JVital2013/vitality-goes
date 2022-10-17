@@ -1,7 +1,7 @@
 # Vitality GOES
 A Web App for showcasing Geostationary Weather Satellite Data. The software is designed to display text and images received from GOES satellites via goestools.
 
-**[Click here to watch a feature overview on YouTube](https://www.youtube.com/watch?v=o5ISR0bBFo0)**
+**[Click Here for Screenshots and Videos](https://github.com/JVital2013/vitality-goes/wiki/Screenshots-and-Videos)**
 
 **[Traducción al español por XQ6DLW, Demys](docs/Vitality-Goes-traduccion-al-español.pdf)**
 
