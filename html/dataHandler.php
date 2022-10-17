@@ -795,7 +795,7 @@ elseif($_GET['type'] == "hurricaneJSON")
 				//First product found for this hurricane; initialize arrays
 				if(!isset($returnData[$stormIdentifier])) $returnData[$stormIdentifier] = [];
 				if(!isset($returnData[$stormIdentifier][$imageType])) $returnData[$stormIdentifier][$imageType] = [];
-				if(!isset($returnData[$stormIdentifier]['title'])) $returnData[$stormIdentifier]['title'] = (substr($stormIdentifier, 0, 2) == "AL" ? "Atlantic" : "Eastern Pacific") . " Basin Tropical Storm #" . (int)substr($stormIdentifier, 2, 2) . ", " . $DateTime->format("Y");
+				if(!isset($returnData[$stormIdentifier]['title'])) $returnData[$stormIdentifier]['title'] = (substr($stormIdentifier, 0, 2) == "AL" ? "Atlantic" : "Eastern Pacific") . " Cyclone #" . (int)substr($stormIdentifier, 2, 2) . ", " . $DateTime->format("Y");
 				
 				//Add product to array
 				$returnData[$stormIdentifier][$imageType][]['description'] = "Rendered: $date " . $DateTime->format('T');
@@ -909,6 +909,7 @@ elseif($_GET['type'] == "hurricaneJSON")
 		}
 		
 		//Sort Images, add titles to them
+		krsort($returnData);
 		foreach($returnData as $stormKey => $stormValues)
 		{
 			foreach($stormValues as $dataKey => $dataValue)
