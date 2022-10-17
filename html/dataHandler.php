@@ -497,8 +497,8 @@ elseif($_GET['type'] == "mesoData")
 }
 elseif($_GET['type'] == "hurricaneData")
 {
-	if(!array_key_exists('timestamp', $_GET) || !array_key_exists('id', $_GET) || preg_match("/^[A-Z0-9]{6}$/", $_GET['id']) === false 
-		|| !array_key_exists('product', $_GET) || preg_match("/^[A-Z0-9]{2}$/", $_GET['product']) === false) die();
+	if(!array_key_exists('timestamp', $_GET) || !array_key_exists('id', $_GET) || preg_match("/^[A-Z0-9]{2}$/", $_GET['id']) == 0 
+		|| !array_key_exists('product', $_GET) || preg_match("/^[A-Z0-9]{6}$/", $_GET['product']) == 0) die();
 		
 	$path = findSpecificEMWIN(scandir_recursive($config['general']['emwinPath']), $_GET['product'].$_GET['id'], $_GET['timestamp']);
 	header('Content-Type: ' . mime_content_type($path));
