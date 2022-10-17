@@ -1,5 +1,5 @@
 /*!
- * lightgallery | 2.6.0-beta.1 | July 13th 2022
+ * lightgallery | 2.7.0 | October 9th 2022
  * http://www.lightgalleryjs.com/
  * Copyright (c) 2020 Sachin Neravath;
  * @license GPLv3
@@ -2683,6 +2683,15 @@
             this.updateCounterTotal();
             this.manageSingleSlideClassName();
         };
+        LightGallery.prototype.destroyGallery = function () {
+            this.destroyModules(true);
+            if (!this.settings.dynamic) {
+                this.invalidateItems();
+            }
+            $LG(window).off(".lg.global" + this.lgId);
+            this.LGel.off('.lg');
+            this.$container.remove();
+        };
         /**
          * Destroy lightGallery.
          * Destroy lightGallery and its plugin instances completely
@@ -2697,17 +2706,13 @@
          *
          */
         LightGallery.prototype.destroy = function () {
-            var _this = this;
             var closeTimeout = this.closeGallery(true);
-            setTimeout(function () {
-                _this.destroyModules(true);
-                if (!_this.settings.dynamic) {
-                    _this.invalidateItems();
-                }
-                $LG(window).off(".lg.global" + _this.lgId);
-                _this.LGel.off('.lg');
-                _this.$container.remove();
-            }, closeTimeout);
+            if (closeTimeout) {
+                setTimeout(this.destroyGallery.bind(this), closeTimeout);
+            }
+            else {
+                this.destroyGallery();
+            }
             return closeTimeout;
         };
         return LightGallery;
