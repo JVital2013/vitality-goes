@@ -32,8 +32,8 @@
 		<link rel="stylesheet" href="/opensans.css">
 		<link rel="stylesheet" href="/simplerpicker/simplerpicker.css">
 		<link rel="stylesheet" href="/fontawesome/css/all.css">
-		<link rel="stylesheet" href="/lightgallery/css/lightgallery.css?v=20220715">
-		<link rel="stylesheet" href="/lightgallery/css/lg-zoom.css?v=20220715">
+		<link rel="stylesheet" href="/lightgallery/css/lightgallery.css?v=20221016">
+		<link rel="stylesheet" href="/lightgallery/css/lg-zoom.css?v=20221016">
 		<link rel="stylesheet" href="/lightgallery/css/lg-jumpto.css?v=20220811">
 		<link href="splashscreens/iphone5_splash.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
 		<link href="splashscreens/iphone6_splash.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
@@ -41,8 +41,8 @@
 		<link href="splashscreens/iphonex_splash.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" rel="apple-touch-startup-image" />
 		<link href="splashscreens/iphonexr_splash.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
 		<link href="splashscreens/iphonexsmax_splash.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)" rel="apple-touch-startup-image" />
-		<script src='/lightgallery/lightgallery.umd.js'></script>
-		<script src="/lightgallery/plugins/zoom/lg-zoom.umd.js?v=20220715"></script>
+		<script src='/lightgallery/lightgallery.umd.js?v=20221016'></script>
+		<script src="/lightgallery/plugins/zoom/lg-zoom.umd.js?v=20221016"></script>
 		<script src="/lightgallery/plugins/jumpto/lg-jumpto.umd.js?v=20220811"></script>
 		<script src="/simplerpicker/simplerpicker.js"></script>
 		<script src='/script.js?v=20221016'></script>
