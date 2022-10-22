@@ -70,7 +70,7 @@ The Other EMWIN tab of Vitality GOES shows miscellaneous data that may be useful
 | N/A                  | Admin Text (HRIT VCID 0)      | Latest Admin Message         | Latest               | Only visible if [adminPath is configured in your config.ini](config.md#configini), and you patched goesproc [with this patch](https://github.com/pietern/goestools/pull/105/files) |
 
 ## Hurricane Center
-Vitality GOES's Hurricane Center displays available data from Tropical Cyclone Advisory files (TCA\*\*\*\*\*.TXT). This includes storm position, direction, air pressure, maximum sustained winds, and whether the storm is strengthening or weakening.
+Vitality GOES's Hurricane Center displays available data from Tropical Cyclone Advisory files (TCA\*\*\*\*\*.TXT) for Atlantic cyclones, and HEPZ\*\*\*\*.TXT files for cyclones in the Eastern Pacific. This includes storm position, direction, air pressure, maximum sustained winds, and whether the storm is strengthening or weakening.
 
 Additionally, graphics of the storm track to date, as well as the current storm forecast, is sourced from the following files:
 
