@@ -825,7 +825,7 @@ elseif($_GET['type'] == "hurricaneJSON")
 						//Get Title and identifier
 						$nameLineParts = preg_split('/ (Intermediate )?Advisory Number/', $nameLine);
 						$thisAdvisoryNumber = trim($nameLineParts[1]);
-						if(isset($returnData[$stormIdentifier]['latestAdvisory']) && strcmp($returnData[$stormIdentifier]['latestAdvisory'], $thisAdvisoryNumber) >= 0) break;
+						if(isset($returnData[$stormIdentifier]['latestAdvisory']) && strnatcmp($returnData[$stormIdentifier]['latestAdvisory'], $thisAdvisoryNumber) >= 0) break;
 						
 						$returnData[$stormIdentifier]['title'] = $nameLineParts[0];
 						$returnData[$stormIdentifier]['latestAdvisory'] = $thisAdvisoryNumber;
