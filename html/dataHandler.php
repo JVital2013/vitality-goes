@@ -802,7 +802,75 @@ elseif($_GET['type'] == "hurricaneJSON")
 				$returnData[$stormIdentifier][$imageType][count($returnData[$stormIdentifier][$imageType]) - 1]['timestamp'] = $DateTime->getTimestamp();
 			}
 			
-			//Tropical Cyclone Advisory
+			//Eastern Pacific Cyclone Advisory
+			if(stripos(basename($thisFile), "-HEPZ") !== false)
+			{
+				$hurricaneStatementLines = file($thisFile);
+				for($i = 0; $i < count($hurricaneStatementLines); $i++)
+				{
+					$thisLine = trim($hurricaneStatementLines[$i]);
+					
+					//Find start of file
+					if(stripos($thisLine, "BULLETIN") === 0)
+					{
+						$nameLine = trim($hurricaneStatementLines[++$i]);
+						$identifierLine = trim($hurricaneStatementLines[++$i]);
+						$advisoryTime = trim($hurricaneStatementLines[++$i]);
+						
+						//Get Storm Identifier
+						$identifierParts = preg_split('/\s+/', $identifierLine);
+						$stormIdentifier = substr($identifierParts[count($identifierParts) - 1], 0, 4) . "YY";
+						if(!isset($returnData[$stormIdentifier])) $returnData[$stormIdentifier] = [];
+						
+						//Get Title and identifier
+						$nameLineParts = preg_split('/ (Intermediate )?Advisory Number/', $nameLine);
+						$thisAdvisoryNumber = trim($nameLineParts[1]);
+						if(isset($returnData[$stormIdentifier]['latestAdvisory']) && strcmp($returnData[$stormIdentifier]['latestAdvisory'], $thisAdvisoryNumber) >= 0) break;
+						
+						$returnData[$stormIdentifier]['title'] = $nameLineParts[0];
+						$returnData[$stormIdentifier]['latestAdvisory'] = $thisAdvisoryNumber;
+						
+						//Get Advisory Time
+						$advisoryTimezone = preg_split('/\s+/', $advisoryTime)[2];
+						$advisoryTimeParts = explode(" $advisoryTimezone ", $advisoryTime);
+						$DateTime = new DateTime($advisoryTimeParts[1] . " " . substr_replace($advisoryTimeParts[0], ":", -5, 0) . " $advisoryTimezone", new DateTimeZone("$advisoryTimezone"));
+						$DateTime->setTimezone(new DateTimeZone(date_default_timezone_get()));
+						$returnData[$stormIdentifier]['latestAdvTime'] = $DateTime->format("F j, Y g:i A T");
+					}
+					
+					//Current Location
+					if(stripos($thisLine, "LOCATION...") === 0)
+					{
+						$locationParts = explode(" ", explode("...", $thisLine)[1]);
+						$returnData[$stormIdentifier]['position'] = substr_replace($locationParts[0], "&deg ", -1, 0) . ", " . substr_replace($locationParts[1], "&deg ", -1, 0);
+					}
+					
+					//Maximum Sustained Winds
+					if(stripos($thisLine, "MAXIMUM SUSTAINED WINDS...") === 0)
+					{
+						$speedParts = explode("...", $thisLine);
+						$speedMph = explode(" ", $speedParts[1])[0];
+						$speedKph = explode(" ", $speedParts[2])[0];
+						$speedKnots = round($speedMph * 0.868976);
+						$returnData[$stormIdentifier]['maxWind'] = "$speedKnots Knots / $speedMph MPH / $speedKph KPH";
+					}
+					
+					//Maximum Sustained Winds
+					if(stripos($thisLine, "PRESENT MOVEMENT...") === 0)
+					{
+						$movementParts = explode("...", $thisLine);
+						$speedMph = preg_replace("/[^0-9]/", "", explode(" AT ", $movementParts[1])[1]);
+						$speedKph = preg_replace("/[^0-9]/", "", $movementParts[2]);
+						$speedKnots = round($speedMph * 0.868976);
+						$returnData[$stormIdentifier]['movement'] = explode(" OR", $movementParts[1])[0] . ", $speedKnots Knots / $speedMph MPH / $speedKph KPH";
+					}
+					
+					//Maximum Sustained Winds
+					if(stripos($thisLine, "MINIMUM CENTRAL PRESSURE...") === 0) $returnData[$stormIdentifier]['pressure'] = preg_replace("/[^0-9]/", "", explode("...", $thisLine)[1]) . " hPa";
+				}
+			}
+			
+			//Tropical Cyclone Advisory (Atlantic)
 			if(stripos(basename($thisFile), "-TCA") !== false)
 			{
 				$hurricaneStatementLines = file($thisFile);
@@ -835,16 +903,14 @@ elseif($_GET['type'] == "hurricaneJSON")
 						$dataValue = preg_split('/:\s+/', $thisLine)[1];
 						$thisAdvisoryNumber = ltrim(explode("/", $dataValue)[1], "0 ");
 						if(isset($returnData[$stormIdentifier]['latestAdvisory']) && $returnData[$stormIdentifier]['latestAdvisory'] > $thisAdvisoryNumber) break;
-						else
-						{
-							$returnData[$stormIdentifier]['latestAdvisory'] = $thisAdvisoryNumber;
-							$returnData[$stormIdentifier]['title'] = $workingTitle;
-							
-							$advisoryTimeParts = explode(" UTC ", $advisoryTime);
-							$DateTime = new DateTime($advisoryTimeParts[1] . " " . $advisoryTimeParts[0] . " UTC", new DateTimeZone("UTC"));
-							$DateTime->setTimezone(new DateTimeZone(date_default_timezone_get()));
-							$returnData[$stormIdentifier]['latestAdvTime'] = $DateTime->format("F j, Y g:i A T");
-						}
+						
+						$returnData[$stormIdentifier]['latestAdvisory'] = $thisAdvisoryNumber;
+						$returnData[$stormIdentifier]['title'] = $workingTitle;
+						
+						$advisoryTimeParts = explode(" UTC ", $advisoryTime);
+						$DateTime = new DateTime($advisoryTimeParts[1] . " " . $advisoryTimeParts[0] . " UTC", new DateTimeZone("UTC"));
+						$DateTime->setTimezone(new DateTimeZone(date_default_timezone_get()));
+						$returnData[$stormIdentifier]['latestAdvTime'] = $DateTime->format("F j, Y g:i A T");
 					}
 					
 					//Get observed position
