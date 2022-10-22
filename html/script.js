@@ -730,15 +730,15 @@ function menuSelect(menuNumber)
 				{
 					mainContent.innerHTML = "";
 					Object.keys(hurricaneInfo).forEach(thisHurricane => {
-						renderStiffCard(thisHurricane, hurricaneInfo[thisHurricane].title);
-						thisCardBody = document.getElementById(thisHurricane + "CardBody");
+						renderCollapsingCard(thisHurricane, hurricaneInfo[thisHurricane].title, "prettyBoxContent noPadding", "weatherBody");
+						thisCardBody = document.getElementById(thisHurricane + "Content").firstChild;
 						thisCardBody.innerHTML = "";
 						
 						//Display advisory information if we have it
 						if("latestAdvisory" in hurricaneInfo[thisHurricane])
 						{
 							advisoryItem = document.createElement('div');
-							advisoryItem.className = 'stiffBoxList';
+							advisoryItem.className = 'prettyBoxList';
 
 							if("latestAdvTime" in hurricaneInfo[thisHurricane]) renderLeftRightLine(advisoryItem, "Advisory Time", hurricaneInfo[thisHurricane].latestAdvTime);
 							renderLeftRightLine(advisoryItem, "Advisory Number", hurricaneInfo[thisHurricane].latestAdvisory);
@@ -756,7 +756,7 @@ function menuSelect(menuNumber)
 						if("RS" in hurricaneInfo[thisHurricane])
 						{
 							rsItem = document.createElement('div');
-							rsItem.className = 'stiffBoxList';
+							rsItem.className = 'prettyBoxList';
 							thisCardBody.appendChild(rsItem);
 							loadHurricane(rsItem, "RS", thisHurricane, hurricaneInfo[thisHurricane].RS);
 						}
@@ -765,7 +765,7 @@ function menuSelect(menuNumber)
 						if("WS" in hurricaneInfo[thisHurricane])
 						{
 							wsItem = document.createElement('div');
-							wsItem.className = 'stiffBoxList';
+							wsItem.className = 'prettyBoxList';
 							thisCardBody.appendChild(wsItem);
 							loadHurricane(wsItem, "WS", thisHurricane, hurricaneInfo[thisHurricane].WS);
 						}
@@ -774,7 +774,8 @@ function menuSelect(menuNumber)
 						if("5D" in hurricaneInfo[thisHurricane])
 						{
 							fdItem = document.createElement('div');
-							fdItem.className = 'stiffBoxList';
+							fdItem.className = 'prettyBoxList';
+							fdItem.style.paddingTop = "5px";
 							loadHurricane(fdItem, "5D", thisHurricane, hurricaneInfo[thisHurricane]["5D"]);
 							
 							fdHeader = document.createElement('div');
