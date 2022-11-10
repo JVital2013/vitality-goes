@@ -879,7 +879,12 @@ elseif($_GET['type'] == "hurricaneJSON")
 					$thisLine = trim($hurricaneStatementLines[$i]);
 					
 					//These first few lines, just pull the data to parse later
-					if($i == 3) $fullName = $thisLine;
+					if($i == 3)
+					{
+						//Exclude test data
+						if(stripos($thisLine, "test") !== false) break;
+						$fullName = $thisLine;
+					}
 					if($i == 5) $advisoryTime = $thisLine;
 					
 					//Get Storm Identifier
