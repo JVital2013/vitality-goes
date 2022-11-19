@@ -18,6 +18,7 @@
  */
 function loadConfig()
 {
+	//TODO: Check if the file exists. If config.ini is missing, throw error. Otherwise, return empty array
 	$config = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini", true, INI_SCANNER_RAW);
 	$config['general']['showSysInfo'] = (stripos($config['general']['showSysInfo'], "true") !== false);
 	$config['general']['debug'] = (stripos($config['general']['debug'], "true") !== false);
@@ -25,27 +26,29 @@ function loadConfig()
 	$config['meso'] = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/meso.ini", true, INI_SCANNER_RAW);
 	$config['l2'] = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/l2.ini", true, INI_SCANNER_RAW);
 	$config['emwin'] = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/emwin.ini", true, INI_SCANNER_RAW);
-	$abiSlugs = array_keys($config['abi']);
-	$mesoSlugs = array_keys($config['meso']);
-	$l2Slugs = array_keys($config['l2']);
-	$emwinSlugs = array_keys($config['emwin']);
 	
-	if(array_key_exists('paths', $config))
-	{
-		foreach($config['paths'] as $key => $value)
-		{
-			for($i = 0; $i < count($config['abi']); $i++) $config['abi'][$abiSlugs[$i]]['path'] = str_replace('{' . $key . '}', $value, $config['abi'][$abiSlugs[$i]]['path']);
-			for($i = 0; $i < count($config['meso']); $i++) $config['meso'][$mesoSlugs[$i]]['path'] = str_replace('{' . $key . '}', $value, $config['meso'][$mesoSlugs[$i]]['path']);
-			for($i = 0; $i < count($config['l2']); $i++) $config['l2'][$l2Slugs[$i]]['path'] = str_replace('{' . $key . '}', $value, $config['l2'][$l2Slugs[$i]]['path']);
-		}
-		unset($config['paths']);
-	}
+	//Parse ABI Configs
+	parseABIConfig($config, $config['abi']);
+	parseABIConfig($config, $config['meso']);
+	parseABIConfig($config, $config['l2']);
+	if(array_key_exists('paths', $config)) unset($config['paths']);
 	
 	if(!array_key_exists('city', $config['location'])) $config['location']['city'] = "";
 	if(!array_key_exists('rwrOrig', $config['location'])) $config['location']['rwrOrig'] = $config['location']['orig'];
 	if(!array_key_exists('emwinPath', $config['general'])) $config['emwin'] = [];
 	
 	return $config;
+}
+
+function parseABIConfig($config, &$abiConfig)
+{
+	$slugs = array_keys($abiConfig);
+	for($i = 0; $i < count($abiConfig); $i++)
+	{
+		if(!array_key_exists("filter", $abiConfig[$slugs[$i]])) $abiConfig[$slugs[$i]]['filter'] = "";
+		if(array_key_exists('paths', $config)) foreach($config['paths'] as $key => $value)
+			$abiConfig[$slugs[$i]]['path'] = str_replace('{' . $key . '}', $value, $abiConfig[$slugs[$i]]['path']);
+	}
 }
 
 function scandir_recursive($dir, &$results = array())
@@ -157,13 +160,13 @@ function findMetadataEMWIN($allEmwinFiles, $product, $title)
 	return $retVal;
 }
 
-function findMetadataABI($path, $title)
+function findMetadataABI($path, $filter, $title)
 {
 	if(!is_dir($path)) return array();
 	
 	$retVal = [];
 	$fileList = scandir_recursive($path);
-	$fileList = preg_grep("/_[0-9]{8}T[0-9]{6}Z\..{3}$/", $fileList);
+	$fileList = preg_grep("/(\\\\|\/)[^\\\\\/]*${filter}[^\\\\\/]*[0-9]{8}T[0-9]{6}Z\..{3}$/", $fileList);
 	usort($fileList, "sortABI");
 	
 	foreach($fileList as $file)
@@ -181,13 +184,13 @@ function findMetadataABI($path, $title)
 	return $retVal;
 }
 
-function findImageABI($path, $timestamp)
+function findImageABI($path, $filter, $timestamp)
 {
 	$DateTime = new DateTime("now", new DateTimeZone("UTC"));
 	$DateTime->setTimestamp($timestamp);
 	
 	$fileList = scandir_recursive($path);
-	foreach($fileList as $thisFile) if(strpos($thisFile, $DateTime->format('Ymd\THis\Z'))) return $thisFile;
+	foreach($fileList as $thisFile) if(preg_match("/(\\\\|\/)[^\\\\\/]*${filter}[^\\\\\/]*" . $DateTime->format('Ymd\THis\Z') . "\..{3}$/", $thisFile)) return $thisFile;
 }
 
 function linesToParagraphs($lineArray, $linesToSkip)
