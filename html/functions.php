@@ -18,21 +18,41 @@
  */
 function loadConfig()
 {
-	//TODO: Check if the file exists. If config.ini is missing, throw error. Otherwise, return empty array
+	//Load main config
 	$config = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini", true, INI_SCANNER_RAW);
 	$config['general']['showSysInfo'] = (stripos($config['general']['showSysInfo'], "true") !== false);
 	$config['general']['debug'] = (stripos($config['general']['debug'], "true") !== false);
-	$config['abi'] = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/abi.ini", true, INI_SCANNER_RAW);
-	$config['meso'] = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/meso.ini", true, INI_SCANNER_RAW);
-	$config['l2'] = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/l2.ini", true, INI_SCANNER_RAW);
-	$config['emwin'] = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/emwin.ini", true, INI_SCANNER_RAW);
 	
-	//Parse ABI Configs
-	parseABIConfig($config, $config['abi']);
-	parseABIConfig($config, $config['meso']);
-	parseABIConfig($config, $config['l2']);
+	//Load extra configs, allow them to not exist
+	if(file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/abi.ini"))
+	{
+		$config['abi'] = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/abi.ini", true, INI_SCANNER_RAW);
+		parseABIConfig($config, $config['abi']);
+	}
+	else $config['abi'] = [];
+	
+	if(file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/meso.ini"))
+	{
+		$config['meso'] = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/meso.ini", true, INI_SCANNER_RAW);
+		parseABIConfig($config, $config['meso']);
+	}
+	else $config['meso'] = [];
+	
+	if(file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/l2.ini"))
+	{
+		$config['l2'] = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/l2.ini", true, INI_SCANNER_RAW);
+		parseABIConfig($config, $config['l2']);
+	}
+	else $config['l2'] = [];
+	
+	if(file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/emwin.ini"))
+	{
+		$config['emwin'] = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/emwin.ini", true, INI_SCANNER_RAW);
+	}
+	else $config['emwin'] = [];
+	
+	//Config touchups
 	if(array_key_exists('paths', $config)) unset($config['paths']);
-	
 	if(!array_key_exists('city', $config['location'])) $config['location']['city'] = "";
 	if(!array_key_exists('rwrOrig', $config['location'])) $config['location']['rwrOrig'] = $config['location']['orig'];
 	if(!array_key_exists('emwinPath', $config['general'])) $config['emwin'] = [];
