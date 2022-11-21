@@ -1000,8 +1000,8 @@ elseif($_GET['type'] == "hurricaneJSON")
 elseif($_GET['type'] == "weatherJSON")
 {
 	$returnData = [];
-	$returnData['city'] = ($currentSettings[$selectedProfile]['city'] == '' ? $currentSettings[$selectedProfile]['wxZone'] : $currentSettings[$selectedProfile]['city']);
-	$returnData['state'] = $currentSettings[$selectedProfile]['stateAbbr'];
+	$returnData['city'] = htmlspecialchars($currentSettings[$selectedProfile]['city'] == '' ? $currentSettings[$selectedProfile]['wxZone'] : $currentSettings[$selectedProfile]['city']);
+	$returnData['state'] = htmlspecialchars($currentSettings[$selectedProfile]['stateAbbr']);
 	
 	//Get all EMWIN files for use later
 	$allEmwinFiles = scandir_recursive($config['general']['emwinPath']);
