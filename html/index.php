@@ -50,7 +50,7 @@
 	<body>
 		<div class='topBar'>
 			<div class='topBarInner'>
-				<i class='fa fa-satellite barLogo' aria-hidden="true" onclick='slideDrawer();'></i>
+				<i class='fas fa-bars barLogo' aria-hidden="true" onclick='slideDrawer();'></i>
 				<div class='barTitle' id='barTitle'></div>
 				<div class="barRefresh" onclick="menuSelect(selectedMenu)"><i class="fa fa-sync" aria-hidden="true"></i></div>
 			</div>
