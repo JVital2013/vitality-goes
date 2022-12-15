@@ -421,6 +421,8 @@ function menuSelect(menuNumber)
 						case "LGT RAIN": conditions = "Light Rain"; break;
 						case "RAIN": conditions = "Rain"; break;
 						case "HVY RAIN": conditions = "Heavy Rain"; break;
+						case "FRZ RAIN": conditions = "Freezing Rain"; break;
+						case "DRIZZLE": conditions = "Drizzle"; break;
 						case "SNOW": conditions = "Snow"; break;
 						case "FAIR": conditions = "Fair"; break;
 						case "FOG": conditions = "Fog"; break;
