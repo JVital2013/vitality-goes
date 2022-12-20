@@ -193,6 +193,9 @@ If anyone would like to take a stab at automating Vitality GOES installation, or
 
 I would love to see how the community can make HRIT/EMWIN data even more accessible through the easy deployment of this software package.
 
+### Integrating weather data from Vitality GOES into Home Assistant
+Home Assistant is a free and open-source smart home control system. You can use Vitality GOES as a "Weather Provider" in Home Assistant; [look here](docs/home-assistant.md) for more.
+
 ### Sharing Vitality GOES across the internet
 Technically speaking, there should be no problem with opening a port on your router so that Vitality GOES can be accessed across the internet. In practice, I **do not** recommend it. For one, Vitality GOES has not been vetted by security professionals. I did keep security in mind when coding it, but I'm making no promises. If you do share it across the internet, make sure your web server is honoring `.htaccess` files. Not all web servers do by default.
 
