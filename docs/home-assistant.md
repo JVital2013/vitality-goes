@@ -1,12 +1,12 @@
 # Using Vitality GOES as a Home Assistant Weather Provider
 
-Home Assistant ([https://www.home-assistant.io/](https://www.home-assistant.io/)) is a free and open-source smart home control system. It has a focus on "local" device control, data collection, and home automation - all without the need to make your smart home dependent on the "cloud" (aka someone else's computer).
+Home Assistant ([https://www.home-assistant.io/](https://www.home-assistant.io/)) is a free and open-source smart home control system. It has a focus on "local" device control, data collection, and home automation - all without making your smart home dependent on the "cloud" (aka someone else's computer).
 
 I use Home Assistant and other open-source projects, like Tasmota ([https://tasmota.github.io/docs/](https://tasmota.github.io/docs/)), to connect my lights, fans, temp/humidity sensors, and other "smart" devices into one cohesive ecosystem. It's very stable and integrates well with other services like Apple HomeKit, Google Assistant, and Alexa.
 
 ### What does this have to do with Weather Satellites?
 
-One of the features of Home Assistant is you can integrate a "Weather Provider" into it. You can then display weather info in the Home Assistant dashboard, or use it to control smarthome automations. Some example weather-related automations would include:
+One feature of Home Assistant is the ability to integrate weather data from a "Weather Provider." You can then display weather info in the Home Assistant dashboard, or use it to control smarthome automations. Some weather-related automation examples would include:
 
 - Turn on the dehumidifier when it starts raining
 - Close the blinds in a particular room when the sun comes out
@@ -37,7 +37,7 @@ Nothing will need to be changed about Vitality GOES as long as its Current Weath
 
 In Home Assistant, [edit your configuration.yaml file](https://www.home-assistant.io/docs/configuration/) to include the configuration information found in [extra/homeassistant-configuration.yaml](/extra/homeassistant-configuration.yaml) of this repo.
 
-If you don't already have a `rest:` or `weather:` section in your configuration.yaml (you probably won't), you can just copy and paste my example into your config file and save it. Don't forget to set the IP/hostname of your Vitality GOES instance where notated!
+If you don't already have a `rest:` or `weather:` section in your configuration.yaml (you probably won't), you can just copy and paste my example into your config file, save it, and restart Home Assistant. Don't forget to set the IP/hostname of your Vitality GOES instance where notated!
 
 If you're a Home Assistant Pro and already have one or both of these sections, work the example config in as necessary.
 
