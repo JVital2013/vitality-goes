@@ -19,7 +19,7 @@
 
 //Load External Functions
 require_once($_SERVER['DOCUMENT_ROOT'] . "/functions.php");
-$config = loadConfig(); //TODO: Handle errors here
+$config = loadConfig();
 
 //Only display errors if set to in the config
 ini_set("display_errors", ($config['general']['debug'] ? "On" : "Off"));
@@ -177,19 +177,19 @@ elseif($_GET['type'] == "abiMetadata")
 {
 	if(!array_key_exists($_GET['id'], $config['abi'])) die();
 	header('Content-Type: application/json; charset=utf-8');
-	echo json_encode(findMetadataABI($config['abi'][$_GET['id']]['path'], $config['abi'][$_GET['id']]['title']));
+	echo json_encode(findMetadataABI($config['abi'][$_GET['id']]['path'], $config['abi'][$_GET['id']]['filter'], $config['abi'][$_GET['id']]['title']));
 }
 elseif($_GET['type'] == "l2Metadata")
 {
 	if(!array_key_exists($_GET['id'], $config['l2'])) die();
 	header('Content-Type: application/json; charset=utf-8');
-	echo json_encode(findMetadataABI($config['l2'][$_GET['id']]['path'], $config['l2'][$_GET['id']]['title']));
+	echo json_encode(findMetadataABI($config['l2'][$_GET['id']]['path'], $config['l2'][$_GET['id']]['filter'], $config['l2'][$_GET['id']]['title']));
 }
 elseif($_GET['type'] == "mesoMetadata")
 {
 	if(!array_key_exists($_GET['id'], $config['meso'])) die();
 	header('Content-Type: application/json; charset=utf-8');
-	echo json_encode(findMetadataABI($config['meso'][$_GET['id']]['path'], $config['meso'][$_GET['id']]['title']));
+	echo json_encode(findMetadataABI($config['meso'][$_GET['id']]['path'], $config['meso'][$_GET['id']]['filter'], $config['meso'][$_GET['id']]['title']));
 }
 elseif($_GET['type'] == "emwinMetadata")
 {
@@ -471,7 +471,7 @@ elseif($_GET['type'] == "metadata")
 elseif($_GET['type'] == "abiData")
 {
 	if(!array_key_exists($_GET['id'], $config['abi']) || !array_key_exists('timestamp', $_GET)) die();
-	$path = findImageABI($config['abi'][$_GET['id']]['path'], $_GET['timestamp']);
+	$path = findImageABI($config['abi'][$_GET['id']]['path'], $config['abi'][$_GET['id']]['filter'], $_GET['timestamp']);
 	header('Content-Type: ' . mime_content_type($path));
 	header('Content-Disposition: inline; filename=' . basename($path));
 	header('Content-Length: ' . filesize($path));
@@ -480,7 +480,7 @@ elseif($_GET['type'] == "abiData")
 elseif($_GET['type'] == "l2Data")
 {
 	if(!array_key_exists($_GET['id'], $config['l2']) || !array_key_exists('timestamp', $_GET)) die();
-	$path = findImageABI($config['l2'][$_GET['id']]['path'], $_GET['timestamp']);
+	$path = findImageABI($config['l2'][$_GET['id']]['path'], $config['l2'][$_GET['id']]['filter'], $_GET['timestamp']);
 	header('Content-Type: ' . mime_content_type($path));
 	header('Content-Disposition: inline; filename=' . basename($path));
 	header('Content-Length: ' . filesize($path));
@@ -489,7 +489,7 @@ elseif($_GET['type'] == "l2Data")
 elseif($_GET['type'] == "mesoData")
 {
 	if(!array_key_exists($_GET['id'], $config['meso']) || !array_key_exists('timestamp', $_GET)) die();
-	$path = findImageABI($config['meso'][$_GET['id']]['path'], $_GET['timestamp']);
+	$path = findImageABI($config['meso'][$_GET['id']]['path'], $config['meso'][$_GET['id']]['filter'], $_GET['timestamp']);
 	header('Content-Type: ' . mime_content_type($path));
 	header('Content-Disposition: inline; filename=' . basename($path));
 	header('Content-Length: ' . filesize($path));
