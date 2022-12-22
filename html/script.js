@@ -417,6 +417,7 @@ function menuSelect(menuNumber)
 						case "PTCLDY": conditions = "Partly Cloudy"; break;
 						case "MOCLDY": conditions = "Mostly Cloudy"; break;
 						case "CLOUDY": conditions = "Cloudy"; break;
+						case "MIX PCPN": conditions = "Winter Mix"; break;
 						case "LGT SNOW": conditions = "Light Snow"; break;
 						case "LGT RAIN": conditions = "Light Rain"; break;
 						case "RAIN": conditions = "Rain"; break;
