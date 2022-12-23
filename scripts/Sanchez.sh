@@ -87,8 +87,9 @@ echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating GOES 16 Sanchez False Color Images
 for srcImg in $(find "$sanchezSrcPath16" -type f)
 do
 	baseName=$(echo $srcImg | awk -F/ '{print $NF}')
-	newName=$(echo $baseName | sed 's/CH13/sanchez/')
+	! [[ "$baseName" =~ ^.*_[0-9]{8}T[0-9]{6}Z\.[A-Za-z]{3}$ ]] && continue
 	
+	newName=$(echo $baseName | sed 's/CH13/sanchez/')
 	nameLastPart=$(echo $baseName | awk -F_ '{print $NF}' | cut -d. -f1)
 	thisDate=$(echo $nameLastPart | cut -dT -f1)
 	thisTime=$(echo $nameLastPart | cut -dT -f2)
@@ -111,8 +112,9 @@ echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating GOES 17 Sanchez False Color Images
 for srcImg in $(find "$sanchezSrcPath17" -type f)
 do
 	baseName=$(echo $srcImg | awk -F/ '{print $NF}')
-	newName=$(echo $baseName | sed 's/CH13/sanchez/')
+	! [[ "$baseName" =~ ^.*_[0-9]{8}T[0-9]{6}Z\.[A-Za-z]{3}$ ]] && continue
 	
+	newName=$(echo $baseName | sed 's/CH13/sanchez/')
 	nameLastPart=$(echo $baseName | awk -F_ '{print $NF}' | cut -d. -f1)
 	thisDate=$(echo $nameLastPart | cut -dT -f1)
 	thisTime=$(echo $nameLastPart | cut -dT -f2)
@@ -135,8 +137,9 @@ echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating GOES 18 Sanchez False Color Images
 for srcImg in $(find "$sanchezSrcPath18" -type f)
 do
 	baseName=$(echo $srcImg | awk -F/ '{print $NF}')
-	newName=$(echo $baseName | sed 's/CH13/sanchez/')
+	! [[ "$baseName" =~ ^.*_[0-9]{8}T[0-9]{6}Z\.[A-Za-z]{3}$ ]] && continue
 	
+	newName=$(echo $baseName | sed 's/CH13/sanchez/')
 	nameLastPart=$(echo $baseName | awk -F_ '{print $NF}' | cut -d. -f1)
 	thisDate=$(echo $nameLastPart | cut -dT -f1)
 	thisTime=$(echo $nameLastPart | cut -dT -f2)
@@ -161,8 +164,9 @@ mkdir -p /tmp/goescomposite
 for src17Img in $(find "$sanchezSrcPath17" -type f)
 do
 	baseName17=$(echo $src17Img | awk -F/ '{print $NF}')
-	newName=$(echo $baseName17 | sed 's/GOES17_FD_CH13/goes16_17_composite/')
+	! [[ "$baseName17" =~ ^.*_[0-9]{8}T[0-9]{6}Z\.[A-Za-z]{3}$ ]] && continue
 	
+	newName=$(echo $baseName17 | sed 's/GOES17_FD_CH13/goes16_17_composite/')
 	if [ ! -f $dstPathComposite/$newName ]
 	then
 		nameLastPart17=$(echo $baseName17 | awk -F_ '{print $NF}' | cut -d. -f1)
@@ -177,6 +181,8 @@ do
 		for src16Img in $(find "$sanchezSrcPath16" -type f)
 		do
 			baseName16=$(echo $src16Img | awk -F/ '{print $NF}')
+			! [[ "$baseName16" =~ ^.*_[0-9]{8}T[0-9]{6}Z\.[A-Za-z]{3}$ ]] && continue
+			
 			nameLastPart16=$(echo $baseName16 | awk -F_ '{print $NF}' | cut -d. -f1)
 			goes16DateStr=${nameLastPart16::-1}
 			
@@ -209,8 +215,9 @@ mkdir -p /tmp/goescomposite
 for src18Img in $(find "$sanchezSrcPath18" -type f)
 do
 	baseName18=$(echo $src18Img | awk -F/ '{print $NF}')
-	newName=$(echo $baseName18 | sed 's/GOES18_FD_CH13/goes16_18_composite/')
+	! [[ "$baseName18" =~ ^.*_[0-9]{8}T[0-9]{6}Z\.[A-Za-z]{3}$ ]] && continue
 	
+	newName=$(echo $baseName18 | sed 's/GOES18_FD_CH13/goes16_18_composite/')
 	if [ ! -f $dstPathComposite/$newName ]
 	then
 		nameLastPart18=$(echo $baseName18 | awk -F_ '{print $NF}' | cut -d. -f1)
@@ -225,6 +232,8 @@ do
 		for src16Img in $(find "$sanchezSrcPath16" -type f)
 		do
 			baseName16=$(echo $src16Img | awk -F/ '{print $NF}')
+			! [[ "$baseName16" =~ ^.*_[0-9]{8}T[0-9]{6}Z\.[A-Za-z]{3}$ ]] && continue
+			
 			nameLastPart16=$(echo $baseName16 | awk -F_ '{print $NF}' | cut -d. -f1)
 			goes16DateStr=${nameLastPart16::-1}
 			
