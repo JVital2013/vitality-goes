@@ -12,7 +12,7 @@ rest:
           {% elif value_json.weatherDesc == 'MOCLDY' or value_json.weatherDesc == 'CLOUDY' %}cloudy
           {% elif value_json.weatherDesc == 'LGT SNOW' or value_json.weatherDesc == 'SNOW' %}snowy
           {% elif value_json.weatherDesc == 'LGT RAIN' or value_json.weatherDesc == 'RAIN' %}rainy
-          {% elif value_json.weatherDesc == 'HVY RAIN' %}pouring-rain
+          {% elif value_json.weatherDesc == 'HVY RAIN' %}pouring
           {% elif value_json.weatherDesc == 'FRZ RAIN' or value_json.weatherDesc == 'MIX PCPN' %}snowy-rainy
           {% elif value_json.weatherDesc == 'FOG' %}fog
           {% elif value_json.weatherDesc == 'TSTM' %}lightning
