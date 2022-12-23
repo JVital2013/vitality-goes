@@ -417,14 +417,17 @@ function menuSelect(menuNumber)
 						case "PTCLDY": conditions = "Partly Cloudy"; break;
 						case "MOCLDY": conditions = "Mostly Cloudy"; break;
 						case "CLOUDY": conditions = "Cloudy"; break;
+						case "HAZE": conditions = "Haze"; break;
 						case "MIX PCPN": conditions = "Winter Mix"; break;
 						case "LGT SNOW": conditions = "Light Snow"; break;
 						case "LGT RAIN": conditions = "Light Rain"; break;
 						case "RAIN": conditions = "Rain"; break;
 						case "HVY RAIN": conditions = "Heavy Rain"; break;
+						case "HVY SNOW": conditions = "Heavy Snow"; break;
 						case "FRZ RAIN": conditions = "Freezing Rain"; break;
 						case "DRIZZLE": conditions = "Drizzle"; break;
 						case "SNOW": conditions = "Snow"; break;
+						case "FLURRIES": conditions = "Flurries"; break;
 						case "FAIR": conditions = "Fair"; break;
 						case "FOG": conditions = "Fog"; break;
 						case "TSTM": conditions = "Thunderstorms"; break;

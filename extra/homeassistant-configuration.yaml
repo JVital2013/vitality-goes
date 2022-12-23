@@ -8,9 +8,9 @@ rest:
         value_template: >
           {% if (is_state('sun.sun', 'below_horizon') and value_json.weatherDesc == 'CLEAR') or value_json.weatherDesc == 'FAIR' %}clear-night
           {% elif (is_state('sun.sun', 'above_horizon') and value_json.weatherDesc == 'CLEAR') or value_json.weatherDesc == 'SUNNY' or value_json.weatherDesc == 'MOSUNNY' %}sunny
-          {% elif value_json.weatherDesc == 'PTSUNNY' or value_json.weatherDesc == 'PTCLDY' %}partlycloudy
+          {% elif value_json.weatherDesc == 'PTSUNNY' or value_json.weatherDesc == 'PTCLDY' or value_json.weatherDesc == 'HAZE' %}partlycloudy
           {% elif value_json.weatherDesc == 'MOCLDY' or value_json.weatherDesc == 'CLOUDY' %}cloudy
-          {% elif value_json.weatherDesc == 'LGT SNOW' or value_json.weatherDesc == 'SNOW' %}snowy
+          {% elif value_json.weatherDesc == 'FLURRIES' or value_json.weatherDesc == 'LGT SNOW' or value_json.weatherDesc == 'SNOW' or value_json.weatherDesc == 'HVY SNOW' %}snowy
           {% elif value_json.weatherDesc == 'LGT RAIN' or value_json.weatherDesc == 'RAIN' %}rainy
           {% elif value_json.weatherDesc == 'HVY RAIN' %}pouring
           {% elif value_json.weatherDesc == 'FRZ RAIN' or value_json.weatherDesc == 'MIX PCPN' %}snowy-rainy
