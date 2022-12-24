@@ -443,7 +443,27 @@ elseif($_GET['type'] == "metadata")
 						else $thisSensorName = "$tempBaseName Temp" . (count($thisDevicesSensors) > 1 ? " $tempCount" : "");
 						
 						$metadata['tempData'][count($metadata['tempData']) - 1]['name'] = $thisSensorName;
-						$metadata['tempData'][count($metadata['tempData']) - 1]['value'] = intval(trim(file_get_contents($thisSensor))) / 1000 . "&deg; C";
+						
+						//Some sensors error when below 0 degrees - catch these errors
+						set_error_handler(function($err_severity, $err_msg, $err_file, $err_line, array $err_context)
+						{
+							throw new ErrorException( $err_msg, 0, $err_severity, $err_file, $err_line );
+						});
+						
+						//Read system sensor data
+						try
+						{
+							$thisSensorData = file_get_contents($thisSensor);
+							$metadata['tempData'][count($metadata['tempData']) - 1]['value'] = intval(trim($thisSensorData)) / 1000 . "&deg; C";
+						}
+						catch (Exception $e)
+						{
+							//Failed; return an error
+							$metadata['tempData'][count($metadata['tempData']) - 1]['value'] = "Error!";
+						}
+						
+						//Return to typical error handler
+						restore_error_handler();
 						$tempCount++;
 					}
 					
