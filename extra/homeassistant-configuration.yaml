@@ -1,6 +1,6 @@
 # Vitality GOES via REST
 rest:
-  - resource: http://YOUR_VITALITY_GOES_HOST/dataHandler.php?type=weatherJSON
+  - resource: http://YOUR_VITALITY_GOES_HOST:PORT/dataHandler.php?type=weatherJSON
     scan_interval: 900
     sensor:
       - unique_id: sensor.vitality_goes_conditions

@@ -37,7 +37,7 @@ Nothing will need to be changed about Vitality GOES as long as its Current Weath
 
 In Home Assistant, [edit your configuration.yaml file](https://www.home-assistant.io/docs/configuration/) to include the configuration information found in [extra/homeassistant-configuration.yaml](/extra/homeassistant-configuration.yaml) of this repo.
 
-If you don't already have a `rest:` or `weather:` section in your configuration.yaml (you probably won't), you can just copy and paste my example into your config file, save it, and restart Home Assistant. Don't forget to set the IP/hostname of your Vitality GOES instance where notated!
+If you don't already have a `rest:` or `weather:` section in your configuration.yaml (you probably won't), you can just copy and paste my example into your config file, save it, and restart Home Assistant. Don't forget to set the IP/hostname and port of your Vitality GOES instance where notated!
 
 If you're a Home Assistant Pro and already have one or both of these sections, work the example config in as necessary.
 
