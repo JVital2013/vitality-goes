@@ -134,7 +134,7 @@ weather:
         {%- elif day.amClouds == "B2" or day.amClouds == "OV" %}
           {%- if day.amPrecip | int < 50 %}
             {%- set forecastCondition = "cloudy" %}
-          {% else %}
+          {%- else %}
             {%- set forecastCondition = "rainy" %}
           {%- endif %}
         {%- endif %}
