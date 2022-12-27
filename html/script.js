@@ -1079,21 +1079,8 @@ function menuSelect(menuNumber)
 				{
 					sysInfo = JSON.parse(this.responseText);
 					target = document.getElementById('sysCardBody');
-					
 					target.innerHTML = "";
-					renderLeftRightLine(target, "OS Version", sysInfo['osVersion']);
-					renderLeftRightLine(target, "Kernel Version", sysInfo['kernelVersion']);
-					if("goestoolsVersion" in sysInfo) renderLeftRightLine(target, "Goestools Version", sysInfo['goestoolsVersion']);
-					renderLeftRightLine(target, "Uptime", sysInfo['uptime']);
-					if("goesrecvStatus" in sysInfo) renderLeftRightLine(target, "Goesrecv Status", sysInfo['goesrecvStatus']);
-					if("goesprocStatus" in sysInfo) renderLeftRightLine(target, "Goesproc Status", sysInfo['goesprocStatus']);
-					if("satdumpStatus" in sysInfo) renderLeftRightLine(target, "SatDump Status", sysInfo['satdumpStatus']);
-					if(sysInfo['noDecoderFound']) renderLeftRightLine(target, "Satellite Decoder", "None Found!");
-					renderLeftRightLine(target, "CPU Load (1min, 5min, 15min)", sysInfo['cpuLoad']);
-					renderLeftRightLine(target, "Memory Used", sysInfo['memUsage']);
-					renderLeftRightLine(target, "Disk Used", sysInfo['diskUsage']);
-					if("powerStatus" in sysInfo) renderLeftRightLine(target, "Power Status", sysInfo['powerStatus']);
-					if("batteryPercentage" in sysInfo) renderLeftRightLine(target, "Battery", sysInfo['batteryPercentage'] + "%");
+					sysInfo.sysData.forEach((sysValue) => {renderLeftRightLine(target, sysValue.name, sysValue.value);});
 
 					target = document.getElementById('sysTempCardBody');
 					target.innerHTML = "";

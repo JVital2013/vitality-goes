@@ -388,40 +388,43 @@ elseif($_GET['type'] == "metadata")
 			
 		case "sysInfo":
 			if(!$config['general']['showSysInfo']) die();
+			$metadata['sysData'] = [];
 			
 			//Kernel Info
-			$metadata['osVersion'] = trim(shell_exec("lsb_release -ds"));
-			$metadata['kernelVersion'] = php_uname('s') . " " . php_uname('r');
+			$metadata['sysData'][] = array("name" => "OS Version", "value" => trim(shell_exec("lsb_release -ds")));
+			$metadata['sysData'][] = array("name" => "Kernel Version", "value" => php_uname('s') . " " . php_uname('r'));
 			
 			//Uptime
 			$uptimeStr = file_get_contents('/proc/uptime');
 			$num = floatval($uptimeStr);
-			$metadata['uptime'] = str_pad(round(fmod($num, 60)), 2, "0", STR_PAD_LEFT);
+			$uptimeStr = str_pad(round(fmod($num, 60)), 2, "0", STR_PAD_LEFT);
 			$num = intdiv($num, 60);
-			$metadata['uptime'] = str_pad($num % 60, 2, "0", STR_PAD_LEFT) . ":" . $metadata['uptime'];
+			$uptimeStr = str_pad($num % 60, 2, "0", STR_PAD_LEFT) . ":" . $uptimeStr;
 			$num = intdiv($num, 60);
-			$metadata['uptime'] = str_pad($num % 24, 2, "0", STR_PAD_LEFT) . ":" . $metadata['uptime'];
-			$metadata['uptime'] = intdiv($num, 24) . " days, " . $metadata['uptime'];
+			$uptimeStr = str_pad($num % 24, 2, "0", STR_PAD_LEFT) . ":" . $uptimeStr;
+			$uptimeStr = intdiv($num, 24) . " days, " . $uptimeStr;
+			$metadata['sysData'][] = array("name" => "Uptime", "value" => $uptimeStr);
 			
 			//Info about running satellite decoders
 			$runningProcesses = shell_exec("ps acxo command");
-			$metadata['noDecoderFound'] = true;
+			$noDecoderFound = true;
 			if(stripos($runningProcesses, "goesrecv") !== false || stripos($runningProcesses, "goesproc") !== false)
 			{
-				$metadata['noDecoderFound'] = false;
-				$metadata['goesrecvStatus'] = (stripos($runningProcesses, "goesrecv") !== false ? "Running" : "<span style='color: red;'>Not Running</span>");
-				$metadata['goesprocStatus'] = (stripos($runningProcesses, "goesproc") !== false ? "Running" : "<span style='color: red;'>Not Running</span>");
-				$metadata['goestoolsVersion'] = explode(" ", str_replace("goesrecv -- ", "", explode(PHP_EOL, shell_exec("goesrecv --version"))[0]))[0];
+				$noDecoderFound = false;
+				$metadata['sysData'][] = array("name" => "Goesrecv Status", "value" => stripos($runningProcesses, "goesrecv") !== false ? "Running" : "<span style='color: red;'>Not Running</span>");
+				$metadata['sysData'][] = array("name" => "Goesproc Status", "value" => stripos($runningProcesses, "goesproc") !== false ? "Running" : "<span style='color: red;'>Not Running</span>");
+				$metadata['sysData'][] = array("name" => "Goestools Version", "value" => explode(" ", str_replace("goesrecv -- ", "", explode(PHP_EOL, shell_exec("goesrecv --version"))[0]))[0]);
 			}
 			if(stripos($runningProcesses, "satdump") !== false)
 			{
-				$metadata['noDecoderFound'] = false;
-				$metadata['satdumpStatus'] = "Running";
+				$noDecoderFound = false;
+				$metadata['sysData'][] = array("name" => "SatDump Status", "value" => "Running");
 			}
+			if($noDecoderFound) $metadata['sysData'][] = array("name" => "Satellite Decoder", "value" => "None Found!");
 			
 			//CPU Load
 			$loadAvg = sys_getloadavg();
-			$metadata['cpuLoad'] = $loadAvg[0] . ", " . $loadAvg[1] . ", " . $loadAvg[2];
+			$metadata['sysData'][] = array("name" => "CPU Load (1min, 5min, 15min)", "value" => $loadAvg[0] . ", " . $loadAvg[1] . ", " . $loadAvg[2]);
 			
 			//Memory Usage
 			$memFile = fopen('/proc/meminfo','r');
@@ -434,19 +437,20 @@ elseif($_GET['type'] == "metadata")
 				if (preg_match('/^MemAvailable:\s+(\d+)\skB$/', $line, $memPieces)) $memAvailable = $memPieces[1];
 			}
 			fclose($memFile);
-			$metadata['memUsage'] = round(($memTotal - $memAvailable) / 1048576, 2) . "GB / " . round($memTotal / 1048576, 2) . "GB - " . round((($memTotal - $memAvailable) / $memAvailable) * 100, 2) . "%";
+			$metadata['sysData'][] = array("name" => "Memory Used", "value" => round(($memTotal - $memAvailable) / 1048576, 2) . "GB / " . round($memTotal / 1048576, 2) . "GB - " . round((($memTotal - $memAvailable) / $memAvailable) * 100, 2) . "%");
 			
 			//Disk Usage
 			$totalDiskSpace = round(disk_total_space("/") / 1073741824, 2);
 			$usedDiskSpace = $totalDiskSpace - round(disk_free_space("/") / 1073741824, 2);
-			$metadata['diskUsage'] = $usedDiskSpace . "GB / " . $totalDiskSpace . "GB  - " . round(($usedDiskSpace / $totalDiskSpace) * 100, 2) . "%";
+			$metadata['sysData'][] = array("name" => "Disk Used", "value" => $usedDiskSpace . "GB / " . $totalDiskSpace . "GB  - " . round(($usedDiskSpace / $totalDiskSpace) * 100, 2) . "%");
 			
 			//Power Status
 			if(file_exists("/sys/class/power_supply/AC/online"))
-				$metadata['powerStatus'] = (file_get_contents("/sys/class/power_supply/AC/online") == 1 ? "Plugged In" : "<span style='color: red;'>Unplugged</span>");
+				$metadata['sysData'][] = array("name" => "Power Status", "value" => file_get_contents("/sys/class/power_supply/AC/online") == 1 ? "Plugged In" : "<span style='color: red;'>Unplugged</span>");
 			
 			//Battery
-			if(file_exists("/sys/class/power_supply/BAT0/capacity")) $metadata['batteryPercentage'] = trim(file_get_contents("/sys/class/power_supply/BAT0/capacity"));
+			if(file_exists("/sys/class/power_supply/BAT0/capacity"))
+				$metadata['sysData'][] = array("name" => "Battery Percentage", "value" => trim(file_get_contents("/sys/class/power_supply/BAT0/capacity")) . "%");
 			
 			//System Temps
 			$hwmonDirs = scandir("/sys/class/hwmon/");
