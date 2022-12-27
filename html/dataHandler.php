@@ -403,11 +403,21 @@ elseif($_GET['type'] == "metadata")
 			$metadata['uptime'] = str_pad($num % 24, 2, "0", STR_PAD_LEFT) . ":" . $metadata['uptime'];
 			$metadata['uptime'] = intdiv($num, 24) . " days, " . $metadata['uptime'];
 			
-			//goestools info
+			//Info about running satellite decoders
 			$runningProcesses = shell_exec("ps acxo command");
-			$metadata['goesrecvStatus'] = (stripos($runningProcesses, "goesrecv") !== false ? "Running" : "<span style='color: red;'>Not Running</span>");
-			$metadata['goesprocStatus'] = (stripos($runningProcesses, "goesproc") !== false ? "Running" : "<span style='color: red;'>Not Running</span>");
-			$metadata['goestoolsVersion'] = explode(" ", str_replace("goesrecv -- ", "", explode(PHP_EOL, shell_exec("goesrecv --version"))[0]))[0];
+			$metadata['noDecoderFound'] = true;
+			if(stripos($runningProcesses, "goesrecv") !== false || stripos($runningProcesses, "goesproc") !== false)
+			{
+				$metadata['noDecoderFound'] = false;
+				$metadata['goesrecvStatus'] = (stripos($runningProcesses, "goesrecv") !== false ? "Running" : "<span style='color: red;'>Not Running</span>");
+				$metadata['goesprocStatus'] = (stripos($runningProcesses, "goesproc") !== false ? "Running" : "<span style='color: red;'>Not Running</span>");
+				$metadata['goestoolsVersion'] = explode(" ", str_replace("goesrecv -- ", "", explode(PHP_EOL, shell_exec("goesrecv --version"))[0]))[0];
+			}
+			if(stripos($runningProcesses, "satdump") !== false)
+			{
+				$metadata['noDecoderFound'] = false;
+				$metadata['satdumpStatus'] = "Running";
+			}
 			
 			//CPU Load
 			$loadAvg = sys_getloadavg();

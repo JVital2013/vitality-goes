@@ -1083,10 +1083,12 @@ function menuSelect(menuNumber)
 					target.innerHTML = "";
 					renderLeftRightLine(target, "OS Version", sysInfo['osVersion']);
 					renderLeftRightLine(target, "Kernel Version", sysInfo['kernelVersion']);
-					renderLeftRightLine(target, "Goestools Version", sysInfo['goestoolsVersion']);
+					if("goestoolsVersion" in sysInfo) renderLeftRightLine(target, "Goestools Version", sysInfo['goestoolsVersion']);
 					renderLeftRightLine(target, "Uptime", sysInfo['uptime']);
-					renderLeftRightLine(target, "Goesrecv Status", sysInfo['goesrecvStatus']);
-					renderLeftRightLine(target, "Goesproc Status", sysInfo['goesprocStatus']);
+					if("goesrecvStatus" in sysInfo) renderLeftRightLine(target, "Goesrecv Status", sysInfo['goesrecvStatus']);
+					if("goesprocStatus" in sysInfo) renderLeftRightLine(target, "Goesproc Status", sysInfo['goesprocStatus']);
+					if("satdumpStatus" in sysInfo) renderLeftRightLine(target, "SatDump Status", sysInfo['satdumpStatus']);
+					if(sysInfo['noDecoderFound']) renderLeftRightLine(target, "Satellite Decoder", "None Found!");
 					renderLeftRightLine(target, "CPU Load (1min, 5min, 15min)", sysInfo['cpuLoad']);
 					renderLeftRightLine(target, "Memory Used", sysInfo['memUsage']);
 					renderLeftRightLine(target, "Disk Used", sysInfo['diskUsage']);
