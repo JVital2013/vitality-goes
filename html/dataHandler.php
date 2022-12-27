@@ -156,10 +156,26 @@ if($_GET['type'] == "preload")
 	$mesoSlugs = array_keys($config['meso']);
 	$l2Slugs = array_keys($config['l2']);
 	$emwinSlugs = array_keys($config['emwin']);
-	for($i = 0; $i < count($config['abi']); $i++) unset($config['abi'][$abiSlugs[$i]]['path']);
-	for($i = 0; $i < count($config['meso']); $i++) unset($config['meso'][$mesoSlugs[$i]]['path']);
-	for($i = 0; $i < count($config['l2']); $i++) unset($config['l2'][$l2Slugs[$i]]['path']);
-	for($i = 0; $i < count($config['emwin']); $i++) unset($config['emwin'][$emwinSlugs[$i]]['path']);
+	for($i = 0; $i < count($config['abi']); $i++)
+	{
+		unset($config['abi'][$abiSlugs[$i]]['path']);
+		unset($config['abi'][$abiSlugs[$i]]['filter']);
+	}
+	for($i = 0; $i < count($config['meso']); $i++)
+	{
+		unset($config['meso'][$mesoSlugs[$i]]['path']);
+		unset($config['meso'][$mesoSlugs[$i]]['filter']);
+	}
+	for($i = 0; $i < count($config['l2']); $i++)
+	{
+		unset($config['l2'][$l2Slugs[$i]]['path']);
+		unset($config['l2'][$l2Slugs[$i]]['filter']);
+	}
+	for($i = 0; $i < count($config['emwin']); $i++)
+	{
+		unset($config['emwin'][$emwinSlugs[$i]]['path']);
+		unset($config['emwin'][$emwinSlugs[$i]]['filter']);
+	}
 	
 	$preloadData['abi'] = $config['abi'];
 	$preloadData['meso'] = $config['meso'];
@@ -171,7 +187,7 @@ if($_GET['type'] == "preload")
 	$preloadData['showAdminInfo'] = array_key_exists('adminPath', $config['general']) &&  is_dir($config['general']['adminPath']);
 	
 	header('Content-Type: application/json; charset=utf-8');
-	echo json_encode($preloadData, JSON_PRETTY_PRINT);
+	echo json_encode($preloadData);
 }
 elseif($_GET['type'] == "abiMetadata")
 {
