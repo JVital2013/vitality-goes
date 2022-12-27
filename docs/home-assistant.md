@@ -35,7 +35,7 @@ Vitality GOES and Home Assistant can (and probably should) be on different machi
 
 Nothing will need to be changed about Vitality GOES as long as its Current Weather screen already shows the necessary items.
 
-In Home Assistant, [edit your configuration.yaml file](https://www.home-assistant.io/docs/configuration/) to include the configuration information found in [extra/homeassistant-configuration.yaml](/extra/homeassistant-configuration.yaml) of this repo.
+In Home Assistant, [edit your configuration.yaml file](https://www.home-assistant.io/docs/configuration/) to include the configuration information found in [configs/homeassistant-configuration.yaml](/configs/homeassistant-configuration.yaml) of this repo.
 
 If you don't already have a `rest:` or `weather:` section in your configuration.yaml (you probably won't), you can just copy and paste my example into your config file, save it, and restart Home Assistant. Don't forget to set the IP/hostname and port of your Vitality GOES instance where notated!
 

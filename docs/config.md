@@ -1,6 +1,6 @@
 # How to Configure Vitality GOES
 
-The Vitality GOES config is stored in `html/config`. There are additional example configs in the [extra folder](/extra). You can start with the configs provided, then change or combine them as necessary. The configuration is broken out into the following files:
+The Vitality GOES config is stored in `html/config`. There are additional example configs in the [configs folder](/configs). Configs for data from goestools are prefixed with "goestools-", while configs for data from SatDump are prefixed with "satdump-". You can start with the configs provided, then change or combine them as necessary. The configuration is broken out into the following files:
 
 * **config.ini**: The main configuration file
 * **emwin.ini**: Stores information about the emwin images you want to display. This file has no effect on emwin text that is displayed, and does not need changed if you're switching between GOES-16 and GOES-17/18.

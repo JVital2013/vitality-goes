@@ -4,7 +4,7 @@ Vitality GOES comes with a number of scripts to enhance and extend its functiona
 
 Some scripts will pull settings from the `scriptconfig.ini` file. This file must be in the same directory as the script when you run it. Make sure you configure this file before running the scripts!
 
-A sample config for GOES-16 is included in the scripts folder, but additional samples can be found in the [extra folder](/extra). Unlike the ini files for Vitality GOES itself, you need to make sure there are no spaces around the equal sign (=). Also, comments should start with a #.
+A sample config for GOES-16 is included in the scripts folder, but additional samples can be found in the [configs folder](/configs). There are currently no scripts written for data from SatDump (TODO). Unlike the ini files for Vitality GOES itself, you need to make sure there are no spaces around the equal sign (=). Also, comments should start with a #.
 
 ## Timelapse scripts
 
