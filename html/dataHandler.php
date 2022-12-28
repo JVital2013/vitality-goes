@@ -498,9 +498,10 @@ elseif($_GET['type'] == "metadata")
 							$metadata['tempData'][count($metadata['tempData']) - 1]['name'] = $thisSensorName;
 							
 							//Some sensors error when below 0 degrees - catch these errors
-							set_error_handler(function($err_severity, $err_msg, $err_file, $err_line, array $err_context)
+							set_error_handler(function($err_severity, $err_msg, $err_file, $err_line)
 							{
-								throw new ErrorException( $err_msg, 0, $err_severity, $err_file, $err_line );
+								throw new ErrorException($err_msg, 0, $err_severity, $err_file, $err_line);
+								return true;
 							});
 							
 							//Read system sensor data
@@ -574,7 +575,21 @@ elseif($_GET['type'] == "metadata")
 			if(array_key_exists('satdumpAPI', $config['general']))
 			{
 				$metadata['satdumpData'] = [];
-				$satdumpStats = json_decode(file_get_contents($config['general']['satdumpAPI']));
+				set_error_handler(function($err_severity, $err_msg, $err_file, $err_line)
+				{
+					throw new ErrorException($err_msg, 0, $err_severity, $err_file, $err_line);
+					return true;
+				});
+				try
+				{
+					$satdumpStats = json_decode(file_get_contents($config['general']['satdumpAPI']));
+				}
+				catch(Exception $e)
+				{
+					$satdumpStats = [];
+				}
+				restore_error_handler();
+				
 				foreach($satdumpStats as $stat => $value)
 				{
 					$metadata['satdumpData'][]['title'] = ucwords(str_replace("_", " ", $stat));

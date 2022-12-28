@@ -1124,28 +1124,32 @@ function menuSelect(menuNumber)
 					if(config.showSatdumpInfo)
 					{
 						target = document.getElementById('satDumpInfoCardBody');
-						target.innerHTML = "";
-						sysInfo.satdumpData.forEach((value) => {
-							satdumpDataTitle = document.createElement('div');
-							satdumpDataTitle.className = 'prettyBoxList';
-							satdumpDataTitle.style.padding = 0;
-							satdumpDataTitle.style.paddingTop = "5px";
-							renderLeftRightLine(satdumpDataTitle, value.title, "");
-							target.appendChild(satdumpDataTitle);
-							
-							satdumpDataHolder = document.createElement('div');
-							satdumpDataHolder.className = 'prettyBoxList';
-							satdumpDataHolder.style.padding = 0;
-							satdumpDataHolder.style.paddingBottom = "10px";
-							satdumpDataHolder.style.marginBottom = 0;
-							
-							value.values.forEach((subvalue) => {
-								renderLeftRightLine(satdumpDataHolder, subvalue.name, subvalue.value);
+						console.log(sysInfo.satdumpData.length);
+						if(sysInfo.satdumpData.length == 0) target.innerHTML = "<div style='text-align: center;'>SatDump Statistics Unavailable!</div>";
+						else
+						{
+							target.innerHTML = "";
+							sysInfo.satdumpData.forEach((value) => {
+								satdumpDataTitle = document.createElement('div');
+								satdumpDataTitle.className = 'prettyBoxList';
+								satdumpDataTitle.style.padding = 0;
+								satdumpDataTitle.style.paddingTop = "5px";
+								renderLeftRightLine(satdumpDataTitle, value.title, "");
+								target.appendChild(satdumpDataTitle);
+								
+								satdumpDataHolder = document.createElement('div');
+								satdumpDataHolder.className = 'prettyBoxList';
+								satdumpDataHolder.style.padding = 0;
+								satdumpDataHolder.style.paddingBottom = "10px";
+								satdumpDataHolder.style.marginBottom = 0;
+								
+								value.values.forEach((subvalue) => {
+									renderLeftRightLine(satdumpDataHolder, subvalue.name, subvalue.value);
+								});
+								
+								target.appendChild(satdumpDataHolder);
 							});
-							
-							target.appendChild(satdumpDataHolder);
-						});
-						
+						}
 					}
 					
 					delete xhttp.sysInfo;
