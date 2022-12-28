@@ -795,6 +795,7 @@ function menuSelect(menuNumber)
 				}
 				
 				if(mainContent.childElementCount <= 2) mainContent.className = "singleCard";
+				else if(mainContent.childElementCount <= 4) mainContent.className = "dualCard";
 				else mainContent.className = "mainContent";
 				delete xhttp.hurricaneInfo;
 			}
@@ -1119,6 +1120,7 @@ function menuSelect(menuNumber)
 					
 					//Fix style based on number of cards
 					if(mainContent.childElementCount <= 2) mainContent.className = "singleCard";
+					else if(mainContent.childElementCount <= 4) mainContent.className = "dualCard";
 					else mainContent.className = "mainContent";
 				}
 			}
@@ -1132,6 +1134,7 @@ function menuSelect(menuNumber)
 	
 	//Change styling for specific screens
 	if(mainContent.childElementCount <= 2) mainContent.className = "singleCard";
+	else if(mainContent.childElementCount <= 4) mainContent.className = "dualCard";
 	else mainContent.className = "mainContent";
 }
 
