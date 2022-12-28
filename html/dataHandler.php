@@ -390,12 +390,161 @@ elseif($_GET['type'] == "metadata")
 			if(!$config['general']['showSysInfo']) die();
 			$metadata['sysData'] = [];
 			
-			//Kernel Info
-			$metadata['sysData'][] = array("name" => "OS Version", "value" => trim(shell_exec("lsb_release -ds")));
-			$metadata['sysData'][] = array("name" => "Kernel Version", "value" => php_uname('s') . " " . php_uname('r'));
+			//Windows System Info
+			if(PHP_OS_FAMILY == "Windows")
+			{
+				//Windows Version
+				$metadata['sysData'][] = array("name" => "Windows Version", "value" => ucfirst(php_uname('v')));
+				
+				//Get Data from PowerShell
+				$powershellData = json_decode(shell_exec("powershell -EncodedCommand " .
+					"JABtAGUAbQBvAHIAeQAgAD0AIABnAGMAaQBtACAAdwBpAG4AMwAyAF8AbwBwAGUAcg"  .
+					"BhAHQAaQBuAGcAcwB5AHMAdABlAG0AIAAtAFAAcgBvAHAAZQByAHQAeQAgAFQAbwB0A" .
+					"GEAbABWAGkAcwBpAGIAbABlAE0AZQBtAG8AcgB5AFMAaQB6AGUALABGAHIAZQBlAFAA" .
+					"aAB5AHMAaQBjAGEAbABNAGUAbQBvAHIAeQA7ACAAJABiAGEAdAB0AGUAcgB5ACAAPQA" .
+					"gAGcAYwBpAG0AIAB3AGkAbgAzADIAXwBiAGEAdAB0AGUAcgB5ADsAIAAkAHIAZQB0AF" .
+					"YAYQBsACAAPQAgAEAAewB1AHAAdABpAG0AZQAgAD0AIAAkACgAKABnAGUAdAAtAGQAY" .
+					"QB0AGUAKQAgAC0AIAAoAGcAYwBpAG0AIABXAGkAbgAzADIAXwBPAHAAZQByAGEAdABp" .
+					"AG4AZwBTAHkAcwB0AGUAbQApAC4ATABhAHMAdABCAG8AbwB0AFUAcABUAGkAbQBlACk" .
+					"ALgBUAG8AdABhAGwAUwBlAGMAbwBuAGQAcwA7ACAAYwBwAHUATABvAGEAZAAgAD0AIA" .
+					"AkACgAZwBjAGkAbQAgAFcAaQBuADMAMgBfAFAAcgBvAGMAZQBzAHMAbwByACAALQBQA" .
+					"HIAbwBwAGUAcgB0AHkAIABMAG8AYQBkAFAAZQByAGMAZQBuAHQAYQBnAGUAKQAuAEwA" .
+					"bwBhAGQAUABlAHIAYwBlAG4AdABhAGcAZQA7ACAAbQBlAG0AVABvAHQAYQBsACAAPQA" .
+					"gACQAbQBlAG0AbwByAHkALgBUAG8AdABhAGwAVgBpAHMAaQBiAGwAZQBNAGUAbQBvAH" .
+					"IAeQBTAGkAegBlADsAIABtAGUAbQBBAHYAYQBpAGwAYQBiAGwAZQAgAD0AIAAkAG0AZ" .
+					"QBtAG8AcgB5AC4ARgByAGUAZQBQAGgAeQBzAGkAYwBhAGwATQBlAG0AbwByAHkAOwB9" .
+					"ADsAIABpAGYAKAAkAGIAYQB0AHQAZQByAHkAIAAtAG4AZQAgACQAbgB1AGwAbAApAHs" .
+					"AJAByAGUAdABWAGEAbAAuAEEAZABkACgAIgBwAG8AdwBlAHIAUwB0AGEAdAB1AHMAIg" .
+					"AsACAAQAAoADIALAAzACwANgAsADcALAA4ACwAOQApAC4AQwBvAG4AdABhAGkAbgBzA" .
+					"CgAJABiAGEAdAB0AGUAcgB5AC4AQgBhAHQAdABlAHIAeQBTAHQAYQB0AHUAcwApACkA" .
+					"OwAgACQAcgBlAHQAVgBhAGwALgBBAGQAZAAoACIAYgBhAHQAdABlAHIAeQBQAGUAcgB" .
+					"jAGUAbgB0AGEAZwBlACIALAAgACQAYgBhAHQAdABlAHIAeQAuAEUAcwB0AGkAbQBhAH" .
+					"QAZQBkAEMAaABhAHIAZwBlAFIAZQBtAGEAaQBuAGkAbgBnACkAOwB9ACAAJAByAGUAd" .
+					"ABWAGEAbAAgAHwAIABDAG8AbgB2AGUAcgB0AFQAbwAtAEoAUwBPAE4AIAAtAEMAbwBt" .
+					"AHAAcgBlAHMAcwA="));
+				
+				//Parse data - hand some of it off for later
+				if(property_exists($powershellData, "powerStatus"))
+					$metadata['sysData'][] = array("name" => "Power Status", "value" => $powershellData->powerStatus ? "Plugged In" : "<span style='color: red;'>Unplugged</span>");
+				if(property_exists($powershellData, "batteryPercentage"))
+				$metadata['sysData'][] = array("name" => "Battery Percentage", "value" => $powershellData->batteryPercentage . "%");
+				$metadata['sysData'][] = array("name" => "CPU Load Average", "value" => $powershellData->cpuLoad . "%");
+				$uptimeStr = $powershellData->uptime;
+				$memTotal = $powershellData->memTotal;
+				$memAvailable = $powershellData->memAvailable;
+				
+				//Info about running processes (parsed later)
+				$runningProcesses = shell_exec("tasklist");
+				
+				//System temp data on Windows requires admin permissions, which we cannot promise,
+				//so it is not supported - sorry!
+				$metadata['tempData'] = [];
+			}
 			
-			//Uptime
-			$uptimeStr = file_get_contents('/proc/uptime');
+			//Other Systems (assume Linux; everyone else is lucky)
+			else
+			{
+				//Kernel Info
+				$metadata['sysData'][] = array("name" => "OS Version", "value" => trim(shell_exec("lsb_release -ds")));
+				$metadata['sysData'][] = array("name" => "Kernel Version", "value" => php_uname('s') . " " . php_uname('r'));
+				
+				//Uptime
+				$uptimeStr = file_get_contents('/proc/uptime');
+				
+				//CPU Load
+				$loadAvg = sys_getloadavg();
+				$metadata['sysData'][] = array("name" => "CPU Load (1min, 5min, 15min)", "value" => $loadAvg[0] . ", " . $loadAvg[1] . ", " . $loadAvg[2]);
+				
+				//Memory Usage (parsed later)
+				$memFile = fopen('/proc/meminfo','r');
+				$memTotal = 0;
+				$memAvailable = 0;
+				while ($line = fgets($memFile))
+				{
+					$memPieces = [];
+					if (preg_match('/^MemTotal:\s+(\d+)\skB$/', $line, $memPieces)) $memTotal = $memPieces[1];
+					if (preg_match('/^MemAvailable:\s+(\d+)\skB$/', $line, $memPieces)) $memAvailable = $memPieces[1];
+				}
+				fclose($memFile);
+				
+				//Power Status
+				if(file_exists("/sys/class/power_supply/AC/online"))
+					$metadata['sysData'][] = array("name" => "Power Status", "value" => file_get_contents("/sys/class/power_supply/AC/online") == 1 ? "Plugged In" : "<span style='color: red;'>Unplugged</span>");
+				
+				//Battery
+				if(file_exists("/sys/class/power_supply/BAT0/capacity"))
+					$metadata['sysData'][] = array("name" => "Battery Percentage", "value" => trim(file_get_contents("/sys/class/power_supply/BAT0/capacity")) . "%");
+				
+				//System Temps
+				$hwmonDirs = scandir("/sys/class/hwmon/");
+				$metadata['tempData'] = [];
+				foreach($hwmonDirs as $thisHwmon)
+				{
+					if($thisHwmon == "." || $thisHwmon == "..") continue;
+					$thisDevicesSensors = glob("/sys/class/hwmon/" . $thisHwmon . "/{temp,fan}*_input", GLOB_BRACE);
+					if(count($thisDevicesSensors) == 0) continue;
+					
+					$tempBaseName = ucfirst(str_replace("_", " ", trim(file_get_contents("/sys/class/hwmon/" . $thisHwmon . "/name"))));
+					$tempCount = $fanCount = 1;
+					foreach($thisDevicesSensors as $thisSensor)
+					{
+						$metadata['tempData'][] = [];
+						
+						if(strpos($thisSensor, "temp") !== false)
+						{
+							if(file_exists(str_replace("input", "label", $thisSensor))) $thisSensorName = trim(file_get_contents(str_replace("input", "label", $thisSensor))) . " Temp";
+							else $thisSensorName = "$tempBaseName Temp" . (count($thisDevicesSensors) > 1 ? " $tempCount" : "");
+							
+							$metadata['tempData'][count($metadata['tempData']) - 1]['name'] = $thisSensorName;
+							
+							//Some sensors error when below 0 degrees - catch these errors
+							set_error_handler(function($err_severity, $err_msg, $err_file, $err_line, array $err_context)
+							{
+								throw new ErrorException( $err_msg, 0, $err_severity, $err_file, $err_line );
+							});
+							
+							//Read system sensor data
+							try
+							{
+								$thisSensorData = file_get_contents($thisSensor);
+								$metadata['tempData'][count($metadata['tempData']) - 1]['value'] = intval(trim($thisSensorData)) / 1000 . "&deg; C";
+							}
+							catch (Exception $e)
+							{
+								//Failed; return an error
+								$metadata['tempData'][count($metadata['tempData']) - 1]['value'] = "Error!";
+							}
+							
+							//Return to typical error handler
+							restore_error_handler();
+							$tempCount++;
+						}
+						
+						else
+						{
+							if(file_exists(str_replace("input", "label", $thisSensor))) $thisSensorName = trim(file_get_contents(str_replace("input", "label", $thisSensor)));
+							else $thisSensorName = "$tempBaseName Fan" . (count($thisDevicesSensors) > 1 ? " $fanCount" : "");
+							
+							$metadata['tempData'][count($metadata['tempData']) - 1]['name'] = $thisSensorName . " Speed";
+							$metadata['tempData'][count($metadata['tempData']) - 1]['value'] = trim(file_get_contents($thisSensor)) . " RPM";
+							$fanCount++;
+						}
+					}
+				}
+				
+				//Info about running processes
+				$runningProcesses = shell_exec("ps acxo command");
+			}
+			
+			//Disk Usage (all OSs)
+			$totalDiskSpace = round(disk_total_space($_SERVER['DOCUMENT_ROOT']) / 1073741824, 2);
+			$usedDiskSpace = $totalDiskSpace - round(disk_free_space($_SERVER['DOCUMENT_ROOT']) / 1073741824, 2);
+			$metadata['sysData'][] = array("name" => "Disk Used", "value" => $usedDiskSpace . "GB / " . $totalDiskSpace . "GB  - " . round(($usedDiskSpace / $totalDiskSpace) * 100, 2) . "%");
+			
+			//Memory Usage
+			$metadata['sysData'][] = array("name" => "Memory Used", "value" => round(($memTotal - $memAvailable) / 1048576, 2) . "GB / " . round($memTotal / 1048576, 2) . "GB - " . round((($memTotal - $memAvailable) / $memAvailable) * 100, 2) . "%");
+			
+			//Uptime (all OSs)
 			$num = floatval($uptimeStr);
 			$uptimeStr = str_pad(round(fmod($num, 60)), 2, "0", STR_PAD_LEFT);
 			$num = intdiv($num, 60);
@@ -405,8 +554,7 @@ elseif($_GET['type'] == "metadata")
 			$uptimeStr = intdiv($num, 24) . " days, " . $uptimeStr;
 			$metadata['sysData'][] = array("name" => "Uptime", "value" => $uptimeStr);
 			
-			//Info about running satellite decoders
-			$runningProcesses = shell_exec("ps acxo command");
+			//Find running satellite decoders (all OSs)
 			$noDecoderFound = true;
 			if(stripos($runningProcesses, "goesrecv") !== false || stripos($runningProcesses, "goesproc") !== false)
 			{
@@ -421,93 +569,6 @@ elseif($_GET['type'] == "metadata")
 				$metadata['sysData'][] = array("name" => "SatDump Status", "value" => "Running");
 			}
 			if($noDecoderFound) $metadata['sysData'][] = array("name" => "Satellite Decoder", "value" => "None Found!");
-			
-			//CPU Load
-			$loadAvg = sys_getloadavg();
-			$metadata['sysData'][] = array("name" => "CPU Load (1min, 5min, 15min)", "value" => $loadAvg[0] . ", " . $loadAvg[1] . ", " . $loadAvg[2]);
-			
-			//Memory Usage
-			$memFile = fopen('/proc/meminfo','r');
-			$memTotal = 0;
-			$memAvailable = 0;
-			while ($line = fgets($memFile))
-			{
-				$memPieces = [];
-				if (preg_match('/^MemTotal:\s+(\d+)\skB$/', $line, $memPieces)) $memTotal = $memPieces[1];
-				if (preg_match('/^MemAvailable:\s+(\d+)\skB$/', $line, $memPieces)) $memAvailable = $memPieces[1];
-			}
-			fclose($memFile);
-			$metadata['sysData'][] = array("name" => "Memory Used", "value" => round(($memTotal - $memAvailable) / 1048576, 2) . "GB / " . round($memTotal / 1048576, 2) . "GB - " . round((($memTotal - $memAvailable) / $memAvailable) * 100, 2) . "%");
-			
-			//Disk Usage
-			$totalDiskSpace = round(disk_total_space("/") / 1073741824, 2);
-			$usedDiskSpace = $totalDiskSpace - round(disk_free_space("/") / 1073741824, 2);
-			$metadata['sysData'][] = array("name" => "Disk Used", "value" => $usedDiskSpace . "GB / " . $totalDiskSpace . "GB  - " . round(($usedDiskSpace / $totalDiskSpace) * 100, 2) . "%");
-			
-			//Power Status
-			if(file_exists("/sys/class/power_supply/AC/online"))
-				$metadata['sysData'][] = array("name" => "Power Status", "value" => file_get_contents("/sys/class/power_supply/AC/online") == 1 ? "Plugged In" : "<span style='color: red;'>Unplugged</span>");
-			
-			//Battery
-			if(file_exists("/sys/class/power_supply/BAT0/capacity"))
-				$metadata['sysData'][] = array("name" => "Battery Percentage", "value" => trim(file_get_contents("/sys/class/power_supply/BAT0/capacity")) . "%");
-			
-			//System Temps
-			$hwmonDirs = scandir("/sys/class/hwmon/");
-			$metadata['tempData'] = [];
-			foreach($hwmonDirs as $thisHwmon)
-			{
-				if($thisHwmon == "." || $thisHwmon == "..") continue;
-				$thisDevicesSensors = glob("/sys/class/hwmon/" . $thisHwmon . "/{temp,fan}*_input", GLOB_BRACE);
-				if(count($thisDevicesSensors) == 0) continue;
-				
-				$tempBaseName = ucfirst(str_replace("_", " ", trim(file_get_contents("/sys/class/hwmon/" . $thisHwmon . "/name"))));
-				$tempCount = $fanCount = 1;
-				foreach($thisDevicesSensors as $thisSensor)
-				{
-					$metadata['tempData'][] = [];
-					
-					if(strpos($thisSensor, "temp") !== false)
-					{
-						if(file_exists(str_replace("input", "label", $thisSensor))) $thisSensorName = trim(file_get_contents(str_replace("input", "label", $thisSensor))) . " Temp";
-						else $thisSensorName = "$tempBaseName Temp" . (count($thisDevicesSensors) > 1 ? " $tempCount" : "");
-						
-						$metadata['tempData'][count($metadata['tempData']) - 1]['name'] = $thisSensorName;
-						
-						//Some sensors error when below 0 degrees - catch these errors
-						set_error_handler(function($err_severity, $err_msg, $err_file, $err_line, array $err_context)
-						{
-							throw new ErrorException( $err_msg, 0, $err_severity, $err_file, $err_line );
-						});
-						
-						//Read system sensor data
-						try
-						{
-							$thisSensorData = file_get_contents($thisSensor);
-							$metadata['tempData'][count($metadata['tempData']) - 1]['value'] = intval(trim($thisSensorData)) / 1000 . "&deg; C";
-						}
-						catch (Exception $e)
-						{
-							//Failed; return an error
-							$metadata['tempData'][count($metadata['tempData']) - 1]['value'] = "Error!";
-						}
-						
-						//Return to typical error handler
-						restore_error_handler();
-						$tempCount++;
-					}
-					
-					else
-					{
-						if(file_exists(str_replace("input", "label", $thisSensor))) $thisSensorName = trim(file_get_contents(str_replace("input", "label", $thisSensor)));
-						else $thisSensorName = "$tempBaseName Fan" . (count($thisDevicesSensors) > 1 ? " $fanCount" : "");
-						
-						$metadata['tempData'][count($metadata['tempData']) - 1]['name'] = $thisSensorName . " Speed";
-						$metadata['tempData'][count($metadata['tempData']) - 1]['value'] = trim(file_get_contents($thisSensor)) . " RPM";
-						$fanCount++;
-					}
-				}
-			}
 			break;
 			
 		default:

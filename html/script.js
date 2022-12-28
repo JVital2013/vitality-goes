@@ -1071,22 +1071,55 @@ function menuSelect(menuNumber)
 			renderStiffCard("sys", "System Info");
 			renderStiffCard("sysTemp", "System Temps");
 			
+			if(config.showGraphs)
+			{
+				renderStatsCard("viterbi", "Viterbi Error Corrections/Packet");
+				renderStatsCard("rs", "Reed-Solomon Error Corrections/Second");
+				renderStatsCard("packets", "Packets/Second");
+				renderStatsCard("freq", "Frequency Offset");
+				renderStatsCard("gain", "Gain");
+				renderStatsCard("omega", "Omega");
+			}
+			
 			//AJAX load system information
 			xhttp.sysInfo = new XMLHttpRequest();
 			xhttp.sysInfo.onreadystatechange = function()
 			{
 				if(this.readyState == 4 && this.status == 200)
 				{
+					//General System Information
 					sysInfo = JSON.parse(this.responseText);
+					
 					target = document.getElementById('sysCardBody');
-					target.innerHTML = "";
-					sysInfo.sysData.forEach((sysValue) => {renderLeftRightLine(target, sysValue.name, sysValue.value);});
-
+					if(sysInfo.sysData.length == 0)
+					{
+						target.parentElement.parentElement.nextSibling.remove();
+						target.parentElement.parentElement.remove();
+					}
+					else
+					{
+						target.innerHTML = "";
+						sysInfo.sysData.forEach((sysValue) => {renderLeftRightLine(target, sysValue.name, sysValue.value);});
+					}
+					
+					//Temp Info
 					target = document.getElementById('sysTempCardBody');
-					target.innerHTML = "";
-					sysInfo.tempData.forEach((tempValue) => {renderLeftRightLine(target, tempValue.name, tempValue.value);});
+					if(sysInfo.tempData.length == 0)
+					{
+						target.parentElement.parentElement.nextSibling.remove();
+						target.parentElement.parentElement.remove();
+					}
+					else
+					{
+						target.innerHTML = "";
+						sysInfo.tempData.forEach((tempValue) => {renderLeftRightLine(target, tempValue.name, tempValue.value);});
+					}
 					
 					delete xhttp.sysInfo;
+					
+					//Fix style based on number of cards
+					if(mainContent.childElementCount <= 2) mainContent.className = "singleCard";
+					else mainContent.className = "mainContent";
 				}
 			}
 			
@@ -1094,15 +1127,6 @@ function menuSelect(menuNumber)
 			xhttp.sysInfo.send();
 		}
 		
-		if(config.showGraphs)
-		{
-			renderStatsCard("viterbi", "Viterbi Error Corrections/Packet");
-			renderStatsCard("rs", "Reed-Solomon Error Corrections/Second");
-			renderStatsCard("packets", "Packets/Second");
-			renderStatsCard("freq", "Frequency Offset");
-			renderStatsCard("gain", "Gain");
-			renderStatsCard("omega", "Omega");
-		}
 		break;
 	}
 	
