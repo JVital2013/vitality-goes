@@ -1072,6 +1072,10 @@ function menuSelect(menuNumber)
 			renderStiffCard("sys", "System Info");
 			renderStiffCard("sysTemp", "System Temps");
 			
+			if(config.showSatdumpInfo)
+			{
+				renderStiffCard("satDumpInfo", "SatDump Info");
+			}
 			if(config.showGraphs)
 			{
 				renderStatsCard("viterbi", "Viterbi Error Corrections/Packet");
@@ -1114,6 +1118,34 @@ function menuSelect(menuNumber)
 					{
 						target.innerHTML = "";
 						sysInfo.tempData.forEach((tempValue) => {renderLeftRightLine(target, tempValue.name, tempValue.value);});
+					}
+					
+					//SatDump Info
+					if(config.showSatdumpInfo)
+					{
+						target = document.getElementById('satDumpInfoCardBody');
+						target.innerHTML = "";
+						sysInfo.satdumpData.forEach((value) => {
+							satdumpDataTitle = document.createElement('div');
+							satdumpDataTitle.className = 'prettyBoxList';
+							satdumpDataTitle.style.padding = 0;
+							satdumpDataTitle.style.paddingTop = "5px";
+							renderLeftRightLine(satdumpDataTitle, value.title, "");
+							target.appendChild(satdumpDataTitle);
+							
+							satdumpDataHolder = document.createElement('div');
+							satdumpDataHolder.className = 'prettyBoxList';
+							satdumpDataHolder.style.padding = 0;
+							satdumpDataHolder.style.paddingBottom = "10px";
+							satdumpDataHolder.style.marginBottom = 0;
+							
+							value.values.forEach((subvalue) => {
+								renderLeftRightLine(satdumpDataHolder, subvalue.name, subvalue.value);
+							});
+							
+							target.appendChild(satdumpDataHolder);
+						});
+						
 					}
 					
 					delete xhttp.sysInfo;

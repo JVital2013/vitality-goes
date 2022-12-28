@@ -182,6 +182,7 @@ if($_GET['type'] == "preload")
 	$preloadData['l2'] = $config['l2'];
 	$preloadData['emwin'] = $config['emwin'];
 	$preloadData['showSysInfo'] = $config['general']['showSysInfo'];
+	$preloadData['showSatdumpInfo'] = array_key_exists('satdumpAPI', $config['general']);
 	$preloadData['showGraphs'] = array_key_exists('graphiteAPI', $config['general']);
 	$preloadData['showEmwinInfo'] = array_key_exists('emwinPath', $config['general']) &&  is_dir($config['general']['emwinPath']);
 	$preloadData['showAdminInfo'] = array_key_exists('adminPath', $config['general']) &&  is_dir($config['general']['adminPath']);
@@ -436,12 +437,11 @@ elseif($_GET['type'] == "metadata")
 				//Info about running processes (parsed later)
 				$runningProcesses = shell_exec("tasklist");
 				
-				//System temp data on Windows requires admin permissions, which we cannot promise,
-				//so it is not supported - sorry!
+				//System temp data on Windows is not supported
 				$metadata['tempData'] = [];
 			}
 			
-			//Other Systems (assume Linux; everyone else is lucky)
+			//Other Systems (assume Linux-like system)
 			else
 			{
 				//Kernel Info
@@ -569,6 +569,25 @@ elseif($_GET['type'] == "metadata")
 				$metadata['sysData'][] = array("name" => "SatDump Status", "value" => "Running");
 			}
 			if($noDecoderFound) $metadata['sysData'][] = array("name" => "Satellite Decoder", "value" => "None Found!");
+			
+			//SatDump Statistics (all OSs)
+			if(array_key_exists('satdumpAPI', $config['general']))
+			{
+				$metadata['satdumpData'] = [];
+				$satdumpStats = json_decode(file_get_contents($config['general']['satdumpAPI']));
+				foreach($satdumpStats as $stat => $value)
+				{
+					$metadata['satdumpData'][]['title'] = ucwords(str_replace("_", " ", $stat));
+					$metadata['satdumpData'][count($metadata['satdumpData']) - 1]['values'] = [];
+					foreach($value as $subName => $subValue)
+					{
+						if(is_float($subValue)) $valToUse = round($subValue, 5);
+						elseif(is_bool($subValue)) $valToUse = $subValue ? "True" : "False";
+						else $valToUse = $subValue;
+						$metadata['satdumpData'][count($metadata['satdumpData']) - 1]['values'][] = array("name" => ucwords(str_replace("_", " ", $subName)), "value" => $valToUse);
+					}
+				}
+			}
 			break;
 			
 		default:
