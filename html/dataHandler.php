@@ -498,13 +498,7 @@ elseif($_GET['type'] == "metadata")
 							$metadata['tempData'][count($metadata['tempData']) - 1]['name'] = $thisSensorName;
 							
 							//Some sensors error when below 0 degrees - catch these errors
-							set_error_handler(function($err_severity, $err_msg, $err_file, $err_line)
-							{
-								throw new ErrorException($err_msg, 0, $err_severity, $err_file, $err_line);
-								return true;
-							});
-							
-							//Read system sensor data
+							set_error_handler("ConvertToException");
 							try
 							{
 								$thisSensorData = file_get_contents($thisSensor);
@@ -575,11 +569,7 @@ elseif($_GET['type'] == "metadata")
 			if(array_key_exists('satdumpAPI', $config['general']))
 			{
 				$metadata['satdumpData'] = [];
-				set_error_handler(function($err_severity, $err_msg, $err_file, $err_line)
-				{
-					throw new ErrorException($err_msg, 0, $err_severity, $err_file, $err_line);
-					return true;
-				});
+				set_error_handler("ConvertToException");
 				try
 				{
 					$satdumpStats = json_decode(file_get_contents($config['general']['satdumpAPI']));

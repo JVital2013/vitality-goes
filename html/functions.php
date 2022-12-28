@@ -268,4 +268,9 @@ function parseFmLine($line, $forecastLTBreaks)
 	
 	return $retVal;
 }
+function ConvertToException($err_severity, $err_msg, $err_file, $err_line)
+{
+	throw new ErrorException($err_msg, 0, $err_severity, $err_file, $err_line);
+	return true;
+}
 ?>
