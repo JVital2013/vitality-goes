@@ -47,6 +47,12 @@ The `rest:` configuration pulls pertinent weather data from Vitality GOES via th
 
   ![Example Vitality GOES Entities](https://user-images.githubusercontent.com/24253715/208742817-9a2386e5-cc94-4b31-99a0-f3d48bb16807.png)
 
-I have opted to "hide" all the forecast sensors in my setup since they have obtuse JSON data in them, but I'm keeping the current condition sensors enabled. This enables me to track conditions like temp, humidity, etc over time.
+You can also use the sensors directly to track trends in temp, humitidity, etc over time.
 
 ![Tracking Wind Over Time](https://user-images.githubusercontent.com/24253715/208743076-08b4ec9c-b493-4583-9988-ab7b39428151.png)
+
+## Troubleshooting the Forecast
+
+Make sure each of the forecast sensors have an Entity ID of "sensor.vitality_goes_forecast_day_X", where X is 1-7. This should be created autmatically when you add in the configuration, but if you fiddle with the config, you may need to reset the Entity ID in the GUI. Some or all of the forecast may be missing if the Entity ID is incorrect.
+
+![Example Entity ID](https://user-images.githubusercontent.com/24253715/209983631-d6d463e1-3f69-4b93-9cf2-735b9102d4f7.png)
