@@ -1124,7 +1124,6 @@ function menuSelect(menuNumber)
 					if(config.showSatdumpInfo)
 					{
 						target = document.getElementById('satDumpInfoCardBody');
-						console.log(sysInfo.satdumpData.length);
 						if(sysInfo.satdumpData.length == 0) target.innerHTML = "<div style='text-align: center;'>SatDump Statistics Unavailable!</div>";
 						else
 						{
@@ -1210,24 +1209,31 @@ function loadStats(targetedContent)
 			if(this.readyState == 4 && this.status == 200)
 			{
 				metadata = JSON.parse(this.responseText);
-				targetedContent.innerHTML = "";
-				parser = new DOMParser();
-				
-				svg1hr = parser.parseFromString(metadata['svg1hr'], "image/svg+xml");
-				svg1hr.documentElement.style.width = "100%";
-				svg1hr.documentElement.style.height = "auto";
-				targetedContent.appendChild(svg1hr.documentElement);
-				targetedContent.appendChild(document.createElement('br'));
-				
-				svg1day = parser.parseFromString(metadata['svg1day'], "image/svg+xml");
-				svg1day.documentElement.style.width = "100%";
-				svg1day.documentElement.style.height = "auto";
-				targetedContent.appendChild(svg1day.documentElement);
-				
-				description = document.createElement('div');
-				description.className = "goeslabel";
-				description.innerHTML = metadata['description'];
-				targetedContent.appendChild(description);
+				if(Object.keys(metadata).length == 0)
+				{
+					targetedContent.innerHTML = "<i>Error loading statistics</i>";
+				}
+				else
+				{
+					targetedContent.innerHTML = "";
+					parser = new DOMParser();
+					
+					svg1hr = parser.parseFromString(metadata['svg1hr'], "image/svg+xml");
+					svg1hr.documentElement.style.width = "100%";
+					svg1hr.documentElement.style.height = "auto";
+					targetedContent.appendChild(svg1hr.documentElement);
+					targetedContent.appendChild(document.createElement('br'));
+					
+					svg1day = parser.parseFromString(metadata['svg1day'], "image/svg+xml");
+					svg1day.documentElement.style.width = "100%";
+					svg1day.documentElement.style.height = "auto";
+					targetedContent.appendChild(svg1day.documentElement);
+					
+					description = document.createElement('div');
+					description.className = "goeslabel";
+					description.innerHTML = metadata['description'];
+					targetedContent.appendChild(description);
+				}
 				
 				delete xhttp.loadStats;
 			}

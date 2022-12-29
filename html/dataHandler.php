@@ -220,91 +220,52 @@ elseif($_GET['type'] == "metadata")
 	switch($_GET['id'])
 	{
 		case "packetsContent":
-			$tzUrl = urlencode($currentSettings[$selectedProfile]['timezone']);
-			$packetOK1hrArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-1hours&tz=$tzUrl&target=stats.packets_ok"))[0]->datapoints;
-			$packetOK1dayArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-24hours&tz=$tzUrl&target=stats.packets_ok"))[0]->datapoints;
-			$packetDrop1hrArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-1hours&tz=$tzUrl&target=stats.packets_dropped"))[0]->datapoints;
-			$packetDrop1dayArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-24hours&tz=$tzUrl&target=stats.packets_dropped"))[0]->datapoints;
-			$packetOK1hr = $packetOK1day = $packetDrop1hr = $packetDrop1day = 0;
-			
-			foreach($packetOK1hrArray as $thisPacket) {$packetOK1hr += $thisPacket[0];}
-			foreach($packetOK1dayArray as $thisPacket) {$packetOK1day += $thisPacket[0];}
-			foreach($packetDrop1hrArray as $thisPacket) {$packetDrop1hr += $thisPacket[0];}
-			foreach($packetDrop1dayArray as $thisPacket) {$packetDrop1day += $thisPacket[0];}
-			
-			$metadata['description'] = "1 Hour Average: " . round(($packetOK1hr / ($packetOK1hr + $packetDrop1hr)) * 100, 4) . "% OK | 1 Day Average: " . round(($packetOK1day / ($packetOK1day + $packetDrop1day)) * 100, 4) . "% OK";
-			$metadata['svg1hr'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&colorList=green%2Cred&fontSize=14&title=HRIT%20Packets%20%2F%20Second%20(1%20Hour)&fgcolor=FFFFFF&lineWidth=2&from=-1hours&tz=$tzUrl&target=alias(stats.packets_ok%2C%22Packets%20OK%22)&target=alias(stats.packets_dropped%2C%22Packets%20Dropped%22)"));
-			$metadata['svg1day'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&colorList=green%2Cred&fontSize=14&title=HRIT%20Packets%20%2F%20Second%20(1%20Day)&fgcolor=FFFFFF&lineWidth=2&from=-1days&tz=$tzUrl&target=alias(stats.packets_ok%2C%22Packets%20OK%22)&target=alias(stats.packets_dropped%2C%22Packets%20Dropped%22)"));
+			set_error_handler("convertToException");
+			try
+			{
+				$tzUrl = urlencode($currentSettings[$selectedProfile]['timezone']);
+				$packetOK1hrArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-1hours&tz=$tzUrl&target=stats.packets_ok"))[0]->datapoints;
+				$packetOK1dayArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-24hours&tz=$tzUrl&target=stats.packets_ok"))[0]->datapoints;
+				$packetDrop1hrArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-1hours&tz=$tzUrl&target=stats.packets_dropped"))[0]->datapoints;
+				$packetDrop1dayArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-24hours&tz=$tzUrl&target=stats.packets_dropped"))[0]->datapoints;
+				$packetOK1hr = $packetOK1day = $packetDrop1hr = $packetDrop1day = 0;
+				
+				foreach($packetOK1hrArray as $thisPacket) {$packetOK1hr += $thisPacket[0];}
+				foreach($packetOK1dayArray as $thisPacket) {$packetOK1day += $thisPacket[0];}
+				foreach($packetDrop1hrArray as $thisPacket) {$packetDrop1hr += $thisPacket[0];}
+				foreach($packetDrop1dayArray as $thisPacket) {$packetDrop1day += $thisPacket[0];}
+				
+				$metadata['description'] = "1 Hour Average: " . round(($packetOK1hr / ($packetOK1hr + $packetDrop1hr)) * 100, 4) . "% OK | 1 Day Average: " . round(($packetOK1day / ($packetOK1day + $packetDrop1day)) * 100, 4) . "% OK";
+				$metadata['svg1hr'] = preg_replace("(clip-path.*clip-rule.*\")", "",
+					file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&colorList=green%2Cred&fontSize=14&title=HRIT%20Packets%20%2F%20Second%20(1%20Hour)&fgcolor=FFFFFF&lineWidth=2&from=-1hours&tz=$tzUrl&target=alias(stats.packets_ok%2C%22Packets%20OK%22)&target=alias(stats.packets_dropped%2C%22Packets%20Dropped%22)"));
+				$metadata['svg1day'] = preg_replace("(clip-path.*clip-rule.*\")", "",
+					file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&colorList=green%2Cred&fontSize=14&title=HRIT%20Packets%20%2F%20Second%20(1%20Day)&fgcolor=FFFFFF&lineWidth=2&from=-1days&tz=$tzUrl&target=alias(stats.packets_ok%2C%22Packets%20OK%22)&target=alias(stats.packets_dropped%2C%22Packets%20Dropped%22)"));
+			}
+			catch(exception $e)
+			{
+				$metadata = [];
+			}
+			restore_error_handler();
 			break;
 			
 		case "viterbiContent":
-			$tzUrl = urlencode($currentSettings[$selectedProfile]['timezone']);
-			$viterbi1hrArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-1hours&tz=$tzUrl&target=divideSeries(stats_counts.viterbi_errors%2CsumSeries(stats_counts.packets_dropped%2Cstats_counts.packets_ok))"))[0]->datapoints;
-			$viterbi1dayArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-1days&tz=$tzUrl&target=divideSeries(stats_counts.viterbi_errors%2CsumSeries(stats_counts.packets_dropped%2Cstats_counts.packets_ok))"))[0]->datapoints;
-			$viterbi1hrSum = $viterbi1daySum = 0;
-			
-			foreach($viterbi1hrArray as $thisPacket) {$viterbi1hrSum += $thisPacket[0];}
-			foreach($viterbi1dayArray as $thisPacket) {$viterbi1daySum += $thisPacket[0];}
-			
-			$metadata['description'] = "1 Hour Average: " . round($viterbi1hrSum / count($viterbi1hrArray), 2) . " | 1 Day Average: " . round($viterbi1daySum / count($viterbi1dayArray), 2);
-			$metadata['svg1hr'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&title=Avg%20Viterbi%20Error%20Corrections%20%2F%20Packet%20(1%20Hour)&fontSize=14&lineWidth=2&from=-1hours&hideLegend=true&colorList=red&tz=$tzUrl&target=divideSeries(stats_counts.viterbi_errors%2CsumSeries(stats_counts.packets_dropped%2Cstats_counts.packets_ok))"));
-			$metadata['svg1day'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&title=Avg%20Viterbi%20Error%20Corrections%20%2F%20Packet%20(1%20Day)&fontSize=14&lineWidth=2&from=-24hours&hideLegend=true&colorList=red&tz=$tzUrl&target=divideSeries(stats_counts.viterbi_errors%2CsumSeries(stats_counts.packets_dropped%2Cstats_counts.packets_ok))"));
+			parseGraphiteData($metadata, $currentSettings[$selectedProfile]['timezone'], $config['general']['graphiteAPI'], "divideSeries(stats_counts.viterbi_errors,sumSeries(stats_counts.packets_dropped,stats_counts.packets_ok))", "Avg Viterbi Error Corrections / Packet", "red");
 			break;
 			
 		case "rsContent":
-			$tzUrl = urlencode($currentSettings[$selectedProfile]['timezone']);
-			$rs1hrArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-1hours&tz=$tzUrl&target=stats.reed_solomon_errors"))[0]->datapoints;
-			$rs1dayArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-24hours&tz=$tzUrl&target=stats.reed_solomon_errors"))[0]->datapoints;
-			$rs1hrSum = $rs1daySum = 0;
-			
-			foreach($rs1hrArray as $thisPacket) {$rs1hrSum += $thisPacket[0];}
-			foreach($rs1dayArray as $thisPacket) {$rs1daySum += $thisPacket[0];}
-			
-			$metadata['description'] = "1 Hour Average: " . round($rs1hrSum / count($rs1hrArray), 2) . " | 1 Day Average: " . round($rs1daySum / count($rs1dayArray), 2);
-			$metadata['svg1hr'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&title=Reed-Solomon%20Errors%20%2F%20Second%20(1%20Hour)&fontSize=14&lineWidth=2&from=-1hours&hideLegend=true&target=alias(stats.reed_solomon_errors%2C%22Reed%20Solomon%20Errors%20per%20Second%22)&tz=$tzUrl"));
-			$metadata['svg1day'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&title=Reed-Solomon%20Errors%20%2F%20Second%20(1%20Day)&fontSize=14&lineWidth=2&hideLegend=true&target=alias(stats.reed_solomon_errors%2C%22Reed%20Solomon%20Errors%20per%20Second%22)&tz=$tzUrl"));
+			parseGraphiteData($metadata, $currentSettings[$selectedProfile]['timezone'], $config['general']['graphiteAPI'], "stats.reed_solomon_errors", "Reed-Solomon Errors / Second", "6464FF");
 			break;
 			
 		case "gainContent":
-			$tzUrl = urlencode($currentSettings[$selectedProfile]['timezone']);
-			$gain1hrArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-1hours&tz=$tzUrl&target=stats.gauges.gain"))[0]->datapoints;
-			$gain1dayArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-24hours&tz=$tzUrl&target=stats.gauges.gain"))[0]->datapoints;
-			$gain1hrSum = $gain1daySum = 0;
-			
-			foreach($gain1hrArray as $thisPacket) {$gain1hrSum += $thisPacket[0];}
-			foreach($gain1dayArray as $thisPacket) {$gain1daySum += $thisPacket[0];}
-			
-			$metadata['description'] = "1 Hour Average: " . round($gain1hrSum / count($gain1hrArray), 2) . " | 1 Day Average: " . round($gain1daySum / count($gain1dayArray), 2);
-			$metadata['svg1hr'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&title=Gain%20Multiplier%20(1%20Hour)&fontSize=14&lineWidth=2&from=-1hours&hideLegend=true&tz=$tzUrl&colorList=orange&target=stats.gauges.gain"));
-			$metadata['svg1day'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&title=Gain%20Multiplier%20(1%20Day)&fontSize=14&lineWidth=2&from=-24hours&hideLegend=true&tz=$tzUrl&colorList=orange&target=stats.gauges.gain"));
+			parseGraphiteData($metadata, $currentSettings[$selectedProfile]['timezone'], $config['general']['graphiteAPI'], "stats.gauges.gain", "Gain Multiplier", "orange");
 			break;
 			
 		case "freqContent":
-			$tzUrl = urlencode($currentSettings[$selectedProfile]['timezone']);
-			$freq1hrArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-1hours&tz=$tzUrl&target=stats.gauges.frequency"))[0]->datapoints;
-			$freq1dayArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-24hours&tz=$tzUrl&target=stats.gauges.frequency"))[0]->datapoints;
-			$freq1hrSum = $freq1daySum = 0;
-			
-			foreach($freq1hrArray as $thisPacket) {$freq1hrSum += $thisPacket[0];}
-			foreach($freq1dayArray as $thisPacket) {$freq1daySum += $thisPacket[0];}
-			
-			$metadata['description'] = "1 Hour Average: " . round($freq1hrSum / count($freq1hrArray), 2) . " | 1 Day Average: " . round($freq1daySum / count($freq1dayArray), 2);
-			$metadata['svg1hr'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&title=Frequency%20Offset%20(1%20Hour)&fontSize=14&lineWidth=2&from=-1hours&hideLegend=true&tz=$tzUrl&target=stats.gauges.frequency&colorList=brown"));
-			$metadata['svg1day'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&title=Frequency%20Offset%20(1%20Day)&fontSize=14&lineWidth=2&from=-24hours&hideLegend=true&tz=$tzUrl&target=stats.gauges.frequency&colorList=brown"));
+			parseGraphiteData($metadata, $currentSettings[$selectedProfile]['timezone'], $config['general']['graphiteAPI'], "stats.gauges.frequency", "Frequency Offset", "brown");
 			break;
 			
 		case "omegaContent":
-			$tzUrl = urlencode($currentSettings[$selectedProfile]['timezone']);
-			$omega1hrArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-1hours&tz=$tzUrl&target=stats.gauges.omega"))[0]->datapoints;
-			$omega1dayArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-24hours&tz=$tzUrl&target=stats.gauges.omega"))[0]->datapoints;
-			$omega1hrSum = $omega1daySum = 0;
-			
-			foreach($omega1hrArray as $thisPacket) {$omega1hrSum += $thisPacket[0];}
-			foreach($omega1dayArray as $thisPacket) {$omega1daySum += $thisPacket[0];}
-			
-			$metadata['description'] = "1 Hour Average: " . round($omega1hrSum / count($omega1hrArray), 2) . " | 1 Day Average: " . round($omega1daySum / count($omega1dayArray), 2);
-			$metadata['svg1hr'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&title=Samples%2FSymbol%20in%20Clock%20Recovery%20(1%20Hour)&fontSize=14&lineWidth=2&from=-1hours&hideLegend=true&tz=$tzUrl&colorList=%23008080&target=stats.gauges.omega"));
-			$metadata['svg1day'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&title=Samples%2FSymbol%20in%20Clock%20Recovery%20(1%20Day)&fontSize=14&lineWidth=2&from=-24hours&hideLegend=true&tz=$tzUrl&colorList=%23008080&target=stats.gauges.omega"));
+			parseGraphiteData($metadata, $currentSettings[$selectedProfile]['timezone'], $config['general']['graphiteAPI'], "stats.gauges.omega", "Samples/Symbol in Clock Recovery", "008080");
 			break;
 			
 		case "otherEmwin":
@@ -504,7 +465,7 @@ elseif($_GET['type'] == "metadata")
 								$thisSensorData = file_get_contents($thisSensor);
 								$metadata['tempData'][count($metadata['tempData']) - 1]['value'] = intval(trim($thisSensorData)) / 1000 . "&deg; C";
 							}
-							catch (Exception $e)
+							catch (exception $e)
 							{
 								//Failed; return an error
 								$metadata['tempData'][count($metadata['tempData']) - 1]['value'] = "Error!";
@@ -574,7 +535,7 @@ elseif($_GET['type'] == "metadata")
 				{
 					$satdumpStats = json_decode(file_get_contents($config['general']['satdumpAPI']));
 				}
-				catch(Exception $e)
+				catch(exception $e)
 				{
 					$satdumpStats = [];
 				}
