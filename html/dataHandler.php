@@ -498,7 +498,7 @@ elseif($_GET['type'] == "metadata")
 							$metadata['tempData'][count($metadata['tempData']) - 1]['name'] = $thisSensorName;
 							
 							//Some sensors error when below 0 degrees - catch these errors
-							set_error_handler("ConvertToException");
+							set_error_handler("convertToException");
 							try
 							{
 								$thisSensorData = file_get_contents($thisSensor);
@@ -556,7 +556,7 @@ elseif($_GET['type'] == "metadata")
 				$noDecoderFound = false;
 				$metadata['sysData'][] = array("name" => "Goesrecv Status", "value" => stripos($runningProcesses, "goesrecv") !== false ? "Running" : "<span style='color: red;'>Not Running</span>");
 				$metadata['sysData'][] = array("name" => "Goesproc Status", "value" => stripos($runningProcesses, "goesproc") !== false ? "Running" : "<span style='color: red;'>Not Running</span>");
-				$metadata['sysData'][] = array("name" => "Goestools Version", "value" => explode(" ", str_replace("goesrecv -- ", "", explode(PHP_EOL, shell_exec("goesrecv --version"))[0]))[0]);
+				if(verifyCommand("goesrecv")) $metadata['sysData'][] = array("name" => "Goestools Version", "value" => explode(" ", str_replace("goesrecv -- ", "", explode(PHP_EOL, shell_exec("goesrecv --version"))[0]))[0]);
 			}
 			if(stripos($runningProcesses, "satdump") !== false)
 			{
@@ -569,7 +569,7 @@ elseif($_GET['type'] == "metadata")
 			if(array_key_exists('satdumpAPI', $config['general']))
 			{
 				$metadata['satdumpData'] = [];
-				set_error_handler("ConvertToException");
+				set_error_handler("convertToException");
 				try
 				{
 					$satdumpStats = json_decode(file_get_contents($config['general']['satdumpAPI']));
