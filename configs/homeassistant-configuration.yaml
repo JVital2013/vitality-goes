@@ -183,7 +183,7 @@ weather:
             {% set forecastCondition = "rainy" %}
           {% endif %}
         {% endif %}
-      
+        
         {# Build Forecast Array #}
         {% set forecast.value = forecast.value + 
         [
@@ -192,10 +192,10 @@ weather:
             "datetime": strptime(state_attr("sensor.vitality_goes_forecast_day_" ~ (forecastDay.value + 1), "date") + " " + (now() + timedelta(days=forecastDay.value)).year | string, "%A, %b %d %Y").isoformat(),
             "native_temperature": state_attr("sensor.vitality_goes_forecast_day_" ~ (forecastDay.value + 1), "maxTemp"),
             "native_templow": state_attr("sensor.vitality_goes_forecast_day_" ~ (forecastDay.value + 1), "minTemp"),
-           "precipitation_probability": forecastPrecip
+            "precipitation_probability": forecastPrecip
           }
         ] %}
-      
+        
         {# Get ready for next day #}
         {% set forecastDay.value = forecastDay.value + 1 %}
       {% endfor %}
