@@ -116,20 +116,6 @@ rest:
           - "pmClouds"
           - "pmHumidity"
           - "date"
-      - unique_id: sensor.vitality_goes_forecast_day_8
-        name: "Vitality GOES - Forecast Day 8"
-        value_template: "OK"
-        json_attributes_path: "$.sevenDayForcast[7]"
-        json_attributes:
-          - "maxTemp"
-          - "minTemp"
-          - "amPrecip"
-          - "amClouds"
-          - "amHumidity"
-          - "pmPrecip"
-          - "pmClouds"
-          - "pmHumidity"
-          - "date"
       - unique_id: sensor.vitality_goes_pressure
         name: "Vitality GOES - Pressure"
         value_template: "{{ (value_json.pressure)[:-1] }}"
@@ -177,7 +163,7 @@ weather:
           {% set forecastDay = namespace(value=0) %}
       {% endif %}
       
-      {% for i in range(0, 7) %}
+      {% for i in range(forecastDay.value, 7) %}
         {# Get conditions for day #}
         {% set forecastClouds = state_attr("sensor.vitality_goes_forecast_day_" ~ (forecastDay.value + 1), "amClouds") %}
         {% set forecastPrecip = state_attr("sensor.vitality_goes_forecast_day_" ~ (forecastDay.value + 1), "amPrecip") %}
