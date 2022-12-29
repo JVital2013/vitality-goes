@@ -340,9 +340,10 @@ elseif($_GET['type'] == "metadata")
 			{
 				//Admin update
 				$allAdminFiles = scandir_recursive($config['general']['adminPath']);
-				$allAdminFiles = preg_grep("/(\\\\|\/)[0-9]{8}T[0-9]{6}Z_/", $allAdminFiles);
+				$allAdminFiles = preg_grep("/[0-9]{4}\.[0-9]{2}\.[0-9]{2}\.(txt|TXT)$/", $allAdminFiles);
 				usort($allAdminFiles, "sortABI");
-				$metadata['latestAdminDate'] = date("M d, Y Hi", strtotime(explode("_", basename($allAdminFiles[count($allAdminFiles) - 1]))[0])) . " " . $DateTime->format('T');
+				$adminDateParts = explode("_", basename($allAdminFiles[count($allAdminFiles) - 1]));
+				$metadata['latestAdminDate'] = DateTimeImmutable::createFromFormat("Y.m.d", substr($adminDateParts[count($adminDateParts) - 1], 0, -4))->format("M d, Y");
 				$metadata['latestAdmin'] = str_replace("?", "-", utf8_decode(file_get_contents($allAdminFiles[count($allAdminFiles) - 1])));
 			}
 			
