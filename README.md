@@ -165,7 +165,7 @@ Vitality GOES is centered around data from the GOES-16/18 satellites, but other 
 ## Credits
 Special thanks to [Pieter Noordhuis for his amazing goestools package](https://pietern.github.io/goestools/). Without him, Vitality GOES would be nothing, and the GOES HRIT/EMWIN feed would remain out of reach for a large number of amateur satellite operators.
 
-Also special thanks to [Aang23 for his SatDump package](https://github.com/altillimity/SatDump)
+Also special thanks to [Aang23 for his SatDump package](https://github.com/altillimity/SatDump), the swiss army knife of amateur satellite reception.
 
 The following software packages are included in Vitality GOES:
 * **FontAwesome Free** ([https://fontawesome.com](https://fontawesome.com/)): made available under the Creative Commons License
