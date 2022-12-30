@@ -63,7 +63,13 @@ To assist you in configuring goestools for Vitality GOES, sample `goesrecv.conf`
 * If you plan on tracking satellite decoding statistics, make sure your `goesrecv.conf` file has a `statsd_address` defined where you are hosting Graphite/statsd. See [See the advanced configuration section](#advanced-configurations-for-goestools) for info on how to set up Graphite/statsd. You can configure this later.
 
 ### Option 2: SatDump
-TODO
+You can use SatDump as a data source without changing any of its configurations. While SatDump can be run interactively with a full UI, this is not recommended for long-term realtime decoding. Instead, you should launch satdump in cli mode for live decoding. Here is an example SatDump command to use an RTL-SDR to pick up GOES-16/18:
+
+```
+satdump live goes_hrit F:\path\to\satdumprepo --source rtlsdr --samplerate 2.4e6 --frequency 1694.1 --gain 40 --http_server 0.0.0.0:8080
+```
+
+The `http_server` part is optional and is only needed to provide decoder/demodulator statistics to Vitality GOES. For more information, see [the config documentation](/docs/config.md#general).
 
 ### Vitality GOES Dependencies
 Vitality GOES itself is a set of PHP, HTML, JavaScript, and CSS files. As such, it needs to be hosted on a web server stack. For this tutorial, I'm going to assume you're not running another web server on the same machine.
