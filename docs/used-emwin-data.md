@@ -67,7 +67,7 @@ The Other EMWIN tab of Vitality GOES shows miscellaneous data that may be useful
 | ADR*****.TXT         | NWS Admin Message             | EMWIN Regional Admin Message | All Available        |  |
 | FEEBAC1S.TXT         | ?                             | EMWIN Licensing Info         | Latest               | Issued daily around 15:30 UTC |
 | EPHTWOUS.TXT         | Weather Satellite Ephemerides | Weather Satellite TLE        | Latest               | Issued several times daily and can be used to track other satellites, including Polar orbiting satellites commonly tracked by amateurs. There are other EPH*****.TXT files that contain operational information of other NOAA-operated satellites |
-| N/A                  | Admin Text (HRIT VCID 0)      | Latest Admin Message         | Latest               | Only visible if [adminPath is configured in your config.ini](config.md#configini), and you patched goesproc [with this patch](https://github.com/pietern/goestools/pull/105/files) |
+| N/A                  | Admin Text (HRIT VCID 0)      | Latest Admin Message         | Latest               | Only visible if [adminPath is configured in your config.ini](config.md#configini), and you patched goesproc [with this patch](https://github.com/pietern/goestools/pull/105/files) or are using SatDump. |
 
 ## Hurricane Center
 Vitality GOES's Hurricane Center displays available data from Tropical Cyclone Advisory files (TCA\*\*\*\*\*.TXT) for Atlantic cyclones, and HEPZ\*\*\*\*.TXT files for cyclones in the Eastern Pacific. This includes storm position, direction, air pressure, maximum sustained winds, and whether the storm is strengthening or weakening.
