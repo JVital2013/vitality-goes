@@ -12,14 +12,16 @@ Additional batch files for Windows can be found at [https://usradioguy.com/custo
 
 ### CreateVideos-ABI
 
-**Additional required system packages:** ffmpeg, imagemagick
-
-**Set in scriptconfig.ini before running:** videoDir, abiSrcDir, abiImgSource, and abiVidName
-
 |           | Windows         | Linux           |
 |-----------|-----------------|-----------------|
 | SatDump   | *Not Supported* | *Not Supported* |
 | Goestools | *Not Supported* | **Supported**   |
+
+**Additional required system packages:**  
+ffmpeg, imagemagick
+
+**Set in scriptconfig.ini before running:**  
+videoDir, abiSrcDir, abiImgSource, and abiVidName
 
 CreateVideos-ABI creates timelapse videos of ABI image products. Timelapses are rendered at 15 frames a second from midnight 1 week ago to midnight last night "satellite time". Videos are stored in `videoDir`, which should be the `videos/` folder of Vitality GOES so they can be viewed in the web client.
 
@@ -27,6 +29,8 @@ To setup this script, it's important to understand how the `abiImgSource` and `a
 
 * `abiImgSource`: Specifies the source of the frames for each video. This should be similar to [`path` in your abi.ini, meso.ini, and l2.ini config files](config.md#abiini-mesoini-and-l2ini), but make sure to match the synax to the example provided in scriptconfig.ini.
 * `abiVidName`: Specifies the name of the MP4 you want to create, without the MP4 extension. Other than the missing extension, this should match the [`videoPath` in your abi.ini, meso.ini, and l2.ini config files](config.md#abiini-mesoini-and-l2ini)
+
+---
 
 ### CreateVideos-EMWIN.sh
 * *Additional required system packages: `ffmpeg`*
