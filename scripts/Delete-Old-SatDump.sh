@@ -7,7 +7,7 @@ twoWeeksAgoL2=$(date -u --date="-14 days" +"s%Y%j%H%M%S0")
 #NWS
 for file in $(find $abiSrcDir/IMAGES/NWS -name "*" -type f)
 do
-	datestr=$(echo $file | awk -F/ '{print $NF}' | cut -d _ -f 1)
+	datestr=$(echo $file | awk -F/ '{print $NF}' | cut -d '-' -f 1)
 	if [[ $datestr < $twoWeeksAgoEMWIN ]]
 	then
 		echo "[$(date +"%Y-%m-%d %H:%M:%S")] Deleting $file..."
