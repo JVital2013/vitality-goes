@@ -8,7 +8,7 @@ Configurations are highly customizable and can be modified to fit your configura
 * **emwin.ini**: Stores information about the emwin images you want to display. This file has no effect on emwin text that is displayed, and does not need changed if you're switching between GOES-16 and 18.
 * **abi.ini**: Contains information about your full-disk images. If you're doing any Sanchez renders, I'd put them in this file as well
 * **meso.ini**: Contains information about your mesoscale images.
-* **l2.ini**: Contains infromation about your ABI Level 2 products. These images contain information about estimated rainfall, land surface temp, sea surface temp, and more. Note that goestools does not receive these unless your goesproc config is set up to do so. The sample config in this repository is configured correctly, but if you're not saving these files, simply leave l2.ini empty.
+* **l2.ini**: Contains infromation about your ABI Level 2 products. These images contain information about estimated rainfall, land surface temp, sea surface temp, and more. Note that goestools does not receive these unless your goesproc config is set up to do so, and SatDump is currently not supported. The sample goesproc config in this repository is configured correctly, but if you're not saving these files, delete l2.ini.
 
 These ini files are parsed with the php [parse_ini_file](https://www.php.net/manual/en/function.parse-ini-file.php) function, so any comments must begin with a semicolon (;).
 
@@ -17,11 +17,11 @@ These ini files are parsed with the php [parse_ini_file](https://www.php.net/man
 This is the main config file. It will likely need configured when you first deploy Vitality GOES. It is broken out into the following sections:
 
 ### General
-* `graphiteAPI`: If you're using goestools and want to view its decoder/demodulator statistcs, this shhould point to your graphite host. It must include the `/render/` path at the end to work properly. If you're not using goestools/graphite, comment/remove this line.
+* `graphiteAPI`: If you're using goestools and want to view its decoder/demodulator statistcs, this should point to your graphite host. It must include the `/render/` path at the end to work properly. If you're not using goestools/graphite, comment/remove this line. For information on how to set up graphite, [look here](/docs/graphite.md).
 * `satdumpAPI`: Points to the SatDump REST API to pull decoder/demodulator statistics. You must run SatDump with the `--http_server` flag to get statistics. If you're not using SatDump or don't want statistics, comment/delete this line.
 * `emwinPath`: Point to the emwin repository of your choice. If you're picking up both GOES West and East, you can use either's EMWIN files. Comment/delete this line to completely disable emwin data (text and images), or if you're not picking up data from a GOES satellite.
-* `adminPath`: The directory with admin text you want to display. SatDump will save these files out-of-the-box, but goestools must be patched with [this patch for it to show up](https://github.com/pietern/goestools/pull/105/files). Comment/delete this line to disable.
-* `showSysInfo`: Set to true if you want to display information about your Vitality GOES server, such as operating temps and system resource availability. Set to false to disable.
+* `adminPath`: The directory with admin text you want to display. SatDump will save these files out-of-the-box, but goestools must be patched with [this patch for it to show up](https://github.com/pietern/goestools/pull/105/files). Comment/delete this line to disable. For GOES satellites only.
+* `showSysInfo`: Set to true if you want to display information about your Vitality GOES server, such as system resource availability and system temps. Set to false to disable.
 * `debug`: Set to true to enable PHP errors. This breaks the AJAX requests within Vitality GOES if there are any errors, so only set this to true if you're debugging data returned by the DataHandler (advanced users only).
 
 ### Paths
@@ -35,7 +35,7 @@ A path should be set up for each satellite downlink you're receiving. Each path 
 
 With this configuration, Vitality GOES will expect your images to be at `/path/to/goestoolsdata/goes16/fd/fc/`. Images may be in a dated subfolder.
 
-If hosted on Windows, set your paths to something like `GOES16 = C:\path\to\goestoolsdata`
+If hosted on Windows, set your paths to something like `GOES16 = C:\path\to\satdumpdata`
 
 ### Location
 This section contains information about your physical location. If you're not displaying EMWIN data, the only thing you need to configure is `timezone`. A list of supported timezones can be found [here](https://www.php.net/manual/en/timezones.php).
