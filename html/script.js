@@ -706,7 +706,7 @@ function menuSelect(menuNumber)
 					
 					adminMessageLastUpdate = document.createElement('div');
 					adminMessageLastUpdate.className = "goeslabel";
-					adminMessageLastUpdate.innerHTML = "Last Broadcast: " + otherEmwinInfo.latestAdminDate;
+					adminMessageLastUpdate.innerHTML = "Last Updated: " + otherEmwinInfo.latestAdminDate;
 					target.parentElement.appendChild(adminMessageLastUpdate);
 				}
 				
