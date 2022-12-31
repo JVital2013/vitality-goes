@@ -2,17 +2,18 @@
 
 Vitality GOES comes with a number of scripts to enhance and extend its functionality. All of these scripts are optional, and are included in the `scripts/` folder. `Cleanup-EmwinText.sh` is highly recommended since it keeps your EMWIN folder from getting too full.
 
-Some scripts will pull settings from the `scriptconfig.ini` file. This file must be in the same directory as the script when you run it. Make sure you configure this file before running the scripts!
+**To get started,** copy `scriptconfig.ini` from the sample config folder you're using into the `scripts/` folder. Then, update all pertinent values. See each script's documentation for what's needed. Unlike the ini files for Vitality GOES itself, you need to make sure there are no spaces around the equal sign (=). Also, comments should start with a #.
 
-A sample config for GOES-16 is included in the scripts folder, but additional samples can be found in the [configs folder](/configs). There are currently no scripts written for data from SatDump (TODO). Unlike the ini files for Vitality GOES itself, you need to make sure there are no spaces around the equal sign (=). Also, comments should start with a #.
+As of right now, scripts are for Linux only. Similar batch files for Windows can be found at [https://usradioguy.com/custom-imagery-scripts-for-goes/](https://usradioguy.com/custom-imagery-scripts-for-goes/).
 
 ## Timelapse scripts
 
 ### CreateVideos-ABI.sh
+* **Only works with goestools - SatDump is not supported**
 * *Additional required system packages: `ffmpeg imagemagick`*
 * *Set `videoDir`, `abiSrcDir`, `abiImgSource`, and `abiVidName` in scriptconfig.ini before running*
 
-CreateVideos-ABI.sh creates timelapse videos of ABI image products. Timelapses are rendered at 15 frames a second from midnight 1 week ago to midnight last night "satellite time". Videos are stored in the `html/videos` folder of Vitality GOES so they can be viewed in the web client.
+CreateVideos-ABI.sh creates timelapse videos of ABI image products. Timelapses are rendered at 15 frames a second from midnight 1 week ago to midnight last night "satellite time". Videos are stored in `videoDir`, which should be the `videos/` folder of Vitality GOES so they can be viewed in the web client.
 
 To setup this script, it's important to understand how the `abiImgSource` and `abiVidName` variables interact with each other. These variables are arrays, and each of the arrays are "lined up" with each other. For example, the first element in `abiImgSource` and `abiVidName` are the configs for the first video. The second element of each array is the config for the next video, the third element of each array is the config for the third video, and so on.
 
@@ -23,7 +24,7 @@ To setup this script, it's important to understand how the `abiImgSource` and `a
 * *Additional required system packages: `ffmpeg`*
 * *Set `videoDir`, `emwinSrcDir`, `emwinCodeName`, `emwinVideoName`, and `emwinFileExt` in scriptconfig.ini before running*
 
-CreateVideos-EMWIN.sh creates timelapse videos of EMWIN image products. Timelapses are rendered at 15 frames a second from 1 week ago to the most recent image. Videos are stored in the `html/videos` folder of Vitality GOES so they can be viewed in the web client.
+CreateVideos-EMWIN.sh creates timelapse videos of EMWIN image products. Timelapses are rendered at 15 frames a second from 1 week ago to the most recent image. Videos are stored in `videoDir`, which should be the `videos/` folder of Vitality GOES so they can be viewed in the web client.
 
 To setup this script, it's important to understand how the `emwinCodeName`, `emwinVideoName`, and `emwinFileExt` variables interact with each other. These variables are arrays, and each of the arrays are "lined up" with each other. For example, the first element in `emwinCodeName`, `emwinVideoName`, and `emwinFileExt` are the configs for the first video. The second element of each array is the config for the next video, the third element of each array is the config for the third video, and so on.
 
@@ -34,13 +35,16 @@ To setup this script, it's important to understand how the `emwinCodeName`, `emw
 ## Other Scripts
 
 ### Sanchez.sh
+* **Only works with goestools - SatDump is not supported**
 * *Additional required system packages: `xplanet imagemagick`*
 * *Additional required software (non-system): [sanchez 1.0.21 or newer](https://github.com/nullpainter/sanchez)*
 * *Set `sanchezSrcPath16`, `sanchezSrcPath17`, `sanchezSrcPath18`, `sanchezDstPath16`, `sanchezDstPath17`, `sanchezDstPath18`, `dstPathComposite`, and `sanchezPath` in scriptconfig.ini before running*
 
 Sanchez.sh is a script that automates Sanchez renders of your geostationary captures. The first time this script runs, it will automatically download 13 images to use as an underlay: one for each month, and a night time image with city lights. After the first run, the script will function without internet. You can also manually download the necessary images and save them in the Resources folder with the correct name, found in the same directory as Sanchez.sh.
 
-The script currently creates 4 things: GOES-16, GOES-17, and GOES-18 false color images, along with composites of GOES-16 and 17/18. The script will also do any "back" renders that it may have missed due to the script being disabled, failing to run, or other issues. When done, enable the Sanchez sections in your [abi.ini config file](config.md#abiini-mesoini-and-l2ini) to display your fancy new renders.
+The script currently reads Channel 13 imagery is read from `sanchezSrcPath16`, `sanchezSrcPath17`, `sanchezSrcPath18`, Then, it creates 4 things: GOES-16, GOES-17, GOES-18, and composited false color images, then saves the images in their respective `sanchesDst*` directory.
+
+The script will also do any "back" renders that it may have missed due to the script being disabled, failing to run, or other issues. When done, enable the Sanchez sections in your [abi.ini config file](config.md#abiini-mesoini-and-l2ini) to display your fancy new renders.
 
 ### Cleanup-EmwinText.sh
 * *Additional required system packages: `zip`*
@@ -50,16 +54,21 @@ When goesproc is configured to save EMWIN text information, it saves *a lot* of 
 
 Cleanup-EmwinText.sh solves the problem by compressing all of yesterday's EMWIN text files into a ZIP folder. This script should be configured to run every day between 1600-2330 UTC.
 
-### Delete-Old.sh
+### Delete-Old-Goestools.sh
 * *Set `abiSrcDir` and `emwinSrcDir` in scriptconfig.ini before running*
 
-Delete-Old.sh deletes all ABI, EMWIN, NWS, and admin text files that are older than 2 weeks old. I run this on my ground station manually after I verify my offline archives are up-to-date.
+Delete-Old.sh deletes all ABI, EMWIN, NWS, and admin text files that are older than 2 weeks old. I run this on my ground station manually after I verify my offline archives are up-to-date. This version is for data coming from goestools.
+
+### Delete-Old-SatDump.sh
+* *Set `abiSrcDir` and `emwinSrcDir` in scriptconfig.ini before running*
+
+Same as Delete-Old-Goestools.sh, but for data from SatDump. This version does not delete old admin text files since they aren't saved repeatedly, and it will not work for non-GOES satellites!
 
 ### Monitor-Recordings.sh
 * *Additional required system package: `inotify-tools`*
 * *Set `abiSrcDir` in scriptconfig.ini before running*
 
-Monitor-Recordings.sh file barely constitutes a script, but it can be used to monitor files as they are saved by goestools. Goesproc does output this information, but if you're running goesproc as a service, the information is hidden. I find that this script does a good job at verifying that goesproc is actually processing data.
+Monitor-Recordings.sh file barely constitutes a script, but it can be used to monitor files as they are saved by goestools/SatDump. Both satellite decoders do output this information, but if you're running them as a service, the information is hidden. I find that this script does a good job at verifying that your satellite decoder is actually processing data.
 
 Run manually as needed.
 
