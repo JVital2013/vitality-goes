@@ -1,19 +1,27 @@
 # Additional Scripts
 
-Vitality GOES comes with a number of scripts to enhance and extend its functionality. All of these scripts are optional, and are included in the `scripts/` folder. `Cleanup-EmwinText.sh` is highly recommended since it keeps your EMWIN folder from getting too full.
+Vitality GOES comes with a number of scripts to enhance and extend its functionality. All of these scripts are optional, but `Cleanup-EmwinText` is highly recommended since it keeps your EMWIN folder from getting too full.
 
-**To get started,** copy `scriptconfig.ini` from the sample config folder you're using into the `scripts/` folder. Then, update all pertinent values. See each script's documentation for what's needed. Unlike the ini files for Vitality GOES itself, you need to make sure there are no spaces around the equal sign (=). Also, comments should start with a #.
+**To get started,** copy `scriptconfig.ini` from the sample config folder you're using into the `scripts-*/` folder you're using. Then, update all pertinent values. See each script's documentation for what's needed. Unlike the ini files for Vitality GOES itself, you need to make sure there are no spaces around the equal sign (=). Also, comments should start with a #.
 
-As of right now, scripts are for Linux only. Similar batch files for Windows can be found at [https://usradioguy.com/custom-imagery-scripts-for-goes/](https://usradioguy.com/custom-imagery-scripts-for-goes/).
+Scripts for Linux hosts and are included in the [scripts-linux/](/scripts-linux/) folder, while scripts for Windows are in [/scripts-windows/](/scripts-windows/). See each script's documentation for a system compatibility matrix.
+
+Additional batch files for Windows can be found at [https://usradioguy.com/custom-imagery-scripts-for-goes/](https://usradioguy.com/custom-imagery-scripts-for-goes/). Over there you can find video rendering scripts for Windows, which is currently not available from this project.
 
 ## Timelapse scripts
 
-### CreateVideos-ABI.sh
-* **Only works with goestools - SatDump is not supported**
-* *Additional required system packages: `ffmpeg imagemagick`*
-* *Set `videoDir`, `abiSrcDir`, `abiImgSource`, and `abiVidName` in scriptconfig.ini before running*
+### CreateVideos-ABI
 
-CreateVideos-ABI.sh creates timelapse videos of ABI image products. Timelapses are rendered at 15 frames a second from midnight 1 week ago to midnight last night "satellite time". Videos are stored in `videoDir`, which should be the `videos/` folder of Vitality GOES so they can be viewed in the web client.
+**Additional required system packages:** ffmpeg, imagemagick
+
+**Set in scriptconfig.ini before running:** videoDir, abiSrcDir, abiImgSource, and abiVidName
+
+|           | Windows         | Linux           |
+|-----------|-----------------|-----------------|
+| SatDump   | *Not Supported* | *Not Supported* |
+| Goestools | *Not Supported* | **Supported**   |
+
+CreateVideos-ABI creates timelapse videos of ABI image products. Timelapses are rendered at 15 frames a second from midnight 1 week ago to midnight last night "satellite time". Videos are stored in `videoDir`, which should be the `videos/` folder of Vitality GOES so they can be viewed in the web client.
 
 To setup this script, it's important to understand how the `abiImgSource` and `abiVidName` variables interact with each other. These variables are arrays, and each of the arrays are "lined up" with each other. For example, the first element in `abiImgSource` and `abiVidName` are the configs for the first video. The second element of each array is the config for the next video, the third element of each array is the config for the third video, and so on.
 
