@@ -500,7 +500,7 @@ elseif($_GET['type'] == "metadata")
 			$metadata['sysData'][] = array("name" => "Disk Used", "value" => $usedDiskSpace . "GB / " . $totalDiskSpace . "GB  - " . round(($usedDiskSpace / $totalDiskSpace) * 100, 2) . "%");
 			
 			//Memory Usage
-			$metadata['sysData'][] = array("name" => "Memory Used", "value" => round(($memTotal - $memAvailable) / 1048576, 2) . "GB / " . round($memTotal / 1048576, 2) . "GB - " . round((($memTotal - $memAvailable) / $memAvailable) * 100, 2) . "%");
+			$metadata['sysData'][] = array("name" => "Memory Used", "value" => round(($memTotal - $memAvailable) / 1048576, 2) . "GB / " . round($memTotal / 1048576, 2) . "GB - " . round((($memTotal - $memAvailable) / $memTotal) * 100, 2) . "%");
 			
 			//Uptime (all OSs)
 			$num = floatval($uptimeStr);
