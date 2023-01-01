@@ -25,7 +25,7 @@ Vitality GOES makes data received from a Geostationary Weather Satellite feed ea
 
 Vitality GOES has the following features:
 
-* It is easily usable by anyone with no knowledge of radio, satellites, or programming once set up by a ground station technician (you!), 
+* It is easily usable by anyone with no knowledge of radio, satellites, or programming once set up by a ground station technician (you!).
 * Vitality GOES presents all full-disk images, Level 2 products, and mesoscale imagery in a user friendly and easily navigatable way.
 * Current weather conditions, forecasts, watches, and warnings from the GOES-16/18 HRIT/EMWIN data feed are presented to the user in a way that is appealing and easy to read. There is no need to parse through data for other locations: your configured location's data is the only thing you're shown. For a writeup on the EMWIN data Vitality GOES pulls and how it's used, see [here](docs/used-emwin-data.md).
 * Vitality GOES is able to monitor the status of the underlying goestools/SatDump stack, including systems temps, error correction rates, and packet drop rates.
@@ -46,7 +46,7 @@ It is recommended that you use a Debian-based Linux distro to host the Vitality 
 
 Windows-hosted Vitality GOES runs slower than it does when hosted on Linux, and your datastore must be kept on an NTFS partition if you want weather information to load at all. It's a known issue in PHP that file operations are slower on Windows, [and they marked it as "not a bug"](https://bugs.php.net/bug.php?id=80695&edit=1).
 
-If you enable the secondary scripts, you may need more processing power than a low-end machine (like a Raspberry Pi) can provide. You may need to offload video rendering tasks to another machine or upgrade your server to something beefier. I'm using a laptop laptop with a 4th generation Core i5 processor, and it has more than enough power to run goestools, Vitality GOES, and all secondary scripts.
+If you enable the secondary scripts, you may need more processing power than a low-end machine (like a Raspberry Pi) can provide. You may need to offload video rendering tasks to another machine or upgrade your server to something beefier. I'm using a laptop with a 4th generation Core i5 processor, and it has more than enough power to run goestools, Vitality GOES, and all secondary scripts.
 
 **The most important system requirement is the one that is most often overlooked:** you, the ground station administrator. It is expected that the ground station administrator has the ability to research, learn, and understand what computer software is actually doing. You don't need to be a Linux or Satellite expert, but you will need a working understanding of filesystem structures and how to modify configuration file to meet your needs. Don't be afraid to reach out for help if you need it, but we appreciate it if you try to solve the problem yourself first. Support will be limited as this is a volunteer project.
 
@@ -59,7 +59,7 @@ To assist you in configuring goestools for Vitality GOES, sample `goesrecv.conf`
 
 * In goesproc-goesr.conf, image handlers should have the filename end in `{time:%Y%m%dT%H%M%SZ}`.
 * While all EMWIN information will be in the same folder, other product types should each have their own folder for best performance. For example, Channel 2 images should be in their own folder and not co-mingled with false color images.
-* If you are going to enable EMWIN information, make sure you have the emwin handler enabled in `goesproc-goesr.conf` and it's not ignoring text files.
+* If will be enabling EMWIN information in Vitality GOES, make sure you have the emwin handler enabled in `goesproc-goesr.conf`. Do not exclude text files in this handler.
 * If you plan on tracking satellite decoding statistics, make sure your `goesrecv.conf` file has a `statsd_address` defined where you are hosting Graphite/statsd. See [See the advanced configuration section](#advanced-configurations-for-goestools) for info on how to set up Graphite/statsd. You can configure this later.
 
 ### Option 2: SatDump
@@ -77,7 +77,7 @@ Vitality GOES itself is a set of PHP, HTML, JavaScript, and CSS files. As such, 
 ---
 
 #### Linux
-Assuming you're on a Debian/Ubuntu-based server, the following commands command should install all the dependencies you need:
+Assuming you're on a Debian/Ubuntu-based server, the following commands should install all the dependencies you need:
 
 ```
 sudo apt update
@@ -178,8 +178,8 @@ Here are a few tools that may help you with picking up the HRIT/EMWIN Feed
 
 * [RTL-SDR Blog tutorial on GOES reception](https://www.rtl-sdr.com/rtl-sdr-com-goes-16-17-and-gk-2a-weather-satellite-reception-comprehensive-tutorial/): A good starting point for how to pick up geostationary weather satellites.
 * [USRadioGuy's GOES tutorial](https://usradioguy.com/programming-a-pi-for-goestools/): Another good tutorial to get you started with the GOES satellites
-* [goesrecv-monitor](https://vksdr.com/goesrecv-monitor): goesrecv monitor is a software utility for monitoring the status of goesrecv by Pieter Noordhuis. Provides a constellation diagram of the BPSK signal along with real-time decoding statistics.
-* [goesbetween](https://github.com/JVital2013/goesbetween): connects to goesrecv, extracts raw IQ samples from it, and sends the samples over the network via rtl_tcp. Clients like GNURadio, SDR#, SDR++, and SatDump can connect to GoesBetween to monitor the spectrum around your satellite downlink, do parallel decoding via SatDump, and more!
+* [goesrecv-monitor](https://vksdr.com/goesrecv-monitor): Goesrecv monitor is a software utility for monitoring the status of goesrecv by Pieter Noordhuis. Provides a constellation diagram of the BPSK signal along with real-time decoding statistics.
+* [goesbetween](https://github.com/JVital2013/goesbetween): Connects to goesrecv, extracts raw IQ samples from it, and sends the samples over the network via rtl_tcp. Clients like GNURadio, SDR#, SDR++, and SatDump can connect to GoesBetween to monitor the spectrum around your satellite downlink, do parallel decoding via SatDump, and more!
 * [goesrecv-ps](https://github.com/JVital2013/goesrecv-ps): a collection of PowerShell scripts for monitoring goesrecv. Contains scripts to make a baseband recording of the HRIT/EMWIN signal and monitor Virtual Channel activity.
 
 ## License
