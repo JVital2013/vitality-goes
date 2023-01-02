@@ -1,12 +1,14 @@
 # How to Configure Vitality GOES
 
-The Vitality GOES config is stored in `html/config`. There are additional example configs in the [extra folder](/extra). You can start with the configs provided, then change or combine them as necessary. The configuration is broken out into the following files:
+The primary Vitality GOES config is stored in `html/config`. To get started, copy a set of example configuration files from the [configs folder](/configs) info `html/config`. Configs for using goestools data source are prefixed with "goestools-", while configs for SatDump are prefixed with "satdump-". Scriptconfig.ini is not needed for Vitality GOES itself, so skip it if present.
+
+Configurations are highly customizable and can be modified to fit your configuration as you see fit. The configuration is broken out into the following files:
 
 * **config.ini**: The main configuration file
-* **emwin.ini**: Stores information about the emwin images you want to display. This file has no effect on emwin text that is displayed, and does not need changed if you're switching between GOES-16 and GOES-17/18.
+* **emwin.ini**: Stores information about the emwin images you want to display. This file has no effect on emwin text that is displayed, and does not need changed if you're switching between GOES-16 and 18.
 * **abi.ini**: Contains information about your full-disk images. If you're doing any Sanchez renders, I'd put them in this file as well
 * **meso.ini**: Contains information about your mesoscale images.
-* **l2.ini**: Contains infromation about your ABI Level 2 products. These images contain information about estimated rainfall, land surface temp, sea surface temp, and more. Note that goestools does not receive these unless your goesproc config is set up to do so. The sample config in this repository is configured correctly, but if you're not saving these files, simply leave l2.ini empty.
+* **l2.ini**: Contains infromation about your ABI Level 2 products. These images contain information about estimated rainfall, land surface temp, sea surface temp, and more. Note that goestools does not receive these unless your goesproc config is set up to do so, and SatDump is currently not supported. The sample goesproc config in this repository is configured correctly, but if you're not saving these files, delete l2.ini.
 
 These ini files are parsed with the php [parse_ini_file](https://www.php.net/manual/en/function.parse-ini-file.php) function, so any comments must begin with a semicolon (;).
 
@@ -15,10 +17,11 @@ These ini files are parsed with the php [parse_ini_file](https://www.php.net/man
 This is the main config file. It will likely need configured when you first deploy Vitality GOES. It is broken out into the following sections:
 
 ### General
-* `graphiteAPI`: Points to your graphite host. It must include the `/render/` path at the end to work properly. If you're not using Graphite, comment this line out
-* `emwinPath`: Point to the emwin repository of your choice. If you're picking up both GOES West and East, you can use either EMWIN locaiton. Comment this line out to completely disable emwin data (text and images)
-* `adminPath`: The directory with admin text you want to display. Goestools must be patched with [this patch anyway for it to show up](https://github.com/pietern/goestools/pull/105/files), so comment it to disable.
-* `showSysInfo`: True if on the same system as goestools. Otherwise, set it to false
+* `graphiteAPI`: If you're using goestools and want to view its decoder/demodulator statistcs, this should point to your graphite host. It must include the `/render/` path at the end to work properly. If you're not using goestools/graphite, comment/remove this line. For information on how to set up graphite, [look here](/docs/graphite.md).
+* `satdumpAPI`: Points to the SatDump REST API to pull decoder/demodulator statistics. You must run SatDump with the `--http_server` flag to get statistics. If you're not using SatDump or don't want statistics, comment/delete this line.
+* `emwinPath`: Point to the emwin repository of your choice. If you're picking up both GOES West and East, you can use either's EMWIN files. Comment/delete this line to completely disable emwin data (text and images), or if you're not picking up data from a GOES satellite.
+* `adminPath`: The directory with admin text you want to display. SatDump will save these files out-of-the-box, but goestools must be patched with [this patch for it to show up](https://github.com/pietern/goestools/pull/105/files). Comment/delete this line to disable. For GOES satellites only.
+* `showSysInfo`: Set to true if you want to display information about your Vitality GOES server, such as system resource availability and system temps. Set to false to disable.
 * `debug`: Set to true to enable PHP errors. This breaks the AJAX requests within Vitality GOES if there are any errors, so only set this to true if you're debugging data returned by the DataHandler (advanced users only).
 
 ### Paths
@@ -32,7 +35,7 @@ A path should be set up for each satellite downlink you're receiving. Each path 
 
 With this configuration, Vitality GOES will expect your images to be at `/path/to/goestoolsdata/goes16/fd/fc/`. Images may be in a dated subfolder.
 
-If hosted on Windows, set your paths to something like `GOES16 = C:\path\to\goestoolsdata`
+If hosted on Windows, set your paths to something like `GOES16 = C:\path\to\satdumpdata`
 
 ### Location
 This section contains information about your physical location. If you're not displaying EMWIN data, the only thing you need to configure is `timezone`. A list of supported timezones can be found [here](https://www.php.net/manual/en/timezones.php).
@@ -69,7 +72,7 @@ You may find that the location section is the hardest part of the config to set 
 
 ## abi.ini, meso.ini, and l2.ini
 
-abi.ini, meso.ini, and l2.ini all work the same. These files specify which images you want to display in the "Full Disk", "Mesoscale Images", and "Level 2 Graphics" sections of Vitality GOES, respectively. If a file contains no configured images, its section will be hidden in Vitality GOES. *If you're receiving GOES-16, you can probably use this file as-is*
+abi.ini, meso.ini, and l2.ini all work the same. These files specify which images you want to display in the "Full Disk", "Mesoscale Images", and "Level 2 Graphics" sections of Vitality GOES, respectively. If a file contains no configured images, its section will be hidden in Vitality GOES. *This file will probably not need to be configured by you, unless you're customizing what gets displayed*
 
 To understand how these config files work, let's look at an example section:
 

@@ -168,6 +168,13 @@ select, input
 	margin: 0 auto;
 	max-width: calc(100% - 20px);
 }
+.dualCard
+{
+	column-count: 2;
+	column-width: 400px;
+	column-gap: 20px;
+	padding: 0 10px;
+}
 .prettyBox:only-child
 {
 	margin-bottom: 30px;

@@ -246,6 +246,7 @@ function linesToParagraphs($lineArray, $linesToSkip)
 	
 	return $retVal;
 }
+
 function is_in_polygon($points_polygon, $vertices_x, $vertices_y, $longitude_x, $latitude_y)
 {
 	$i = $j = $c = 0;
@@ -256,6 +257,7 @@ function is_in_polygon($points_polygon, $vertices_x, $vertices_y, $longitude_x, 
 	}
 	return $c;
 }
+
 function parseFmLine($line, $forecastLTBreaks)
 {
 	$retVal = [];
@@ -267,5 +269,44 @@ function parseFmLine($line, $forecastLTBreaks)
 	}
 	
 	return $retVal;
+}
+
+function parseGraphiteData(&$metadata, $tz, $graphiteAPI, $target, $title, $color)
+{
+	set_error_handler("convertToException");
+	try
+	{
+		$tzUrl = urlencode($tz);
+		$targetUrl = urlencode($target);
+		$titleUrl = urlencode($title);
+		
+		$hrArray = json_decode(file_get_contents("$graphiteAPI?format=json&from=-1hours&tz=$tzUrl&target=$targetUrl"))[0]->datapoints;
+		$dayArray = json_decode(file_get_contents("$graphiteAPI?format=json&from=-1days&tz=$tzUrl&target=$targetUrl"))[0]->datapoints;
+		$hrSum = $daySum = 0;
+		
+		foreach($hrArray as $thisPacket) {$hrSum += $thisPacket[0];}
+		foreach($dayArray as $thisPacket) {$daySum += $thisPacket[0];}
+		
+		$metadata['description'] = "1 Hour Average: " . round($hrSum / count($hrArray), 2) . " | 1 Day Average: " . round($daySum / count($dayArray), 2);
+		$metadata['svg1hr'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents("$graphiteAPI?width=600&height=350&format=svg&title=$titleUrl%20(1%20Hour)&fontSize=14&lineWidth=2&from=-1hours&hideLegend=true&colorList=$color&tz=$tzUrl&target=$targetUrl"));
+		$metadata['svg1day'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents("$graphiteAPI?width=600&height=350&format=svg&title=$titleUrl%20(1%20Day)&fontSize=14&lineWidth=2&from=-24hours&hideLegend=true&colorList=$color&tz=$tzUrl&target=$targetUrl"));
+	}
+	catch(exception $e)
+	{
+		$metadata = [];
+	}
+	restore_error_handler();
+}
+
+function convertToException($err_severity, $err_msg, $err_file, $err_line)
+{
+	throw new ErrorException($err_msg, 0, $err_severity, $err_file, $err_line);
+	return true;
+}
+
+function verifyCommand($command)
+{
+	$test = PHP_OS_FAMILY == "Windows" ? 'where' : 'command -v';
+	return is_executable(trim(shell_exec("$test $command")));
 }
 ?>

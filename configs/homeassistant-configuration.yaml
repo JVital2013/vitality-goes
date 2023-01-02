@@ -1,0 +1,206 @@
+# Vitality GOES via REST
+rest:
+  - resource: http://YOUR_VITALITY_GOES_HOST:PORT/dataHandler.php?type=weatherJSON
+    scan_interval: 900
+    sensor:
+      - unique_id: sensor.vitality_goes_conditions
+        name: "Vitality GOES - Conditions"
+        value_template: >
+          {% if (is_state('sun.sun', 'below_horizon') and value_json.weatherDesc == 'CLEAR') or value_json.weatherDesc == 'FAIR' %}clear-night
+          {% elif (is_state('sun.sun', 'above_horizon') and value_json.weatherDesc == 'CLEAR') or value_json.weatherDesc == 'SUNNY' or value_json.weatherDesc == 'MOSUNNY' %}sunny
+          {% elif value_json.weatherDesc == 'PTSUNNY' or value_json.weatherDesc == 'PTCLDY' or value_json.weatherDesc == 'HAZE' %}partlycloudy
+          {% elif value_json.weatherDesc == 'MOCLDY' or value_json.weatherDesc == 'CLOUDY' %}cloudy
+          {% elif value_json.weatherDesc == 'FLURRIES' or value_json.weatherDesc == 'LGT SNOW' or value_json.weatherDesc == 'SNOW' or value_json.weatherDesc == 'HVY SNOW' %}snowy
+          {% elif value_json.weatherDesc == 'LGT RAIN' or value_json.weatherDesc == 'RAIN' %}rainy
+          {% elif value_json.weatherDesc == 'HVY RAIN' %}pouring
+          {% elif value_json.weatherDesc == 'FRZ RAIN' or value_json.weatherDesc == 'MIX PCPN' %}snowy-rainy
+          {% elif value_json.weatherDesc == 'FOG' %}fog
+          {% elif value_json.weatherDesc == 'TSTM' %}lightning
+          {% else %}exceptional
+          {% endif %}
+      - unique_id: sensor.vitality_goes_forecast_day_1
+        name: "Vitality GOES - Forecast Day 1"
+        value_template: "OK"
+        json_attributes_path: "$.sevenDayForcast[0]"
+        json_attributes:
+          - "maxTemp"
+          - "minTemp"
+          - "amPrecip"
+          - "amClouds"
+          - "amHumidity"
+          - "pmPrecip"
+          - "pmClouds"
+          - "pmHumidity"
+          - "date"
+      - unique_id: sensor.vitality_goes_forecast_day_2
+        name: "Vitality GOES - Forecast Day 2"
+        value_template: "OK"
+        json_attributes_path: "$.sevenDayForcast[1]"
+        json_attributes:
+          - "maxTemp"
+          - "minTemp"
+          - "amPrecip"
+          - "amClouds"
+          - "amHumidity"
+          - "pmPrecip"
+          - "pmClouds"
+          - "pmHumidity"
+          - "date"
+      - unique_id: sensor.vitality_goes_forecast_day_3
+        name: "Vitality GOES - Forecast Day 3"
+        value_template: "OK"
+        json_attributes_path: "$.sevenDayForcast[2]"
+        json_attributes:
+          - "maxTemp"
+          - "minTemp"
+          - "amPrecip"
+          - "amClouds"
+          - "amHumidity"
+          - "pmPrecip"
+          - "pmClouds"
+          - "pmHumidity"
+          - "date"
+      - unique_id: sensor.vitality_goes_forecast_day_4
+        name: "Vitality GOES - Forecast Day 4"
+        value_template: "OK"
+        json_attributes_path: "$.sevenDayForcast[3]"
+        json_attributes:
+          - "maxTemp"
+          - "minTemp"
+          - "amPrecip"
+          - "amClouds"
+          - "amHumidity"
+          - "pmPrecip"
+          - "pmClouds"
+          - "pmHumidity"
+          - "date"
+      - unique_id: sensor.vitality_goes_forecast_day_5
+        name: "Vitality GOES - Forecast Day 5"
+        value_template: "OK"
+        json_attributes_path: "$.sevenDayForcast[4]"
+        json_attributes:
+          - "maxTemp"
+          - "minTemp"
+          - "amPrecip"
+          - "amClouds"
+          - "amHumidity"
+          - "pmPrecip"
+          - "pmClouds"
+          - "pmHumidity"
+          - "date"
+      - unique_id: sensor.vitality_goes_forecast_day_6
+        name: "Vitality GOES - Forecast Day 6"
+        value_template: "OK"
+        json_attributes_path: "$.sevenDayForcast[5]"
+        json_attributes:
+          - "maxTemp"
+          - "minTemp"
+          - "amPrecip"
+          - "amClouds"
+          - "amHumidity"
+          - "pmPrecip"
+          - "pmClouds"
+          - "pmHumidity"
+          - "date"
+      - unique_id: sensor.vitality_goes_forecast_day_7
+        name: "Vitality GOES - Forecast Day 7"
+        value_template: "OK"
+        json_attributes_path: "$.sevenDayForcast[6]"
+        json_attributes:
+          - "maxTemp"
+          - "minTemp"
+          - "amPrecip"
+          - "amClouds"
+          - "amHumidity"
+          - "pmPrecip"
+          - "pmClouds"
+          - "pmHumidity"
+          - "date"
+      - unique_id: sensor.vitality_goes_pressure
+        name: "Vitality GOES - Pressure"
+        value_template: "{{ (value_json.pressure)[:-1] }}"
+        unit_of_measurement: "inHg"
+        device_class: pressure
+        state_class: measurement
+      - unique_id: sensor.vitality_goes_temp
+        name: "Vitality GOES - Temp"
+        value_template: "{{ value_json.temp }}"
+        unit_of_measurement: "°F"
+        device_class: temperature
+        state_class: measurement
+      - unique_id: sensor.vitality_goes_humidity
+        name: "Vitality GOES - Humidity"
+        value_template: "{{ value_json.humidity }}"
+        unit_of_measurement: "%"
+        device_class: humidity
+        state_class: measurement
+      - unique_id: sensor.vitality_goes_wind
+        name: "Vitality GOES - Wind"
+        value_template: "{{ value_json.wind }}"
+        unit_of_measurement: "mph"
+        device_class: wind_speed
+        state_class: measurement
+      - unique_id: sensor.vitality_goes_wind_direction
+        name: "Vitality GOES - Wind Direction"
+        value_template: "{{ value_json.windDirection }}"
+
+# Vitality GOES Weather Source
+weather:
+  - platform: template
+    unique_id: weather.vitality_goes
+    name: "Vitality GOES"
+    condition_template: "{{ states('sensor.vitality_goes_conditions') }}"
+    temperature_template: "{{ states('sensor.vitality_goes_temp') | float }}"
+    temperature_unit: "°F"
+    humidity_template: "{{ states('sensor.vitality_goes_humidity') | float }}"
+    pressure_template: "{{ states('sensor.vitality_goes_pressure') | float }}"
+    pressure_unit: "inHg"
+    wind_speed_template: "{{ states('sensor.vitality_goes_wind') | float }}"
+    wind_speed_unit: "mph"
+    wind_bearing_template: "{{ states('sensor.vitality_goes_wind_direction') }}"
+    attribution_template: "Powered by Vitality GOES - https://github.com/JVital2013/vitality-goes"
+    forecast_template: >
+      {% set forecast = namespace(value=[]) %}
+      {% if state_attr("sensor.vitality_goes_forecast_day_1", "maxTemp") == none %}
+        {% set forecastDay = namespace(value=1) %}
+      {% else %}
+          {% set forecastDay = namespace(value=0) %}
+      {% endif %}
+      
+      {% for i in range(forecastDay.value, 7) %}
+        {# Get conditions for day #}
+        {% set forecastClouds = state_attr("sensor.vitality_goes_forecast_day_" ~ (forecastDay.value + 1), "amClouds") %}
+        {% set forecastPrecip = state_attr("sensor.vitality_goes_forecast_day_" ~ (forecastDay.value + 1), "amPrecip") %}
+        {% set forecastCondition = "exceptional" %}
+        {% if forecastClouds == "CL" or forecastClouds == "FW" %}
+          {% set forecastCondition = "sunny" %}
+        {% elif forecastClouds == "SC" or forecastClouds == "B1" %}
+          {% if forecastPrecip | int < 50 %}
+            {% set forecastCondition = "partlycloudy" %}
+          {% else %}
+            {% set forecastCondition = "rainy" %}
+          {% endif %}
+        {% elif forecastClouds == "B2" or forecastClouds == "OV" %}
+          {% if forecastPrecip | int < 50 %}
+            {% set forecastCondition = "cloudy" %}
+          {% else %}
+            {% set forecastCondition = "rainy" %}
+          {% endif %}
+        {% endif %}
+        
+        {# Build Forecast Array #}
+        {% set forecast.value = forecast.value + 
+        [
+          {
+            "condition": forecastCondition,
+            "datetime": strptime(state_attr("sensor.vitality_goes_forecast_day_" ~ (forecastDay.value + 1), "date") + " " + (now() + timedelta(days=forecastDay.value)).year | string, "%A, %b %d %Y").isoformat(),
+            "native_temperature": state_attr("sensor.vitality_goes_forecast_day_" ~ (forecastDay.value + 1), "maxTemp"),
+            "native_templow": state_attr("sensor.vitality_goes_forecast_day_" ~ (forecastDay.value + 1), "minTemp"),
+            "precipitation_probability": forecastPrecip
+          }
+        ] %}
+        
+        {# Get ready for next day #}
+        {% set forecastDay.value = forecastDay.value + 1 %}
+      {% endfor %}
+      {{ forecast.value }}

@@ -706,7 +706,7 @@ function menuSelect(menuNumber)
 					
 					adminMessageLastUpdate = document.createElement('div');
 					adminMessageLastUpdate.className = "goeslabel";
-					adminMessageLastUpdate.innerHTML = "Last Broadcast: " + otherEmwinInfo.latestAdminDate;
+					adminMessageLastUpdate.innerHTML = "Last Updated: " + otherEmwinInfo.latestAdminDate;
 					target.parentElement.appendChild(adminMessageLastUpdate);
 				}
 				
@@ -795,6 +795,7 @@ function menuSelect(menuNumber)
 				}
 				
 				if(mainContent.childElementCount <= 2) mainContent.className = "singleCard";
+				else if(mainContent.childElementCount <= 4) mainContent.className = "dualCard";
 				else mainContent.className = "mainContent";
 				delete xhttp.hurricaneInfo;
 			}
@@ -1071,33 +1072,91 @@ function menuSelect(menuNumber)
 			renderStiffCard("sys", "System Info");
 			renderStiffCard("sysTemp", "System Temps");
 			
+			if(config.showSatdumpInfo)
+			{
+				renderStiffCard("satDumpInfo", "SatDump Info");
+			}
+			if(config.showGraphs)
+			{
+				renderStatsCard("viterbi", "Viterbi Error Corrections/Packet");
+				renderStatsCard("rs", "Reed-Solomon Error Corrections/Second");
+				renderStatsCard("packets", "Packets/Second");
+				renderStatsCard("freq", "Frequency Offset");
+				renderStatsCard("gain", "Gain");
+				renderStatsCard("omega", "Omega");
+			}
+			
 			//AJAX load system information
 			xhttp.sysInfo = new XMLHttpRequest();
 			xhttp.sysInfo.onreadystatechange = function()
 			{
 				if(this.readyState == 4 && this.status == 200)
 				{
+					//General System Information
 					sysInfo = JSON.parse(this.responseText);
-					target = document.getElementById('sysCardBody');
 					
-					target.innerHTML = "";
-					renderLeftRightLine(target, "OS Version", sysInfo['osVersion']);
-					renderLeftRightLine(target, "Kernel Version", sysInfo['kernelVersion']);
-					renderLeftRightLine(target, "Goestools Version", sysInfo['goestoolsVersion']);
-					renderLeftRightLine(target, "Uptime", sysInfo['uptime']);
-					renderLeftRightLine(target, "Goesrecv Status", sysInfo['goesrecvStatus']);
-					renderLeftRightLine(target, "Goesproc Status", sysInfo['goesprocStatus']);
-					renderLeftRightLine(target, "CPU Load (1min, 5min, 15min)", sysInfo['cpuLoad']);
-					renderLeftRightLine(target, "Memory Used", sysInfo['memUsage']);
-					renderLeftRightLine(target, "Disk Used", sysInfo['diskUsage']);
-					if("powerStatus" in sysInfo) renderLeftRightLine(target, "Power Status", sysInfo['powerStatus']);
-					if("batteryPercentage" in sysInfo) renderLeftRightLine(target, "Battery", sysInfo['batteryPercentage'] + "%");
-
+					target = document.getElementById('sysCardBody');
+					if(sysInfo.sysData.length == 0)
+					{
+						target.parentElement.parentElement.nextSibling.remove();
+						target.parentElement.parentElement.remove();
+					}
+					else
+					{
+						target.innerHTML = "";
+						sysInfo.sysData.forEach((sysValue) => {renderLeftRightLine(target, sysValue.name, sysValue.value);});
+					}
+					
+					//Temp Info
 					target = document.getElementById('sysTempCardBody');
-					target.innerHTML = "";
-					sysInfo.tempData.forEach((tempValue) => {renderLeftRightLine(target, tempValue.name, tempValue.value);});
+					if(sysInfo.tempData.length == 0)
+					{
+						target.parentElement.parentElement.nextSibling.remove();
+						target.parentElement.parentElement.remove();
+					}
+					else
+					{
+						target.innerHTML = "";
+						sysInfo.tempData.forEach((tempValue) => {renderLeftRightLine(target, tempValue.name, tempValue.value);});
+					}
+					
+					//SatDump Info
+					if(config.showSatdumpInfo)
+					{
+						target = document.getElementById('satDumpInfoCardBody');
+						if(sysInfo.satdumpData.length == 0) target.innerHTML = "<div style='text-align: center;'>SatDump Statistics Unavailable!</div>";
+						else
+						{
+							target.innerHTML = "";
+							sysInfo.satdumpData.forEach((value) => {
+								satdumpDataTitle = document.createElement('div');
+								satdumpDataTitle.className = 'prettyBoxList';
+								satdumpDataTitle.style.padding = 0;
+								satdumpDataTitle.style.paddingTop = "5px";
+								renderLeftRightLine(satdumpDataTitle, value.title, "");
+								target.appendChild(satdumpDataTitle);
+								
+								satdumpDataHolder = document.createElement('div');
+								satdumpDataHolder.className = 'prettyBoxList';
+								satdumpDataHolder.style.padding = 0;
+								satdumpDataHolder.style.paddingBottom = "10px";
+								satdumpDataHolder.style.marginBottom = 0;
+								
+								value.values.forEach((subvalue) => {
+									renderLeftRightLine(satdumpDataHolder, subvalue.name, subvalue.value);
+								});
+								
+								target.appendChild(satdumpDataHolder);
+							});
+						}
+					}
 					
 					delete xhttp.sysInfo;
+					
+					//Fix style based on number of cards
+					if(mainContent.childElementCount <= 2) mainContent.className = "singleCard";
+					else if(mainContent.childElementCount <= 4) mainContent.className = "dualCard";
+					else mainContent.className = "mainContent";
 				}
 			}
 			
@@ -1105,20 +1164,12 @@ function menuSelect(menuNumber)
 			xhttp.sysInfo.send();
 		}
 		
-		if(config.showGraphs)
-		{
-			renderStatsCard("viterbi", "Viterbi Error Corrections/Packet");
-			renderStatsCard("rs", "Reed-Solomon Error Corrections/Second");
-			renderStatsCard("packets", "Packets/Second");
-			renderStatsCard("freq", "Frequency Offset");
-			renderStatsCard("gain", "Gain");
-			renderStatsCard("omega", "Omega");
-		}
 		break;
 	}
 	
 	//Change styling for specific screens
 	if(mainContent.childElementCount <= 2) mainContent.className = "singleCard";
+	else if(mainContent.childElementCount <= 4) mainContent.className = "dualCard";
 	else mainContent.className = "mainContent";
 }
 
@@ -1158,24 +1209,31 @@ function loadStats(targetedContent)
 			if(this.readyState == 4 && this.status == 200)
 			{
 				metadata = JSON.parse(this.responseText);
-				targetedContent.innerHTML = "";
-				parser = new DOMParser();
-				
-				svg1hr = parser.parseFromString(metadata['svg1hr'], "image/svg+xml");
-				svg1hr.documentElement.style.width = "100%";
-				svg1hr.documentElement.style.height = "auto";
-				targetedContent.appendChild(svg1hr.documentElement);
-				targetedContent.appendChild(document.createElement('br'));
-				
-				svg1day = parser.parseFromString(metadata['svg1day'], "image/svg+xml");
-				svg1day.documentElement.style.width = "100%";
-				svg1day.documentElement.style.height = "auto";
-				targetedContent.appendChild(svg1day.documentElement);
-				
-				description = document.createElement('div');
-				description.className = "goeslabel";
-				description.innerHTML = metadata['description'];
-				targetedContent.appendChild(description);
+				if(Object.keys(metadata).length == 0)
+				{
+					targetedContent.innerHTML = "<i>Error loading statistics</i>";
+				}
+				else
+				{
+					targetedContent.innerHTML = "";
+					parser = new DOMParser();
+					
+					svg1hr = parser.parseFromString(metadata['svg1hr'], "image/svg+xml");
+					svg1hr.documentElement.style.width = "100%";
+					svg1hr.documentElement.style.height = "auto";
+					targetedContent.appendChild(svg1hr.documentElement);
+					targetedContent.appendChild(document.createElement('br'));
+					
+					svg1day = parser.parseFromString(metadata['svg1day'], "image/svg+xml");
+					svg1day.documentElement.style.width = "100%";
+					svg1day.documentElement.style.height = "auto";
+					targetedContent.appendChild(svg1day.documentElement);
+					
+					description = document.createElement('div');
+					description.className = "goeslabel";
+					description.innerHTML = metadata['description'];
+					targetedContent.appendChild(description);
+				}
 				
 				delete xhttp.loadStats;
 			}

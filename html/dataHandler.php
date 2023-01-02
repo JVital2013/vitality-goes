@@ -156,22 +156,39 @@ if($_GET['type'] == "preload")
 	$mesoSlugs = array_keys($config['meso']);
 	$l2Slugs = array_keys($config['l2']);
 	$emwinSlugs = array_keys($config['emwin']);
-	for($i = 0; $i < count($config['abi']); $i++) unset($config['abi'][$abiSlugs[$i]]['path']);
-	for($i = 0; $i < count($config['meso']); $i++) unset($config['meso'][$mesoSlugs[$i]]['path']);
-	for($i = 0; $i < count($config['l2']); $i++) unset($config['l2'][$l2Slugs[$i]]['path']);
-	for($i = 0; $i < count($config['emwin']); $i++) unset($config['emwin'][$emwinSlugs[$i]]['path']);
+	for($i = 0; $i < count($config['abi']); $i++)
+	{
+		unset($config['abi'][$abiSlugs[$i]]['path']);
+		unset($config['abi'][$abiSlugs[$i]]['filter']);
+	}
+	for($i = 0; $i < count($config['meso']); $i++)
+	{
+		unset($config['meso'][$mesoSlugs[$i]]['path']);
+		unset($config['meso'][$mesoSlugs[$i]]['filter']);
+	}
+	for($i = 0; $i < count($config['l2']); $i++)
+	{
+		unset($config['l2'][$l2Slugs[$i]]['path']);
+		unset($config['l2'][$l2Slugs[$i]]['filter']);
+	}
+	for($i = 0; $i < count($config['emwin']); $i++)
+	{
+		unset($config['emwin'][$emwinSlugs[$i]]['path']);
+		unset($config['emwin'][$emwinSlugs[$i]]['filter']);
+	}
 	
 	$preloadData['abi'] = $config['abi'];
 	$preloadData['meso'] = $config['meso'];
 	$preloadData['l2'] = $config['l2'];
 	$preloadData['emwin'] = $config['emwin'];
 	$preloadData['showSysInfo'] = $config['general']['showSysInfo'];
+	$preloadData['showSatdumpInfo'] = array_key_exists('satdumpAPI', $config['general']);
 	$preloadData['showGraphs'] = array_key_exists('graphiteAPI', $config['general']);
 	$preloadData['showEmwinInfo'] = array_key_exists('emwinPath', $config['general']) &&  is_dir($config['general']['emwinPath']);
 	$preloadData['showAdminInfo'] = array_key_exists('adminPath', $config['general']) &&  is_dir($config['general']['adminPath']);
 	
 	header('Content-Type: application/json; charset=utf-8');
-	echo json_encode($preloadData, JSON_PRETTY_PRINT);
+	echo json_encode($preloadData);
 }
 elseif($_GET['type'] == "abiMetadata")
 {
@@ -203,91 +220,52 @@ elseif($_GET['type'] == "metadata")
 	switch($_GET['id'])
 	{
 		case "packetsContent":
-			$tzUrl = urlencode($currentSettings[$selectedProfile]['timezone']);
-			$packetOK1hrArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-1hours&tz=$tzUrl&target=stats.packets_ok"))[0]->datapoints;
-			$packetOK1dayArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-24hours&tz=$tzUrl&target=stats.packets_ok"))[0]->datapoints;
-			$packetDrop1hrArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-1hours&tz=$tzUrl&target=stats.packets_dropped"))[0]->datapoints;
-			$packetDrop1dayArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-24hours&tz=$tzUrl&target=stats.packets_dropped"))[0]->datapoints;
-			$packetOK1hr = $packetOK1day = $packetDrop1hr = $packetDrop1day = 0;
-			
-			foreach($packetOK1hrArray as $thisPacket) {$packetOK1hr += $thisPacket[0];}
-			foreach($packetOK1dayArray as $thisPacket) {$packetOK1day += $thisPacket[0];}
-			foreach($packetDrop1hrArray as $thisPacket) {$packetDrop1hr += $thisPacket[0];}
-			foreach($packetDrop1dayArray as $thisPacket) {$packetDrop1day += $thisPacket[0];}
-			
-			$metadata['description'] = "1 Hour Average: " . round(($packetOK1hr / ($packetOK1hr + $packetDrop1hr)) * 100, 4) . "% OK | 1 Day Average: " . round(($packetOK1day / ($packetOK1day + $packetDrop1day)) * 100, 4) . "% OK";
-			$metadata['svg1hr'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&colorList=green%2Cred&fontSize=14&title=HRIT%20Packets%20%2F%20Second%20(1%20Hour)&fgcolor=FFFFFF&lineWidth=2&from=-1hours&tz=$tzUrl&target=alias(stats.packets_ok%2C%22Packets%20OK%22)&target=alias(stats.packets_dropped%2C%22Packets%20Dropped%22)"));
-			$metadata['svg1day'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&colorList=green%2Cred&fontSize=14&title=HRIT%20Packets%20%2F%20Second%20(1%20Day)&fgcolor=FFFFFF&lineWidth=2&from=-1days&tz=$tzUrl&target=alias(stats.packets_ok%2C%22Packets%20OK%22)&target=alias(stats.packets_dropped%2C%22Packets%20Dropped%22)"));
+			set_error_handler("convertToException");
+			try
+			{
+				$tzUrl = urlencode($currentSettings[$selectedProfile]['timezone']);
+				$packetOK1hrArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-1hours&tz=$tzUrl&target=stats.packets_ok"))[0]->datapoints;
+				$packetOK1dayArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-24hours&tz=$tzUrl&target=stats.packets_ok"))[0]->datapoints;
+				$packetDrop1hrArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-1hours&tz=$tzUrl&target=stats.packets_dropped"))[0]->datapoints;
+				$packetDrop1dayArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-24hours&tz=$tzUrl&target=stats.packets_dropped"))[0]->datapoints;
+				$packetOK1hr = $packetOK1day = $packetDrop1hr = $packetDrop1day = 0;
+				
+				foreach($packetOK1hrArray as $thisPacket) {$packetOK1hr += $thisPacket[0];}
+				foreach($packetOK1dayArray as $thisPacket) {$packetOK1day += $thisPacket[0];}
+				foreach($packetDrop1hrArray as $thisPacket) {$packetDrop1hr += $thisPacket[0];}
+				foreach($packetDrop1dayArray as $thisPacket) {$packetDrop1day += $thisPacket[0];}
+				
+				$metadata['description'] = "1 Hour Average: " . round(($packetOK1hr / ($packetOK1hr + $packetDrop1hr)) * 100, 4) . "% OK | 1 Day Average: " . round(($packetOK1day / ($packetOK1day + $packetDrop1day)) * 100, 4) . "% OK";
+				$metadata['svg1hr'] = preg_replace("(clip-path.*clip-rule.*\")", "",
+					file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&colorList=green%2Cred&fontSize=14&title=HRIT%20Packets%20%2F%20Second%20(1%20Hour)&fgcolor=FFFFFF&lineWidth=2&from=-1hours&tz=$tzUrl&target=alias(stats.packets_ok%2C%22Packets%20OK%22)&target=alias(stats.packets_dropped%2C%22Packets%20Dropped%22)"));
+				$metadata['svg1day'] = preg_replace("(clip-path.*clip-rule.*\")", "",
+					file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&colorList=green%2Cred&fontSize=14&title=HRIT%20Packets%20%2F%20Second%20(1%20Day)&fgcolor=FFFFFF&lineWidth=2&from=-1days&tz=$tzUrl&target=alias(stats.packets_ok%2C%22Packets%20OK%22)&target=alias(stats.packets_dropped%2C%22Packets%20Dropped%22)"));
+			}
+			catch(exception $e)
+			{
+				$metadata = [];
+			}
+			restore_error_handler();
 			break;
 			
 		case "viterbiContent":
-			$tzUrl = urlencode($currentSettings[$selectedProfile]['timezone']);
-			$viterbi1hrArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-1hours&tz=$tzUrl&target=divideSeries(stats_counts.viterbi_errors%2CsumSeries(stats_counts.packets_dropped%2Cstats_counts.packets_ok))"))[0]->datapoints;
-			$viterbi1dayArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-1days&tz=$tzUrl&target=divideSeries(stats_counts.viterbi_errors%2CsumSeries(stats_counts.packets_dropped%2Cstats_counts.packets_ok))"))[0]->datapoints;
-			$viterbi1hrSum = $viterbi1daySum = 0;
-			
-			foreach($viterbi1hrArray as $thisPacket) {$viterbi1hrSum += $thisPacket[0];}
-			foreach($viterbi1dayArray as $thisPacket) {$viterbi1daySum += $thisPacket[0];}
-			
-			$metadata['description'] = "1 Hour Average: " . round($viterbi1hrSum / count($viterbi1hrArray), 2) . " | 1 Day Average: " . round($viterbi1daySum / count($viterbi1dayArray), 2);
-			$metadata['svg1hr'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&title=Avg%20Viterbi%20Error%20Corrections%20%2F%20Packet%20(1%20Hour)&fontSize=14&lineWidth=2&from=-1hours&hideLegend=true&colorList=red&tz=$tzUrl&target=divideSeries(stats_counts.viterbi_errors%2CsumSeries(stats_counts.packets_dropped%2Cstats_counts.packets_ok))"));
-			$metadata['svg1day'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&title=Avg%20Viterbi%20Error%20Corrections%20%2F%20Packet%20(1%20Day)&fontSize=14&lineWidth=2&from=-24hours&hideLegend=true&colorList=red&tz=$tzUrl&target=divideSeries(stats_counts.viterbi_errors%2CsumSeries(stats_counts.packets_dropped%2Cstats_counts.packets_ok))"));
+			parseGraphiteData($metadata, $currentSettings[$selectedProfile]['timezone'], $config['general']['graphiteAPI'], "divideSeries(stats_counts.viterbi_errors,sumSeries(stats_counts.packets_dropped,stats_counts.packets_ok))", "Avg Viterbi Error Corrections / Packet", "red");
 			break;
 			
 		case "rsContent":
-			$tzUrl = urlencode($currentSettings[$selectedProfile]['timezone']);
-			$rs1hrArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-1hours&tz=$tzUrl&target=stats.reed_solomon_errors"))[0]->datapoints;
-			$rs1dayArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-24hours&tz=$tzUrl&target=stats.reed_solomon_errors"))[0]->datapoints;
-			$rs1hrSum = $rs1daySum = 0;
-			
-			foreach($rs1hrArray as $thisPacket) {$rs1hrSum += $thisPacket[0];}
-			foreach($rs1dayArray as $thisPacket) {$rs1daySum += $thisPacket[0];}
-			
-			$metadata['description'] = "1 Hour Average: " . round($rs1hrSum / count($rs1hrArray), 2) . " | 1 Day Average: " . round($rs1daySum / count($rs1dayArray), 2);
-			$metadata['svg1hr'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&title=Reed-Solomon%20Errors%20%2F%20Second%20(1%20Hour)&fontSize=14&lineWidth=2&from=-1hours&hideLegend=true&target=alias(stats.reed_solomon_errors%2C%22Reed%20Solomon%20Errors%20per%20Second%22)&tz=$tzUrl"));
-			$metadata['svg1day'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&title=Reed-Solomon%20Errors%20%2F%20Second%20(1%20Day)&fontSize=14&lineWidth=2&hideLegend=true&target=alias(stats.reed_solomon_errors%2C%22Reed%20Solomon%20Errors%20per%20Second%22)&tz=$tzUrl"));
+			parseGraphiteData($metadata, $currentSettings[$selectedProfile]['timezone'], $config['general']['graphiteAPI'], "stats.reed_solomon_errors", "Reed-Solomon Errors / Second", "6464FF");
 			break;
 			
 		case "gainContent":
-			$tzUrl = urlencode($currentSettings[$selectedProfile]['timezone']);
-			$gain1hrArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-1hours&tz=$tzUrl&target=stats.gauges.gain"))[0]->datapoints;
-			$gain1dayArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-24hours&tz=$tzUrl&target=stats.gauges.gain"))[0]->datapoints;
-			$gain1hrSum = $gain1daySum = 0;
-			
-			foreach($gain1hrArray as $thisPacket) {$gain1hrSum += $thisPacket[0];}
-			foreach($gain1dayArray as $thisPacket) {$gain1daySum += $thisPacket[0];}
-			
-			$metadata['description'] = "1 Hour Average: " . round($gain1hrSum / count($gain1hrArray), 2) . " | 1 Day Average: " . round($gain1daySum / count($gain1dayArray), 2);
-			$metadata['svg1hr'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&title=Gain%20Multiplier%20(1%20Hour)&fontSize=14&lineWidth=2&from=-1hours&hideLegend=true&tz=$tzUrl&colorList=orange&target=stats.gauges.gain"));
-			$metadata['svg1day'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&title=Gain%20Multiplier%20(1%20Day)&fontSize=14&lineWidth=2&from=-24hours&hideLegend=true&tz=$tzUrl&colorList=orange&target=stats.gauges.gain"));
+			parseGraphiteData($metadata, $currentSettings[$selectedProfile]['timezone'], $config['general']['graphiteAPI'], "stats.gauges.gain", "Gain Multiplier", "orange");
 			break;
 			
 		case "freqContent":
-			$tzUrl = urlencode($currentSettings[$selectedProfile]['timezone']);
-			$freq1hrArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-1hours&tz=$tzUrl&target=stats.gauges.frequency"))[0]->datapoints;
-			$freq1dayArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-24hours&tz=$tzUrl&target=stats.gauges.frequency"))[0]->datapoints;
-			$freq1hrSum = $freq1daySum = 0;
-			
-			foreach($freq1hrArray as $thisPacket) {$freq1hrSum += $thisPacket[0];}
-			foreach($freq1dayArray as $thisPacket) {$freq1daySum += $thisPacket[0];}
-			
-			$metadata['description'] = "1 Hour Average: " . round($freq1hrSum / count($freq1hrArray), 2) . " | 1 Day Average: " . round($freq1daySum / count($freq1dayArray), 2);
-			$metadata['svg1hr'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&title=Frequency%20Offset%20(1%20Hour)&fontSize=14&lineWidth=2&from=-1hours&hideLegend=true&tz=$tzUrl&target=stats.gauges.frequency&colorList=brown"));
-			$metadata['svg1day'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&title=Frequency%20Offset%20(1%20Day)&fontSize=14&lineWidth=2&from=-24hours&hideLegend=true&tz=$tzUrl&target=stats.gauges.frequency&colorList=brown"));
+			parseGraphiteData($metadata, $currentSettings[$selectedProfile]['timezone'], $config['general']['graphiteAPI'], "stats.gauges.frequency", "Frequency Offset", "brown");
 			break;
 			
 		case "omegaContent":
-			$tzUrl = urlencode($currentSettings[$selectedProfile]['timezone']);
-			$omega1hrArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-1hours&tz=$tzUrl&target=stats.gauges.omega"))[0]->datapoints;
-			$omega1dayArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-24hours&tz=$tzUrl&target=stats.gauges.omega"))[0]->datapoints;
-			$omega1hrSum = $omega1daySum = 0;
-			
-			foreach($omega1hrArray as $thisPacket) {$omega1hrSum += $thisPacket[0];}
-			foreach($omega1dayArray as $thisPacket) {$omega1daySum += $thisPacket[0];}
-			
-			$metadata['description'] = "1 Hour Average: " . round($omega1hrSum / count($omega1hrArray), 2) . " | 1 Day Average: " . round($omega1daySum / count($omega1dayArray), 2);
-			$metadata['svg1hr'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&title=Samples%2FSymbol%20in%20Clock%20Recovery%20(1%20Hour)&fontSize=14&lineWidth=2&from=-1hours&hideLegend=true&tz=$tzUrl&colorList=%23008080&target=stats.gauges.omega"));
-			$metadata['svg1day'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&title=Samples%2FSymbol%20in%20Clock%20Recovery%20(1%20Day)&fontSize=14&lineWidth=2&from=-24hours&hideLegend=true&tz=$tzUrl&colorList=%23008080&target=stats.gauges.omega"));
+			parseGraphiteData($metadata, $currentSettings[$selectedProfile]['timezone'], $config['general']['graphiteAPI'], "stats.gauges.omega", "Samples/Symbol in Clock Recovery", "008080");
 			break;
 			
 		case "otherEmwin":
@@ -362,9 +340,10 @@ elseif($_GET['type'] == "metadata")
 			{
 				//Admin update
 				$allAdminFiles = scandir_recursive($config['general']['adminPath']);
-				$allAdminFiles = preg_grep("/(\\\\|\/)[0-9]{8}T[0-9]{6}Z_/", $allAdminFiles);
+				$allAdminFiles = preg_grep("/[0-9]{4}\.[0-9]{2}\.[0-9]{2}\.(txt|TXT)$/", $allAdminFiles);
 				usort($allAdminFiles, "sortABI");
-				$metadata['latestAdminDate'] = date("M d, Y Hi", strtotime(explode("_", basename($allAdminFiles[count($allAdminFiles) - 1]))[0])) . " " . $DateTime->format('T');
+				$adminDateParts = explode("_", basename($allAdminFiles[count($allAdminFiles) - 1]));
+				$metadata['latestAdminDate'] = DateTimeImmutable::createFromFormat("Y.m.d", substr($adminDateParts[count($adminDateParts) - 1], 0, -4))->format("M d, Y");
 				$metadata['latestAdmin'] = str_replace("?", "-", utf8_decode(file_get_contents($allAdminFiles[count($allAdminFiles) - 1])));
 			}
 			
@@ -372,109 +351,208 @@ elseif($_GET['type'] == "metadata")
 			
 		case "sysInfo":
 			if(!$config['general']['showSysInfo']) die();
+			$metadata['sysData'] = [];
 			
-			//Kernel Info
-			$metadata['osVersion'] = trim(shell_exec("lsb_release -ds"));
-			$metadata['kernelVersion'] = php_uname('s') . " " . php_uname('r');
+			//Windows System Info
+			if(PHP_OS_FAMILY == "Windows")
+			{
+				//Windows Version
+				$metadata['sysData'][] = array("name" => "Windows Version", "value" => ucfirst(php_uname('v')));
+				
+				//Get Data from PowerShell
+				$powershellData = json_decode(shell_exec("powershell -EncodedCommand " .
+					"JABtAGUAbQBvAHIAeQAgAD0AIABnAGMAaQBtACAAdwBpAG4AMwAyAF8AbwBwAGU" .
+					"AcgBhAHQAaQBuAGcAcwB5AHMAdABlAG0AIAAtAFAAcgBvAHAAZQByAHQAeQAgAF" .
+					"QAbwB0AGEAbABWAGkAcwBpAGIAbABlAE0AZQBtAG8AcgB5AFMAaQB6AGUALABGA" .
+					"HIAZQBlAFAAaAB5AHMAaQBjAGEAbABNAGUAbQBvAHIAeQA7ACAAJABiAGEAdAB0" .
+					"AGUAcgB5ACAAPQAgAGcAYwBpAG0AIAB3AGkAbgAzADIAXwBiAGEAdAB0AGUAcgB" .
+					"5ADsAIAAkAHIAZQB0AFYAYQBsACAAPQAgAEAAewB1AHAAdABpAG0AZQAgAD0AIA" .
+					"AkACgAKABnAGUAdAAtAGQAYQB0AGUAKQAgAC0AIAAoAGcAYwBpAG0AIABXAGkAb" .
+					"gAzADIAXwBPAHAAZQByAGEAdABpAG4AZwBTAHkAcwB0AGUAbQApAC4ATABhAHMA" .
+					"dABCAG8AbwB0AFUAcABUAGkAbQBlACkALgBUAG8AdABhAGwAUwBlAGMAbwBuAGQ" .
+					"AcwA7ACAAYwBwAHUATABvAGEAZAAgAD0AIAAkACgAZwBjAGkAbQAgAFcAaQBuAD" .
+					"MAMgBfAFAAcgBvAGMAZQBzAHMAbwByACAALQBQAHIAbwBwAGUAcgB0AHkAIABMA" .
+					"G8AYQBkAFAAZQByAGMAZQBuAHQAYQBnAGUAKQAuAEwAbwBhAGQAUABlAHIAYwBl" .
+					"AG4AdABhAGcAZQA7ACAAbQBlAG0AVABvAHQAYQBsACAAPQAgACQAbQBlAG0AbwB" .
+					"yAHkALgBUAG8AdABhAGwAVgBpAHMAaQBiAGwAZQBNAGUAbQBvAHIAeQBTAGkAeg" .
+					"BlADsAIABtAGUAbQBBAHYAYQBpAGwAYQBiAGwAZQAgAD0AIAAkAG0AZQBtAG8Ac" .
+					"gB5AC4ARgByAGUAZQBQAGgAeQBzAGkAYwBhAGwATQBlAG0AbwByAHkAOwB9ADsA" .
+					"IABpAGYAKAAkAGIAYQB0AHQAZQByAHkAIAAtAG4AZQAgACQAbgB1AGwAbAApAHs" .
+					"AJAByAGUAdABWAGEAbAAuAEEAZABkACgAIgBwAG8AdwBlAHIAUwB0AGEAdAB1AH" .
+					"MAIgAsACAAQAAoADIALAAzACwANgAsADcALAA4ACwAOQApACAALQBjAG8AbgB0A" .
+					"GEAaQBuAHMAIAAkAGIAYQB0AHQAZQByAHkALgBCAGEAdAB0AGUAcgB5AFMAdABh" .
+					"AHQAdQBzACkAOwAgACQAcgBlAHQAVgBhAGwALgBBAGQAZAAoACIAYgBhAHQAdAB" .
+					"lAHIAeQBQAGUAcgBjAGUAbgB0AGEAZwBlACIALAAgACQAYgBhAHQAdABlAHIAeQ" .
+					"AuAEUAcwB0AGkAbQBhAHQAZQBkAEMAaABhAHIAZwBlAFIAZQBtAGEAaQBuAGkAb" .
+					"gBnACkAOwB9ACAAJAByAGUAdABWAGEAbAAgAHwAIABDAG8AbgB2AGUAcgB0AFQA" .
+					"bwAtAEoAUwBPAE4AIAAtAEMAbwBtAHAAcgBlAHMAcwA="));
+				
+				//Parse data - hand some of it off for later
+				if(property_exists($powershellData, "powerStatus"))
+					$metadata['sysData'][] = array("name" => "Power Status", "value" => $powershellData->powerStatus ? "Plugged In" : "<span style='color: red;'>Unplugged</span>");
+				if(property_exists($powershellData, "batteryPercentage"))
+				$metadata['sysData'][] = array("name" => "Battery Percentage", "value" => $powershellData->batteryPercentage . "%");
+				$metadata['sysData'][] = array("name" => "CPU Load Average", "value" => $powershellData->cpuLoad . "%");
+				$uptimeStr = $powershellData->uptime;
+				$memTotal = $powershellData->memTotal;
+				$memAvailable = $powershellData->memAvailable;
+				
+				//Info about running processes (parsed later)
+				$runningProcesses = shell_exec("tasklist");
+				
+				//System temp data on Windows is not supported
+				$metadata['tempData'] = [];
+			}
 			
-			//Uptime
-			$uptimeStr = file_get_contents('/proc/uptime');
-			$num = floatval($uptimeStr);
-			$metadata['uptime'] = str_pad(round(fmod($num, 60)), 2, "0", STR_PAD_LEFT);
-			$num = intdiv($num, 60);
-			$metadata['uptime'] = str_pad($num % 60, 2, "0", STR_PAD_LEFT) . ":" . $metadata['uptime'];
-			$num = intdiv($num, 60);
-			$metadata['uptime'] = str_pad($num % 24, 2, "0", STR_PAD_LEFT) . ":" . $metadata['uptime'];
-			$metadata['uptime'] = intdiv($num, 24) . " days, " . $metadata['uptime'];
+			//Other Systems (assume Linux-like system)
+			else
+			{
+				//Kernel Info
+				$metadata['sysData'][] = array("name" => "OS Version", "value" => trim(shell_exec("lsb_release -ds")));
+				$metadata['sysData'][] = array("name" => "Kernel Version", "value" => php_uname('s') . " " . php_uname('r'));
+				
+				//Uptime
+				$uptimeStr = file_get_contents('/proc/uptime');
+				
+				//CPU Load
+				$loadAvg = sys_getloadavg();
+				$metadata['sysData'][] = array("name" => "CPU Load (1min, 5min, 15min)", "value" => $loadAvg[0] . ", " . $loadAvg[1] . ", " . $loadAvg[2]);
+				
+				//Memory Usage (parsed later)
+				$memFile = fopen('/proc/meminfo','r');
+				$memTotal = 0;
+				$memAvailable = 0;
+				while ($line = fgets($memFile))
+				{
+					$memPieces = [];
+					if (preg_match('/^MemTotal:\s+(\d+)\skB$/', $line, $memPieces)) $memTotal = $memPieces[1];
+					if (preg_match('/^MemAvailable:\s+(\d+)\skB$/', $line, $memPieces)) $memAvailable = $memPieces[1];
+				}
+				fclose($memFile);
+				
+				//Power Status
+				if(file_exists("/sys/class/power_supply/AC/online"))
+					$metadata['sysData'][] = array("name" => "Power Status", "value" => file_get_contents("/sys/class/power_supply/AC/online") == 1 ? "Plugged In" : "<span style='color: red;'>Unplugged</span>");
+				
+				//Battery
+				if(file_exists("/sys/class/power_supply/BAT0/capacity"))
+					$metadata['sysData'][] = array("name" => "Battery Percentage", "value" => trim(file_get_contents("/sys/class/power_supply/BAT0/capacity")) . "%");
+				
+				//System Temps
+				$hwmonDirs = scandir("/sys/class/hwmon/");
+				$metadata['tempData'] = [];
+				foreach($hwmonDirs as $thisHwmon)
+				{
+					if($thisHwmon == "." || $thisHwmon == "..") continue;
+					$thisDevicesSensors = glob("/sys/class/hwmon/" . $thisHwmon . "/{temp,fan}*_input", GLOB_BRACE);
+					if(count($thisDevicesSensors) == 0) continue;
+					
+					$tempBaseName = ucfirst(str_replace("_", " ", trim(file_get_contents("/sys/class/hwmon/" . $thisHwmon . "/name"))));
+					$tempCount = $fanCount = 1;
+					foreach($thisDevicesSensors as $thisSensor)
+					{
+						$metadata['tempData'][] = [];
+						
+						if(strpos($thisSensor, "temp") !== false)
+						{
+							if(file_exists(str_replace("input", "label", $thisSensor))) $thisSensorName = trim(file_get_contents(str_replace("input", "label", $thisSensor))) . " Temp";
+							else $thisSensorName = "$tempBaseName Temp" . (count($thisDevicesSensors) > 1 ? " $tempCount" : "");
+							
+							$metadata['tempData'][count($metadata['tempData']) - 1]['name'] = $thisSensorName;
+							
+							//Some sensors error when below 0 degrees - catch these errors
+							set_error_handler("convertToException");
+							try
+							{
+								$thisSensorData = file_get_contents($thisSensor);
+								$metadata['tempData'][count($metadata['tempData']) - 1]['value'] = intval(trim($thisSensorData)) / 1000 . "&deg; C";
+							}
+							catch (exception $e)
+							{
+								//Failed; return an error
+								$metadata['tempData'][count($metadata['tempData']) - 1]['value'] = "Error!";
+							}
+							
+							//Return to typical error handler
+							restore_error_handler();
+							$tempCount++;
+						}
+						
+						else
+						{
+							if(file_exists(str_replace("input", "label", $thisSensor))) $thisSensorName = trim(file_get_contents(str_replace("input", "label", $thisSensor)));
+							else $thisSensorName = "$tempBaseName Fan" . (count($thisDevicesSensors) > 1 ? " $fanCount" : "");
+							
+							$metadata['tempData'][count($metadata['tempData']) - 1]['name'] = $thisSensorName . " Speed";
+							$metadata['tempData'][count($metadata['tempData']) - 1]['value'] = trim(file_get_contents($thisSensor)) . " RPM";
+							$fanCount++;
+						}
+					}
+				}
+				
+				//Info about running processes
+				$runningProcesses = shell_exec("ps acxo command");
+			}
 			
-			//goestools info
-			$runningProcesses = shell_exec("ps acxo command");
-			$metadata['goesrecvStatus'] = (stripos($runningProcesses, "goesrecv") !== false ? "Running" : "<span style='color: red;'>Not Running</span>");
-			$metadata['goesprocStatus'] = (stripos($runningProcesses, "goesproc") !== false ? "Running" : "<span style='color: red;'>Not Running</span>");
-			$metadata['goestoolsVersion'] = explode(" ", str_replace("goesrecv -- ", "", explode(PHP_EOL, shell_exec("goesrecv --version"))[0]))[0];
-			
-			//CPU Load
-			$loadAvg = sys_getloadavg();
-			$metadata['cpuLoad'] = $loadAvg[0] . ", " . $loadAvg[1] . ", " . $loadAvg[2];
+			//Disk Usage (all OSs)
+			$totalDiskSpace = round(disk_total_space($_SERVER['DOCUMENT_ROOT']) / 1073741824, 2);
+			$usedDiskSpace = $totalDiskSpace - round(disk_free_space($_SERVER['DOCUMENT_ROOT']) / 1073741824, 2);
+			$metadata['sysData'][] = array("name" => "Disk Used", "value" => $usedDiskSpace . "GB / " . $totalDiskSpace . "GB  - " . round(($usedDiskSpace / $totalDiskSpace) * 100, 2) . "%");
 			
 			//Memory Usage
-			$memFile = fopen('/proc/meminfo','r');
-			$memTotal = 0;
-			$memAvailable = 0;
-			while ($line = fgets($memFile))
+			$metadata['sysData'][] = array("name" => "Memory Used", "value" => round(($memTotal - $memAvailable) / 1048576, 2) . "GB / " . round($memTotal / 1048576, 2) . "GB - " . round((($memTotal - $memAvailable) / $memTotal) * 100, 2) . "%");
+			
+			//Uptime (all OSs)
+			$num = floatval($uptimeStr);
+			$uptimeStr = str_pad(round(fmod($num, 60)), 2, "0", STR_PAD_LEFT);
+			$num = intdiv($num, 60);
+			$uptimeStr = str_pad($num % 60, 2, "0", STR_PAD_LEFT) . ":" . $uptimeStr;
+			$num = intdiv($num, 60);
+			$uptimeStr = str_pad($num % 24, 2, "0", STR_PAD_LEFT) . ":" . $uptimeStr;
+			$uptimeStr = intdiv($num, 24) . " days, " . $uptimeStr;
+			$metadata['sysData'][] = array("name" => "Uptime", "value" => $uptimeStr);
+			
+			//Find running satellite decoders (all OSs)
+			$noDecoderFound = true;
+			if(stripos($runningProcesses, "goesrecv") !== false || stripos($runningProcesses, "goesproc") !== false)
 			{
-				$memPieces = [];
-				if (preg_match('/^MemTotal:\s+(\d+)\skB$/', $line, $memPieces)) $memTotal = $memPieces[1];
-				if (preg_match('/^MemAvailable:\s+(\d+)\skB$/', $line, $memPieces)) $memAvailable = $memPieces[1];
+				$noDecoderFound = false;
+				$metadata['sysData'][] = array("name" => "Goesrecv Status", "value" => stripos($runningProcesses, "goesrecv") !== false ? "Running" : "<span style='color: red;'>Not Running</span>");
+				$metadata['sysData'][] = array("name" => "Goesproc Status", "value" => stripos($runningProcesses, "goesproc") !== false ? "Running" : "<span style='color: red;'>Not Running</span>");
+				if(verifyCommand("goesrecv")) $metadata['sysData'][] = array("name" => "Goestools Version", "value" => explode(" ", str_replace("goesrecv -- ", "", explode(PHP_EOL, shell_exec("goesrecv --version"))[0]))[0]);
 			}
-			fclose($memFile);
-			$metadata['memUsage'] = round(($memTotal - $memAvailable) / 1048576, 2) . "GB / " . round($memTotal / 1048576, 2) . "GB - " . round((($memTotal - $memAvailable) / $memAvailable) * 100, 2) . "%";
-			
-			//Disk Usage
-			$totalDiskSpace = round(disk_total_space("/") / 1073741824, 2);
-			$usedDiskSpace = $totalDiskSpace - round(disk_free_space("/") / 1073741824, 2);
-			$metadata['diskUsage'] = $usedDiskSpace . "GB / " . $totalDiskSpace . "GB  - " . round(($usedDiskSpace / $totalDiskSpace) * 100, 2) . "%";
-			
-			//Power Status
-			if(file_exists("/sys/class/power_supply/AC/online"))
-				$metadata['powerStatus'] = (file_get_contents("/sys/class/power_supply/AC/online") == 1 ? "Plugged In" : "<span style='color: red;'>Unplugged</span>");
-			
-			//Battery
-			if(file_exists("/sys/class/power_supply/BAT0/capacity")) $metadata['batteryPercentage'] = trim(file_get_contents("/sys/class/power_supply/BAT0/capacity"));
-			
-			//System Temps
-			$hwmonDirs = scandir("/sys/class/hwmon/");
-			$metadata['tempData'] = [];
-			foreach($hwmonDirs as $thisHwmon)
+			if(stripos($runningProcesses, "satdump") !== false)
 			{
-				if($thisHwmon == "." || $thisHwmon == "..") continue;
-				$thisDevicesSensors = glob("/sys/class/hwmon/" . $thisHwmon . "/{temp,fan}*_input", GLOB_BRACE);
-				if(count($thisDevicesSensors) == 0) continue;
-				
-				$tempBaseName = ucfirst(str_replace("_", " ", trim(file_get_contents("/sys/class/hwmon/" . $thisHwmon . "/name"))));
-				$tempCount = $fanCount = 1;
-				foreach($thisDevicesSensors as $thisSensor)
+				$noDecoderFound = false;
+				$metadata['sysData'][] = array("name" => "SatDump Status", "value" => "Running");
+			}
+			if($noDecoderFound) $metadata['sysData'][] = array("name" => "Satellite Decoder", "value" => "None Found!");
+			
+			//SatDump Statistics (all OSs)
+			if(array_key_exists('satdumpAPI', $config['general']))
+			{
+				$metadata['satdumpData'] = [];
+				set_error_handler("convertToException");
+				try
 				{
-					$metadata['tempData'][] = [];
-					
-					if(strpos($thisSensor, "temp") !== false)
+					$satdumpStats = json_decode(file_get_contents($config['general']['satdumpAPI']));
+				}
+				catch(exception $e)
+				{
+					$satdumpStats = [];
+				}
+				restore_error_handler();
+				
+				foreach($satdumpStats as $stat => $value)
+				{
+					$metadata['satdumpData'][]['title'] = ucwords(str_replace("_", " ", $stat));
+					$metadata['satdumpData'][count($metadata['satdumpData']) - 1]['values'] = [];
+					foreach($value as $subName => $subValue)
 					{
-						if(file_exists(str_replace("input", "label", $thisSensor))) $thisSensorName = trim(file_get_contents(str_replace("input", "label", $thisSensor))) . " Temp";
-						else $thisSensorName = "$tempBaseName Temp" . (count($thisDevicesSensors) > 1 ? " $tempCount" : "");
-						
-						$metadata['tempData'][count($metadata['tempData']) - 1]['name'] = $thisSensorName;
-						
-						//Some sensors error when below 0 degrees - catch these errors
-						set_error_handler(function($err_severity, $err_msg, $err_file, $err_line, array $err_context)
-						{
-							throw new ErrorException( $err_msg, 0, $err_severity, $err_file, $err_line );
-						});
-						
-						//Read system sensor data
-						try
-						{
-							$thisSensorData = file_get_contents($thisSensor);
-							$metadata['tempData'][count($metadata['tempData']) - 1]['value'] = intval(trim($thisSensorData)) / 1000 . "&deg; C";
-						}
-						catch (Exception $e)
-						{
-							//Failed; return an error
-							$metadata['tempData'][count($metadata['tempData']) - 1]['value'] = "Error!";
-						}
-						
-						//Return to typical error handler
-						restore_error_handler();
-						$tempCount++;
-					}
-					
-					else
-					{
-						if(file_exists(str_replace("input", "label", $thisSensor))) $thisSensorName = trim(file_get_contents(str_replace("input", "label", $thisSensor)));
-						else $thisSensorName = "$tempBaseName Fan" . (count($thisDevicesSensors) > 1 ? " $fanCount" : "");
-						
-						$metadata['tempData'][count($metadata['tempData']) - 1]['name'] = $thisSensorName . " Speed";
-						$metadata['tempData'][count($metadata['tempData']) - 1]['value'] = trim(file_get_contents($thisSensor)) . " RPM";
-						$fanCount++;
+						if(is_float($subValue)) $valToUse = round($subValue, 5);
+						elseif(is_bool($subValue)) $valToUse = $subValue ? "True" : "False";
+						else $valToUse = $subValue;
+						$metadata['satdumpData'][count($metadata['satdumpData']) - 1]['values'][] = array("name" => ucwords(str_replace("_", " ", $subName)), "value" => $valToUse);
 					}
 				}
 			}
