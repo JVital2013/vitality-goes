@@ -121,21 +121,25 @@ rest:
         value_template: "{{ (value_json.pressure)[:-1] }}"
         unit_of_measurement: "inHg"
         device_class: pressure
+        state_class: measurement
       - unique_id: sensor.vitality_goes_temp
         name: "Vitality GOES - Temp"
         value_template: "{{ value_json.temp }}"
         unit_of_measurement: "°F"
         device_class: temperature
+        state_class: measurement
       - unique_id: sensor.vitality_goes_humidity
         name: "Vitality GOES - Humidity"
         value_template: "{{ value_json.humidity }}"
         unit_of_measurement: "%"
         device_class: humidity
+        state_class: measurement
       - unique_id: sensor.vitality_goes_wind
         name: "Vitality GOES - Wind"
         value_template: "{{ value_json.wind }}"
         unit_of_measurement: "mph"
         device_class: wind_speed
+        state_class: measurement
       - unique_id: sensor.vitality_goes_wind_direction
         name: "Vitality GOES - Wind Direction"
         value_template: "{{ value_json.windDirection }}"
