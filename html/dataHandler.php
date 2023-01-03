@@ -344,7 +344,7 @@ elseif($_GET['type'] == "metadata")
 				usort($allAdminFiles, "sortABI");
 				$adminDateParts = explode("_", basename($allAdminFiles[count($allAdminFiles) - 1]));
 				$metadata['latestAdminDate'] = DateTimeImmutable::createFromFormat("Y.m.d", substr($adminDateParts[count($adminDateParts) - 1], 0, -4))->format("M d, Y");
-				$metadata['latestAdmin'] = str_replace("?", "-", utf8_decode(file_get_contents($allAdminFiles[count($allAdminFiles) - 1])));
+				$metadata['latestAdmin'] = iconv('WINDOWS-1252', 'UTF-8', file_get_contents($allAdminFiles[count($allAdminFiles) - 1]));
 			}
 			
 			break;
@@ -503,7 +503,7 @@ elseif($_GET['type'] == "metadata")
 			$metadata['sysData'][] = array("name" => "Memory Used", "value" => round(($memTotal - $memAvailable) / 1048576, 2) . "GB / " . round($memTotal / 1048576, 2) . "GB - " . round((($memTotal - $memAvailable) / $memTotal) * 100, 2) . "%");
 			
 			//Uptime (all OSs)
-			$num = floatval($uptimeStr);
+			$num = (int)floatval($uptimeStr);
 			$uptimeStr = str_pad(round(fmod($num, 60)), 2, "0", STR_PAD_LEFT);
 			$num = intdiv($num, 60);
 			$uptimeStr = str_pad($num % 60, 2, "0", STR_PAD_LEFT) . ":" . $uptimeStr;

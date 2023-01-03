@@ -186,7 +186,7 @@ function findMetadataABI($path, $filter, $title)
 	
 	$retVal = [];
 	$fileList = scandir_recursive($path);
-	$fileList = preg_grep("/(\\\\|\/)[^\\\\\/]*${filter}[^\\\\\/]*[0-9]{8}T[0-9]{6}Z\..{3}$/", $fileList);
+	$fileList = preg_grep("/(\\\\|\/)[^\\\\\/]*{$filter}[^\\\\\/]*[0-9]{8}T[0-9]{6}Z\..{3}$/", $fileList);
 	usort($fileList, "sortABI");
 	
 	foreach($fileList as $file)
@@ -210,7 +210,7 @@ function findImageABI($path, $filter, $timestamp)
 	$DateTime->setTimestamp($timestamp);
 	
 	$fileList = scandir_recursive($path);
-	foreach($fileList as $thisFile) if(preg_match("/(\\\\|\/)[^\\\\\/]*${filter}[^\\\\\/]*" . $DateTime->format('Ymd\THis\Z') . "\..{3}$/", $thisFile)) return $thisFile;
+	foreach($fileList as $thisFile) if(preg_match("/(\\\\|\/)[^\\\\\/]*{$filter}[^\\\\\/]*" . $DateTime->format('Ymd\THis\Z') . "\..{3}$/", $thisFile)) return $thisFile;
 }
 
 function linesToParagraphs($lineArray, $linesToSkip)
