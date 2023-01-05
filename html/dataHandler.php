@@ -344,7 +344,11 @@ elseif($_GET['type'] == "metadata")
 				usort($allAdminFiles, "sortABI");
 				$adminDateParts = explode("_", basename($allAdminFiles[count($allAdminFiles) - 1]));
 				$metadata['latestAdminDate'] = DateTimeImmutable::createFromFormat("Y.m.d", substr($adminDateParts[count($adminDateParts) - 1], 0, -4))->format("M d, Y");
-				$metadata['latestAdmin'] = iconv('WINDOWS-1252', 'UTF-8', file_get_contents($allAdminFiles[count($allAdminFiles) - 1]));
+				
+				//Detect if it's unicode, and if it's not, convert it to UTF-8 from an assumed WINDOWS-1252
+				$latestAdminData = file_get_contents($allAdminFiles[count($allAdminFiles) - 1]);
+				if(!preg_match('//u', $latestAdminData)) $latestAdminData = iconv('WINDOWS-1252', 'UTF-8', $latestAdminData);
+				$metadata['latestAdmin'] = $latestAdminData;
 			}
 			
 			break;
