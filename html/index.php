@@ -1,6 +1,6 @@
 <?php
 /* 
- * Copyright 2022 Jamie Vital
+ * Copyright 2022-2023 Jamie Vital
  * This software is licensed under the GNU General Public License
  * 
  * This file is part of Vitality GOES.
@@ -16,11 +16,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Vitality GOES.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+//Load data from config
+$config = $config = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini", true, INI_SCANNER_RAW);
+
+//Get title of site
+if(array_key_exists('siteTitle', $config['general'])) $siteTitle = htmlspecialchars(strip_tags($config['general']['siteTitle']));
+else $siteTitle = "Vitality GOES";
+
 ?>
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Vitality GOES</title>
+		<title><?php echo $siteTitle ?></title>
 
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 		<meta name="mobile-web-app-capable" content="yes">

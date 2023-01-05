@@ -10,13 +10,14 @@ Configurations are highly customizable and can be modified to fit your configura
 * **meso.ini**: Contains information about your mesoscale images.
 * **l2.ini**: Contains infromation about your ABI Level 2 products. These images contain information about estimated rainfall, land surface temp, sea surface temp, and more. Note that goestools does not receive these unless your goesproc config is set up to do so, and SatDump is currently not supported. The sample goesproc config in this repository is configured correctly, but if you're not saving these files, delete l2.ini.
 
-These ini files are parsed with the php [parse_ini_file](https://www.php.net/manual/en/function.parse-ini-file.php) function, so any comments must begin with a semicolon (;).
+Any comments must begin with a semicolon (;).
 
 ## config.ini
 
 This is the main config file. It will likely need configured when you first deploy Vitality GOES. It is broken out into the following sections:
 
 ### General
+* `siteTitle`: Sets the title of the Vitality GOES Web App. If not set, the site title defaults to "Vitality GOES"
 * `graphiteAPI`: If you're using goestools and want to view its decoder/demodulator statistcs, this should point to your graphite host. It must include the `/render/` path at the end to work properly. If you're not using goestools/graphite, comment/remove this line. For information on how to set up graphite, [look here](/docs/graphite.md).
 * `satdumpAPI`: Points to the SatDump REST API to pull decoder/demodulator statistics. You must run SatDump with the `--http_server` flag to get statistics. If you're not using SatDump or don't want statistics, comment/delete this line.
 * `emwinPath`: Point to the emwin repository of your choice. If you're picking up both GOES West and East, you can use either's EMWIN files. Comment/delete this line to completely disable emwin data (text and images), or if you're not picking up data from a GOES satellite.
