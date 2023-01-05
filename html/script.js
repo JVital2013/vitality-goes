@@ -284,7 +284,7 @@ function menuSelect(menuNumber)
 	//Do nothing if there are no valid menus (there is always at least 1 child, even with no menus)
 	if(document.getElementById('sideBar').childElementCount < 2)
 	{
-		mainContent.innerHTML = "<div style='height: 30px;'></div><div style='color: white; text-align: center;'>No data found to display! Please verify the server config</div>";
+		mainContent.innerHTML = "<div style='height: 30px;'></div><div class='errorMessage'>No data found to display! Please verify the server config</div>";
 		mainContent.className = "singleCard";
 		return;
 	}
@@ -334,7 +334,7 @@ function menuSelect(menuNumber)
 	
 	if(typeof(EventSource) == "undefined")
 	{
-		mainContent.innerHTML = "<div style='height: 30px;'></div><div style='color: white; text-align: center;'>Sorry! Internet Explorer does not support this site. Please use a real browser.</div>";
+		mainContent.innerHTML = "<div style='height: 30px;'></div><div class='errorMessage'>Sorry! Internet Explorer does not support this site. Please use a real browser.</div>";
 		mainContent.className = "singleCard";
 		return;
 	}
@@ -462,7 +462,7 @@ function menuSelect(menuNumber)
 					weatherInfo.sevenDayForcast.forEach(todaysForcast => {
 						forcastCard = document.createElement('div');
 						forcastCard.className = 'forecastCard';
-						forcastCard.innerHTML = "<div style='font-weight: bold; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #888888;'>" + todaysForcast.date + "</div>";
+						forcastCard.innerHTML = "<div class='forecastHeader'>" + todaysForcast.date + "</div>";
 						
 						if("amClouds" in todaysForcast && "amPrecip" in todaysForcast)
 						{
@@ -487,7 +487,7 @@ function menuSelect(menuNumber)
 						if("amPrecip" in todaysForcast) renderLeftRightLine(forcastCard, "Precipitation", todaysForcast.amPrecip + "%");
 						if("amHumidity" in todaysForcast) renderLeftRightLine(forcastCard, "Humidity", todaysForcast.amHumidity + "%");
 						
-						if((("amClouds" in todaysForcast && "amPrecip" in todaysForcast) || "maxTemp" in todaysForcast || "amPrecip" in todaysForcast || "amHumidity" in todaysForcast) && (("pmClouds" in todaysForcast && "pmPrecip" in todaysForcast) || "minTemp" in todaysForcast || "pmPrecip" in todaysForcast || "pmHumidity" in todaysForcast)) forcastCard.innerHTML += "<div style='font-weight: bold; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid #888888; margin-top: 25px;'>Evening</div>";
+						if((("amClouds" in todaysForcast && "amPrecip" in todaysForcast) || "maxTemp" in todaysForcast || "amPrecip" in todaysForcast || "amHumidity" in todaysForcast) && (("pmClouds" in todaysForcast && "pmPrecip" in todaysForcast) || "minTemp" in todaysForcast || "pmPrecip" in todaysForcast || "pmHumidity" in todaysForcast)) forcastCard.innerHTML += "<div class='forecastHeader' style='margin-top: 25px;'>Evening</div>";
 						if("pmClouds" in todaysForcast && "pmPrecip" in todaysForcast)
 						{
 							//Probably not raining

@@ -32,6 +32,11 @@ select, input
 	margin: 2px;
 	max-width: 100%;
 }
+.errorMessage
+{
+	color: white;
+	text-align: center;
+}
 .topBar
 {
 	background: #000080;
@@ -385,6 +390,13 @@ select, input
 {
 	border-right: solid 1px #888888;
 	margin-right: 1px;
+}
+.forecastHeader
+{
+	font-weight: bold;
+	margin-bottom: 10px;
+	padding-bottom: 5px;
+	border-bottom: 1px solid #888888;
 }
 .mapLinks
 {
