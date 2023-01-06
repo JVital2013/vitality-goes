@@ -1,5 +1,5 @@
 /* 
- * Copyright 2022 Jamie Vital
+ * Copyright 2022-2023 Jamie Vital
  * This software is licensed under the GNU General Public License
  * 
  * This file is part of Vitality GOES.
