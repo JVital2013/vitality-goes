@@ -22,7 +22,12 @@ require_once($_SERVER['DOCUMENT_ROOT'] . "/functions.php");
 $config = loadConfig();
 
 //Only display errors if set to in the config
-ini_set("display_errors", ($config['general']['debug'] ? "On" : "Off"));
+if($config['general']['debug'])
+{
+	ini_set("display_errors", "On");
+	error_reporting(E_ALL);
+}
+else ini_set("display_errors", "Off");
 
 //Load Current User Settings from Cookie
 $sendCookie = false;
