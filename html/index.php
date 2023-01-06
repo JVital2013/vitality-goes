@@ -50,9 +50,10 @@ if(is_dir("{$_SERVER['DOCUMENT_ROOT']}/themes"))
 
 //Find theme to load
 $themeblock = "";
-if(array_key_exists('siteTheme', $config['general'])) $themeToUse = $config['general']['siteTheme'];
-if(array_key_exists('currentTheme', $_COOKIE)) $themeToUse = $_COOKIE['currentTheme'];
-if(isset($themeToUse) && array_key_exists($themeToUse, $themes))
+if(array_key_exists('selectedTheme', $_COOKIE) && array_key_exists($_COOKIE['selectedTheme'], $themes)) $themeToUse = $_COOKIE['selectedTheme'];
+elseif(array_key_exists('siteTheme', $config['general']) && array_key_exists($config['general']['siteTheme'], $themes)) $themeToUse = $config['general']['siteTheme'];
+
+if(isset($themeToUse))
 {
 	foreach($themes[$themeToUse] as $stylesheet)
 	{
