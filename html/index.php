@@ -18,11 +18,50 @@
  */
 
 //Load data from config
-$config = $config = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini", true, INI_SCANNER_RAW);
+$config = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini", true, INI_SCANNER_RAW);
 
 //Get title of site
 if(array_key_exists('siteTitle', $config['general'])) $siteTitle = htmlspecialchars(strip_tags($config['general']['siteTitle']));
 else $siteTitle = "Vitality GOES";
+
+//Get themes
+if(is_dir("{$_SERVER['DOCUMENT_ROOT']}/themes"))
+{
+	$themeDirs = glob("{$_SERVER['DOCUMENT_ROOT']}/themes/*", GLOB_ONLYDIR);
+	$themes = [];
+	
+	foreach($themeDirs as $themeDir)
+	{
+		//Make sure theme is valid
+		if(!is_file("$themeDir/theme.ini")) continue;
+		$thisThemeDef = parse_ini_file("$themeDir/theme.ini", true, INI_SCANNER_RAW);
+		if($thisThemeDef === false || !array_key_exists("stylesheets", $thisThemeDef)) continue;
+		
+		//Make sure the theme doesn't try loading something strange
+		foreach($thisThemeDef['stylesheets'] as $stylesheet)
+			if((!preg_match("/^https?:\/\/.*$/", $stylesheet) && strpos($stylesheet, "..") !== false) ||
+				(!preg_match("/^https?:\/\/.*$/", $stylesheet) && !is_file("$themeDir/$stylesheet")))
+					continue 2;
+		
+		//Theme is valid, allow it
+		$themes[basename($themeDir)] = $thisThemeDef['stylesheets'];
+	}
+}
+
+//Find theme to load
+$themeblock = "";
+if(array_key_exists('siteTheme', $config['general'])) $themeToUse = $config['general']['siteTheme'];
+if(array_key_exists('currentTheme', $_COOKIE)) $themeToUse = $_COOKIE['currentTheme'];
+if(isset($themeToUse) && array_key_exists($themeToUse, $themes))
+{
+	foreach($themes[$themeToUse] as $stylesheet)
+	{
+		if(preg_match("/^https?:\/\/.*$/", $stylesheet)) $stylesheetURL = $stylesheet;
+		else $stylesheetURL = "/themes/$themeToUse/$stylesheet";
+		
+		$themeblock .= "<link rel=\"stylesheet\" href=\"$stylesheetURL\">\n\t\t\t";
+	}
+}
 
 ?>
 <!DOCTYPE html>
@@ -43,6 +82,8 @@ else $siteTitle = "Vitality GOES";
 		<link rel="stylesheet" href="/lightgallery/css/lightgallery.css?v=20221016">
 		<link rel="stylesheet" href="/lightgallery/css/lg-zoom.css?v=20221016">
 		<link rel="stylesheet" href="/lightgallery/css/lg-jumpto.css?v=20220811">
+		<?php echo $themeblock; ?>
+		
 		<link href="splashscreens/iphone5_splash.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
 		<link href="splashscreens/iphone6_splash.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
 		<link href="splashscreens/iphoneplus_splash.png" media="(device-width: 621px) and (device-height: 1104px) and (-webkit-device-pixel-ratio: 3)" rel="apple-touch-startup-image" />
