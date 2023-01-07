@@ -747,8 +747,8 @@ elseif($_GET['type'] == "settings")
 			break;
 		case "theme":
 			$themes = findAllThemes();
-			$dropdownList['default'] = "Vitality GOES (Dark)";
-			foreach($themes as $theme => $name) $dropdownList[$theme] = $name['name'];
+			$dropdownList['default'] = "Built-In (Dark)";
+			foreach($themes as $theme => $name) $dropdownList[$theme] = htmlspecialchars(strip_tags($name['name']));
 			break;
 		default:
 			break;
