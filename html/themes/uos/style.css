@@ -1,0 +1,127 @@
+/* 
+ * Copyright 2022-2023 Jamie Vital
+ * This software is licensed under the GNU General Public License
+ * 
+ * This file is part of Vitality GOES.
+ * Vitality GOES is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Vitality GOES is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with Vitality GOES.  If not, see <http://www.gnu.org/licenses/>.
+ */
+body
+{
+	background: repeating-linear-gradient(to bottom, #031a0b, #09160d, #031a0b 10px);
+	background-attachment: fixed;
+	font-family: "Perfect DOS VGA 437 Win", monospace;
+}
+.topBar
+{
+	background: repeating-linear-gradient(to bottom, #031a0b, #09160d, #031a0b 10px);
+	box-shadow: none;
+	border-bottom: solid 1px #47976e;
+}
+.barTitle, .weatherHeader, .prettyBoxHeader, .menuItem, .weatherLeft
+{
+	font-weight: normal;
+}
+.topBarInner, .spanLink.selected, .prettyBox
+{
+	color: #5cdc95;
+}
+.sideBar
+{
+	background: repeating-linear-gradient(to bottom, #031a0b, #09160d, #031a0b 10px);
+	box-shadow: none;
+	border-right: solid 1px #47976e;
+}
+.menuItem, .menuItem:hover
+{
+	color: #5cdc95;
+}
+.menuItem.selected, .menuItem.selected:hover
+{
+	color: #09160d;
+}
+.menuItem.selected
+{
+	background: #47976e;
+}
+.menuItem:hover, input:enabled:hover, select:enabled:hover
+{
+	background: #183425;
+}
+.menuItem.selected:hover
+{
+	background: #5cdc95;
+}
+.prettyBox
+{
+	box-shadow: none;
+	background: none;
+	border: solid 1px #47976e;
+	border-radius: 0px;
+}
+.prettyBoxContent
+{
+	border-top: solid 1px #47976e;
+}
+.otherEmwinBody
+{
+	font-family: inherit;
+	font-size: 10pt;
+}
+.forecastCard
+{
+	border-left: solid 1px #47976e;
+}
+.forecastHeader, .prettyBoxList
+{
+	border-bottom: solid 1px #47976e;
+}
+.spanLink
+{
+	color: #47976e;
+}
+.spanLink:after
+{
+	color: #47976e;
+}
+.goeslabel
+{
+	font-size: 9pt;
+	margin-bottom: 3px;
+}
+input, select
+{
+	background: transparent;
+	font-size: 9pt;
+	font-family: inherit;
+	border-radius: 0;
+}
+input:enabled, select:enabled
+{
+	border: solid 1px #47976e;
+	color: #5cdc95;
+}
+input:disabled, select:disabled
+{
+	border: solid 1px #2d5e43;
+	color: #2d5e43;
+}
+.otherEmwinBody::-webkit-scrollbar-track,
+.forcastCardHolder::-webkit-scrollbar-track
+{
+	background: #183425;
+}
+.otherEmwinBody::-webkit-scrollbar-thumb,
+.forcastCardHolder::-webkit-scrollbar-thumb
+{
+	background: #47976e;
+}

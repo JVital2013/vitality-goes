@@ -170,6 +170,7 @@ Also special thanks to [Aang23 for his SatDump package](https://github.com/altil
 The following software packages are included in Vitality GOES:
 * **FontAwesome Free** ([https://fontawesome.com](https://fontawesome.com/)): made available under the Creative Commons License
 * **LightGallery by Sachin Neravath** ([https://www.lightgalleryjs.com](https://www.lightgalleryjs.com/)): made available under the GPLv3 License.
+* **Perfect DOS VGA 437 Font** ([https://www.dafont.com/perfect-dos-vga-437.font])(https://www.dafont.com/perfect-dos-vga-437.font): available in the Public Domain
 * **OpenSans** ([https://fonts.google.com/specimen/Open+Sans](https://fonts.google.com/specimen/Open+Sans)): made available under the Apache License.
 * **SimplerPicker** ([https://github.com/JVital2013/simplerpicker](https://github.com/JVital2013/simplerpicker)): made available under the MIT License.
 
