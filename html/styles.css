@@ -123,9 +123,8 @@ select, input
 }
 .menuItem
 {
-	padding: 10%;
+	padding: 30px 25px;
 	height: 20px;
-	width: 80%;
 	font-size: 12pt;
 	cursor: pointer;
 	vertical-align: middle;
@@ -420,11 +419,11 @@ select, input
 {
 	content: none;
 }
-@media (max-height: 600px)
+@media (max-height: 775px)
 {
 	.menuItem
 	{
 		font-size: 10pt;
-		padding: 15px 10%;
+		padding: 15px 20px;
 	}
 }

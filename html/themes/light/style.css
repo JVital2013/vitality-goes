@@ -22,21 +22,34 @@ body
 }
 .topBar
 {
-	background: #0081bb;
+	background: #03a9f4;
 	box-shadow: none;
+	height: 60px;
 }
 .barLogo
 {
 	filter: none;
+	font-size: 20pt;
+}
+.barRefresh
+{
+	font-size: 20pt;
 }
 .barTitle
 {
 	text-shadow: none;
 	opacity: 0.9;
+	width: calc(100% - 96px);
+	font-size: 14pt;
 }
 .sideBar
 {
 	background: white;
+}
+.menuItem
+{
+	padding: 25px;
+	font-size: 11pt;
 }
 .menuItem, .menuItem:hover,
 .menuItem.selected, .menuItem.selected:hover
@@ -54,6 +67,10 @@ body
 .menuItem.selected:hover
 {
 	background-color: #a9d6eb;
+}
+.mainBodyPadding
+{
+	height: 60px;
 }
 .prettyBox
 {
