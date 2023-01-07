@@ -18,52 +18,25 @@
  */
 
 //Load data from config
+require_once($_SERVER['DOCUMENT_ROOT'] . "/functions.php");
 $config = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini", true, INI_SCANNER_RAW);
 
 //Get title of site
 if(array_key_exists('siteTitle', $config['general'])) $siteTitle = htmlspecialchars(strip_tags($config['general']['siteTitle']));
 else $siteTitle = "Vitality GOES";
 
-//Get themes
-if(is_dir("{$_SERVER['DOCUMENT_ROOT']}/themes"))
-{
-	$themeDirs = glob("{$_SERVER['DOCUMENT_ROOT']}/themes/*", GLOB_ONLYDIR);
-	$themes = [];
-	
-	foreach($themeDirs as $themeDir)
-	{
-		//Make sure theme is valid
-		if(!is_file("$themeDir/theme.ini")) continue;
-		$thisThemeDef = parse_ini_file("$themeDir/theme.ini", true, INI_SCANNER_RAW);
-		if($thisThemeDef === false || !array_key_exists("stylesheets", $thisThemeDef)) continue;
-		
-		//Make sure the theme doesn't try loading something strange
-		foreach($thisThemeDef['stylesheets'] as $stylesheet)
-			if((!preg_match("/^https?:\/\/.*$/", $stylesheet) && strpos($stylesheet, "..") !== false) ||
-				(!preg_match("/^https?:\/\/.*$/", $stylesheet) && !is_file("$themeDir/$stylesheet")))
-					continue 2;
-		
-		//Theme is valid, allow it
-		$themes[basename($themeDir)] = $thisThemeDef['stylesheets'];
-	}
-}
-
-//Find theme to load
+//Load Theme
 $themeblock = "";
-if(array_key_exists('selectedTheme', $_COOKIE) && array_key_exists($_COOKIE['selectedTheme'], $themes)) $themeToUse = $_COOKIE['selectedTheme'];
-elseif(array_key_exists('siteTheme', $config['general']) && array_key_exists($config['general']['siteTheme'], $themes)) $themeToUse = $config['general']['siteTheme'];
-
-if(isset($themeToUse))
+$theme = loadTheme($config);
+if($theme !== false)
 {
-	foreach($themes[$themeToUse] as $stylesheet)
+	foreach($theme['stylesheets'] as $stylesheet)
 	{
 		if(preg_match("/^https?:\/\/.*$/", $stylesheet)) $stylesheetURL = $stylesheet;
-		else $stylesheetURL = "/themes/$themeToUse/$stylesheet";
-		
-		$themeblock .= "<link rel=\"stylesheet\" href=\"$stylesheetURL\">\n\t\t\t";
+		else $stylesheetURL = "/themes/{$theme['slug']}/$stylesheet";
+		$themeblock .= "<link rel=\"stylesheet\" href=\"$stylesheetURL\">\n\t\t";
 	}
 }
-
 ?>
 <!DOCTYPE html>
 <html>
@@ -75,7 +48,7 @@ if(isset($themeToUse))
 		<meta name="apple-mobile-web-app-capable" content="yes">
 
 		<link rel="apple-touch-icon" href="/icon-512x512.png">
-		<link rel="manifest" href="/manifest.json?v=20220616">
+		<link rel="manifest" href="/manifest.php">
 		<link rel="stylesheet" href="/styles.css?v=20221230">
 		<link rel="stylesheet" href="/opensans.css">
 		<link rel="stylesheet" href="/simplerpicker/simplerpicker.css">

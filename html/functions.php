@@ -60,6 +60,59 @@ function loadConfig()
 	return $config;
 }
 
+function findAllThemes()
+{
+	$themes = [];
+	if(is_dir("{$_SERVER['DOCUMENT_ROOT']}/themes"))
+	{
+		$themeDirs = glob("{$_SERVER['DOCUMENT_ROOT']}/themes/*", GLOB_ONLYDIR);
+		foreach($themeDirs as $themeDir)
+		{
+			//Make sure theme is valid
+			if(!is_file("$themeDir/theme.ini")) continue;
+			$thisThemeDef = parse_ini_file("$themeDir/theme.ini", true, INI_SCANNER_RAW);
+			if($thisThemeDef === false || !array_key_exists("stylesheets", $thisThemeDef) || !is_array($thisThemeDef['stylesheets'])) continue;
+			
+			//Make sure the theme doesn't try loading something strange
+			foreach($thisThemeDef['stylesheets'] as $stylesheet)
+				if((!preg_match("/^https?:\/\/.*$/", $stylesheet) && strpos($stylesheet, "..") !== false) ||
+					(!preg_match("/^https?:\/\/.*$/", $stylesheet) && !is_file("$themeDir/$stylesheet")))
+						continue 2;
+			
+			//Theme is valid, allow it
+			$themes[basename($themeDir)] = $thisThemeDef;
+		}
+	}
+	
+	return $themes;
+}
+
+function loadTheme($config)
+{
+	$themes = findAllThemes();
+	
+	//If default theme is defined in cookie, return false (no theme)
+	//Otherwise, use the overlay theme specified if it exists
+	if(array_key_exists('selectedTheme', $_COOKIE))
+	{
+		if($_COOKIE['selectedTheme'] == "default") return false;
+		if(array_key_exists($_COOKIE['selectedTheme'], $themes)) $themeToUse = $_COOKIE['selectedTheme'];
+	}
+	
+	//If no valid theme was found in the cookie, check for a valid theme
+	//in the server config. Use it if found
+	if(!isset($themeToUse) && array_key_exists('siteTheme', $config['general']) && array_key_exists($config['general']['siteTheme'], $themes))
+		$themeToUse = $config['general']['siteTheme'];
+	
+	//Return theme if found; otherwise return false
+	if(isset($themeToUse))
+	{
+		$themes[$themeToUse]['slug'] = $themeToUse;
+		return $themes[$themeToUse];
+	}
+	else return false;
+}
+
 function parseABIConfig($config, &$abiConfig)
 {
 	$slugs = array_keys($abiConfig);
