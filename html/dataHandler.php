@@ -189,8 +189,12 @@ if($_GET['type'] == "preload")
 	$preloadData['showSysInfo'] = $config['general']['showSysInfo'];
 	$preloadData['showSatdumpInfo'] = array_key_exists('satdumpAPI', $config['general']);
 	$preloadData['showGraphs'] = array_key_exists('graphiteAPI', $config['general']);
-	$preloadData['showEmwinInfo'] = array_key_exists('emwinPath', $config['general']) &&  is_dir($config['general']['emwinPath']);
-	$preloadData['showAdminInfo'] = array_key_exists('adminPath', $config['general']) &&  is_dir($config['general']['adminPath']);
+	$preloadData['showEmwinInfo'] = array_key_exists('emwinPath', $config['general']) && is_dir($config['general']['emwinPath']);
+	$preloadData['showAdminInfo'] = array_key_exists('adminPath', $config['general']) && is_dir($config['general']['adminPath']);
+	
+	$currentTheme = loadTheme($config);
+	if($currentTheme === false) $preloadData['theme'] = "default";
+	else $preloadData['theme'] = $currentTheme['slug'];
 	
 	header('Content-Type: application/json; charset=utf-8');
 	echo json_encode($preloadData);
@@ -741,7 +745,11 @@ elseif($_GET['type'] == "settings")
 			
 			sort($dropdownList);
 			break;
-			
+		case "theme":
+			$themes = findAllThemes();
+			$dropdownList['default'] = "Vitality GOES (Dark)";
+			foreach($themes as $theme => $name) $dropdownList[$theme] = $name['name'];
+			break;
 		default:
 			break;
 	}

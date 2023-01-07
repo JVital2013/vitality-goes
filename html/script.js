@@ -805,262 +805,307 @@ function menuSelect(menuNumber)
 		break;
 		
 		case 7:
-		barTitle.innerHTML = "Configure Location";
+		barTitle.innerHTML = "Local Settings";
 		mainContent.innerHTML = "";
 		
-		renderStiffCard("selectedProfile", "Location Settings Profile");
+		//Render main cards
+		if(config.showEmwinInfo) renderStiffCard("selectedProfile", "Location Settings Profile");
+		renderStiffCard("selectedTheme", "Web App Theme");
 		
-		selectedProfile = parseInt(getCookie('selectedProfile'));
-		currentSettings = JSON.parse(getCookie('currentSettings'));
-		profileSelectorHolder = document.createElement('div');
-		profileSelectorHolder.className = 'prettyBoxList';
-		profileSelectorHolder.style.padding = 0;
-		profileSelectorHolder.style.paddingBottom = "10px";
-		profileSelectorHolder.style.textAlign = 'center';
-		profileSelectorHolder.innerHTML = "<b>Profile: </b>";
-		
-		profileSelector = document.createElement('select');
-		profileSelector.id = 'profileSelector';
-		thisProfile = 0;
-		currentSettings.forEach(profile => {
-			newOption = document.createElement('option');
-			newOption.value = thisProfile;
-			newOption.text = (thisProfile == 0 ? "Ground Station Defaults" : (profile.city == "" ? profile.wxZone : toTitleCase(profile.city)) + ", " + profile.stateAbbr);
-			profileSelector.appendChild(newOption);
-			thisProfile++;
-		});
-		profileSelector.selectedIndex = selectedProfile;
-		profileSelector.addEventListener('change', function(evt) {
-			lastRadarCode = currentSettings[selectedProfile].radarCode;
+		if(config.showEmwinInfo)
+		{
+			//Set up profile
+			selectedProfile = parseInt(getCookie('selectedProfile'));
+			currentSettings = JSON.parse(getCookie('currentSettings'));
+			profileSelectorHolder = document.createElement('div');
+			profileSelectorHolder.className = 'prettyBoxList';
+			profileSelectorHolder.style.padding = 0;
+			profileSelectorHolder.style.paddingBottom = "10px";
+			profileSelectorHolder.style.textAlign = 'center';
+			profileSelectorHolder.innerHTML = "<span style='font-weight: bold;'>Profile: </span>";
 			
-			selectedProfile = document.getElementById('profileSelector').selectedIndex;
-			setCookie('selectedProfile', selectedProfile);
-			
-			if(currentSettings[selectedProfile].radarCode != lastRadarCode) location.reload();
-			else menuSelect(selectedMenu);
-		});
-		profileSelectorHolder.appendChild(profileSelector);
-		
-		addNewButton = document.createElement('input');
-		addNewButton.id = "addNewButton";
-		addNewButton.type = "button";
-		addNewButton.value = "Add";
-		addNewButton.disabled = (currentSettings.length >= 10);
-		addNewButton.addEventListener('click', function() {
-			currentSettings.push(currentSettings[selectedProfile]);
-			setCookie("currentSettings", JSON.stringify(currentSettings));
-			setCookie("selectedProfile", currentSettings.length - 1);
-			menuSelect(selectedMenu);
-		});
-		profileSelectorHolder.appendChild(addNewButton);
-		
-		deleteButton = document.createElement('input');
-		deleteButton.id = "deleteButton";
-		deleteButton.type = "button";
-		deleteButton.value = "Delete";
-		deleteButton.style.color = "red";
-		deleteButton.addEventListener('click', function() {
-			lastRadarCode = currentSettings[selectedProfile].radarCode;
-			
-			currentSettings.splice(selectedProfile, 1);
-			selectedProfile = 0;
-			
-			setCookie("currentSettings", JSON.stringify(currentSettings));
-			setCookie("selectedProfile", selectedProfile);
-			
-			if(currentSettings[selectedProfile].radarCode != lastRadarCode) location.reload();
-			else menuSelect(selectedMenu);
-		});
-		profileSelectorHolder.appendChild(deleteButton);
-		
-		target = document.getElementById('selectedProfileCardBody');
-		target.innerHTML = "";
-		target.appendChild(profileSelectorHolder);
-		
-		generalSettingsHolder = document.createElement('div');
-		generalSettingsHolder.className = 'prettyBoxList';
-		generalSettingsHolder.style.padding = 0;
-		generalSettingsHolder.style.paddingBottom = "10px";
-		renderLeftRightLine(generalSettingsHolder, "Timezone", "<select id='timezone'></select>");
-		renderLeftRightLine(generalSettingsHolder, "Radar Code", "<select id='radarCode'></select>");
-		renderLeftRightLine(generalSettingsHolder, "State/Territory", "<select id='stateAbbr'></select>");
-		renderLeftRightLine(generalSettingsHolder, "Latitude", "<input style='width: 40px;' type='text' id='lat' />");
-		renderLeftRightLine(generalSettingsHolder, "Longitude", "<input style='width: 40px;' type='text' id='lon' />");
-		target.appendChild(generalSettingsHolder);
-		
-		origSettingsHolder = document.createElement('div');
-		origSettingsHolder.className = 'prettyBoxList';
-		origSettingsHolder.style.padding = 0;
-		origSettingsHolder.style.paddingBottom = "10px";
-		renderLeftRightLine(origSettingsHolder, "NWS Office", "<select id='orig'></select>");
-		renderLeftRightLine(origSettingsHolder, "Weather Zone", "<select id='wxZone'></select>");
-		target.appendChild(origSettingsHolder);
-		
-		rwrOrigSettingsHolder = document.createElement('div');
-		rwrOrigSettingsHolder.className = 'prettyBoxList';
-		rwrOrigSettingsHolder.style.padding = 0;
-		rwrOrigSettingsHolder.style.paddingBottom = "10px";
-		renderLeftRightLine(rwrOrigSettingsHolder, "NWS Office (Weather Roundup)", "<select id='rwrOrig'></select>");
-		renderLeftRightLine(rwrOrigSettingsHolder, "City", "<select id='city'></select>");
-		target.appendChild(rwrOrigSettingsHolder);
-		
-		document.getElementById('orig').addEventListener('change', function(evt) {getForecastZone(evt.target.value);});
-		document.getElementById('rwrOrig').addEventListener('change', function(evt) {getLocations(evt.target.value);});
-		
-		saveButtonHolder = document.createElement('div');
-		saveButtonHolder.className = 'prettyBoxList';
-		saveButtonHolder.style.padding = 0;
-		saveButtonHolder.style.marginBottom = 0;
-		saveButtonHolder.style.textAlign = 'center';
-		saveButton = document.createElement('input');
-		saveButton.type = 'button';
-		saveButton.id = 'saveButton';
-		saveButton.style.fontWeight = 'bold';
-		saveButton.value = "Save";
-		saveButton.style.width = "100%";
-		saveButton.addEventListener('click', function() {
-			if(selectedProfile != 0)
-			{
+			profileSelector = document.createElement('select');
+			profileSelector.id = 'profileSelector';
+			thisProfile = 0;
+			currentSettings.forEach(profile => {
+				newOption = document.createElement('option');
+				newOption.value = thisProfile;
+				newOption.text = (thisProfile == 0 ? "Ground Station Defaults" : (profile.city == "" ? profile.wxZone : toTitleCase(profile.city)) + ", " + profile.stateAbbr);
+				profileSelector.appendChild(newOption);
+				thisProfile++;
+			});
+			profileSelector.selectedIndex = selectedProfile;
+			profileSelector.addEventListener('change', function(evt) {
 				lastRadarCode = currentSettings[selectedProfile].radarCode;
 				
-				currentSettings[selectedProfile].radarCode = document.getElementById('radarCode').value;
-				currentSettings[selectedProfile].stateAbbr = document.getElementById('stateAbbr').value;
-				currentSettings[selectedProfile].orig = document.getElementById('orig').value;
-				currentSettings[selectedProfile].rwrOrig = document.getElementById('rwrOrig').value;
-				currentSettings[selectedProfile].wxZone = document.getElementById('wxZone').value;
-				currentSettings[selectedProfile].city = document.getElementById('city').value;
-				currentSettings[selectedProfile].lat = document.getElementById('lat').value;
-				currentSettings[selectedProfile].lon = document.getElementById('lon').value;
-				currentSettings[selectedProfile].timezone = document.getElementById('timezone').value;
+				selectedProfile = document.getElementById('profileSelector').selectedIndex;
+				setCookie('selectedProfile', selectedProfile);
+				
+				if(currentSettings[selectedProfile].radarCode != lastRadarCode) location.reload();
+				else menuSelect(selectedMenu);
+			});
+			profileSelectorHolder.appendChild(profileSelector);
+			
+			addNewButton = document.createElement('input');
+			addNewButton.id = "addNewButton";
+			addNewButton.type = "button";
+			addNewButton.value = "Add";
+			addNewButton.disabled = (currentSettings.length >= 10);
+			addNewButton.addEventListener('click', function() {
+				currentSettings.push(currentSettings[selectedProfile]);
+				setCookie("currentSettings", JSON.stringify(currentSettings));
+				setCookie("selectedProfile", currentSettings.length - 1);
+				menuSelect(selectedMenu);
+			});
+			profileSelectorHolder.appendChild(addNewButton);
+			
+			deleteButton = document.createElement('input');
+			deleteButton.id = "deleteButton";
+			deleteButton.type = "button";
+			deleteButton.value = "Delete";
+			deleteButton.style.color = "red";
+			deleteButton.addEventListener('click', function() {
+				lastRadarCode = currentSettings[selectedProfile].radarCode;
+				
+				currentSettings.splice(selectedProfile, 1);
+				selectedProfile = 0;
 				
 				setCookie("currentSettings", JSON.stringify(currentSettings));
+				setCookie("selectedProfile", selectedProfile);
 				
-				//Make dummy request to dataHandler. This will reset the cookie if it's invalid
-				xhttp.dummy = new XMLHttpRequest();
-				xhttp.dummy.onreadystatechange = function()
+				if(currentSettings[selectedProfile].radarCode != lastRadarCode) location.reload();
+				else menuSelect(selectedMenu);
+			});
+			profileSelectorHolder.appendChild(deleteButton);
+			
+			target = document.getElementById('selectedProfileCardBody');
+			target.innerHTML = "";
+			target.appendChild(profileSelectorHolder);
+			
+			generalSettingsHolder = document.createElement('div');
+			generalSettingsHolder.className = 'prettyBoxList';
+			generalSettingsHolder.style.padding = 0;
+			generalSettingsHolder.style.paddingBottom = "10px";
+			renderLeftRightLine(generalSettingsHolder, "Timezone", "<select id='timezone'></select>");
+			renderLeftRightLine(generalSettingsHolder, "Radar Code", "<select id='radarCode'></select>");
+			renderLeftRightLine(generalSettingsHolder, "State/Territory", "<select id='stateAbbr'></select>");
+			renderLeftRightLine(generalSettingsHolder, "Latitude", "<input style='width: 40px;' type='text' id='lat' />");
+			renderLeftRightLine(generalSettingsHolder, "Longitude", "<input style='width: 40px;' type='text' id='lon' />");
+			target.appendChild(generalSettingsHolder);
+			
+			origSettingsHolder = document.createElement('div');
+			origSettingsHolder.className = 'prettyBoxList';
+			origSettingsHolder.style.padding = 0;
+			origSettingsHolder.style.paddingBottom = "10px";
+			renderLeftRightLine(origSettingsHolder, "NWS Office", "<select id='orig'></select>");
+			renderLeftRightLine(origSettingsHolder, "Weather Zone", "<select id='wxZone'></select>");
+			target.appendChild(origSettingsHolder);
+			
+			rwrOrigSettingsHolder = document.createElement('div');
+			rwrOrigSettingsHolder.className = 'prettyBoxList';
+			rwrOrigSettingsHolder.style.padding = 0;
+			rwrOrigSettingsHolder.style.paddingBottom = "10px";
+			renderLeftRightLine(rwrOrigSettingsHolder, "NWS Office (Weather Roundup)", "<select id='rwrOrig'></select>");
+			renderLeftRightLine(rwrOrigSettingsHolder, "City", "<select id='city'></select>");
+			target.appendChild(rwrOrigSettingsHolder);
+			
+			document.getElementById('orig').addEventListener('change', function(evt) {getForecastZone(evt.target.value);});
+			document.getElementById('rwrOrig').addEventListener('change', function(evt) {getLocations(evt.target.value);});
+			
+			saveButtonHolder = document.createElement('div');
+			saveButtonHolder.className = 'prettyBoxList';
+			saveButtonHolder.style.padding = 0;
+			saveButtonHolder.style.marginBottom = 0;
+			saveButtonHolder.style.textAlign = 'center';
+			saveButton = document.createElement('input');
+			saveButton.type = 'button';
+			saveButton.id = 'saveButton';
+			saveButton.style.fontWeight = 'bold';
+			saveButton.value = "Save";
+			saveButton.style.width = "100%";
+			saveButton.addEventListener('click', function() {
+				if(selectedProfile != 0)
 				{
-					if(this.readyState == 4 && this.status == 200)
+					lastRadarCode = currentSettings[selectedProfile].radarCode;
+					
+					currentSettings[selectedProfile].radarCode = document.getElementById('radarCode').value;
+					currentSettings[selectedProfile].stateAbbr = document.getElementById('stateAbbr').value;
+					currentSettings[selectedProfile].orig = document.getElementById('orig').value;
+					currentSettings[selectedProfile].rwrOrig = document.getElementById('rwrOrig').value;
+					currentSettings[selectedProfile].wxZone = document.getElementById('wxZone').value;
+					currentSettings[selectedProfile].city = document.getElementById('city').value;
+					currentSettings[selectedProfile].lat = document.getElementById('lat').value;
+					currentSettings[selectedProfile].lon = document.getElementById('lon').value;
+					currentSettings[selectedProfile].timezone = document.getElementById('timezone').value;
+					
+					setCookie("currentSettings", JSON.stringify(currentSettings));
+					
+					//Make dummy request to dataHandler. This will reset the cookie if it's invalid
+					xhttp.dummy = new XMLHttpRequest();
+					xhttp.dummy.onreadystatechange = function()
 					{
-						//Request complete; reload settings view
-						if(currentSettings[selectedProfile].radarCode != lastRadarCode) location.reload();
-						else menuSelect(selectedMenu);
-						delete xhttp.dummy;
+						if(this.readyState == 4 && this.status == 200)
+						{
+							//Request complete; reload settings view
+							if(currentSettings[selectedProfile].radarCode != lastRadarCode) location.reload();
+							else menuSelect(selectedMenu);
+							delete xhttp.dummy;
+						}
+						
 					}
 					
+					xhttp.dummy.open("GET", "dataHandler.php", true);
+					xhttp.dummy.send();
 				}
-				
-				xhttp.dummy.open("GET", "dataHandler.php", true);
-				xhttp.dummy.send();
+			});
+			saveButtonHolder.appendChild(saveButton);
+			target.appendChild(saveButtonHolder);
+			
+			//Set up interface
+			if(selectedProfile == 0)
+			{
+				document.getElementById('deleteButton').disabled = true;
+				document.getElementById('deleteButton').style.color = "";
+				document.getElementById('radarCode').disabled = true;
+				document.getElementById('stateAbbr').disabled = true;
+				document.getElementById('orig').disabled = true;
+				document.getElementById('rwrOrig').disabled = true;
+				document.getElementById('wxZone').disabled = true;
+				document.getElementById('city').disabled = true;
+				document.getElementById('lat').disabled = true;
+				document.getElementById('lon').disabled = true;
+				document.getElementById('timezone').disabled = true;
 			}
-		});
-		saveButtonHolder.appendChild(saveButton);
-		target.appendChild(saveButtonHolder);
-		
-		//Set up interface
-		if(selectedProfile == 0)
-		{
-			document.getElementById('deleteButton').disabled = true;
-			document.getElementById('deleteButton').style.color = "";
-			document.getElementById('radarCode').disabled = true;
-			document.getElementById('stateAbbr').disabled = true;
-			document.getElementById('orig').disabled = true;
-			document.getElementById('rwrOrig').disabled = true;
-			document.getElementById('wxZone').disabled = true;
-			document.getElementById('city').disabled = true;
-			document.getElementById('lat').disabled = true;
-			document.getElementById('lon').disabled = true;
-			document.getElementById('timezone').disabled = true;
+			else
+			{
+				document.getElementById('deleteButton').disabled = false;
+				document.getElementById('deleteButton').style.color = "red";
+				document.getElementById('radarCode').disabled = false;
+				document.getElementById('stateAbbr').disabled = false;
+				document.getElementById('orig').disabled = false;
+				document.getElementById('rwrOrig').disabled = false;
+				document.getElementById('wxZone').disabled = false;
+				document.getElementById('city').disabled = false;
+				document.getElementById('lat').disabled = false;
+				document.getElementById('lon').disabled = false;
+				document.getElementById('timezone').disabled = false;
+			}
+			
+			//Latitude and longitude
+			document.getElementById('lat').value = currentSettings[selectedProfile].lat;
+			document.getElementById('lon').value = currentSettings[selectedProfile].lon;
+			
+			getForecastZone(currentSettings[selectedProfile].orig);
+			getLocations(currentSettings[selectedProfile].rwrOrig);
+			
+			//Load most dropdowns
+			xhttp.dropdowns = new XMLHttpRequest();
+			xhttp.dropdowns.onreadystatechange = function()
+			{
+				if(this.readyState == 4 && this.status == 200)
+				{
+					//Radar Codes
+					returnVal = JSON.parse(this.responseText);
+					
+					target = document.getElementById('radarCode');
+					returnVal.radar.forEach((radarCode) => {
+						newOption = document.createElement('option');
+						newOption.value = radarCode;
+						newOption.text = radarCode;
+						target.appendChild(newOption);
+					});
+					
+					target.value = currentSettings[selectedProfile].radarCode;
+					
+					//State Dropdown
+					target = document.getElementById('stateAbbr');
+					returnVal.stateAbbr.forEach((stateAbbr) => {
+						newOption = document.createElement('option');
+						newOption.value = stateAbbr;
+						newOption.text = stateAbbr;
+						target.appendChild(newOption);
+					});
+					
+					target.value = currentSettings[selectedProfile].stateAbbr;
+					
+					//Originators
+					target = document.getElementById('orig');
+					returnVal.orig.forEach((orig) => {
+						newOption = document.createElement('option');
+						newOption.value = orig.orig + orig.state;
+						newOption.text = orig.state + " - " + orig.orig;
+						target.appendChild(newOption);
+					});
+					
+					target.value = currentSettings[selectedProfile].orig;
+					
+					//Originators - RWR
+					target = document.getElementById('rwrOrig');
+					returnVal.rwrOrig.forEach((rwrOrig) => {
+						newOption = document.createElement('option');
+						newOption.value = rwrOrig.orig + rwrOrig.state;
+						newOption.text = rwrOrig.state + " - " + rwrOrig.orig;
+						target.appendChild(newOption);
+					});
+					
+					target.value = currentSettings[selectedProfile].rwrOrig;
+					
+					//Timezone
+					target = document.getElementById('timezone');
+					returnVal.timezone.forEach((timezone) => {
+						newOption = document.createElement('option');
+						newOption.value = timezone;
+						newOption.text = timezone;
+						target.appendChild(newOption);
+					});
+					
+					target.value = currentSettings[selectedProfile].timezone;
+					delete xhttp.dropdowns;
+				}
+			}
+
+			xhttp.dropdowns.open("GET", "dataHandler.php?type=settings&dropdown=general", true);
+			xhttp.dropdowns.send();
 		}
-		else
-		{
-			document.getElementById('deleteButton').disabled = false;
-			document.getElementById('deleteButton').style.color = "red";
-			document.getElementById('radarCode').disabled = false;
-			document.getElementById('stateAbbr').disabled = false;
-			document.getElementById('orig').disabled = false;
-			document.getElementById('rwrOrig').disabled = false;
-			document.getElementById('wxZone').disabled = false;
-			document.getElementById('city').disabled = false;
-			document.getElementById('lat').disabled = false;
-			document.getElementById('lon').disabled = false;
-			document.getElementById('timezone').disabled = false;
-		}
 		
-		//Latitude and longitude
-		document.getElementById('lat').value = currentSettings[selectedProfile].lat;
-		document.getElementById('lon').value = currentSettings[selectedProfile].lon;
-		
-		getForecastZone(currentSettings[selectedProfile].orig);
-		getLocations(currentSettings[selectedProfile].rwrOrig);
-		
-		//Load most dropdowns
-		xhttp.dropdowns = new XMLHttpRequest();
-		xhttp.dropdowns.onreadystatechange = function()
+		//Set up theme card
+		xhttp.theme = new XMLHttpRequest();
+		xhttp.theme.onreadystatechange = function()
 		{
 			if(this.readyState == 4 && this.status == 200)
 			{
-				//Radar Codes
 				returnVal = JSON.parse(this.responseText);
+				target = document.getElementById('selectedThemeCardBody');
+				target.style.textAlign = "center";
 				
-				target = document.getElementById('radarCode');
-				returnVal.radar.forEach((radarCode) => {
+				target.innerHTML = "";
+				themeSelector = document.createElement('select');
+				themeSelector.id = 'themeSelector';
+				Object.keys(returnVal).forEach(thisTheme => {
 					newOption = document.createElement('option');
-					newOption.value = radarCode;
-					newOption.text = radarCode;
-					target.appendChild(newOption);
+					newOption.value = thisTheme;
+					newOption.text = returnVal[thisTheme];
+					themeSelector.appendChild(newOption);
 				});
+				themeSelector.value = config.theme;
+				target.appendChild(themeSelector);
 				
-				target.value = currentSettings[selectedProfile].radarCode;
-				
-				//State Dropdown
-				target = document.getElementById('stateAbbr');
-				returnVal.stateAbbr.forEach((stateAbbr) => {
-					newOption = document.createElement('option');
-					newOption.value = stateAbbr;
-					newOption.text = stateAbbr;
-					target.appendChild(newOption);
+				setThemeButton = document.createElement('input');
+				setThemeButton.id = "setThemeButton";
+				setThemeButton.type = "button";
+				setThemeButton.value = "Set Theme";
+				setThemeButton.addEventListener('click', function() {
+					setCookie("selectedTheme", document.getElementById('themeSelector').value);
+					location.reload();
 				});
-				
-				target.value = currentSettings[selectedProfile].stateAbbr;
-				
-				//Originators
-				target = document.getElementById('orig');
-				returnVal.orig.forEach((orig) => {
-					newOption = document.createElement('option');
-					newOption.value = orig.orig + orig.state;
-					newOption.text = orig.state + " - " + orig.orig;
-					target.appendChild(newOption);
-				});
-				
-				target.value = currentSettings[selectedProfile].orig;
-				
-				//Originators - RWR
-				target = document.getElementById('rwrOrig');
-				returnVal.rwrOrig.forEach((rwrOrig) => {
-					newOption = document.createElement('option');
-					newOption.value = rwrOrig.orig + rwrOrig.state;
-					newOption.text = rwrOrig.state + " - " + rwrOrig.orig;
-					target.appendChild(newOption);
-				});
-				
-				target.value = currentSettings[selectedProfile].rwrOrig;
-				
-				//Timezone
-				target = document.getElementById('timezone');
-				returnVal.timezone.forEach((timezone) => {
-					newOption = document.createElement('option');
-					newOption.value = timezone;
-					newOption.text = timezone;
-					target.appendChild(newOption);
-				});
-				
-				target.value = currentSettings[selectedProfile].timezone;
-				delete xhttp.dropdowns;
+				target.appendChild(setThemeButton);
+				delete xhttp.theme;
 			}
 		}
-
-		xhttp.dropdowns.open("GET", "dataHandler.php?type=settings&dropdown=general", true);
-		xhttp.dropdowns.send();
+		
+		xhttp.theme.open("GET", "dataHandler.php?type=settings&dropdown=theme", true);
+		xhttp.theme.send();
+		
 		break;
 		
 		case 8:
@@ -1452,7 +1497,7 @@ window.addEventListener("load", function()
 			if(Object.keys(config.emwin).length > 0) renderMenuItem(4, 'image', 'EMWIN Imagery');
 			if(config.showAdminInfo || config.showEmwinInfo) renderMenuItem(5, 'align-left', 'Other EMWIN');
 			if(config.showEmwinInfo) renderMenuItem(6, 'wind', 'Hurricane Center');
-			if(config.showEmwinInfo) renderMenuItem(7, 'cogs', 'Configure Location');
+			renderMenuItem(7, 'cogs', 'Local Settings');
 			if(config.showGraphs || config.showSysInfo) renderMenuItem(8, 'info-circle', 'System Info');
 	
 			menuSelect(selectedMenu);

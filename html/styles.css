@@ -176,9 +176,11 @@ select, input
 .dualCard
 {
 	column-count: 2;
-	column-width: 400px;
+	column-width: 350px;
 	column-gap: 20px;
 	padding: 0 10px;
+	max-width: 1000px;
+	margin: 0 auto;
 }
 .prettyBox:only-child
 {
