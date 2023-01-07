@@ -1081,24 +1081,22 @@ function menuSelect(menuNumber)
 				target.innerHTML = "";
 				themeSelector = document.createElement('select');
 				themeSelector.id = 'themeSelector';
+				themeSelector.style.width = "100%";
+				
 				Object.keys(returnVal).forEach(thisTheme => {
 					newOption = document.createElement('option');
 					newOption.value = thisTheme;
 					newOption.text = returnVal[thisTheme];
 					themeSelector.appendChild(newOption);
 				});
-				themeSelector.value = config.theme;
-				target.appendChild(themeSelector);
 				
-				setThemeButton = document.createElement('input');
-				setThemeButton.id = "setThemeButton";
-				setThemeButton.type = "button";
-				setThemeButton.value = "Set Theme";
-				setThemeButton.addEventListener('click', function() {
+				themeSelector.value = config.theme;
+				themeSelector.addEventListener('change', function() {
 					setCookie("selectedTheme", document.getElementById('themeSelector').value);
 					location.reload();
 				});
-				target.appendChild(setThemeButton);
+				
+				target.appendChild(themeSelector);
 				delete xhttp.theme;
 			}
 		}
