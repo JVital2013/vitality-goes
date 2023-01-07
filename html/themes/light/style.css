@@ -48,13 +48,23 @@ body
 }
 .menuItem
 {
-	padding: 25px;
+	padding: 15px;
 	font-size: 11pt;
+	margin: 10px;
+	border-radius: 10px;
 }
-.menuItem, .menuItem:hover,
-.menuItem.selected, .menuItem.selected:hover
+.menuItem, .menuItem:hover
 {
-	color: #212121;
+	color: #414141;
+}
+.menuItem.selected, .menuItem.selected:hover,
+.selected .menuItemIconHolder
+{
+	color: #03a9f4;
+}
+.menuItemIconHolder
+{
+	font-size: 16pt;
 }
 .menuItem:hover
 {
@@ -62,7 +72,7 @@ body
 }
 .menuItem.selected
 {
-	background-color: #b3e5fC;
+	background-color: #cdedfc;
 }
 .menuItem.selected:hover
 {
@@ -84,9 +94,13 @@ body
 {
 	border-bottom-color: #e0e0e0;
 }
-.forecastCard .fa, .menuItemIconHolder
+.forecastCard .fa
 {
 	color: #44739e;
+}
+.menuItemIconHolder
+{
+	color: #808080;
 }
 .spanLink.selected
 {
