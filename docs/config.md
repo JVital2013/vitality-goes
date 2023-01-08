@@ -18,6 +18,7 @@ This is the main config file. It will likely need configured when you first depl
 
 ### General
 * `siteTitle`: Sets the title of the Vitality GOES Web App. If not set, the site title defaults to "Vitality GOES"
+* `siteTheme`: The theme for Vitality GOES. Leave unset to use the built-in theme, or set it to an installed theme. The included themes are "light", "purple", "red", and "uos". This option can be overridden per-browser by using the "Local Settings" screen. For more on theming, [look here](/docs/themes.md).
 * `graphiteAPI`: If you're using goestools and want to view its decoder/demodulator statistcs, this should point to your graphite host. It must include the `/render/` path at the end to work properly. If you're not using goestools/graphite, comment/remove this line. For information on how to set up graphite, [look here](/docs/graphite.md).
 * `satdumpAPI`: Points to the SatDump REST API to pull decoder/demodulator statistics. You must run SatDump with the `--http_server` flag to get statistics. If you're not using SatDump or don't want statistics, comment/delete this line.
 * `emwinPath`: Point to the emwin repository of your choice. If you're picking up both GOES West and East, you can use either's EMWIN files. Comment/delete this line to completely disable emwin data (text and images), or if you're not picking up data from a GOES satellite.
@@ -41,7 +42,7 @@ If hosted on Windows, set your paths to something like `GOES16 = C:\path\to\satd
 ### Location
 This section contains information about your physical location. If you're not displaying EMWIN data, the only thing you need to configure is `timezone`. A list of supported timezones can be found [here](https://www.php.net/manual/en/timezones.php).
 
-If you are displaying EMWIN/local weather data, here's what each of the other options mean. Note that these options can also be changed per client web browser by using the "configure location" screen in Vitality GOES.
+If you are displaying EMWIN/local weather data, here's what each of the other options mean. Note that these options can also be changed per client web browser by using the "Local Settings" screen in Vitality GOES.
 
 * `radarCode`: The last 5 letters of the radar file for your region. In the emwin directory, all radar files end with RAD{radarCode}.GIF. **The radar image you want to display must be configured as an available image in emwin.ini**
   
@@ -63,13 +64,13 @@ If you are displaying EMWIN/local weather data, here's what each of the other op
   *  STHPL (Southern Plains Region)
   *  UMSVY (Upper Mississippi Valley)
 *  `stateAbbr`: The post office abbreviation of your state. Also includes things like PR for Puerto Rico, AS for American Samoa, etc.
-*  `wxZone`: The weather zone of your location. This is typically your state abbreviation, a Z, and a 3 digit number. Example: PAZ066. You can either use the "Configure Location" section of Vitality GOES to figure this out, or use [this site](https://pnwpest.org/cgi-bin/wea3/wea3) to search for your town. "Weather Zone" shows up in the upper-right of that page.
-*  `orig`: The National Weather Service Forecast Office for your local weather information. The code needs to be the office call sign, plus the 2-letter state abbreviation. You can either use the "Configure Location" section of Vitality GOES to figure this out, or look at [https://en.wikipedia.org/wiki/List_of_National_Weather_Service_Weather_Forecast_Offices](https://en.wikipedia.org/wiki/List_of_National_Weather_Service_Weather_Forecast_Offices). For example, State College PA is "CTP", so orig needs to be set to `CTPPA`
+*  `wxZone`: The weather zone of your location. This is typically your state abbreviation, a Z, and a 3 digit number. Example: PAZ066. You can either use the "Local Settings" section of Vitality GOES to figure this out, or use [this site](https://pnwpest.org/cgi-bin/wea3/wea3) to search for your town. "Weather Zone" shows up in the upper-right of that page.
+*  `orig`: The National Weather Service Forecast Office for your local weather information. The code needs to be the office call sign, plus the 2-letter state abbreviation. You can either use the "Local Settings" section of Vitality GOES to figure this out, or look at [https://en.wikipedia.org/wiki/List_of_National_Weather_Service_Weather_Forecast_Offices](https://en.wikipedia.org/wiki/List_of_National_Weather_Service_Weather_Forecast_Offices). For example, State College PA is "CTP", so orig needs to be set to `CTPPA`
 *  `lat` and `lon`: Your exact latitude and longitude. This is only used to determine if you're within an alert area as issued by the NWS. It must contain 2 decimal points to work correctly
-*  `rwrOrig` *(Optional)*: Accepts the same type of code as `orig`, but specifically for the Regional Weather Roundup information ("Current Weather" card in the Vitality GOES interface). It appears that the weather roundup is sometimes issued by a different office than the rest of your forecast. Use the "Configure Location" section within Vitality GOES to figure this out. *If not set, your `orig` value will be used in place of rwrOrig*
-*  `city` *(Optional)*: Your city/town name, exactly as it appears in the Regional Weather Roundup (RWR). The "Configure Location" screen in Vitality GOES can help you figure this out. *If not set, the "Current Weather" card in the current weather screen will not be shown.*
+*  `rwrOrig` *(Optional)*: Accepts the same type of code as `orig`, but specifically for the Regional Weather Roundup information ("Current Weather" card in the Vitality GOES interface). It appears that the weather roundup is sometimes issued by a different office than the rest of your forecast. Use the "Local Settings" section within Vitality GOES to figure this out. *If not set, your `orig` value will be used in place of rwrOrig*
+*  `city` *(Optional)*: Your city/town name, exactly as it appears in the Regional Weather Roundup (RWR). The "Local Settings" screen in Vitality GOES can help you figure this out. *If not set, the "Current Weather" card in the current weather screen will not be shown.*
 
-You may find that the location section is the hardest part of the config to set up. I would recommend leaving it at its defaults, then use the "Configure Location" screen in Vitality GOES to determine what each value should be set to for your location. Once you have it working client-side, configure the settings as appropraite in this config file.
+You may find that the location section is the hardest part of the config to set up. I would recommend leaving it at its defaults, then use the "Local Settings" screen in Vitality GOES to determine what each value should be set to for your location. Once you have it working client-side, configure the settings as appropraite in this config file.
 
 ## abi.ini, meso.ini, and l2.ini
 
