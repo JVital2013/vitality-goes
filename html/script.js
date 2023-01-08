@@ -82,7 +82,7 @@ function renderImageCard(slug, color)
 	
 	header = document.createElement('div');
 	header.className = "prettyBoxHeader";
-	header.innerHTML = "<i class='fa fa-chevron-" + (expandedCards.includes(slug + "Content") ? "down" : "right") + "' aria-hidden='true'></i>&nbsp;&nbsp;&nbsp;&nbsp;" + config[imageType][slug].title;
+	header.innerHTML = "<i class='fa fa-chevron-" + (expandedCards.includes(slug + "Content") ? "down" : "right") + "' aria-hidden='true'></i>" + config[imageType][slug].title;
 	header.addEventListener('click', showCollapseCard);
 	card.appendChild(header);
 	content = document.createElement('div');
@@ -99,7 +99,7 @@ function renderImageCard(slug, color)
 		links.style.display = expandedCards.includes(slug + "Content") ? "block" : "none";
 		recent = document.createElement('span');
 		recent.className = "spanLink selected";
-		recent.innerHTML = "Current&nbsp;&nbsp;";
+		recent.innerHTML = "Current";
 		recent.id = slug + "-Recent";
 		recent.addEventListener("click", switchCardView);
 		links.appendChild(recent);
@@ -126,7 +126,7 @@ function renderCollapsingCard(slug, name, cardClass, bodyClass)
 	card.className = "prettyBox";
 	cardHeader = document.createElement('div');
 	cardHeader.className = "prettyBoxHeader";
-	cardHeader.innerHTML = "<i class='fa fa-chevron-" + (expandedCards.includes(slug + "Content") ? "down" : "right") + "' aria-hidden='true'></i>&nbsp;&nbsp;&nbsp;&nbsp;" + name;
+	cardHeader.innerHTML = "<i class='fa fa-chevron-" + (expandedCards.includes(slug + "Content") ? "down" : "right") + "' aria-hidden='true'></i>" + name;
 	cardHeader.addEventListener('click', showCollapseCard);
 	card.appendChild(cardHeader);
 	cardContent = document.createElement('div');
@@ -173,7 +173,7 @@ function renderStatsCard(slug, name)
 	card.className = "prettyBox";
 	header = document.createElement('div');
 	header.className = "prettyBoxHeader";
-	header.innerHTML = "<i class='fa fa-chevron-" + (expandedCards.includes(slug + "Content") ? "down" : "right") + "' aria-hidden='true'></i>&nbsp;&nbsp;&nbsp;&nbsp;" + name;
+	header.innerHTML = "<i class='fa fa-chevron-" + (expandedCards.includes(slug + "Content") ? "down" : "right") + "' aria-hidden='true'></i>" + name;
 	header.addEventListener('click', showCollapseCard);
 	card.appendChild(header);
 	content = document.createElement('div');
@@ -360,7 +360,7 @@ function menuSelect(menuNumber)
 			links.className = "mapLinks";
 			recent = document.createElement('span');
 			recent.className = "spanLink selected";
-			recent.innerHTML = "Current&nbsp;&nbsp;";
+			recent.innerHTML = "Current";
 			recent.id = "emwinLocalRadar-Recent";
 			recent.addEventListener("click", switchRadarView);
 			links.appendChild(recent);

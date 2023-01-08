@@ -224,7 +224,7 @@ function findMetadataEMWIN($allEmwinFiles, $product, $title)
 			$DateTime = new DateTime($fileNameParts[4], new DateTimeZone("UTC"));
 			$DateTime->setTimezone(new DateTimeZone(date_default_timezone_get()));
 			$date = $DateTime->format("F j, Y g:i A");
-			$retVal[]['subHtml'] = "<b>$title</b><div class='goeslabel gl-overlay'>Rendered: $date " . $DateTime->format('T') . "</div>";
+			$retVal[]['subHtml'] = "<b>$title</b><div class='lgLabel'>Rendered: $date " . $DateTime->format('T') . "</div>";
 			$retVal[count($retVal) - 1]['description'] = "Rendered: $date " . $DateTime->format('T');
 			$retVal[count($retVal) - 1]['timestamp'] = $DateTime->getTimestamp();
 		}
@@ -249,7 +249,7 @@ function findMetadataABI($path, $filter, $title)
 		$timestamp = strtotime(explode(".", $splitName[count($splitName) - 1])[0]);
 		$date = date("F j, Y g:i A", $timestamp);
 		$DateTime = new DateTime("now", new DateTimeZone(date_default_timezone_get()));
-		$retVal[]['subHtml'] = "<b>$title</b><div class='goeslabel gl-overlay'>$date " . $DateTime->format('T') . "</div>";
+		$retVal[]['subHtml'] = "<b>$title</b><div class='lgLabel'>$date " . $DateTime->format('T') . "</div>";
 		$retVal[count($retVal) - 1]['description'] = "Taken: $date " . $DateTime->format('T');
 		$retVal[count($retVal) - 1]['timestamp'] = $timestamp;
 	}

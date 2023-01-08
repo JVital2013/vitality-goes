@@ -110,17 +110,17 @@ body
 {
 	border-top-color: #e0e0e0;
 }
-input, select
+.prettyBox input, .prettyBox select
 {
 	background: transparent;
 	border-radius: 10px;
 }
-input:enabled, select:enabled
+.prettyBox input:enabled, .prettyBox select:enabled
 {
 	border: solid 1px #44739e;
 	color: #44739e;
 }
-input:disabled, select:disabled
+.prettyBox input:disabled, .prettyBox select:disabled
 {
 	border: solid 1px #808080;
 	color: #808080;

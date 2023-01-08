@@ -1103,7 +1103,7 @@ elseif($_GET['type'] == "hurricaneJSON")
 				if(is_array($dataValue))
 				{
 					usort($returnData[$stormKey][$dataKey], 'sortByTimestamp');
-					for($i = 0; $i < count($returnData[$stormKey][$dataKey]); $i++) $returnData[$stormKey][$dataKey][$i]['subHtml'] = "<b>" . $returnData[$stormKey]['title'] . "</b><div class='goeslabel gl-overlay'>" . $returnData[$stormKey][$dataKey][$i]['description'] . "</div>";
+					for($i = 0; $i < count($returnData[$stormKey][$dataKey]); $i++) $returnData[$stormKey][$dataKey][$i]['subHtml'] = "<b>" . $returnData[$stormKey]['title'] . "</b><div class='lgLabel'>" . $returnData[$stormKey][$dataKey][$i]['description'] . "</div>";
 				}
 			}
 		}

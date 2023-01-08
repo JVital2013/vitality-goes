@@ -53,7 +53,7 @@ body
 {
 	background: #47976e;
 }
-.menuItem:hover, input:enabled:hover, select:enabled:hover
+.menuItem:hover, .prettyBox input:enabled:hover, .prettyBox select:enabled:hover
 {
 	background: #183425;
 }
@@ -99,19 +99,19 @@ body
 	margin-bottom: 3px;
 	color: #47976e;
 }
-input, select
+.prettyBox input, .prettyBox select
 {
 	background: transparent;
 	font-size: 9pt;
 	font-family: inherit;
 	border-radius: 0;
 }
-input:enabled, select:enabled
+.prettyBox input:enabled, .prettyBox select:enabled
 {
 	border: solid 1px #47976e;
 	color: #5cdc95;
 }
-input:disabled, select:disabled
+.prettyBox input:disabled, .prettyBox select:disabled
 {
 	border: solid 1px #2d5e43;
 	color: #2d5e43;

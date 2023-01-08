@@ -271,6 +271,10 @@ select, input
 	user-select: none;
 	font-size: 10pt;
 }
+.prettyBoxHeader .fa
+{
+	margin-right: 10px;
+}
 .weatherHeader
 {
 	font-weight: bold;
@@ -357,9 +361,13 @@ select, input
 	margin-top: 5px;
 	font-size: 8pt;
 }
-.gl-overlay
+.lgLabel
 {
 	margin-bottom: 5px;
+	font-style: oblique;
+	text-align: center;
+	margin-top: 5px;
+	font-size: 8pt;
 }
 .forcastCardHolder
 {
@@ -407,17 +415,18 @@ select, input
 	cursor: pointer;
 	color: #888888;
 	font-size: 10pt;
-	margin-right: 5px;
 }
 .spanLink:after
 {
 	content: "|";
 	font-weight: inherit;
 	color: #888888;
+	padding: 0 5px;
 }
 .spanLink:last-child:after
 {
 	content: none;
+	padding: none;
 }
 @media (max-height: 775px)
 {
