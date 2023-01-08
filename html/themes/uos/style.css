@@ -81,6 +81,10 @@ body
 {
 	border-left: solid 1px #47976e;
 }
+.forecastCard:last-child
+{
+	border-right: solid 1px #47976e;
+}
 .forecastHeader, .prettyBoxList
 {
 	border-bottom: solid 1px #47976e;
@@ -106,6 +110,10 @@ body
 	font-family: inherit;
 	border-radius: 0;
 }
+.prettyBox select
+{
+	appearance: none;
+}
 .prettyBox input:enabled, .prettyBox select:enabled
 {
 	border: solid 1px #47976e;
@@ -115,6 +123,10 @@ body
 {
 	border: solid 1px #2d5e43;
 	color: #2d5e43;
+}
+.prettyBox input:focus, .prettyBox select:focus
+{
+	outline: none;
 }
 .otherEmwinBody::-webkit-scrollbar-track,
 .forcastCardHolder::-webkit-scrollbar-track
