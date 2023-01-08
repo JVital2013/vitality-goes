@@ -14,10 +14,11 @@ A Web App for showcasing Geostationary Weather Satellite Data. Vitality GOES is 
 4. [Installing Vitality GOES](#installing-vitality-goes)
 5. [Configuring Vitality GOES](#configuring-vitality-goes)
 6. [Updating Vitality GOES](#updating-vitality-goes)
-7. [Integrating weather data into Home Assistant](#integrating-weather-data-into-home-assistant)
-8. [Creating configs for other satellites](#creating-configs-for-other-satellites)
-9. [Credits](#credits)
-10. [Additional Resources](#additional-resources)
+7. [Theming](#theming)
+8. [Integrating weather data into Home Assistant](#integrating-weather-data-into-home-assistant)
+9. [Creating configs for other satellites](#creating-configs-for-other-satellites)
+10. [Credits](#credits)
+11. [Additional Resources](#additional-resources)
 
 ## What does Vitality GOES do?
 
@@ -148,6 +149,9 @@ If you still have your cloned vitality-goes repo from last time, you can also ju
 2. Extract the zip
 3. Open a command line within the extracted zip's vitality-goes-main directory
 4. Run the following command: `robocopy html C:\xampp\htdocs /MIR /R:0 /W:0 /XD videos config`
+
+## Theming
+Vitality GOES supports theming. It comes with 5 themes, but you can make your own or install others shared with you. To get started with theming, [take a look at the themes documentation](/docs/themes.md).
 
 ## Integrating weather data into Home Assistant
 Home Assistant is a free and open-source smart home control system. You can use Vitality GOES as a "Weather Provider" in Home Assistant; [look here](docs/home-assistant.md) for more.
