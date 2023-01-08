@@ -748,7 +748,11 @@ elseif($_GET['type'] == "settings")
 		case "theme":
 			$themes = findAllThemes();
 			$dropdownList['default'] = "Built-In (Dark)";
-			foreach($themes as $theme => $name) $dropdownList[$theme] = htmlspecialchars(strip_tags($name['name']));
+			foreach($themes as $theme => $themeData)
+			{
+				if(array_key_exists("name", $themeData)) $dropdownList[$theme] = htmlspecialchars(strip_tags($themeData['name']));
+				else $dropdownList[$theme] = htmlspecialchars(strip_tags($theme));
+			}
 			break;
 		default:
 			break;
