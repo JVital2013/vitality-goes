@@ -21,7 +21,7 @@
 }
 .menuItem.selected
 {
-	background: #3c0000;
+	background: #930000;
 }
 .menuItem:hover
 {
@@ -29,5 +29,5 @@
 }
 .menuItem.selected:hover
 {
-	background: #480000;
+	background: #a30000;
 }
