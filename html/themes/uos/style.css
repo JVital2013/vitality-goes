@@ -85,11 +85,11 @@ body
 {
 	margin-bottom: 3px;
 	color: #47976e;
+	font-size: 9pt;
 }
 .prettyBox input, .prettyBox select
 {
 	background: transparent;
-	font-size: 9pt;
 	font-family: inherit;
 	border-radius: 0;
 }
