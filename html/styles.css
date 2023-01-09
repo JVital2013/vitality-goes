@@ -15,7 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Vitality GOES.  If not, see <http://www.gnu.org/licenses/>.
  */
-
+html
+{
+	-webkit-text-size-adjust: 100%;
+}
 body
 {
 	margin: 0px;
