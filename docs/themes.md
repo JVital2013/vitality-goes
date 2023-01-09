@@ -14,7 +14,7 @@ The following themes are included with Vitality GOES:
 |*Built-in*           |*default/unset*  |*The default theme for Vitality GOES if another valid theme is not selected*    |
 |Dark Red             |red              |Red variant of the built-in theme                                               |
 |GOES Assistant       |light            |Light theme inspiried by Home Assistant                                         |
-|Purple               |purple           |In case you REALLY like purple                                                  |
+|Purple               |purple           |My very supportive wife wanted to make her own theme and I said OK              |
 |RobCo Industries UOS |uos              |Vitality GOES for RobCo's Unified Operating System (UOS). Pip-Boy not included. |
 
 ## Installing Themes

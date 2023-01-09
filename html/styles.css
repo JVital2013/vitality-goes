@@ -65,6 +65,7 @@ select, input
 	font-size: 24pt;
 	padding-right: 20px;
 	filter: drop-shadow(0px 1px 1px #000);
+	-webkit-tap-highlight-color: transparent;
 }
 .barTitle
 {
@@ -89,6 +90,7 @@ select, input
 	width: 30px;
 	font-size: 22pt;
 	cursor: pointer;
+	-webkit-tap-highlight-color: transparent;
 }
 .barRefresh svg
 {
