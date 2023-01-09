@@ -818,14 +818,12 @@ function menuSelect(menuNumber)
 			selectedProfile = parseInt(getCookie('selectedProfile'));
 			currentSettings = JSON.parse(getCookie('currentSettings'));
 			profileSelectorHolder = document.createElement('div');
-			profileSelectorHolder.className = 'prettyBoxList';
-			profileSelectorHolder.style.padding = 0;
-			profileSelectorHolder.style.paddingBottom = "10px";
-			profileSelectorHolder.style.textAlign = 'center';
+			profileSelectorHolder.className = 'prettyBoxList profileSelector';
 			profileSelectorHolder.innerHTML = "<span style='font-weight: bold;'>Profile: </span>";
 			
 			profileSelector = document.createElement('select');
 			profileSelector.id = 'profileSelector';
+			profileSelector.style.minWidth = "30px";
 			thisProfile = 0;
 			currentSettings.forEach(profile => {
 				newOption = document.createElement('option');

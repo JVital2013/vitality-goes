@@ -406,6 +406,13 @@ select, input
 	padding: 5px;
 	user-select: none;
 }
+.profileSelector
+{
+    padding: 0px 0px 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 .spanLink.selected
 {
 	font-weight: bold;
