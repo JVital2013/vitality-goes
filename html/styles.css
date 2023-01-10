@@ -1,5 +1,5 @@
 /* 
- * Copyright 2022 Jamie Vital
+ * Copyright 2022-2023 Jamie Vital
  * This software is licensed under the GNU General Public License
  * 
  * This file is part of Vitality GOES.
@@ -15,7 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Vitality GOES.  If not, see <http://www.gnu.org/licenses/>.
  */
-
+html
+{
+	-webkit-text-size-adjust: 100%;
+}
 body
 {
 	margin: 0px;
@@ -31,6 +34,11 @@ select, input
 	padding: 5px;
 	margin: 2px;
 	max-width: 100%;
+}
+.errorMessage
+{
+	color: white;
+	text-align: center;
 }
 .topBar
 {
@@ -60,6 +68,7 @@ select, input
 	font-size: 24pt;
 	padding-right: 20px;
 	filter: drop-shadow(0px 1px 1px #000);
+	-webkit-tap-highlight-color: transparent;
 }
 .barTitle
 {
@@ -84,6 +93,7 @@ select, input
 	width: 30px;
 	font-size: 22pt;
 	cursor: pointer;
+	-webkit-tap-highlight-color: transparent;
 }
 .barRefresh svg
 {
@@ -118,9 +128,8 @@ select, input
 }
 .menuItem
 {
-	padding: 10%;
+	padding: 30px 25px;
 	height: 20px;
-	width: 80%;
 	font-size: 12pt;
 	cursor: pointer;
 	vertical-align: middle;
@@ -171,9 +180,11 @@ select, input
 .dualCard
 {
 	column-count: 2;
-	column-width: 400px;
+	column-width: 350px;
 	column-gap: 20px;
 	padding: 0 10px;
+	max-width: 1000px;
+	margin: 0 auto;
 }
 .prettyBox:only-child
 {
@@ -265,6 +276,10 @@ select, input
 	user-select: none;
 	font-size: 10pt;
 }
+.prettyBoxHeader .fa
+{
+	margin-right: 10px;
+}
 .weatherHeader
 {
 	font-weight: bold;
@@ -306,15 +321,18 @@ select, input
 	white-space: pre;
 	overflow-x: auto;
 }
-.otherEmwinBody::-webkit-scrollbar 
+.otherEmwinBody::-webkit-scrollbar,
+.forcastCardHolder::-webkit-scrollbar
 {
 	height: 10px;
 }
-.otherEmwinBody::-webkit-scrollbar-track
+.otherEmwinBody::-webkit-scrollbar-track,
+.forcastCardHolder::-webkit-scrollbar-track
 {
 	background: #444444;
 }
-.otherEmwinBody::-webkit-scrollbar-thumb
+.otherEmwinBody::-webkit-scrollbar-thumb,
+.forcastCardHolder::-webkit-scrollbar-thumb
 {
 	background: #888888;
 }
@@ -348,9 +366,13 @@ select, input
 	margin-top: 5px;
 	font-size: 8pt;
 }
-.gl-overlay
+.lgLabel
 {
 	margin-bottom: 5px;
+	font-style: oblique;
+	text-align: center;
+	margin-top: 5px;
+	font-size: 8pt;
 }
 .forcastCardHolder
 {
@@ -359,18 +381,6 @@ select, input
 	padding-bottom: 10px;
 	user-select: none;
 	margin-bottom: 10px;
-}
-.forcastCardHolder::-webkit-scrollbar 
-{
-	height: 10px;
-}
-.forcastCardHolder::-webkit-scrollbar-track
-{
-	background: #444444;
-}
-.forcastCardHolder::-webkit-scrollbar-thumb
-{
-	background: #888888;
 }
 .forecastCard
 {
@@ -386,11 +396,25 @@ select, input
 	border-right: solid 1px #888888;
 	margin-right: 1px;
 }
+.forecastHeader
+{
+	font-weight: bold;
+	margin-bottom: 10px;
+	padding-bottom: 5px;
+	border-bottom: 1px solid #888888;
+}
 .mapLinks
 {
 	text-align: center;
 	padding: 5px;
 	user-select: none;
+}
+.profileSelector
+{
+    padding: 0px 0px 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .spanLink.selected
 {
@@ -403,23 +427,24 @@ select, input
 	cursor: pointer;
 	color: #888888;
 	font-size: 10pt;
-	margin-right: 5px;
 }
 .spanLink:after
 {
 	content: "|";
 	font-weight: inherit;
 	color: #888888;
+	padding: 0 5px;
 }
 .spanLink:last-child:after
 {
 	content: none;
+	padding: none;
 }
-@media (max-height: 600px)
+@media (max-height: 775px)
 {
 	.menuItem
 	{
 		font-size: 10pt;
-		padding: 15px 10%;
+		padding: 15px 20px;
 	}
 }

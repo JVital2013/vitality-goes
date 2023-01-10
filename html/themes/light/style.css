@@ -1,0 +1,120 @@
+body
+{
+	background: #f5f5f5;
+}
+.topBar
+{
+	background: #03a9f4;
+	box-shadow: none;
+	height: 60px;
+}
+.barLogo
+{
+	filter: none;
+	font-size: 20pt;
+}
+.barRefresh
+{
+	font-size: 20pt;
+}
+.barTitle
+{
+	text-shadow: none;
+	opacity: 0.9;
+	width: calc(100% - 96px);
+	font-size: 14pt;
+}
+.sideBar
+{
+	background: white;
+}
+.menuItem
+{
+	padding: 15px;
+	font-size: 11pt;
+	margin: 10px;
+	border-radius: 10px;
+}
+.menuItem, .menuItem:hover
+{
+	color: #414141;
+}
+.menuItem.selected, .menuItem.selected:hover,
+.selected .menuItemIconHolder
+{
+	color: #03a9f4;
+}
+.menuItemIconHolder
+{
+	font-size: 16pt;
+}
+.menuItem:hover
+{
+	background-color: #f0f0f0;
+}
+.menuItem.selected
+{
+	background-color: #cdedfc;
+}
+.menuItem.selected:hover
+{
+	background-color: #a9d6eb;
+}
+.mainBodyPadding
+{
+	height: 60px;
+}
+.prettyBox
+{
+	background: white;
+	color: #212121;
+	box-shadow: none;
+	border: solid 1.5px #e0e0e0;
+	border-radius: 20px;
+}
+.prettyBoxList
+{
+	border-bottom-color: #e0e0e0;
+}
+.forecastCard .fa
+{
+	color: #44739e;
+}
+.menuItemIconHolder
+{
+	color: #808080;
+}
+.spanLink.selected
+{
+	color: #212121;
+}
+.prettyBoxContent
+{
+	border-top-color: #e0e0e0;
+}
+.prettyBox input, .prettyBox select
+{
+	background: transparent;
+	border-radius: 10px;
+}
+.prettyBox input:enabled, .prettyBox select:enabled
+{
+	border: solid 1px #44739e;
+	color: #44739e;
+}
+.prettyBox input:disabled, .prettyBox select:disabled
+{
+	border: solid 1px #808080;
+	color: #808080;
+}
+.otherEmwinBody::-webkit-scrollbar-track,
+.forcastCardHolder::-webkit-scrollbar-track
+{
+	background: #e0e0e0;
+}
+.otherEmwinBody::-webkit-scrollbar-thumb,
+.forcastCardHolder::-webkit-scrollbar-thumb
+{
+	background: #a0a0a0;
+}
+

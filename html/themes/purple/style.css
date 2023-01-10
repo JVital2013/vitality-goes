@@ -1,0 +1,97 @@
+body
+{
+	background: #221a2a;
+	-webkit-tap-highlight-color: #76559f8c;
+}
+
+.sideBar
+{
+	background: #221a2a;
+}
+
+.topBar
+{
+	background: linear-gradient(#7c52b7, #170b28);
+}
+	
+.topBarInner
+{
+	color: #d8c6f1;
+}
+
+.spanLink
+{
+	color: #8971ab;
+}
+
+.spanLink:after 
+{
+	color: #8a66bd;
+}
+
+.spanLink.selected
+{
+	color: #d8c6f1;
+}
+
+.forecastHeader
+{
+	border-bottom: 1px solid #8a66bd;
+}
+
+.forecastCard
+{
+	border-left: 1px solid #8a66bd;
+}
+
+.forecastCard:last-child
+{
+	border-right: 1px solid #8a66bd;
+}
+
+.menuItem 
+{
+	color: #d8c6f1;
+}
+
+.menuItem:hover 
+{
+	background: #675e72;
+	color: #d8c6f1;
+}
+.menuItem.selected
+{
+	background: #5a3c7e;
+	color: #d8c6f1;
+}
+
+.menuItem.selected:hover
+{
+	background: #5d447a;
+	color: #d8c6f1;
+}
+.prettyBox
+{
+	background: #3a3048;
+	color: #d8c6f1;
+}
+
+.prettyBoxContent 
+{
+	border-top: 1px solid #8a66bd;
+}
+
+.prettyBoxList 
+{
+    border-bottom: 1px solid #8a66bd;
+}
+
+.otherEmwinBody::-webkit-scrollbar-track, .forcastCardHolder::-webkit-scrollbar-track 
+{
+	background: #543a78;
+}
+
+.otherEmwinBody::-webkit-scrollbar-thumb, .forcastCardHolder::-webkit-scrollbar-thumb 
+{
+	background: #8a66bd;
+}

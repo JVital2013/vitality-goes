@@ -1,6 +1,6 @@
 <?php
 /* 
- * Copyright 2022 Jamie Vital
+ * Copyright 2022-2023 Jamie Vital
  * This software is licensed under the GNU General Public License
  * 
  * This file is part of Vitality GOES.
@@ -22,7 +22,12 @@ require_once($_SERVER['DOCUMENT_ROOT'] . "/functions.php");
 $config = loadConfig();
 
 //Only display errors if set to in the config
-ini_set("display_errors", ($config['general']['debug'] ? "On" : "Off"));
+if($config['general']['debug'])
+{
+	ini_set("display_errors", "On");
+	error_reporting(E_ALL);
+}
+else ini_set("display_errors", "Off");
 
 //Load Current User Settings from Cookie
 $sendCookie = false;
@@ -184,8 +189,12 @@ if($_GET['type'] == "preload")
 	$preloadData['showSysInfo'] = $config['general']['showSysInfo'];
 	$preloadData['showSatdumpInfo'] = array_key_exists('satdumpAPI', $config['general']);
 	$preloadData['showGraphs'] = array_key_exists('graphiteAPI', $config['general']);
-	$preloadData['showEmwinInfo'] = array_key_exists('emwinPath', $config['general']) &&  is_dir($config['general']['emwinPath']);
-	$preloadData['showAdminInfo'] = array_key_exists('adminPath', $config['general']) &&  is_dir($config['general']['adminPath']);
+	$preloadData['showEmwinInfo'] = array_key_exists('emwinPath', $config['general']) && is_dir($config['general']['emwinPath']);
+	$preloadData['showAdminInfo'] = array_key_exists('adminPath', $config['general']) && is_dir($config['general']['adminPath']);
+	
+	$currentTheme = loadTheme($config);
+	if($currentTheme === false) $preloadData['theme'] = "default";
+	else $preloadData['theme'] = $currentTheme['slug'];
 	
 	header('Content-Type: application/json; charset=utf-8');
 	echo json_encode($preloadData);
@@ -736,7 +745,15 @@ elseif($_GET['type'] == "settings")
 			
 			sort($dropdownList);
 			break;
-			
+		case "theme":
+			$themes = findAllThemes();
+			$dropdownList['default'] = "Built-In (Dark)";
+			foreach($themes as $theme => $themeData)
+			{
+				if(array_key_exists("name", $themeData)) $dropdownList[$theme] = htmlspecialchars(strip_tags($themeData['name']));
+				else $dropdownList[$theme] = htmlspecialchars(strip_tags($theme));
+			}
+			break;
 		default:
 			break;
 	}
@@ -1090,7 +1107,7 @@ elseif($_GET['type'] == "hurricaneJSON")
 				if(is_array($dataValue))
 				{
 					usort($returnData[$stormKey][$dataKey], 'sortByTimestamp');
-					for($i = 0; $i < count($returnData[$stormKey][$dataKey]); $i++) $returnData[$stormKey][$dataKey][$i]['subHtml'] = "<b>" . $returnData[$stormKey]['title'] . "</b><div class='goeslabel gl-overlay'>" . $returnData[$stormKey][$dataKey][$i]['description'] . "</div>";
+					for($i = 0; $i < count($returnData[$stormKey][$dataKey]); $i++) $returnData[$stormKey][$dataKey][$i]['subHtml'] = "<b>" . $returnData[$stormKey]['title'] . "</b><div class='lgLabel'>" . $returnData[$stormKey][$dataKey][$i]['description'] . "</div>";
 				}
 			}
 		}
