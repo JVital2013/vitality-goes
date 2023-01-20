@@ -1,8 +1,10 @@
 # How to Configure Vitality GOES
 
-The primary Vitality GOES config is stored in `html/config`. To get started, copy a set of example configuration files from the [configs folder](/configs) info `html/config`. Configs for using goestools data source are prefixed with "goestools-", while configs for SatDump are prefixed with "satdump-". Scriptconfig.ini is not needed for Vitality GOES itself, so skip it if present.
+Configuration files should be placed in the `config` folder where Vitality GOES is installed. To get started, [copy the contents of a provided example config](/configs) into the config folder where Vitality GOES is installed. Scriptconfig.ini is not needed for Vitality GOES itself, so skip it if present.
 
-Configurations are highly customizable and can be modified to fit your configuration as you see fit. The configuration is broken out into the following files:
+![Example Copy Configs](https://user-images.githubusercontent.com/24253715/213600531-dbd89150-309d-4695-b276-0df8e414ae55.png)
+
+Configurations are highly customizable and can be modified to fit your ground station. A typical configuration will consist of 5 ini files:
 
 * **config.ini**: The main configuration file
 * **emwin.ini**: Stores information about the emwin images you want to display. This file has no effect on emwin text that is displayed, and does not need changed if you're switching between GOES-16 and 18.
@@ -10,7 +12,7 @@ Configurations are highly customizable and can be modified to fit your configura
 * **meso.ini**: Contains information about your mesoscale images.
 * **l2.ini**: Contains infromation about your ABI Level 2 products. These images contain information about estimated rainfall, land surface temp, sea surface temp, and more. Note that goestools does not receive these unless your goesproc config is set up to do so, and SatDump is currently not supported. The sample goesproc config in this repository is configured correctly, but if you're not saving these files, delete l2.ini.
 
-Any comments must begin with a semicolon (;).
+Any comments must begin with a semicolon (;). Example configs for using goestools data source are prefixed with "goestools-", while configs for SatDump are prefixed with "satdump-".
 
 ## config.ini
 
