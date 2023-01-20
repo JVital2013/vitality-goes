@@ -106,6 +106,7 @@ git clone https://github.com/JVital2013/vitality-goes
 cd vitality-goes
 cp -r html /var/www/html
 ```
+Then, copy a set of example configuration files from the configs folder of this repo into /var/www/html/config. Take a look at the [config readme](docs/config.md) for more.
 
 ### Windows
 To start hosing Vitality GOES in Windows:
@@ -115,8 +116,10 @@ To start hosing Vitality GOES in Windows:
 3. Delete the contents of C:\xampp\htdocs\
 4. Copy the contents of vitality-goes\html into C:\xampp\htdocs\
 
+Then, copy a set of example configuration files from the configs folder of this repo into C:\xampp\htdocs\config. Take a look at the [config readme](docs/config.md) for more.
+
 ## Configuring Vitality GOES
-Take a look at the [config readme](docs/config.md) to for initial Vitality GOES configuration.
+Take a look at the [config readme](docs/config.md) for info on how to tweak the Vitality GOES configuration to your liking
 
 ### Advanced configurations for goestools
 
