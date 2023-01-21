@@ -171,7 +171,7 @@ You can use Vitality GOES to view images from other satellites not included in t
 * Make sure your images end with a timestamp like `{time:%Y%m%dT%H%M%SZ}`, and are a JPG or PNG file. Depending on the satellite/software, you may need to rewrite the file names after receiving them to match the expected format.
 * Configure all desired images in the `abi.ini` or `meso.ini` config files (even if your sat of choice doesn't technically use an ABI).
 * Delete `l2.ini` and `emwin.ini` as these are GOES Specific.
-* In `config.ini`, disable `emwinPath` and `adminPath` as these are also GOES specific.
+* In `config.ini`, disable `emwinPath`, `adminPath`, and everthing under `location` other than the timezone as these are also GOES specific.
 
 **I am looking for submissions of working config files for other geostationary satellites!** If you get this working, please open a pull request or otherwise contact me so I can include a sample with Vitality GOES.
 
