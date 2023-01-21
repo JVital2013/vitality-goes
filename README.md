@@ -37,13 +37,19 @@ In a typical enviornment, a satellite downlink is picked up by your satellite di
 
 ![Flow of Geostationary Weather Data Via Vitality GOES](https://user-images.githubusercontent.com/24253715/210028326-0ad63425-cb31-4489-84ea-83de3a940562.png)
 
+Vitality GOES comes with sample configs for the following satellites:
+
+- GOES-16 HRIT
+- GOES-18 HRIT
+- EWS-G1 (GOES-13) GVAR
+
 ## System Requirements
 
-You need to set up a satellite dish and point it at the satellite of your choice to get started. Additionally, SatDump or goestools must be configured to save recieved data to disk. Vitality GOES was designed to handle HRIT/EMWIN data from GOES-16/18, but other satellites may work. See the [additional resources section](#additional-resources) for info on how to set up a ground station with goestools.
+You need to set up a satellite dish and point it at the satellite of your choice to get started. Additionally, SatDump or goestools must be configured to save recieved data to disk. See the [additional resources section](#additional-resources) for info on how to set up a ground station with goestools, and [this YouTube Video](https://www.youtube.com/watch?v=XMDAiUjzkhw) for a quick-start guide to setting up a test station with SatDump.
 
 It is recommended that you host Vitality GOES on your ground station itself for the most up-to-date information and to simplify setup/maintenance. If you choose, it can be hosted on another machine if you have a sync process set up between the ground station and the Vitality GOES server. *Syncing received images from another machine is outside the scope of Vitality GOES.*
 
-It is recommended that you use a Debian-based Linux distro to host the Vitality GOES server. Something like Raspberry Pi OS, Ubuntu, or Debian is preferred.
+It is also recommended that you use a Debian-based Linux distro to host the Vitality GOES server. Something like Raspberry Pi OS, Ubuntu, or Debian is preferred.
 
 Windows-hosted Vitality GOES runs slower than it does when hosted on Linux, and your datastore must be kept on an NTFS partition if you want weather information to load at all. It's a known issue in PHP that file operations are slower on Windows, [and they marked it as "not a bug"](https://bugs.php.net/bug.php?id=80695&edit=1).
 
@@ -73,7 +79,7 @@ satdump live goes_hrit F:\path\to\satdumprepo --source rtlsdr --samplerate 2.4e6
 The `http_server` part is optional and is only needed to provide decoder/demodulator statistics to Vitality GOES. For more information, see [the config documentation](/docs/config.md#general).
 
 ### Vitality GOES Dependencies
-Vitality GOES itself is a set of PHP, HTML, JavaScript, and CSS files. As such, it needs to be hosted on a web server stack. For this tutorial, I'm going to assume you're not running another web server on the same machine.
+Vitality GOES itself is a set of PHP, HTML, JavaScript, and CSS files. As such, it needs to be hosted on a web server stack. For this readme, I'm going to assume you're not running another web server on the same machine.
 
 ---
 
@@ -119,7 +125,7 @@ To start hosing Vitality GOES in Windows:
 Then, copy a set of example configuration files from the configs folder of this repo into C:\xampp\htdocs\config. Take a look at the [config readme](docs/config.md) for more.
 
 ## Configuring Vitality GOES
-Take a look at the [config readme](docs/config.md) for info on how to tweak the Vitality GOES configuration to your liking
+Take a look at the [config readme](docs/config.md) for info on how to tweak the Vitality GOES configuration to your liking.
 
 ### Advanced configurations for goestools
 
@@ -160,7 +166,7 @@ Vitality GOES supports theming. It comes with 5 themes, but you can make your ow
 Home Assistant is a free and open-source smart home control system. You can use Vitality GOES as a "Weather Provider" in Home Assistant; [look here](docs/home-assistant.md) for more.
 
 ## Creating configs for other satellites
-Vitality GOES is centered around data from the GOES-16/18 satellites, but other satellites will likely work with it. Here's how to set it up:
+You can use Vitality GOES to view images from other satellites not included in the sample configs. Here's how to set it up:
 
 * Make sure your images end with a timestamp like `{time:%Y%m%dT%H%M%SZ}`, and are a JPG or PNG file. Depending on the satellite/software, you may need to rewrite the file names after receiving them to match the expected format.
 * Configure all desired images in the `abi.ini` or `meso.ini` config files (even if your sat of choice doesn't technically use an ABI).
