@@ -291,7 +291,7 @@ function menuSelect(menuSlug)
 	selectedMenuElement = document.getElementById('menuItem' + selectedMenu);
 	if(selectedMenuElement) selectedMenuElement.className = 'menuItem';
 	
-	if(!document.getElementById('menuItem' + menuSlug)) menuSlug = test.childNodes[3].id.replace("menuItem", "");
+	if(!document.getElementById('menuItem' + menuSlug)) menuSlug = document.getElementById('sideBar').getElementsByClassName('menuItem')[0].id.replace("menuItem", "");
 	document.getElementById('menuItem' + menuSlug).className = 'menuItem selected';
 	
 	if(selectedMenu != menuSlug)

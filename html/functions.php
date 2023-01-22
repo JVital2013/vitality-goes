@@ -28,6 +28,7 @@ function loadConfig()
 	{
 		foreach($config['types'] as $type => $inifile)
 		{
+			//Validate Extra Configs
 			unset($config['types'][$type]);
 			if(!file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/$inifile")) continue;
 			
@@ -39,12 +40,13 @@ function loadConfig()
 				!array_key_exists('icon', $configPart['_category_']))
 				continue;
 			
+			//Get Category Information
 			$config['types'][$type] = [];
 			$config['types'][$type]['title'] = $configPart['_category_']['title'];
 			$config['types'][$type]['icon'] = $configPart['_category_']['icon'];
-			
 			unset($configPart['_category_']);
 			
+			//Parse config for each card
 			$slugs = array_keys($configPart);
 			for($i = 0; $i < count($configPart); $i++)
 			{
