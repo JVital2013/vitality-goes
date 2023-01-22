@@ -152,7 +152,7 @@ if($_GET['type'] == "preload")
 	{
 		foreach($config['types']['emwin']['data'] as $value)
 		{
-			if($value['filter'] == "RAD" . $currentSettings[$selectedProfile]['radarCode'] . ".GIF" && isset($value["videoPath"]))
+			if($value['filter'] == "RAD" . $currentSettings[$selectedProfile]['radarCode'] && isset($value["videoPath"]))
 			{
 				$preloadData['localRadarVideo'] = $value["videoPath"];
 				break;

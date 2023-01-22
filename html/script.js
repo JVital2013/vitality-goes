@@ -1411,7 +1411,7 @@ function switchCardView(event)
 		me.parentNode.previousSibling.innerHTML = "Loading, please wait...";
 		loadImage(me.parentNode.previousSibling, replayMetadata);
 	}
-	else me.parentNode.previousSibling.innerHTML = "<video controls loop autoplay playsinline style='width: 100%;'><source src='/videos/" + config['types'][selectedMenu][me.id.replace("-timelapse", "")].videoPath + "' type='video/mp4' /></video>";
+	else me.parentNode.previousSibling.innerHTML = "<video controls loop autoplay playsinline style='width: 100%;'><source src='/videos/" + config.types[selectedMenu].data[me.id.replace("-timelapse", "")].videoPath + "' type='video/mp4' /></video>";
 }
 
 function switchRadarView(event)
