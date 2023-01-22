@@ -541,6 +541,11 @@ elseif($_GET['type'] == "metadata")
 		{
 			switch($config['types'][$_GET['id']]['data'][$_GET['subid']]['mode'])
 			{
+				case "begin":
+					$filterRegex = "/(\\\\|\/)[0-9]{14}[^\\\\\/]*{$config['types'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/";
+					$dateRegex = "/^([0-9]{14})/";
+					$dateFormat = "YmdHis";
+					break;
 				case "beginz":
 					$filterRegex = "/(\\\\|\/)[0-9]{8}T[0-9]{6}Z[^\\\\\/]*{$config['types'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/";
 					$dateRegex = "/^([0-9]{8}T[0-9]{6}Z)/";
@@ -549,6 +554,11 @@ elseif($_GET['type'] == "metadata")
 				case "emwin":
 					$filterRegex = "/(\\\\|\/)[^\\\\\/]*[0-9]{14}_[0-9]{6}-[0-9]-{$config['types'][$_GET['id']]['data'][$_GET['subid']]['filter']}\..{3}$/";
 					$dateRegex = "/([0-9]{14})_[0-9]{6}-[0-9]-{$config['types'][$_GET['id']]['data'][$_GET['subid']]['filter']}\..{3}$/";
+					$dateFormat = "YmdHis";
+					break;
+				case "end":
+					$filterRegex = "/(\\\\|\/)[^\\\\\/]*{$config['types'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*[0-9]{14}\..{3}$/";
+					$dateRegex = "/([0-9]{14})\..{3}$/";
 					$dateFormat = "YmdHis";
 					break;
 				case "endz":
@@ -598,11 +608,17 @@ elseif($_GET['type'] == "data")
 	
 	switch($config['types'][$_GET['id']]['data'][$_GET['subid']]['mode'])
 	{
+		case "begin":
+			$regex = "/(\\\\|\/)" . $DateTime->format('YmdHis') . "[^\\\\\/]*{$config['types'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/";
+			break;
 		case "beginz":
 			$regex = "/(\\\\|\/)" . $DateTime->format('Ymd\THis\Z') . "[^\\\\\/]*{$config['types'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/";
 			break;
 		case "emwin":
 			$regex = "/(\\\\|\/)[^\\\\\/]*" . $DateTime->format('YmdHis') . "_[0-9]{6}-[0-9]-{$config['types'][$_GET['id']]['data'][$_GET['subid']]['filter']}\..{3}$/";
+			break;
+		case "end":
+			$regex = "/(\\\\|\/)[^\\\\\/]*{$config['types'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*" . $DateTime->format('YmdHis') . "\..{3}$/";
 			break;
 		case "endz":
 			$regex = "/(\\\\|\/)[^\\\\\/]*{$config['types'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*" . $DateTime->format('Ymd\THis\Z') . "\..{3}$/";
