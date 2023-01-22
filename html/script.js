@@ -1194,7 +1194,7 @@ function showCollapseCard(event)
 		event.currentTarget.nextSibling.style.display = "block";
 		if(event.currentTarget.nextSibling.nextSibling != null) event.currentTarget.nextSibling.nextSibling.style.display = "block";
 		
-		if(selectedMenu == 8) loadStats(event.currentTarget.nextSibling);
+		if(selectedMenu == "systemInfo") loadStats(event.currentTarget.nextSibling);
 		else if(event.currentTarget.nextSibling.innerHTML == "Loading, please wait...") loadImageMetadata(event.currentTarget.nextSibling);
 	}
 	else
