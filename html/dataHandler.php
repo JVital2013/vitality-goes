@@ -541,16 +541,22 @@ elseif($_GET['type'] == "metadata")
 		{
 			switch($config['types'][$_GET['id']]['data'][$_GET['subid']]['mode'])
 			{
+				case "beginz":
+					$filterRegex = "/(\\\\|\/)[0-9]{8}T[0-9]{6}Z[^\\\\\/]*{$config['types'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/";
+					$dateRegex = "/^([0-9]{8}T[0-9]{6}Z)/";
+					$dateFormat = "Ymd\THis\Z";
+					break;
 				case "emwin":
 					$filterRegex = "/(\\\\|\/)[^\\\\\/]*[0-9]{14}_[0-9]{6}-[0-9]-{$config['types'][$_GET['id']]['data'][$_GET['subid']]['filter']}\..{3}$/";
 					$dateRegex = "/([0-9]{14})_[0-9]{6}-[0-9]-{$config['types'][$_GET['id']]['data'][$_GET['subid']]['filter']}\..{3}$/";
 					$dateFormat = "YmdHis";
 					break;
-				default: //goesabi
+				case "endz":
 					$filterRegex = "/(\\\\|\/)[^\\\\\/]*{$config['types'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*[0-9]{8}T[0-9]{6}Z\..{3}$/";
 					$dateRegex = "/([0-9]{8}T[0-9]{6}Z)\..{3}$/";
 					$dateFormat = "Ymd\THis\Z";
 					break;
+				default: die("Invalid server config: " . $config['types'][$_GET['id']]['data'][$_GET['subid']]['mode'] . "is not a valid file parser mode!"); break;
 			}
 			
 			$fileList = scandir_recursive($config['types'][$_GET['id']]['data'][$_GET['subid']]['path']);
@@ -558,8 +564,10 @@ elseif($_GET['type'] == "metadata")
 			
 			foreach($fileList as $file)
 			{
-				preg_match($dateRegex, $file, $regexMatches);
+				preg_match($dateRegex, basename($file), $regexMatches);
 				$DateTime = DateTime::createFromFormat($dateFormat, $regexMatches[1], new DateTimeZone("UTC"));
+				if($DateTime === false) continue;
+				
 				$DateTime->setTimezone(new DateTimeZone(date_default_timezone_get()));
 				$metadata[]['subHtml'] = "<b>{$config['types'][$_GET['id']]['data'][$_GET['subid']]['title']}</b><div class='lgLabel'>" . $DateTime->format('F j, Y g:i A T') . "</div>";
 				$metadata[count($metadata) - 1]['description'] = $DateTime->format('F j, Y g:i A T');
@@ -590,12 +598,16 @@ elseif($_GET['type'] == "data")
 	
 	switch($config['types'][$_GET['id']]['data'][$_GET['subid']]['mode'])
 	{
+		case "beginz":
+			$regex = "/(\\\\|\/)" . $DateTime->format('Ymd\THis\Z') . "[^\\\\\/]*{$config['types'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/";
+			break;
 		case "emwin":
 			$regex = "/(\\\\|\/)[^\\\\\/]*" . $DateTime->format('YmdHis') . "_[0-9]{6}-[0-9]-{$config['types'][$_GET['id']]['data'][$_GET['subid']]['filter']}\..{3}$/";
 			break;
-		default: //goesabi
+		case "endz":
 			$regex = "/(\\\\|\/)[^\\\\\/]*{$config['types'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*" . $DateTime->format('Ymd\THis\Z') . "\..{3}$/";
 			break;
+		default: die(); break;
 	}
 
 	$fileList = scandir_recursive($config['types'][$_GET['id']]['data'][$_GET['subid']]['path']);

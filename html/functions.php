@@ -51,7 +51,7 @@ function loadConfig()
 			for($i = 0; $i < count($configPart); $i++)
 			{
 				if(!array_key_exists("filter", $configPart[$slugs[$i]])) $configPart[$slugs[$i]]['filter'] = "";
-				if(!array_key_exists("mode", $configPart[$slugs[$i]])) $configPart[$slugs[$i]]['mode'] = "goesabi";
+				if(!array_key_exists("mode", $configPart[$slugs[$i]])) $configPart[$slugs[$i]]['mode'] = "endz";
 				if(array_key_exists('paths', $config)) foreach($config['paths'] as $key => $value)
 					$configPart[$slugs[$i]]['path'] = str_replace('{' . $key . '}', $value, $configPart[$slugs[$i]]['path']);
 			}
