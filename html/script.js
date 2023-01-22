@@ -21,16 +21,14 @@ var sideBar = false;
 var lightGalleries = [];
 var xhttp = [];
 var config;
-var imageType;
 
 //Load current state from sessionStorage
-storedSelectedMenu = sessionStorage.getItem('selectedMenu');
-if(storedSelectedMenu == null)
+var selectedMenu = sessionStorage.getItem('selectedMenu');
+if(selectedMenu == null)
 {
-	var selectedMenu = 0;
-	sessionStorage.setItem('selectedMenu', 0);
+	var selectedMenu = 'currentWeather';
+	sessionStorage.setItem('selectedMenu', 'currentWeather');
 }
-else var selectedMenu = parseInt(storedSelectedMenu);
 
 //Load expanded cards from sessionStorage
 storedExpandedCards = sessionStorage.getItem('expandedCards');
@@ -82,7 +80,7 @@ function renderImageCard(slug, color)
 	
 	header = document.createElement('div');
 	header.className = "prettyBoxHeader";
-	header.innerHTML = "<i class='fa fa-chevron-" + (expandedCards.includes(slug + "Content") ? "down" : "right") + "' aria-hidden='true'></i>" + config[imageType][slug].title;
+	header.innerHTML = "<i class='fa fa-chevron-" + (expandedCards.includes(slug + "Content") ? "down" : "right") + "' aria-hidden='true'></i>" + config.types[selectedMenu].data[slug].title;
 	header.addEventListener('click', showCollapseCard);
 	card.appendChild(header);
 	content = document.createElement('div');
@@ -92,7 +90,7 @@ function renderImageCard(slug, color)
 	content.style.display = expandedCards.includes(slug + "Content") ? "block" : "none";
 	card.appendChild(content);
 	
-	if(config[imageType][slug].videoPath)
+	if(config.types[selectedMenu].data[slug].videoPath)
 	{
 		links = document.createElement('div');
 		links.className = "mapLinks";
@@ -277,7 +275,7 @@ function toTitleCase(str) {
         return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
     });
 }
-function menuSelect(menuNumber)
+function menuSelect(menuSlug)
 {
 	retractDrawer();
 	
@@ -293,21 +291,12 @@ function menuSelect(menuNumber)
 	selectedMenuElement = document.getElementById('menuItem' + selectedMenu);
 	if(selectedMenuElement) selectedMenuElement.className = 'menuItem';
 	
-	menuDidDisappear = false;
-	while(!document.getElementById('menuItem' + menuNumber))
-	{
-		if(menuDidDisappear) menuNumber++;
-		else
-		{
-			menuDidDisappear = true;
-			menuNumber = 0;
-		}			
-	}
-	document.getElementById('menuItem' + menuNumber).className = 'menuItem selected';
+	if(!document.getElementById('menuItem' + menuSlug)) menuSlug = test.childNodes[3].id.replace("menuItem", "");
+	document.getElementById('menuItem' + menuSlug).className = 'menuItem selected';
 	
-	if(selectedMenu != menuNumber)
+	if(selectedMenu != menuSlug)
 	{
-		selectedMenu = menuNumber;
+		selectedMenu = menuSlug;
 		sessionStorage.setItem('selectedMenu', selectedMenu);
 		window.scrollTo({top: 0});
 	}
@@ -323,15 +312,6 @@ function menuSelect(menuNumber)
 	Object.keys(xhttp).forEach(thisxhttp => {xhttp[thisxhttp].abort();});
 	xhttp = [];
 	
-	switch(selectedMenu)
-	{
-		case 1: imageType = 'abi'; break;
-		case 2: imageType = 'l2'; break;
-		case 3: imageType = 'meso'; break;
-		case 4: imageType = 'emwin'; break;
-		default: imageType = ''; break;
-	}
-	
 	if(typeof(EventSource) == "undefined")
 	{
 		mainContent.innerHTML = "<div style='height: 30px;'></div><div class='errorMessage'>Sorry! Internet Explorer does not support this site. Please use a real browser.</div>";
@@ -340,9 +320,9 @@ function menuSelect(menuNumber)
 	}
 	
 	//Load the selected menu
-	switch(menuNumber)
+	switch(selectedMenu)
 	{
-		case 0:
+		case 'currentWeather':
 		barTitle.innerHTML = "Current Weather";
 		mainContent.innerHTML = "";
 		
@@ -564,32 +544,14 @@ function menuSelect(menuNumber)
 		xhttp.alertJSON.open("GET", "dataHandler.php?type=alertJSON", true);
 		xhttp.alertJSON.send();
 		break;
-		
-		case 1:
-		barTitle.innerHTML = "Full Disk";
-		mainContent.innerHTML = "";
-		Object.keys(config.abi).forEach(function(key){renderImageCard(key, config.abi[key].color);});
-		break;
-		
-		case 2:
-		barTitle.innerHTML = "Level 2 Imagery";
-		mainContent.innerHTML = "";
-		Object.keys(config.l2).forEach(function(key){renderImageCard(key, config.l2[key].color);});
-		break;
-		
-		case 3:
-		barTitle.innerHTML = "Mesoscale Imagery";
-		mainContent.innerHTML = "";
-		Object.keys(config.meso).forEach(function(key){renderImageCard(key, config.meso[key].color);});
-		break;
 
-		case 4:
+		case 'emwinImagery':
 		barTitle.innerHTML = "EMWIN Imagery";
 		mainContent.innerHTML = "";
 		Object.keys(config.emwin).forEach(function(key){renderImageCard(key, config.emwin[key].color);});
 		break;
 		
-		case 5:
+		case 'otherEmwin':
 		barTitle.innerHTML = "Other EMWIN";
 		mainContent.innerHTML = "";
 		
@@ -717,7 +679,7 @@ function menuSelect(menuNumber)
 		xhttp.otherEMWIN.send();
 		break;
 		
-		case 6:
+		case 'hurricaneCenter':
 		barTitle.innerHTML = "Hurricane Center";
 		mainContent.innerHTML = "";
 		renderStiffCard("loadingNotice", "Hurricane Info");
@@ -804,7 +766,7 @@ function menuSelect(menuNumber)
 		xhttp.hurricaneInfo.send();
 		break;
 		
-		case 7:
+		case 'localSettings':
 		barTitle.innerHTML = "Local Settings";
 		mainContent.innerHTML = "";
 		
@@ -1101,10 +1063,9 @@ function menuSelect(menuNumber)
 		
 		xhttp.theme.open("GET", "dataHandler.php?type=settings&dropdown=theme", true);
 		xhttp.theme.send();
-		
 		break;
 		
-		case 8:
+		case 'systemInfo':
 		barTitle.innerHTML = "System Info";
 		mainContent.innerHTML = "";
 		
@@ -1204,8 +1165,16 @@ function menuSelect(menuNumber)
 			xhttp.sysInfo.open("GET", "dataHandler.php?type=metadata&id=sysInfo", true);
 			xhttp.sysInfo.send();
 		}
-		
 		break;
+		
+		default:
+			if(Object.keys(config.types).includes(selectedMenu))
+			{
+				barTitle.innerHTML = config.types[selectedMenu].title;
+				mainContent.innerHTML = "";
+				Object.keys(config.types[selectedMenu].data).forEach(function(key){renderImageCard(key, config.types[selectedMenu].data[key].color);});
+			}
+			break;
 	}
 	
 	//Change styling for specific screens
@@ -1371,7 +1340,7 @@ function loadImageMetadata(targetedContent)
 		}
 	}
 	
-	xhttp.loadImage.open("GET", "dataHandler.php?type=" + imageType + "Metadata&id=" + targetedContent.id.replace('Content', ''), true);
+	xhttp.loadImage.open("GET", "dataHandler.php?type=metadata&id=" + selectedMenu + "&subid=" + targetedContent.id.replace('Content', ''), true);
 	xhttp.loadImage.send();
 }
 function loadImage(targetedContent, metadata)
@@ -1387,7 +1356,7 @@ function loadImage(targetedContent, metadata)
 	goesImg = document.createElement('img');
 	goesImg.className = "goesimg";
 	goesImg.id = 'lightbox-' + contentId;
-	goesImg.src = "/dataHandler.php?type=" + imageType + "Data&id=" + contentId + "&timestamp=" + metadata[metadata.length - 1]['timestamp'];
+	goesImg.src = "/dataHandler.php?type=data&id=" + selectedMenu + "&subid=" + contentId + "&timestamp=" + metadata[metadata.length - 1]['timestamp'];
 	goesImg.addEventListener('click', function(event){lightGalleries[event.target.id].openGallery(lightGalleries[event.target.id].galleryItems.length - 1);});
 	goesImg.addEventListener('lgBeforeOpen', function(event){
 		document.getElementsByTagName('body')[0].style.overflow = "hidden";
@@ -1406,7 +1375,7 @@ function loadImage(targetedContent, metadata)
 	targetedContent.appendChild(goesLabel);
 	
 	dynamicEl = [];
-	metadata.forEach(thisImg => {dynamicEl.push({src: "/dataHandler.php?type=" + imageType + "Data&id=" + contentId + "&timestamp=" + thisImg['timestamp'], description: thisImg['description'], subHtml: thisImg['subHtml'], timestamp: thisImg['timestamp']});});
+	metadata.forEach(thisImg => {dynamicEl.push({src: "/dataHandler.php?type=data&id=" + selectedMenu + "&subid=" + contentId + "&timestamp=" + thisImg['timestamp'], description: thisImg['description'], subHtml: thisImg['subHtml'], timestamp: thisImg['timestamp']});});
 	lightGalleries["lightbox-" + contentId] = lightGallery(goesImg, {
 		plugins: [lgZoom, lgJumpTo],
 		loop: false,
@@ -1442,7 +1411,7 @@ function switchCardView(event)
 		me.parentNode.previousSibling.innerHTML = "Loading, please wait...";
 		loadImage(me.parentNode.previousSibling, replayMetadata);
 	}
-	else me.parentNode.previousSibling.innerHTML = "<video controls loop autoplay playsinline style='width: 100%;'><source src='/videos/" + config[imageType][me.id.replace("-timelapse", "")].videoPath + "' type='video/mp4' /></video>";
+	else me.parentNode.previousSibling.innerHTML = "<video controls loop autoplay playsinline style='width: 100%;'><source src='/videos/" + config['types'][selectedMenu][me.id.replace("-timelapse", "")].videoPath + "' type='video/mp4' /></video>";
 }
 
 function switchRadarView(event)
@@ -1485,16 +1454,14 @@ window.addEventListener("load", function()
 				mainContent.className = "singleCard";
 				return;
 			}
-
-			if(config.showEmwinInfo) renderMenuItem(0, 'cloud', 'Current Weather');
-			if(Object.keys(config.abi).length > 0) renderMenuItem(1, 'globe-americas', 'Full Disk');
-			if(Object.keys(config.l2).length > 0) renderMenuItem(2, 'atom', 'Level 2 Graphics');
-			if(Object.keys(config.meso).length > 0) renderMenuItem(3, 'search-plus', 'Mesoscale Imagery');
-			if(Object.keys(config.emwin).length > 0) renderMenuItem(4, 'image', 'EMWIN Imagery');
-			if(config.showAdminInfo || config.showEmwinInfo) renderMenuItem(5, 'align-left', 'Other EMWIN');
-			if(config.showEmwinInfo) renderMenuItem(6, 'wind', 'Hurricane Center');
-			renderMenuItem(7, 'cogs', 'Local Settings');
-			if(config.showGraphs || config.showSysInfo) renderMenuItem(8, 'info-circle', 'System Info');
+			
+			//Render Menu Items
+			if(config.showEmwinInfo) renderMenuItem('currentWeather', 'cloud', 'Current Weather');
+			Object.keys(config.types).forEach((type) => { renderMenuItem(type, config.types[type].icon, config.types[type].title); });
+			if(config.showAdminInfo || config.showEmwinInfo) renderMenuItem('otherEmwin', 'align-left', 'Other EMWIN');
+			if(config.showEmwinInfo) renderMenuItem('hurricaneCenter', 'wind', 'Hurricane Center');
+			renderMenuItem('localSettings', 'cogs', 'Local Settings');
+			if(config.showGraphs || config.showSysInfo) renderMenuItem('systemInfo', 'info-circle', 'System Info');
 	
 			menuSelect(selectedMenu);
 			delete xhttp.preload;

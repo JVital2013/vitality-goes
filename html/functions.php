@@ -23,39 +23,45 @@ function loadConfig()
 	$config['general']['showSysInfo'] = (stripos($config['general']['showSysInfo'], "true") !== false);
 	$config['general']['debug'] = (stripos($config['general']['debug'], "true") !== false);
 	
-	//Load extra configs, allow them to not exist
-	if(file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/abi.ini"))
+	//Load Extra configs
+	if(array_key_exists('types', $config))
 	{
-		$config['abi'] = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/abi.ini", true, INI_SCANNER_RAW);
-		parseABIConfig($config, $config['abi']);
+		foreach($config['types'] as $type => $inifile)
+		{
+			unset($config['types'][$type]);
+			if(!file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/$inifile")) continue;
+			
+			$configPart = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/$inifile", true, INI_SCANNER_RAW);
+			if($configPart === false ||
+				!array_key_exists('_category_', $configPart) || 
+				count($configPart) < 2 || 
+				!array_key_exists('title', $configPart['_category_']) ||
+				!array_key_exists('icon', $configPart['_category_']))
+				continue;
+			
+			$config['types'][$type] = [];
+			$config['types'][$type]['title'] = $configPart['_category_']['title'];
+			$config['types'][$type]['icon'] = $configPart['_category_']['icon'];
+			
+			unset($configPart['_category_']);
+			
+			$slugs = array_keys($configPart);
+			for($i = 0; $i < count($configPart); $i++)
+			{
+				if(!array_key_exists("filter", $configPart[$slugs[$i]])) $configPart[$slugs[$i]]['filter'] = "";
+				if(!array_key_exists("mode", $configPart[$slugs[$i]])) $configPart[$slugs[$i]]['mode'] = "goesabi";
+				if(array_key_exists('paths', $config)) foreach($config['paths'] as $key => $value)
+					$configPart[$slugs[$i]]['path'] = str_replace('{' . $key . '}', $value, $configPart[$slugs[$i]]['path']);
+			}
+			
+			$config['types'][$type]['data'] = $configPart;
+		}
 	}
-	else $config['abi'] = [];
-	
-	if(file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/meso.ini"))
-	{
-		$config['meso'] = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/meso.ini", true, INI_SCANNER_RAW);
-		parseABIConfig($config, $config['meso']);
-	}
-	else $config['meso'] = [];
-	
-	if(file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/l2.ini"))
-	{
-		$config['l2'] = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/l2.ini", true, INI_SCANNER_RAW);
-		parseABIConfig($config, $config['l2']);
-	}
-	else $config['l2'] = [];
-	
-	if(file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/emwin.ini"))
-	{
-		$config['emwin'] = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/emwin.ini", true, INI_SCANNER_RAW);
-	}
-	else $config['emwin'] = [];
 	
 	//Config touchups
 	if(array_key_exists('paths', $config)) unset($config['paths']);
 	if(!array_key_exists('city', $config['location'])) $config['location']['city'] = "";
 	if(!array_key_exists('rwrOrig', $config['location']) && array_key_exists('orig', $config['location'])) $config['location']['rwrOrig'] = $config['location']['orig'];
-	if(!array_key_exists('emwinPath', $config['general'])) $config['emwin'] = [];
 	
 	return $config;
 }
@@ -113,17 +119,6 @@ function loadTheme($config)
 	else return false;
 }
 
-function parseABIConfig($config, &$abiConfig)
-{
-	$slugs = array_keys($abiConfig);
-	for($i = 0; $i < count($abiConfig); $i++)
-	{
-		if(!array_key_exists("filter", $abiConfig[$slugs[$i]])) $abiConfig[$slugs[$i]]['filter'] = "";
-		if(array_key_exists('paths', $config)) foreach($config['paths'] as $key => $value)
-			$abiConfig[$slugs[$i]]['path'] = str_replace('{' . $key . '}', $value, $abiConfig[$slugs[$i]]['path']);
-	}
-}
-
 function scandir_recursive($dir, &$results = array())
 {
 	$dirHandle = opendir($dir);
@@ -165,7 +160,7 @@ function sortEMWIN($a, $b)
 	return $explodedB[4] - $explodedA[4];
 }
 
-function sortABI($a, $b)
+function sortByBasename($a, $b)
 {
 	return strcmp(basename($a), basename($b));
 }
@@ -231,39 +226,6 @@ function findMetadataEMWIN($allEmwinFiles, $product, $title)
 	}	
 	usort($retVal, 'sortByTimestamp');
 	return $retVal;
-}
-
-function findMetadataABI($path, $filter, $title)
-{
-	if(!is_dir($path)) return array();
-	
-	$retVal = [];
-	$fileList = scandir_recursive($path);
-	$fileList = preg_grep("/(\\\\|\/)[^\\\\\/]*{$filter}[^\\\\\/]*[0-9]{8}T[0-9]{6}Z\..{3}$/", $fileList);
-	usort($fileList, "sortABI");
-	
-	foreach($fileList as $file)
-	{
-		
-		$splitName = explode("_", $file);
-		$timestamp = strtotime(explode(".", $splitName[count($splitName) - 1])[0]);
-		$date = date("F j, Y g:i A", $timestamp);
-		$DateTime = new DateTime("now", new DateTimeZone(date_default_timezone_get()));
-		$retVal[]['subHtml'] = "<b>$title</b><div class='lgLabel'>$date " . $DateTime->format('T') . "</div>";
-		$retVal[count($retVal) - 1]['description'] = "Taken: $date " . $DateTime->format('T');
-		$retVal[count($retVal) - 1]['timestamp'] = $timestamp;
-	}
-	
-	return $retVal;
-}
-
-function findImageABI($path, $filter, $timestamp)
-{
-	$DateTime = new DateTime("now", new DateTimeZone("UTC"));
-	$DateTime->setTimestamp($timestamp);
-	
-	$fileList = scandir_recursive($path);
-	foreach($fileList as $thisFile) if(preg_match("/(\\\\|\/)[^\\\\\/]*{$filter}[^\\\\\/]*" . $DateTime->format('Ymd\THis\Z') . "\..{3}$/", $thisFile)) return $thisFile;
 }
 
 function linesToParagraphs($lineArray, $linesToSkip)
