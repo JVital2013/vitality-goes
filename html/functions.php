@@ -19,7 +19,10 @@
 function loadConfig()
 {
 	//Load main config
+	if(!file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini")) die("config.ini is missing! Make sure\nyou have config files in:\n\n" . $_SERVER['DOCUMENT_ROOT'] . "/config/");
 	$config = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini", true, INI_SCANNER_RAW);
+	if($config === false) die("Unable to parse config.ini");
+	
 	$config['general']['showSysInfo'] = (stripos($config['general']['showSysInfo'], "true") !== false);
 	$config['general']['debug'] = (stripos($config['general']['debug'], "true") !== false);
 	
