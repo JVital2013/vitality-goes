@@ -545,6 +545,10 @@ elseif($_GET['type'] == "metadata")
 					$regex = "/(\\\\|\/)(?<date>[0-9]{14})[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
 					$dateFormat = "YmdHis";
 					break;
+				case "beginu":
+					$regex = "/(\\\\|\/)(?<date>[0-9]{8}_[0-9]{6})[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
+					$dateFormat = "Ymd_His";
+					break;
 				case "beginz":
 					$regex = "/(\\\\|\/)(?<date>[0-9]{8}T[0-9]{6}Z)[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
 					$dateFormat = "Ymd\THis\Z";
@@ -557,13 +561,17 @@ elseif($_GET['type'] == "metadata")
 					$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*(?<date>[0-9]{14})\..{3}$/i";
 					$dateFormat = "YmdHis";
 					break;
+				case "endu":
+					$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*(?<date>[0-9]{8}_[0-9]{6})\..{3}$/i";
+					$dateFormat = "Ymd_His";
+					break;
 				case "endz":
 					$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*(?<date>[0-9]{8}T[0-9]{6}Z)\..{3}$/i";
 					$dateFormat = "Ymd\THis\Z";
 					break;
 				default: die("Invalid server config: " . $config['categories'][$_GET['id']]['data'][$_GET['subid']]['mode'] . "is not a valid file parser mode!"); break;
 			}
-			
+	
 			$fileList = scandir_recursive($config['categories'][$_GET['id']]['data'][$_GET['subid']]['path']);
 			foreach($fileList as $file)
 			{
@@ -604,6 +612,9 @@ elseif($_GET['type'] == "data")
 		case "begin":
 			$regex = "/(\\\\|\/)" . $DateTime->format('YmdHis') . "[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
 			break;
+		case "beginu":
+			$regex = "/(\\\\|\/)" . $DateTime->format('Ymd_His') . "[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
+			break;
 		case "beginz":
 			$regex = "/(\\\\|\/)" . $DateTime->format('Ymd\THis\Z') . "[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
 			break;
@@ -612,6 +623,9 @@ elseif($_GET['type'] == "data")
 			break;
 		case "end":
 			$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*" . $DateTime->format('YmdHis') . "\..{3}$/i";
+			break;
+		case "endu":
+			$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*" . $DateTime->format('Ymd_His') . "\..{3}$/i";
 			break;
 		case "endz":
 			$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*" . $DateTime->format('Ymd\THis\Z') . "\..{3}$/i";
