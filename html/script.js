@@ -80,7 +80,7 @@ function renderImageCard(slug, color)
 	
 	header = document.createElement('div');
 	header.className = "prettyBoxHeader";
-	header.innerHTML = "<i class='fa fa-chevron-" + (expandedCards.includes(slug + "Content") ? "down" : "right") + "' aria-hidden='true'></i>" + config.types[selectedMenu].data[slug].title;
+	header.innerHTML = "<i class='fa fa-chevron-" + (expandedCards.includes(slug + "Content") ? "down" : "right") + "' aria-hidden='true'></i>" + config.categories[selectedMenu].data[slug].title;
 	header.addEventListener('click', showCollapseCard);
 	card.appendChild(header);
 	content = document.createElement('div');
@@ -90,7 +90,7 @@ function renderImageCard(slug, color)
 	content.style.display = expandedCards.includes(slug + "Content") ? "block" : "none";
 	card.appendChild(content);
 	
-	if(config.types[selectedMenu].data[slug].videoPath)
+	if(config.categories[selectedMenu].data[slug].videoPath)
 	{
 		links = document.createElement('div');
 		links.className = "mapLinks";
@@ -1168,11 +1168,11 @@ function menuSelect(menuSlug)
 		break;
 		
 		default:
-			if(Object.keys(config.types).includes(selectedMenu))
+			if(Object.keys(config.categories).includes(selectedMenu))
 			{
-				barTitle.innerHTML = config.types[selectedMenu].title;
+				barTitle.innerHTML = config.categories[selectedMenu].title;
 				mainContent.innerHTML = "";
-				Object.keys(config.types[selectedMenu].data).forEach(function(key){renderImageCard(key, config.types[selectedMenu].data[key].color);});
+				Object.keys(config.categories[selectedMenu].data).forEach(function(key){renderImageCard(key, config.categories[selectedMenu].data[key].color);});
 			}
 			break;
 	}
@@ -1411,7 +1411,7 @@ function switchCardView(event)
 		me.parentNode.previousSibling.innerHTML = "Loading, please wait...";
 		loadImage(me.parentNode.previousSibling, replayMetadata);
 	}
-	else me.parentNode.previousSibling.innerHTML = "<video controls loop autoplay playsinline style='width: 100%;'><source src='/videos/" + config.types[selectedMenu].data[me.id.replace("-timelapse", "")].videoPath + "' type='video/mp4' /></video>";
+	else me.parentNode.previousSibling.innerHTML = "<video controls loop autoplay playsinline style='width: 100%;'><source src='/videos/" + config.categories[selectedMenu].data[me.id.replace("-timelapse", "")].videoPath + "' type='video/mp4' /></video>";
 }
 
 function switchRadarView(event)
@@ -1457,7 +1457,7 @@ window.addEventListener("load", function()
 			
 			//Render Menu Items
 			if(config.showEmwinInfo) renderMenuItem('currentWeather', 'cloud', 'Current Weather');
-			Object.keys(config.types).forEach((type) => { renderMenuItem(type, config.types[type].icon, config.types[type].title); });
+			Object.keys(config.categories).forEach((type) => { renderMenuItem(type, config.categories[type].icon, config.categories[type].title); });
 			if(config.showAdminInfo || config.showEmwinInfo) renderMenuItem('otherEmwin', 'align-left', 'Other EMWIN');
 			if(config.showEmwinInfo) renderMenuItem('hurricaneCenter', 'wind', 'Hurricane Center');
 			renderMenuItem('localSettings', 'cogs', 'Local Settings');

@@ -27,12 +27,13 @@ function loadConfig()
 	$config['general']['debug'] = (stripos($config['general']['debug'], "true") !== false);
 	
 	//Load Extra configs
-	if(array_key_exists('types', $config))
+	if(!array_key_exists('categories', $config)) $config['categories'] = [];
+	else
 	{
-		foreach($config['types'] as $type => $inifile)
+		foreach($config['categories'] as $type => $inifile)
 		{
 			//Validate Extra Configs
-			unset($config['types'][$type]);
+			unset($config['categories'][$type]);
 			if(!file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/$inifile")) continue;
 			
 			$configPart = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/$inifile", true, INI_SCANNER_RAW);
@@ -44,9 +45,9 @@ function loadConfig()
 				continue;
 			
 			//Get Category Information
-			$config['types'][$type] = [];
-			$config['types'][$type]['title'] = $configPart['_category_']['title'];
-			$config['types'][$type]['icon'] = $configPart['_category_']['icon'];
+			$config['categories'][$type] = [];
+			$config['categories'][$type]['title'] = $configPart['_category_']['title'];
+			$config['categories'][$type]['icon'] = $configPart['_category_']['icon'];
 			unset($configPart['_category_']);
 			
 			//Parse config for each card
@@ -59,7 +60,7 @@ function loadConfig()
 					$configPart[$slugs[$i]]['path'] = str_replace('{' . $key . '}', $value, $configPart[$slugs[$i]]['path']);
 			}
 			
-			$config['types'][$type]['data'] = $configPart;
+			$config['categories'][$type]['data'] = $configPart;
 		}
 	}
 	
@@ -74,25 +75,24 @@ function loadConfig()
 function findAllThemes()
 {
 	$themes = [];
-	if(is_dir("{$_SERVER['DOCUMENT_ROOT']}/themes"))
+	if(!is_dir("{$_SERVER['DOCUMENT_ROOT']}/themes")) return $themes;
+	
+	$themeDirs = glob("{$_SERVER['DOCUMENT_ROOT']}/themes/*", GLOB_ONLYDIR);
+	foreach($themeDirs as $themeDir)
 	{
-		$themeDirs = glob("{$_SERVER['DOCUMENT_ROOT']}/themes/*", GLOB_ONLYDIR);
-		foreach($themeDirs as $themeDir)
-		{
-			//Make sure theme is valid
-			if(!is_file("$themeDir/theme.ini")) continue;
-			$thisThemeDef = parse_ini_file("$themeDir/theme.ini", true, INI_SCANNER_RAW);
-			if($thisThemeDef === false || !array_key_exists("stylesheets", $thisThemeDef) || !is_array($thisThemeDef['stylesheets'])) continue;
-			
-			//Make sure the theme doesn't try loading something strange
-			foreach($thisThemeDef['stylesheets'] as $stylesheet)
-				if((!preg_match("/^https?:\/\/.*$/", $stylesheet) && strpos($stylesheet, "..") !== false) ||
-					(!preg_match("/^https?:\/\/.*$/", $stylesheet) && !is_file("$themeDir/$stylesheet")))
-						continue 2;
-			
-			//Theme is valid, allow it
-			$themes[basename($themeDir)] = $thisThemeDef;
-		}
+		//Make sure theme is valid
+		if(!is_file("$themeDir/theme.ini")) continue;
+		$thisThemeDef = parse_ini_file("$themeDir/theme.ini", true, INI_SCANNER_RAW);
+		if($thisThemeDef === false || !array_key_exists("stylesheets", $thisThemeDef) || !is_array($thisThemeDef['stylesheets'])) continue;
+		
+		//Make sure the theme doesn't try loading something strange
+		foreach($thisThemeDef['stylesheets'] as $stylesheet)
+			if((!preg_match("/^https?:\/\/.*$/", $stylesheet) && strpos($stylesheet, "..") !== false) ||
+				(!preg_match("/^https?:\/\/.*$/", $stylesheet) && !is_file("$themeDir/$stylesheet")))
+					continue 2;
+		
+		//Theme is valid, allow it
+		$themes[basename($themeDir)] = $thisThemeDef;
 	}
 	
 	return $themes;
@@ -201,10 +201,7 @@ function findSpecificEMWIN($allEmwinFiles, $product, $timestamp)
 	
 	foreach($allEmwinFiles as $thisFile)
 	{
-		if(strpos($thisFile, $DateTime->format('YmdHis')) !== false && strpos($thisFile, $product) !== false)
-		{
-			return $thisFile;
-		}
+		if(strpos($thisFile, $DateTime->format('YmdHis')) !== false && strpos($thisFile, $product) !== false) return $thisFile;
 	}
 	
 	return false;
@@ -213,21 +210,19 @@ function findSpecificEMWIN($allEmwinFiles, $product, $timestamp)
 function findMetadataEMWIN($allEmwinFiles, $product, $title)
 {
 	$retVal = [];
-	
 	foreach($allEmwinFiles as $thisFile)
 	{
-		if(strpos($thisFile, $product) !== false)
-		{
-			$fileNameParts = explode("_", basename($thisFile));
-			if(count($fileNameParts) != 6) continue;
-			
-			$DateTime = new DateTime($fileNameParts[4], new DateTimeZone("UTC"));
-			$DateTime->setTimezone(new DateTimeZone(date_default_timezone_get()));
-			$date = $DateTime->format("F j, Y g:i A");
-			$retVal[]['subHtml'] = "<b>$title</b><div class='lgLabel'>Rendered: $date " . $DateTime->format('T') . "</div>";
-			$retVal[count($retVal) - 1]['description'] = "Rendered: $date " . $DateTime->format('T');
-			$retVal[count($retVal) - 1]['timestamp'] = $DateTime->getTimestamp();
-		}
+		if(strpos($thisFile, $product) === false) continue;
+		
+		$fileNameParts = explode("_", basename($thisFile));
+		if(count($fileNameParts) != 6) continue;
+		
+		$DateTime = new DateTime($fileNameParts[4], new DateTimeZone("UTC"));
+		$DateTime->setTimezone(new DateTimeZone(date_default_timezone_get()));
+		$date = $DateTime->format("F j, Y g:i A");
+		$retVal[]['subHtml'] = "<b>$title</b><div class='lgLabel'>Rendered: $date " . $DateTime->format('T') . "</div>";
+		$retVal[count($retVal) - 1]['description'] = "Rendered: $date " . $DateTime->format('T');
+		$retVal[count($retVal) - 1]['timestamp'] = $DateTime->getTimestamp();
 	}	
 	usort($retVal, 'sortByTimestamp');
 	return $retVal;

@@ -148,9 +148,9 @@ if($_GET['type'] == "preload")
 	$preloadData = [];
 	
 	$preloadData['localRadarVideo'] = "";
-	if(array_key_exists('emwin', $config['types']) && array_key_exists('radarCode', $currentSettings[$selectedProfile]))
+	if(array_key_exists('emwin', $config['categories']) && array_key_exists('radarCode', $currentSettings[$selectedProfile]))
 	{
-		foreach($config['types']['emwin']['data'] as $value)
+		foreach($config['categories']['emwin']['data'] as $value)
 		{
 			if($value['filter'] == "RAD" . $currentSettings[$selectedProfile]['radarCode'] && isset($value["videoPath"]))
 			{
@@ -160,16 +160,16 @@ if($_GET['type'] == "preload")
 		}
 	}
 	
-	$preloadData['types'] = [];
-	foreach($config['types'] as $type => $typeProps)
+	$preloadData['categories'] = [];
+	foreach($config['categories'] as $type => $typeProps)
 	{
-		foreach($config['types'][$type]['data'] as $thisSlug => $thisValue)
+		foreach($config['categories'][$type]['data'] as $thisSlug => $thisValue)
 		{
-			unset($config['types'][$type]['data'][$thisSlug]['path']);
-			unset($config['types'][$type]['data'][$thisSlug]['filter']);
+			unset($config['categories'][$type]['data'][$thisSlug]['path']);
+			unset($config['categories'][$type]['data'][$thisSlug]['filter']);
 		}
 		
-		$preloadData['types'][$type] = $config['types'][$type];
+		$preloadData['categories'][$type] = $config['categories'][$type];
 	}
 	
 	$preloadData['showSysInfo'] = $config['general']['showSysInfo'];
@@ -534,37 +534,37 @@ elseif($_GET['type'] == "metadata")
 	}
 	
 	//Check if it's an image metadata request
-	elseif(array_key_exists($_GET['id'], $config['types']) && array_key_exists('subid', $_GET) && array_key_exists($_GET['subid'], $config['types'][$_GET['id']]['data']))
+	elseif(array_key_exists($_GET['id'], $config['categories']) && array_key_exists('subid', $_GET) && array_key_exists($_GET['subid'], $config['categories'][$_GET['id']]['data']))
 	{
 		//Query looks valid; load from disk if available
-		if(is_dir($config['types'][$_GET['id']]['data'][$_GET['subid']]['path']))
+		if(is_dir($config['categories'][$_GET['id']]['data'][$_GET['subid']]['path']))
 		{
-			switch($config['types'][$_GET['id']]['data'][$_GET['subid']]['mode'])
+			switch($config['categories'][$_GET['id']]['data'][$_GET['subid']]['mode'])
 			{
 				case "begin":
-					$regex = "/(\\\\|\/)(?<date>[0-9]{14})[^\\\\\/]*{$config['types'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
+					$regex = "/(\\\\|\/)(?<date>[0-9]{14})[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
 					$dateFormat = "YmdHis";
 					break;
 				case "beginz":
-					$regex = "/(\\\\|\/)(?<date>[0-9]{8}T[0-9]{6}Z)[^\\\\\/]*{$config['types'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
+					$regex = "/(\\\\|\/)(?<date>[0-9]{8}T[0-9]{6}Z)[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
 					$dateFormat = "Ymd\THis\Z";
 					break;
 				case "emwin":
-					$regex = "/_(?<date>[0-9]{14})_[^\\\\\/]*{$config['types'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
+					$regex = "/_(?<date>[0-9]{14})_[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
 					$dateFormat = "YmdHis";
 					break;
 				case "end":
-					$regex = "/{$config['types'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*(?<date>[0-9]{14})\..{3}$/i";
+					$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*(?<date>[0-9]{14})\..{3}$/i";
 					$dateFormat = "YmdHis";
 					break;
 				case "endz":
-					$regex = "/{$config['types'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*(?<date>[0-9]{8}T[0-9]{6}Z)\..{3}$/i";
+					$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*(?<date>[0-9]{8}T[0-9]{6}Z)\..{3}$/i";
 					$dateFormat = "Ymd\THis\Z";
 					break;
-				default: die("Invalid server config: " . $config['types'][$_GET['id']]['data'][$_GET['subid']]['mode'] . "is not a valid file parser mode!"); break;
+				default: die("Invalid server config: " . $config['categories'][$_GET['id']]['data'][$_GET['subid']]['mode'] . "is not a valid file parser mode!"); break;
 			}
 			
-			$fileList = scandir_recursive($config['types'][$_GET['id']]['data'][$_GET['subid']]['path']);
+			$fileList = scandir_recursive($config['categories'][$_GET['id']]['data'][$_GET['subid']]['path']);
 			foreach($fileList as $file)
 			{
 				if(!preg_match($regex, $file, $regexMatches)) continue;
@@ -572,7 +572,7 @@ elseif($_GET['type'] == "metadata")
 				if($DateTime === false) continue;
 				
 				$DateTime->setTimezone(new DateTimeZone(date_default_timezone_get()));
-				$metadata[]['subHtml'] = "<b>{$config['types'][$_GET['id']]['data'][$_GET['subid']]['title']}</b><div class='lgLabel'>" . $DateTime->format('F j, Y g:i A T') . "</div>";
+				$metadata[]['subHtml'] = "<b>{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['title']}</b><div class='lgLabel'>" . $DateTime->format('F j, Y g:i A T') . "</div>";
 				$metadata[count($metadata) - 1]['description'] = $DateTime->format('F j, Y g:i A T');
 				$metadata[count($metadata) - 1]['timestamp'] = $DateTime->getTimestamp();
 			}
@@ -590,36 +590,36 @@ elseif($_GET['type'] == "metadata")
 elseif($_GET['type'] == "data")
 {
 	if(!array_key_exists('id', $_GET) ||
-		!array_key_exists($_GET['id'], $config['types']) ||
+		!array_key_exists($_GET['id'], $config['categories']) ||
 		!array_key_exists('subid', $_GET) ||
-		!array_key_exists($_GET['subid'], $config['types'][$_GET['id']]['data']) ||
+		!array_key_exists($_GET['subid'], $config['categories'][$_GET['id']]['data']) ||
 		!array_key_exists('timestamp', $_GET))
 		die();
 		
 	$DateTime = new DateTime("now", new DateTimeZone("UTC"));
 	$DateTime->setTimestamp($_GET['timestamp']);
 	
-	switch($config['types'][$_GET['id']]['data'][$_GET['subid']]['mode'])
+	switch($config['categories'][$_GET['id']]['data'][$_GET['subid']]['mode'])
 	{
 		case "begin":
-			$regex = "/(\\\\|\/)" . $DateTime->format('YmdHis') . "[^\\\\\/]*{$config['types'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
+			$regex = "/(\\\\|\/)" . $DateTime->format('YmdHis') . "[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
 			break;
 		case "beginz":
-			$regex = "/(\\\\|\/)" . $DateTime->format('Ymd\THis\Z') . "[^\\\\\/]*{$config['types'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
+			$regex = "/(\\\\|\/)" . $DateTime->format('Ymd\THis\Z') . "[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
 			break;
 		case "emwin":
-			$regex = "/_" . $DateTime->format('YmdHis') . "_[^\\\\\/]*{$config['types'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
+			$regex = "/_" . $DateTime->format('YmdHis') . "_[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
 			break;
 		case "end":
-			$regex = "/{$config['types'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*" . $DateTime->format('YmdHis') . "\..{3}$/i";
+			$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*" . $DateTime->format('YmdHis') . "\..{3}$/i";
 			break;
 		case "endz":
-			$regex = "/{$config['types'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*" . $DateTime->format('Ymd\THis\Z') . "\..{3}$/i";
+			$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*" . $DateTime->format('Ymd\THis\Z') . "\..{3}$/i";
 			break;
 		default: die(); break;
 	}
 
-	$fileList = scandir_recursive($config['types'][$_GET['id']]['data'][$_GET['subid']]['path']);
+	$fileList = scandir_recursive($config['categories'][$_GET['id']]['data'][$_GET['subid']]['path']);
 	foreach($fileList as $thisFile)
 	{
 		if(preg_match($regex, $thisFile))
