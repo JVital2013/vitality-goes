@@ -76,9 +76,9 @@ As a bonus - if you have your local radar image configured in one of your catego
 You may find that the location section is the hardest part of the config to set up. I would recommend leaving it at its defaults, then use the "Local Settings" screen in Vitality GOES to determine what each value should be set to for your location. Once you have it working client-side, configure the settings as appropraite in this config file.
 
 ## Category ini files (abi.ini, meso.ini, etc)
+All category ini files will have a `[_category_]` section at the top, followed by any number of image sections.
 
-All category ini files will have a `[_category_]` section at the top, followed by any number of image sections. Here is an example `[_category_]` section:
-
+### \_category\_ definition
 ```ini
 [_category_]
 title = "Full Disk"
@@ -88,7 +88,8 @@ icon = globe-americas
 * `title`: The name of the category, as shown in the main menu and title bar
 * `icon`: The FontAwesome icon to use in the menu. Vitality GOES currently comes with FontAwesome 5, so [look here for available icons](https://fontawesome.com/v5/search).
 
-Here is an example image section, of which there can be multiple per ini file:
+### Image sections
+You can have multiple image sections per ini file
 
 ```ini
 [fdfc_16]
@@ -111,6 +112,17 @@ videoPath = GOES16FalseColor.mp4
 If a file contains no configured images, or if it's `[_category_]` section is missing, it will be hidden in Vitality GOES. *These files will probably not need to be configured by you, unless you're customizing what gets displayed*
 
 ## Supported filename parser modes
+The mode selected for an image tells Vitality GOES how to parse its filename. It affects where the timestamp should be in the filename, how the timestamp should be formatted, and how the `filter` attribute is applied to the filename.
+
 The following filename parser modes are supported for use in the `mode` attribute of your category ini files:
 
-TODO
+*Example Time: January 24, 2023 11:06:36 UTC*
+| Mode       | Timestamp Location        | Timestamp Format Example     | Filter matches any text...      | 
+| ---------- | ------------------------- | ---------------------------- | ------------------------------- |
+| begin      | Beginning of filename     | 20230124110636               | After the timestamp             |
+| beginu     | Beginning of filename     | 20230124_110636              | After the timestamp             |
+| beginz     | Beginning of filename     | 20230124T110636Z             | After the timestamp             |
+| emwin | In the middle of the filename as specified in the [EMWIN naming convention](https://www.weather.gov/emwin/format) | 20230124110636 | After the timestamp |
+| end        | End of filename           | 20230124110636               | Before the timestamp            |
+| endu       | End of filename           | 20230124_110636              | Before the timestamp            |
+| **endz**   | **End of filename**       | **20230124T110636Z**         | **Before the timestamp**        |
