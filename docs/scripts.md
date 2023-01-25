@@ -2,6 +2,8 @@
 
 Vitality GOES comes with a number of scripts to enhance and extend its functionality. All of these scripts are optional, but `Cleanup-EmwinText` is highly recommended since it keeps your EMWIN folder from getting too full.
 
+*Included scripts are for GOES-16/18 HRIT data only*
+
 **To get started,** copy `scriptconfig.ini` from the sample config folder you're using into the `scripts-*/` folder you're using. Then, update all pertinent values. See each script's documentation for what's needed. Unlike the ini files for Vitality GOES itself, you need to make sure there are no spaces around the equal sign (=). Also, comments should start with a #.
 
 Scripts for Linux hosts and are included in the [scripts-linux/](/scripts-linux/) folder, while scripts for Windows are in [/scripts-windows/](/scripts-windows/). See below for each scripts' compatibility matrix and dependencies; the Windows scripts have no additional dependencies.
