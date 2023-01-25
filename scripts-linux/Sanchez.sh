@@ -107,31 +107,6 @@ do
 	fi
 done
 
-#GOES 17
-echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating GOES 17 Sanchez False Color Images"
-for srcImg in $(find "$sanchezSrcPath17" -type f)
-do
-	baseName=$(echo $srcImg | awk -F/ '{print $NF}')
-	! [[ "$baseName" =~ ^.*_[0-9]{8}T[0-9]{6}Z\.[A-Za-z]{3}$ ]] && continue
-	
-	newName=$(echo $baseName | sed 's/CH13/sanchez/')
-	nameLastPart=$(echo $baseName | awk -F_ '{print $NF}' | cut -d. -f1)
-	thisDate=$(echo $nameLastPart | cut -dT -f1)
-	thisTime=$(echo $nameLastPart | cut -dT -f2)
-	thisTime=${thisTime::-1}
-	
-	if [ ! -f $sanchezDstPath17/$newName ]
-	then
-		echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating $newName..."
-		
-		#Build Underlay
-		rm /tmp/underlay.jpg > /dev/null 2>&1
-		satelliteMonth=$(date -u -d "$thisDate ${thisTime:0:2}:${thisTime:2:2}:${thisTime:4:2} + 8 hour" +"%m")
-		xplanet -config "$(dirname "$(readlink -fm "$0")")/Resources/xplanet-$satelliteMonth" -body earth -projection rectangular -num_times 1 -geometry 21600x10800 -date $thisDate.$thisTime -output /tmp/underlay.jpg
-		$sanchezPath -q -s $srcImg -u /tmp/underlay.jpg -r $((10850/$(identify -format '%w' $srcImg))) -n -o $sanchezDstPath17/$newName
-	fi
-done
-
 #GOES 18
 echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating GOES 18 Sanchez False Color Images"
 for srcImg in $(find "$sanchezSrcPath18" -type f)
@@ -154,57 +129,6 @@ do
 		satelliteMonth=$(date -u -d "$thisDate ${thisTime:0:2}:${thisTime:2:2}:${thisTime:4:2} + 8 hour" +"%m")
 		xplanet -config "$(dirname "$(readlink -fm "$0")")/Resources/xplanet-$satelliteMonth" -body earth -projection rectangular -num_times 1 -geometry 21600x10800 -date $thisDate.$thisTime -output /tmp/underlay.jpg
 		$sanchezPath -q -s $srcImg -u /tmp/underlay.jpg -r $((10850/$(identify -format '%w' $srcImg))) -n -o $sanchezDstPath18/$newName
-	fi
-done
-
-#Composite 16/17
-echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating GOES 16/17 Composite False Color Images"
-
-mkdir -p /tmp/goescomposite
-for src17Img in $(find "$sanchezSrcPath17" -type f)
-do
-	baseName17=$(echo $src17Img | awk -F/ '{print $NF}')
-	! [[ "$baseName17" =~ ^.*_[0-9]{8}T[0-9]{6}Z\.[A-Za-z]{3}$ ]] && continue
-	
-	newName=$(echo $baseName17 | sed 's/GOES17_FD_CH13/goes16_17_composite/')
-	if [ ! -f $dstPathComposite/$newName ]
-	then
-		nameLastPart17=$(echo $baseName17 | awk -F_ '{print $NF}' | cut -d. -f1)
-		thisDate=$(echo $nameLastPart17 | cut -dT -f1)
-		thisTime=$(echo $nameLastPart17 | cut -dT -f2)
-		thisTime=${thisTime::-1}
-		goes17DateStr=${nameLastPart17::-1}
-		
-		newestAllowed=$(date -u --date="$thisDate ${thisTime:0:2}:${thisTime:2:2}:${thisTime:4:2} UTC + 15 minutes" +"%Y%m%dT%H%M%S")
-		oldestAllowed=$(date -u --date="$thisDate ${thisTime:0:2}:${thisTime:2:2}:${thisTime:4:2} UTC - 15 minutes" +"%Y%m%dT%H%M%S")
-
-		for src16Img in $(find "$sanchezSrcPath16" -type f)
-		do
-			baseName16=$(echo $src16Img | awk -F/ '{print $NF}')
-			! [[ "$baseName16" =~ ^.*_[0-9]{8}T[0-9]{6}Z\.[A-Za-z]{3}$ ]] && continue
-			
-			nameLastPart16=$(echo $baseName16 | awk -F_ '{print $NF}' | cut -d. -f1)
-			goes16DateStr=${nameLastPart16::-1}
-			
-			if [[ $goes16DateStr == $goes17DateStr || ( $goes16DateStr > $goes17DateStr && $goes16DateStr < $newestAllowed ) || ( $goes16DateStr < $goes17DateStr && $goes16DateStr > $oldestAllowed ) ]]
-			then
-				echo "[$(date +"%Y-%m-%d %H:%M:%S")] Creating $newName..."
-				sanchezTime="${goes16DateStr:0:4}-${goes16DateStr:4:2}-${goes16DateStr:6:5}:${goes16DateStr:11:2}:${goes16DateStr:13:2}"
-				
-				#Build Underlay
-				rm /tmp/underlay.jpg > /dev/null 2>&1
-				satelliteMonth=$(date -u -d "$thisDate ${thisTime:0:2}:${thisTime:2:2}:${thisTime:4:2} + 6 hour" +"%m")
-				xplanet -config "$(dirname "$(readlink -fm "$0")")/Resources/xplanet-$satelliteMonth" -body earth -projection rectangular -num_times 1 -geometry 21600x10800 -date $thisDate.$thisTime -output /tmp/underlay.jpg
-				
-				#Render Composite
-				rm /tmp/goescomposite/* > /dev/null 2>&1
-				cp $src16Img /tmp/goescomposite/
-				cp $src17Img /tmp/goescomposite/
-				
-				$sanchezPath reproject -q -s /tmp/goescomposite/ -u /tmp/underlay.jpg -n -o $dstPathComposite/$newName -T $sanchezTime -a
-				break 
-			fi
-		done
 	fi
 done
 

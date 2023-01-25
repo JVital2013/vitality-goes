@@ -71,11 +71,11 @@ xplanet, imagemagick
 [Sanchez 1.0.21 or newer](https://github.com/nullpainter/sanchez)
 
 **Set in scriptconfig.ini before running:**  
-`sanchezSrcPath16`, `sanchezSrcPath17`, `sanchezSrcPath18`, `sanchezDstPath16`, `sanchezDstPath17`, `sanchezDstPath18`, `dstPathComposite`, and `sanchezPath`
+`sanchezSrcPath16`, `sanchezSrcPath18`, `sanchezDstPath16`, `sanchezDstPath18`, `dstPathComposite`, and `sanchezPath`
 
 Sanchez.sh is a script that automates Sanchez renders of your geostationary captures. The first time this script runs, it will automatically download 13 images to use as an underlay: one for each month, and a night time image with city lights. After the first run, the script will function without internet. You can also manually download the necessary images and save them in the Resources folder with the correct name, found in the same directory as Sanchez.sh.
 
-The script reads Channel 13 imagery from `sanchezSrcPath16`, `sanchezSrcPath17`, `sanchezSrcPath18`. Then, it creates false-color imagery of GOES-16, GOES-17, GOES-18, and composites. Images are saved in the respective `sanchesDst*` directory.
+The script reads Channel 13 imagery from `sanchezSrcPath16` and `sanchezSrcPath18`. Then, it creates false-color imagery of GOES-16, GOES-18, and composites. Images are saved in the respective `sanchesDst*` directory.
 
 The script will also do any "back" renders that it may have missed due to the script being disabled, failing to run, or other issues. When done, enable the Sanchez sections in your [abi.ini config file](config.md#abiini-mesoini-and-l2ini) to display your fancy new renders.
 

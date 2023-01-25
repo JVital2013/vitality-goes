@@ -33,7 +33,7 @@ foreach($file in $files)
 }
 
 #ABI Imagery
-$files = Get-ChildItem -Attributes !Directory -Recurse "$($config.abiSrcDir)\IMAGES\GOES-16", "$($config.abiSrcDir)\IMAGES\GOES-17", "$($config.abiSrcDir)\IMAGES\GOES-18"
+$files = Get-ChildItem -Attributes !Directory -Recurse "$($config.abiSrcDir)\IMAGES\GOES-16", "$($config.abiSrcDir)\IMAGES\GOES-18"
 foreach($file in $files)
 {
     $datestr = $file.BaseName.Split('_')[-1]
