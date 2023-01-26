@@ -37,7 +37,15 @@ if(storedExpandedCards == null)
 	var expandedCards = [];
 	sessionStorage.setItem('expandedCards', "[]");
 }
-else var expandedCards = JSON.parse(storedExpandedCards);
+else
+{
+	try{var expandedCards = JSON.parse(storedExpandedCards);}
+	catch(error)
+	{
+		var expandedCards = [];
+		sessionStorage.setItem('expandedCards', "[]");
+	}
+}
 
 function getCookie(name)
 {
@@ -360,7 +368,18 @@ function menuSelect(menuSlug)
 		{
 			if(this.readyState == 4 && this.status == 200)
 			{
-				weatherInfo = JSON.parse(this.responseText);
+				try{weatherInfo = JSON.parse(this.responseText);}
+				catch(error)
+				{
+					mainContent.innerHTML = "";
+					renderCollapsingCard("serverError", "The server returned bad data. Click to expand", "prettyBoxContent", "otherEmwinBody");
+					target = document.getElementById('serverErrorContent').firstChild;
+					target.innerHTML = "";
+					target.appendChild(document.createTextNode(this.responseText));
+					mainContent.className = "singleCard";
+					delete xhttp.weatherJSON;
+					return;
+				}
 				
 				//Weather Alert
 				if(weatherInfo.alert != "")
@@ -527,7 +546,13 @@ function menuSelect(menuSlug)
 		{
 			if(this.readyState == 4 && this.status == 200)
 			{
-				alertInfo = JSON.parse(this.responseText);
+				try{alertInfo = JSON.parse(this.responseText);}
+				catch(error)
+				{
+					renderAlert("The server returned bad alert data: <br /><br />" + this.responseText, "red");
+					delete xhttp.alertJSON;
+					return;
+				}
 				
 				//Weather Warnings
 				alertInfo.weatherWarnings.forEach(function(element){renderAlert(element, "red")});
@@ -571,7 +596,18 @@ function menuSelect(menuSlug)
 		{
 			if(this.readyState == 4 && this.status == 200)
 			{
-				otherEmwinInfo = JSON.parse(this.responseText);
+				try{otherEmwinInfo = JSON.parse(this.responseText);}
+				catch(error)
+				{
+					mainContent.innerHTML = "";
+					renderCollapsingCard("serverError", "The server returned bad data. Click to expand", "prettyBoxContent", "otherEmwinBody");
+					target = document.getElementById('serverErrorContent').firstChild;
+					target.innerHTML = "";
+					target.appendChild(document.createTextNode(this.responseText));
+					mainContent.className = "singleCard";
+					delete xhttp.otherEMWIN;
+					return;
+				}
 				
 				if(config.showEmwinInfo)
 				{
@@ -689,7 +725,18 @@ function menuSelect(menuSlug)
 		{
 			if(this.readyState == 4 && this.status == 200)
 			{
-				hurricaneInfo = JSON.parse(this.responseText);
+				try{hurricaneInfo = JSON.parse(this.responseText);}
+				catch(error)
+				{
+					target = document.getElementById('loadingNoticeCardBody');
+					target.innerHTML = "";
+					target.appendChild(document.createTextNode("The server returned bad data:" + this.responseText));
+					target.className += " otherEmwinBody";
+					
+					delete xhttp.hurricaneInfo;
+					return;
+				}
+				
 				if(Object.keys(hurricaneInfo).length == 0)
 				{
 					document.getElementById('loadingNoticeCardBody').innerHTML = "<div style='text-align: center;'>No tropical activity at this time</div>";
@@ -964,9 +1011,18 @@ function menuSelect(menuSlug)
 			{
 				if(this.readyState == 4 && this.status == 200)
 				{
-					//Radar Codes
-					returnVal = JSON.parse(this.responseText);
+					try{returnVal = JSON.parse(this.responseText);}
+					catch(error)
+					{
+						target = document.getElementById('selectedProfileCardBody');
+						target.innerHTML = "";
+						target.className += " otherEmwinBody";
+						target.appendChild(document.createTextNode("The server returned bad data: " + this.responseText));
+						delete xhttp.dropdowns;
+						return;
+					}
 					
+					//Radar Codes
 					target = document.getElementById('radarCode');
 					returnVal.radar.forEach((radarCode) => {
 						newOption = document.createElement('option');
@@ -1034,11 +1090,19 @@ function menuSelect(menuSlug)
 		{
 			if(this.readyState == 4 && this.status == 200)
 			{
-				returnVal = JSON.parse(this.responseText);
 				target = document.getElementById('selectedThemeCardBody');
-				target.style.textAlign = "center";
-				
 				target.innerHTML = "";
+				
+				try{returnVal = JSON.parse(this.responseText);}
+				catch(error)
+				{
+					target.appendChild(document.createTextNode("The server returned bad data:" + this.responseText));
+					target.className += " otherEmwinBody";
+					delete xhttp.theme;
+					return;
+				}
+				
+				target.style.textAlign = "center";
 				themeSelector = document.createElement('select');
 				themeSelector.id = 'themeSelector';
 				themeSelector.style.width = "100%";
@@ -1095,9 +1159,21 @@ function menuSelect(menuSlug)
 				if(this.readyState == 4 && this.status == 200)
 				{
 					//General System Information
-					sysInfo = JSON.parse(this.responseText);
-					
 					target = document.getElementById('sysCardBody');
+					try{sysInfo = JSON.parse(this.responseText);}
+					catch(error)
+					{
+						target.innerHTML = "";
+						target.appendChild(document.createTextNode("The server returned bad data: " + this.responseText));
+						target.className += " otherEmwinBody";
+						
+						target = document.getElementById('sysTempCardBody');
+						target.parentElement.parentElement.nextSibling.remove();
+						target.parentElement.parentElement.remove();
+						delete xhttp.sysInfo;
+						return;
+					}
+					
 					if(sysInfo.sysData.length == 0)
 					{
 						target.parentElement.parentElement.nextSibling.remove();
@@ -1218,32 +1294,34 @@ function loadStats(targetedContent)
 		{
 			if(this.readyState == 4 && this.status == 200)
 			{
-				metadata = JSON.parse(this.responseText);
-				if(Object.keys(metadata).length == 0)
-				{
-					targetedContent.innerHTML = "<i>Error loading statistics</i>";
-				}
-				else
+				try{metadata = JSON.parse(this.responseText);}
+				catch(error)
 				{
 					targetedContent.innerHTML = "";
-					parser = new DOMParser();
-					
-					svg1hr = parser.parseFromString(metadata['svg1hr'], "image/svg+xml");
-					svg1hr.documentElement.style.width = "100%";
-					svg1hr.documentElement.style.height = "auto";
-					targetedContent.appendChild(svg1hr.documentElement);
-					targetedContent.appendChild(document.createElement('br'));
-					
-					svg1day = parser.parseFromString(metadata['svg1day'], "image/svg+xml");
-					svg1day.documentElement.style.width = "100%";
-					svg1day.documentElement.style.height = "auto";
-					targetedContent.appendChild(svg1day.documentElement);
-					
-					description = document.createElement('div');
-					description.className = "goeslabel";
-					description.innerHTML = metadata['description'];
-					targetedContent.appendChild(description);
+					targetedContent.appendChild(document.createTextNode("The server returned bad data: " + this.responseText));
+					targetedContent.className += " otherEmwinBody";
+					delete xhttp.loadStats;
+					return;
 				}
+				
+				targetedContent.innerHTML = "";
+				parser = new DOMParser();
+				
+				svg1hr = parser.parseFromString(metadata['svg1hr'], "image/svg+xml");
+				svg1hr.documentElement.style.width = "100%";
+				svg1hr.documentElement.style.height = "auto";
+				targetedContent.appendChild(svg1hr.documentElement);
+				targetedContent.appendChild(document.createElement('br'));
+				
+				svg1day = parser.parseFromString(metadata['svg1day'], "image/svg+xml");
+				svg1day.documentElement.style.width = "100%";
+				svg1day.documentElement.style.height = "auto";
+				targetedContent.appendChild(svg1day.documentElement);
+				
+				description = document.createElement('div');
+				description.className = "goeslabel";
+				description.innerHTML = metadata['description'];
+				targetedContent.appendChild(description);
 				
 				delete xhttp.loadStats;
 			}
@@ -1334,7 +1412,15 @@ function loadImageMetadata(targetedContent)
 	{
 		if(this.readyState == 4 && this.status == 200)
 		{
-			metadata = JSON.parse(this.responseText);
+			try{metadata = JSON.parse(this.responseText);}
+			catch(error)
+			{
+				targetedContent.innerHTML = "";
+				targetedContent.appendChild(document.createTextNode("The server returned bad data: " + this.responseText));
+				targetedContent.className += " otherEmwinBody";
+				delete xhttp.loadImage;
+			}
+			
 			loadImage(targetedContent, metadata);
 			delete xhttp.loadImage;
 		}
@@ -1452,6 +1538,7 @@ window.addEventListener("load", function()
 				target = document.getElementById('serverErrorContent').firstChild;
 				target.innerHTML = this.responseText;
 				mainContent.className = "singleCard";
+				delete xhttp.preload;
 				return;
 			}
 			

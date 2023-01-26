@@ -288,29 +288,20 @@ function parseFmLine($line, $forecastLTBreaks)
 
 function parseGraphiteData(&$metadata, $tz, $graphiteAPI, $target, $title, $color)
 {
-	set_error_handler("convertToException");
-	try
-	{
-		$tzUrl = urlencode($tz);
-		$targetUrl = urlencode($target);
-		$titleUrl = urlencode($title);
-		
-		$hrArray = json_decode(file_get_contents("$graphiteAPI?format=json&from=-1hours&tz=$tzUrl&target=$targetUrl"))[0]->datapoints;
-		$dayArray = json_decode(file_get_contents("$graphiteAPI?format=json&from=-1days&tz=$tzUrl&target=$targetUrl"))[0]->datapoints;
-		$hrSum = $daySum = 0;
-		
-		foreach($hrArray as $thisPacket) {$hrSum += $thisPacket[0];}
-		foreach($dayArray as $thisPacket) {$daySum += $thisPacket[0];}
-		
-		$metadata['description'] = "1 Hour Average: " . round($hrSum / count($hrArray), 2) . " | 1 Day Average: " . round($daySum / count($dayArray), 2);
-		$metadata['svg1hr'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents("$graphiteAPI?width=600&height=350&format=svg&title=$titleUrl%20(1%20Hour)&fontSize=14&lineWidth=2&from=-1hours&hideLegend=true&colorList=$color&tz=$tzUrl&target=$targetUrl"));
-		$metadata['svg1day'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents("$graphiteAPI?width=600&height=350&format=svg&title=$titleUrl%20(1%20Day)&fontSize=14&lineWidth=2&from=-24hours&hideLegend=true&colorList=$color&tz=$tzUrl&target=$targetUrl"));
-	}
-	catch(exception $e)
-	{
-		$metadata = [];
-	}
-	restore_error_handler();
+	$tzUrl = urlencode($tz);
+	$targetUrl = urlencode($target);
+	$titleUrl = urlencode($title);
+
+	$hrArray = json_decode(file_get_contents("$graphiteAPI?format=json&from=-1hours&tz=$tzUrl&target=$targetUrl"))[0]->datapoints;
+	$dayArray = json_decode(file_get_contents("$graphiteAPI?format=json&from=-1days&tz=$tzUrl&target=$targetUrl"))[0]->datapoints;
+	$hrSum = $daySum = 0;
+
+	foreach($hrArray as $thisPacket) {$hrSum += $thisPacket[0];}
+	foreach($dayArray as $thisPacket) {$daySum += $thisPacket[0];}
+
+	$metadata['description'] = "1 Hour Average: " . round($hrSum / count($hrArray), 2) . " | 1 Day Average: " . round($daySum / count($dayArray), 2);
+	$metadata['svg1hr'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents("$graphiteAPI?width=600&height=350&format=svg&title=$titleUrl%20(1%20Hour)&fontSize=14&lineWidth=2&from=-1hours&hideLegend=true&colorList=$color&tz=$tzUrl&target=$targetUrl"));
+	$metadata['svg1day'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents("$graphiteAPI?width=600&height=350&format=svg&title=$titleUrl%20(1%20Day)&fontSize=14&lineWidth=2&from=-24hours&hideLegend=true&colorList=$color&tz=$tzUrl&target=$targetUrl"));
 }
 
 function convertToException($err_severity, $err_msg, $err_file, $err_line)
