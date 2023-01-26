@@ -825,10 +825,9 @@ elseif($_GET['type'] == "alertJSON")
 				$thisLine = trim($hurricaneStatementLine);
 				if($thisLine != "" && is_numeric($thisLine[0]))
 				{
-					$DateTime = new DateTime("now", new DateTimeZone(date_default_timezone_get()));
-					$issueTimeParts = explode(" " . $DateTime->format('T') . " ", $thisLine);
-					$issueTimeParts[0] = substr_replace($issueTimeParts[0], ":", -5, 0);
-					$thisHurricaneMessageTime = strtotime($issueTimeParts[1] . " " . $issueTimeParts[0]);
+					preg_match("/^(?<time>[0-9]* [A-Z]*)(\s+[A-Z]*\s+)(?<date>.*)$/i", trim($thisLine), $issueTimeParts);
+					$issueTimeParts['time'] = substr_replace($issueTimeParts['time'], ":", -5, 0);
+					$thisHurricaneMessageTime = strtotime($issueTimeParts['date']." ".$issueTimeParts['time']);
 					
 					if($thisHurricaneMessageTime > $latestHurricaneMessage)
 					{
@@ -871,13 +870,12 @@ elseif($_GET['type'] == "alertJSON")
 				if(stripos($weatherData[$i], "* Until") === 0)
 				{
 					//Convert issue time to something PHP can understand
-					$DateTime = new DateTime("now", new DateTimeZone(date_default_timezone_get()));
-					$issueTimeParts = explode(" " . $DateTime->format('T') . " ", $issueTime);
-					$issueTimeParts[0] = substr_replace($issueTimeParts[0], ":", -5, 0);
+					preg_match("/^(?<time>[0-9]* [A-Z]*)(\s+[A-Z]*\s+)(?<date>.*)$/i", $issueTime, $issueTimeParts);
+					$issueTimeParts['time'] = substr_replace($issueTimeParts['time'], ":", -5, 0);
 					
 					//Convert the expire time to something PHP can understand
 					$expireTimeStr = substr_replace(substr(str_replace("* Until ", "", trim($weatherData[$i])), 0, -1), ":", -9, 0);
-					$expireTime = strtotime($expireTimeStr, strtotime($issueTimeParts[1]." ".$issueTimeParts[0]));
+					$expireTime = strtotime($expireTimeStr, strtotime($issueTimeParts['date']." ".$issueTimeParts['time']));
 				}
 				
 				//Get geofencing of warning
@@ -903,7 +901,7 @@ elseif($_GET['type'] == "alertJSON")
 			}
 			
 			//Run checks to see if execution should continue
-			if(!isset($expireTime) || time() > $expireTime) continue;
+			if(isset($expireTime) && time() > $expireTime) continue;
 			if(!is_in_polygon(count($geoLat) - 1, $geoLon, $geoLat, $currentSettings[$selectedProfile]['lon'], $currentSettings[$selectedProfile]['lat'])) continue;
 			
 			//Geolocation and time limits checked out OK; send warning to client
