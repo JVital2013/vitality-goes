@@ -29,21 +29,32 @@ if($config['general']['debug'])
 }
 else ini_set("display_errors", "Off");
 
+//Delete old cookie
+if(array_key_exists('currentSettings', $_COOKIE)) setcookie("currentSettings", "", time() - 3600, "/", ".".$_SERVER['SERVER_NAME']);
+
 //Load Current User Settings from Cookie
 $sendCookie = false;
-if(array_key_exists('currentSettings', $_COOKIE))
-{
-	$currentSettings = json_decode($_COOKIE['currentSettings'], true);
-	if(!is_array($currentSettings))
-	{
-		$currentSettings = [];
-		$sendCookie = true;
-	}
-}
+$currentSettings = [];
+if(!array_key_exists('localSettings', $_COOKIE)) $sendCookie = true;
 else
 {
-	$currentSettings = [];
-	$sendCookie = true;
+	$allLocations = explode("~", $_COOKIE['localSettings']);
+	foreach($allLocations as $thisLocation)
+	{
+		$profileParts = explode("!", $thisLocation);
+		if(count($profileParts) != 9) continue;
+		$currentSettings[] = [
+			'city' => $profileParts[0],
+			'lat' => $profileParts[1],
+			'lon' => $profileParts[2],
+			'orig' => $profileParts[3],
+			'radarCode' => $profileParts[4],
+			'rwrOrig' => $profileParts[5],
+			'stateAbbr' => $profileParts[6],
+			'timezone' => $profileParts[7],
+			'wxZone' => $profileParts[8]
+		];
+	}
 }
 
 //Overwrite first setting profile in array with all other settings on server
@@ -120,13 +131,6 @@ if($selectedProfile > 0)
 					break 2;
 				}
 				break;
-			
-			//Prevent injecting variables into the script from the cookie
-			default:
-				unset($currentSettings[$selectedProfile]);
-				$selectedProfile = 0;
-				$sendCookie = true;
-				break 2;
 		}
 	}
 }
@@ -134,8 +138,24 @@ if($selectedProfile > 0)
 //Save settings in case something changed
 if($sendCookie)
 {
+	$profileParts = [];
+	foreach($currentSettings as $thisLocation)
+	{
+		$profileParts[] = join("!", [
+			(array_key_exists('city', $thisLocation) ? rawurlencode($thisLocation['city']) : ""),
+			(array_key_exists('lat', $thisLocation) ? $thisLocation['lat'] : ""),
+			(array_key_exists('lon', $thisLocation) ? $thisLocation['lon'] : ""),
+			(array_key_exists('orig', $thisLocation) ? $thisLocation['orig'] : ""),
+			(array_key_exists('radarCode', $thisLocation) ? $thisLocation['radarCode'] : ""),
+			(array_key_exists('rwrOrig', $thisLocation) ? $thisLocation['rwrOrig'] : ""),
+			(array_key_exists('stateAbbr', $thisLocation) ? $thisLocation['stateAbbr'] : ""),
+			(array_key_exists('timezone', $thisLocation) ? rawurlencode($thisLocation['timezone']) : ""),
+			(array_key_exists('wxZone', $thisLocation) ? $thisLocation['wxZone'] : "")
+		]);
+	}
+	
 	setcookie("selectedProfile", "$selectedProfile", time() + 31536000, "/", ".".$_SERVER['SERVER_NAME']);
-	setcookie("currentSettings", json_encode(array_values($currentSettings), JSON_UNESCAPED_SLASHES), time() + 31536000, "/", ".".$_SERVER['SERVER_NAME']);
+	setrawcookie("localSettings", join("~", $profileParts), time() + 31536000, "/", ".".$_SERVER['SERVER_NAME']);
 }
 
 //Set the specified timezone

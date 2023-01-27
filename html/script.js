@@ -46,17 +46,56 @@ else
 		sessionStorage.setItem('expandedCards', "[]");
 	}
 }
-
 function getCookie(name)
 {
 	return decodeURIComponent((name = (document.cookie + ';').match(new RegExp(name + '=.*;'))) && name[0].split(/=|;/)[1]);
 }
-
 function setCookie(name, value)
 {
 	var e = new Date;
 	e.setDate(e.getDate() + 365);
 	document.cookie = name + "=" + encodeURIComponent(value) + ';expires=' + e.toUTCString() + ';path=/;domain=.' + document.domain;
+}
+function encodeProfile(profileArray)
+{
+	profileParts = [];
+	profileArray.forEach((thisLocation) => {
+		profileParts.push([
+			(thisLocation.hasOwnProperty('city') ? thisLocation.city : ""),
+			(thisLocation.hasOwnProperty('lat') ? thisLocation.lat : ""),
+			(thisLocation.hasOwnProperty('lon') ? thisLocation.lon : ""),
+			(thisLocation.hasOwnProperty('orig') ? thisLocation.orig : ""),
+			(thisLocation.hasOwnProperty('radarCode') ? thisLocation.radarCode : ""),
+			(thisLocation.hasOwnProperty('rwrOrig') ? thisLocation.rwrOrig : ""),
+			(thisLocation.hasOwnProperty('stateAbbr') ? thisLocation.stateAbbr : ""),
+			(thisLocation.hasOwnProperty('timezone') ? thisLocation.timezone : ""),
+			(thisLocation.hasOwnProperty('wxZone') ? thisLocation.wxZone : "")
+		].join("!"));
+	});
+	
+	return profileParts.join('~');
+}
+function decodeProfile(profileString)
+{
+	profileArray = [];
+	allLocations = profileString.split("~");
+	allLocations.forEach((thisLocation) => {
+		profileParts = thisLocation.split("!");
+		if(profileParts.length != 9) return;
+		profileArray.push({
+			'city': profileParts[0],
+			'lat': profileParts[1],
+			'lon': profileParts[2],
+			'orig': profileParts[3],
+			'radarCode': profileParts[4],
+			'rwrOrig': profileParts[5],
+			'stateAbbr': profileParts[6],
+			'timezone': profileParts[7],
+			'wxZone': profileParts[8]
+		});
+	});
+	
+	return profileArray;
 }
 function slideDrawer()
 {
@@ -825,7 +864,7 @@ function menuSelect(menuSlug)
 		{
 			//Set up profile
 			selectedProfile = parseInt(getCookie('selectedProfile'));
-			currentSettings = JSON.parse(getCookie('currentSettings'));
+			currentSettings = decodeProfile(getCookie('localSettings'));
 			profileSelectorHolder = document.createElement('div');
 			profileSelectorHolder.className = 'prettyBoxList profileSelector';
 			profileSelectorHolder.innerHTML = "<span style='font-weight: bold;'>Profile: </span>";
@@ -860,7 +899,7 @@ function menuSelect(menuSlug)
 			addNewButton.disabled = (currentSettings.length >= 10);
 			addNewButton.addEventListener('click', function() {
 				currentSettings.push(currentSettings[selectedProfile]);
-				setCookie("currentSettings", JSON.stringify(currentSettings));
+				setCookie("localSettings", encodeProfile(currentSettings));
 				setCookie("selectedProfile", currentSettings.length - 1);
 				menuSelect(selectedMenu);
 			});
@@ -877,7 +916,7 @@ function menuSelect(menuSlug)
 				currentSettings.splice(selectedProfile, 1);
 				selectedProfile = 0;
 				
-				setCookie("currentSettings", JSON.stringify(currentSettings));
+				setCookie("localSettings", encodeProfile(currentSettings));
 				setCookie("selectedProfile", selectedProfile);
 				
 				if(currentSettings[selectedProfile].radarCode != lastRadarCode) location.reload();
@@ -945,7 +984,7 @@ function menuSelect(menuSlug)
 					currentSettings[selectedProfile].lon = document.getElementById('lon').value;
 					currentSettings[selectedProfile].timezone = document.getElementById('timezone').value;
 					
-					setCookie("currentSettings", JSON.stringify(currentSettings));
+					setCookie("localSettings", encodeProfile(currentSettings));
 					
 					//Make dummy request to dataHandler. This will reset the cookie if it's invalid
 					xhttp.dummy = new XMLHttpRequest();
