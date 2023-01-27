@@ -988,6 +988,7 @@ elseif($_GET['type'] == "hurricaneJSON")
 						$nameLine = trim($hurricaneStatementLines[++$i]);
 						$identifierLine = trim($hurricaneStatementLines[++$i]);
 						$advisoryTime = trim($hurricaneStatementLines[++$i]);
+						if(stripos($advisoryTime, "ISSUED BY") === 0) $advisoryTime = trim($hurricaneStatementLines[++$i]);
 						
 						//Get Storm Identifier
 						$identifierParts = preg_split('/\s+/', $identifierLine);
@@ -1005,6 +1006,7 @@ elseif($_GET['type'] == "hurricaneJSON")
 						//Get Advisory Time
 						$advisoryTimezone = preg_split('/\s+/', $advisoryTime)[2];
 						$advisoryTimeParts = explode(" $advisoryTimezone ", $advisoryTime);
+						
 						$DateTime = new DateTime($advisoryTimeParts[1] . " " . substr_replace($advisoryTimeParts[0], ":", -5, 0) . " $advisoryTimezone", new DateTimeZone("$advisoryTimezone"));
 						$DateTime->setTimezone(new DateTimeZone(date_default_timezone_get()));
 						$returnData[$stormIdentifier]['latestAdvTime'] = $DateTime->format("F j, Y g:i A T");
@@ -1057,7 +1059,11 @@ elseif($_GET['type'] == "hurricaneJSON")
 						if(stripos($thisLine, "test") !== false) break;
 						$fullName = $thisLine;
 					}
-					if($i == 5) $advisoryTime = $thisLine;
+					if($i == 5)
+					{
+						if(stripos($thisLine, "ISSUED BY") === 0) $advisoryTime = trim($hurricaneStatementLines[$i + 1]);
+						else $advisoryTime = $thisLine;
+					}
 					
 					//Get Storm Identifier
 					if($i == 4)
@@ -1103,11 +1109,16 @@ elseif($_GET['type'] == "hurricaneJSON")
 					if(stripos($thisLine, "MOV:") === 0)
 					{
 						$dataValue = preg_split('/:\s+/', $thisLine)[1];
-						$movementParts = explode(" ", $dataValue);
-						$speedKnots = ltrim(preg_replace("/[^0-9]/", "", $movementParts[1]), "0 ");
-						$speedMph = round($speedKnots * 1.15078);
-						$speedKph = round($speedKnots * 1.852);
-						$returnData[$stormIdentifier]['movement'] = $movementParts[0] . ", $speedKnots Knots / $speedMph MPH / $speedKph KPH";
+						if($dataValue == "STNRY") $returnData[$stormIdentifier]['movement'] = "Stationary";
+						else 
+						{
+							$movementParts = explode(" ", $dataValue);
+							
+							$speedKnots = ltrim(preg_replace("/[^0-9]/", "", $movementParts[1]), "0 ");
+							$speedMph = round($speedKnots * 1.15078);
+							$speedKph = round($speedKnots * 1.852);
+							$returnData[$stormIdentifier]['movement'] = $movementParts[0] . ", $speedKnots Knots / $speedMph MPH / $speedKph KPH";
+						}
 					}
 					
 					//Current Status
