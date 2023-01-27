@@ -19,43 +19,55 @@
 function loadConfig()
 {
 	//Load main config
+	if(!file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini")) die("config.ini is missing! Make sure\nyou have config files in:\n\n" . $_SERVER['DOCUMENT_ROOT'] . "/config/");
 	$config = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini", true, INI_SCANNER_RAW);
+	if($config === false) die("Unable to parse config.ini");
+	
 	$config['general']['showSysInfo'] = (stripos($config['general']['showSysInfo'], "true") !== false);
 	$config['general']['debug'] = (stripos($config['general']['debug'], "true") !== false);
 	
-	//Load extra configs, allow them to not exist
-	if(file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/abi.ini"))
+	//Load Extra configs
+	if(!array_key_exists('categories', $config)) $config['categories'] = [];
+	else
 	{
-		$config['abi'] = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/abi.ini", true, INI_SCANNER_RAW);
-		parseABIConfig($config, $config['abi']);
+		foreach($config['categories'] as $type => $inifile)
+		{
+			//Validate Extra Configs
+			unset($config['categories'][$type]);
+			if(!file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/$inifile")) continue;
+			
+			$configPart = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/$inifile", true, INI_SCANNER_RAW);
+			if($configPart === false ||
+				!array_key_exists('_category_', $configPart) || 
+				count($configPart) < 2 || 
+				!array_key_exists('title', $configPart['_category_']) ||
+				!array_key_exists('icon', $configPart['_category_']))
+				continue;
+			
+			//Get Category Information
+			$config['categories'][$type] = [];
+			$config['categories'][$type]['title'] = $configPart['_category_']['title'];
+			$config['categories'][$type]['icon'] = $configPart['_category_']['icon'];
+			unset($configPart['_category_']);
+			
+			//Parse config for each card
+			$slugs = array_keys($configPart);
+			for($i = 0; $i < count($configPart); $i++)
+			{
+				if(!array_key_exists("filter", $configPart[$slugs[$i]])) $configPart[$slugs[$i]]['filter'] = "";
+				if(!array_key_exists("mode", $configPart[$slugs[$i]])) $configPart[$slugs[$i]]['mode'] = "endz";
+				if(array_key_exists('paths', $config)) foreach($config['paths'] as $key => $value)
+					$configPart[$slugs[$i]]['path'] = str_replace('{' . $key . '}', $value, $configPart[$slugs[$i]]['path']);
+			}
+			
+			$config['categories'][$type]['data'] = $configPart;
+		}
 	}
-	else $config['abi'] = [];
-	
-	if(file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/meso.ini"))
-	{
-		$config['meso'] = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/meso.ini", true, INI_SCANNER_RAW);
-		parseABIConfig($config, $config['meso']);
-	}
-	else $config['meso'] = [];
-	
-	if(file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/l2.ini"))
-	{
-		$config['l2'] = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/l2.ini", true, INI_SCANNER_RAW);
-		parseABIConfig($config, $config['l2']);
-	}
-	else $config['l2'] = [];
-	
-	if(file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/emwin.ini"))
-	{
-		$config['emwin'] = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/emwin.ini", true, INI_SCANNER_RAW);
-	}
-	else $config['emwin'] = [];
 	
 	//Config touchups
 	if(array_key_exists('paths', $config)) unset($config['paths']);
 	if(!array_key_exists('city', $config['location'])) $config['location']['city'] = "";
 	if(!array_key_exists('rwrOrig', $config['location']) && array_key_exists('orig', $config['location'])) $config['location']['rwrOrig'] = $config['location']['orig'];
-	if(!array_key_exists('emwinPath', $config['general'])) $config['emwin'] = [];
 	
 	return $config;
 }
@@ -63,25 +75,24 @@ function loadConfig()
 function findAllThemes()
 {
 	$themes = [];
-	if(is_dir("{$_SERVER['DOCUMENT_ROOT']}/themes"))
+	if(!is_dir("{$_SERVER['DOCUMENT_ROOT']}/themes")) return $themes;
+	
+	$themeDirs = glob("{$_SERVER['DOCUMENT_ROOT']}/themes/*", GLOB_ONLYDIR);
+	foreach($themeDirs as $themeDir)
 	{
-		$themeDirs = glob("{$_SERVER['DOCUMENT_ROOT']}/themes/*", GLOB_ONLYDIR);
-		foreach($themeDirs as $themeDir)
-		{
-			//Make sure theme is valid
-			if(!is_file("$themeDir/theme.ini")) continue;
-			$thisThemeDef = parse_ini_file("$themeDir/theme.ini", true, INI_SCANNER_RAW);
-			if($thisThemeDef === false || !array_key_exists("stylesheets", $thisThemeDef) || !is_array($thisThemeDef['stylesheets'])) continue;
-			
-			//Make sure the theme doesn't try loading something strange
-			foreach($thisThemeDef['stylesheets'] as $stylesheet)
-				if((!preg_match("/^https?:\/\/.*$/", $stylesheet) && strpos($stylesheet, "..") !== false) ||
-					(!preg_match("/^https?:\/\/.*$/", $stylesheet) && !is_file("$themeDir/$stylesheet")))
-						continue 2;
-			
-			//Theme is valid, allow it
-			$themes[basename($themeDir)] = $thisThemeDef;
-		}
+		//Make sure theme is valid
+		if(!is_file("$themeDir/theme.ini")) continue;
+		$thisThemeDef = parse_ini_file("$themeDir/theme.ini", true, INI_SCANNER_RAW);
+		if($thisThemeDef === false || !array_key_exists("stylesheets", $thisThemeDef) || !is_array($thisThemeDef['stylesheets'])) continue;
+		
+		//Make sure the theme doesn't try loading something strange
+		foreach($thisThemeDef['stylesheets'] as $stylesheet)
+			if((!preg_match("/^https?:\/\/.*$/", $stylesheet) && strpos($stylesheet, "..") !== false) ||
+				(!preg_match("/^https?:\/\/.*$/", $stylesheet) && !is_file("$themeDir/$stylesheet")))
+					continue 2;
+		
+		//Theme is valid, allow it
+		$themes[basename($themeDir)] = $thisThemeDef;
 	}
 	
 	return $themes;
@@ -111,17 +122,6 @@ function loadTheme($config)
 		return $themes[$themeToUse];
 	}
 	else return false;
-}
-
-function parseABIConfig($config, &$abiConfig)
-{
-	$slugs = array_keys($abiConfig);
-	for($i = 0; $i < count($abiConfig); $i++)
-	{
-		if(!array_key_exists("filter", $abiConfig[$slugs[$i]])) $abiConfig[$slugs[$i]]['filter'] = "";
-		if(array_key_exists('paths', $config)) foreach($config['paths'] as $key => $value)
-			$abiConfig[$slugs[$i]]['path'] = str_replace('{' . $key . '}', $value, $abiConfig[$slugs[$i]]['path']);
-	}
 }
 
 function scandir_recursive($dir, &$results = array())
@@ -165,7 +165,7 @@ function sortEMWIN($a, $b)
 	return $explodedB[4] - $explodedA[4];
 }
 
-function sortABI($a, $b)
+function sortByBasename($a, $b)
 {
 	return strcmp(basename($a), basename($b));
 }
@@ -193,6 +193,15 @@ function findNewestEMWIN($allEmwinFiles, $product)
 	return $path;
 }
 
+function getEMWINDate($path)
+{
+	//This assumes the path is already validated as EMWIN!
+	$fileNameParts = explode("_", basename($path));
+	$DateTime = new DateTime($fileNameParts[4], new DateTimeZone("UTC"));
+	$DateTime->setTimezone(new DateTimeZone(date_default_timezone_get()));
+	return $DateTime->format("M d, Y Hi T");
+}
+
 function findSpecificEMWIN($allEmwinFiles, $product, $timestamp)
 {
 	$DateTime = new DateTime("now", new DateTimeZone(date_default_timezone_get()));
@@ -201,69 +210,29 @@ function findSpecificEMWIN($allEmwinFiles, $product, $timestamp)
 	
 	foreach($allEmwinFiles as $thisFile)
 	{
-		if(strpos($thisFile, $DateTime->format('YmdHis')) !== false && strpos($thisFile, $product) !== false)
-		{
-			return $thisFile;
-		}
+		if(strpos($thisFile, $DateTime->format('YmdHis')) !== false && strpos($thisFile, $product) !== false) return $thisFile;
 	}
 	
 	return false;
 }
 
-function findMetadataEMWIN($allEmwinFiles, $product, $title)
+function findMetadataEMWIN($allEmwinFiles, $product)
 {
 	$retVal = [];
-	
 	foreach($allEmwinFiles as $thisFile)
 	{
-		if(strpos($thisFile, $product) !== false)
-		{
-			$fileNameParts = explode("_", basename($thisFile));
-			if(count($fileNameParts) != 6) continue;
-			
-			$DateTime = new DateTime($fileNameParts[4], new DateTimeZone("UTC"));
-			$DateTime->setTimezone(new DateTimeZone(date_default_timezone_get()));
-			$date = $DateTime->format("F j, Y g:i A");
-			$retVal[]['subHtml'] = "<b>$title</b><div class='lgLabel'>Rendered: $date " . $DateTime->format('T') . "</div>";
-			$retVal[count($retVal) - 1]['description'] = "Rendered: $date " . $DateTime->format('T');
-			$retVal[count($retVal) - 1]['timestamp'] = $DateTime->getTimestamp();
-		}
+		if(stripos($thisFile, $product) === false) continue;
+		
+		$fileNameParts = explode("_", basename($thisFile));
+		if(count($fileNameParts) != 6) continue;
+		
+		$DateTime = new DateTime($fileNameParts[4], new DateTimeZone("UTC"));
+		$DateTime->setTimezone(new DateTimeZone(date_default_timezone_get()));
+		$retVal[]['description'] = "Rendered: ". $DateTime->format("F j, Y g:i A T");
+		$retVal[count($retVal) - 1]['timestamp'] = $DateTime->getTimestamp();
 	}	
 	usort($retVal, 'sortByTimestamp');
 	return $retVal;
-}
-
-function findMetadataABI($path, $filter, $title)
-{
-	if(!is_dir($path)) return array();
-	
-	$retVal = [];
-	$fileList = scandir_recursive($path);
-	$fileList = preg_grep("/(\\\\|\/)[^\\\\\/]*{$filter}[^\\\\\/]*[0-9]{8}T[0-9]{6}Z\..{3}$/", $fileList);
-	usort($fileList, "sortABI");
-	
-	foreach($fileList as $file)
-	{
-		
-		$splitName = explode("_", $file);
-		$timestamp = strtotime(explode(".", $splitName[count($splitName) - 1])[0]);
-		$date = date("F j, Y g:i A", $timestamp);
-		$DateTime = new DateTime("now", new DateTimeZone(date_default_timezone_get()));
-		$retVal[]['subHtml'] = "<b>$title</b><div class='lgLabel'>$date " . $DateTime->format('T') . "</div>";
-		$retVal[count($retVal) - 1]['description'] = "Taken: $date " . $DateTime->format('T');
-		$retVal[count($retVal) - 1]['timestamp'] = $timestamp;
-	}
-	
-	return $retVal;
-}
-
-function findImageABI($path, $filter, $timestamp)
-{
-	$DateTime = new DateTime("now", new DateTimeZone("UTC"));
-	$DateTime->setTimestamp($timestamp);
-	
-	$fileList = scandir_recursive($path);
-	foreach($fileList as $thisFile) if(preg_match("/(\\\\|\/)[^\\\\\/]*{$filter}[^\\\\\/]*" . $DateTime->format('Ymd\THis\Z') . "\..{3}$/", $thisFile)) return $thisFile;
 }
 
 function linesToParagraphs($lineArray, $linesToSkip)
@@ -326,29 +295,20 @@ function parseFmLine($line, $forecastLTBreaks)
 
 function parseGraphiteData(&$metadata, $tz, $graphiteAPI, $target, $title, $color)
 {
-	set_error_handler("convertToException");
-	try
-	{
-		$tzUrl = urlencode($tz);
-		$targetUrl = urlencode($target);
-		$titleUrl = urlencode($title);
-		
-		$hrArray = json_decode(file_get_contents("$graphiteAPI?format=json&from=-1hours&tz=$tzUrl&target=$targetUrl"))[0]->datapoints;
-		$dayArray = json_decode(file_get_contents("$graphiteAPI?format=json&from=-1days&tz=$tzUrl&target=$targetUrl"))[0]->datapoints;
-		$hrSum = $daySum = 0;
-		
-		foreach($hrArray as $thisPacket) {$hrSum += $thisPacket[0];}
-		foreach($dayArray as $thisPacket) {$daySum += $thisPacket[0];}
-		
-		$metadata['description'] = "1 Hour Average: " . round($hrSum / count($hrArray), 2) . " | 1 Day Average: " . round($daySum / count($dayArray), 2);
-		$metadata['svg1hr'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents("$graphiteAPI?width=600&height=350&format=svg&title=$titleUrl%20(1%20Hour)&fontSize=14&lineWidth=2&from=-1hours&hideLegend=true&colorList=$color&tz=$tzUrl&target=$targetUrl"));
-		$metadata['svg1day'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents("$graphiteAPI?width=600&height=350&format=svg&title=$titleUrl%20(1%20Day)&fontSize=14&lineWidth=2&from=-24hours&hideLegend=true&colorList=$color&tz=$tzUrl&target=$targetUrl"));
-	}
-	catch(exception $e)
-	{
-		$metadata = [];
-	}
-	restore_error_handler();
+	$tzUrl = urlencode($tz);
+	$targetUrl = urlencode($target);
+	$titleUrl = urlencode($title);
+
+	$hrArray = json_decode(file_get_contents("$graphiteAPI?format=json&from=-1hours&tz=$tzUrl&target=$targetUrl"))[0]->datapoints;
+	$dayArray = json_decode(file_get_contents("$graphiteAPI?format=json&from=-1days&tz=$tzUrl&target=$targetUrl"))[0]->datapoints;
+	$hrSum = $daySum = 0;
+
+	foreach($hrArray as $thisPacket) {$hrSum += $thisPacket[0];}
+	foreach($dayArray as $thisPacket) {$daySum += $thisPacket[0];}
+
+	$metadata['description'] = "1 Hour Average: " . round($hrSum / count($hrArray), 2) . " | 1 Day Average: " . round($daySum / count($dayArray), 2);
+	$metadata['svg1hr'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents("$graphiteAPI?width=600&height=350&format=svg&title=$titleUrl%20(1%20Hour)&fontSize=14&lineWidth=2&from=-1hours&hideLegend=true&colorList=$color&tz=$tzUrl&target=$targetUrl"));
+	$metadata['svg1day'] = preg_replace("(clip-path.*clip-rule.*\")", "", file_get_contents("$graphiteAPI?width=600&height=350&format=svg&title=$titleUrl%20(1%20Day)&fontSize=14&lineWidth=2&from=-24hours&hideLegend=true&colorList=$color&tz=$tzUrl&target=$targetUrl"));
 }
 
 function convertToException($err_severity, $err_msg, $err_file, $err_line)

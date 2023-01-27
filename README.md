@@ -1,5 +1,5 @@
 # Vitality GOES
-A Web App for showcasing Geostationary Weather Satellite Data. Vitality GOES is designed to display data received from GOES satellites via goestools or Satdump, but images from other satellites can be displayed as well.
+A Web App for showcasing Geostationary Weather Satellite Data. Vitality GOES is designed to display data received from GOES-16/18 satellites via goestools or Satdump, but images from other satellites can be displayed as well.
 
 **[Click Here for Screenshots and Videos](https://github.com/JVital2013/vitality-goes/wiki/Screenshots-and-Videos)**
 
@@ -27,21 +27,23 @@ Vitality GOES makes data received from a Geostationary Weather Satellite feed ea
 Vitality GOES has the following features:
 
 * It is easily usable by anyone with no knowledge of radio, satellites, or programming once set up by a ground station technician (you!).
-* Vitality GOES presents all full-disk images, Level 2 products, and mesoscale imagery in a user friendly and easily navigatable way.
+* Vitality GOES presents all full-disk images, and mesoscale imagery, and more in a user friendly and easily navigatable way.
 * Current weather conditions, forecasts, watches, and warnings from the GOES-16/18 HRIT/EMWIN data feed are presented to the user in a way that is appealing and easy to read. There is no need to parse through data for other locations: your configured location's data is the only thing you're shown. For a writeup on the EMWIN data Vitality GOES pulls and how it's used, see [here](docs/used-emwin-data.md).
 * Vitality GOES is able to monitor the status of the underlying goestools/SatDump stack, including systems temps, error correction rates, and packet drop rates.
 
+Sample configurations are provided for the following satellite/station setups:
+
+| Satellite Downlink    | Supported Programs   |
+| --------------------- | -------------------- |
+| GOES-16 and 18 HRIT   | goestools or SatDump |
+| EWS-G1 (GOES-13) GVAR | SatDump              |
+| GEO-KOMPSAT 2A LRIT   | xrit-rx or SatDump   |
+
 ### How does it work?
 
-In a typical enviornment, a satellite downlink is picked up by your satellite dish and processed into text and image data by goestools/SatDump. From there, Vitality GOES reads the data and presents it to the user on their device across the local network.
+A satellite downlink is picked up by your satellite dish, and is processed into text and image data by goestools/SatDump. From there, Vitality GOES reads the data and presents it to the user on their device across the local network.
 
 ![Flow of Geostationary Weather Data Via Vitality GOES](https://user-images.githubusercontent.com/24253715/210028326-0ad63425-cb31-4489-84ea-83de3a940562.png)
-
-Vitality GOES comes with sample configs for the following satellites:
-
-- GOES-16 HRIT
-- GOES-18 HRIT
-- EWS-G1 (GOES-13) GVAR
 
 ## System Requirements
 
@@ -49,13 +51,9 @@ You need to set up a satellite dish and point it at the satellite of your choice
 
 It is recommended that you host Vitality GOES on your ground station itself for the most up-to-date information and to simplify setup/maintenance. If you choose, it can be hosted on another machine if you have a sync process set up between the ground station and the Vitality GOES server. *Syncing received images from another machine is outside the scope of Vitality GOES.*
 
-It is also recommended that you use a Debian-based Linux distro to host the Vitality GOES server. Something like Raspberry Pi OS, Ubuntu, or Debian is preferred.
-
-Windows-hosted Vitality GOES runs slower than it does when hosted on Linux, and your datastore must be kept on an NTFS partition if you want weather information to load at all. It's a known issue in PHP that file operations are slower on Windows, [and they marked it as "not a bug"](https://bugs.php.net/bug.php?id=80695&edit=1).
+It is also recommended that you use a Debian-based Linux distro to host the Vitality GOES server. Something like Raspberry Pi OS, Ubuntu, or Debian is preferred. If you host it on Windows, make sure your satellite data is on an NTFS drive.
 
 If you enable the secondary scripts, you may need more processing power than a low-end machine (like a Raspberry Pi) can provide. You may need to offload video rendering tasks to another machine or upgrade your server to something beefier. I'm using a laptop with a 4th generation Core i5 processor, and it has more than enough power to run goestools, Vitality GOES, and all secondary scripts.
-
-**The most important system requirement is the one that is most often overlooked:** you, the ground station administrator. It is expected that the ground station administrator has the ability to research, learn, and understand what computer software is actually doing. You don't need to be a Linux or Satellite expert, but you will need a working understanding of filesystem structures and how to modify configuration file to meet your needs. Don't be afraid to reach out for help if you need it, but we appreciate it if you try to solve the problem yourself first. Support will be limited as this is a volunteer project.
 
 Once configured, any modern web browser can connect to Vitality GOES and view the data. Anyone with access to your server can view the data with ease!
 
@@ -168,12 +166,10 @@ Home Assistant is a free and open-source smart home control system. You can use 
 ## Creating configs for other satellites
 You can use Vitality GOES to view images from other satellites not included in the sample configs. Here's how to set it up:
 
-* Make sure your images end with a timestamp like `{time:%Y%m%dT%H%M%SZ}`, and are a JPG or PNG file. Depending on the satellite/software, you may need to rewrite the file names after receiving them to match the expected format.
-* Configure all desired images in the `abi.ini` or `meso.ini` config files (even if your sat of choice doesn't technically use an ABI).
-* Delete `l2.ini` and `emwin.ini` as these are GOES Specific.
-* In `config.ini`, disable `emwinPath`, `adminPath`, and everthing under `location` other than the timezone as these are also GOES specific.
-
-**I am looking for submissions of working config files for other geostationary satellites!** If you get this working, please open a pull request or otherwise contact me so I can include a sample with Vitality GOES.
+* Make sure your images [are named in one of the supported naming schemas](/docs/config.ini), and are a JPG or PNG file. If your program does not save images in a supported naming schema, [open an issue/pull request to have your format supported!](https://github.com/JVital2013/vitality-goes/issues).
+* In `config.ini`, disable `emwinPath`, `adminPath`, and everthing under `location` other than the timezone as these are also GOES specific. Configure at least one category ini file
+* Specify the images you want to display within the category ini file(s)
+* Open a pull request to have your satellite's configs included :)
 
 ## Credits
 Special thanks to [Pieter Noordhuis for his amazing goestools package](https://pietern.github.io/goestools/). Without him, Vitality GOES would be nothing, and the GOES HRIT/EMWIN feed would remain out of reach for a large number of amateur satellite operators.

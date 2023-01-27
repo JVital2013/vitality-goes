@@ -31,7 +31,7 @@ do
 done
 
 #ABI Imagery
-for file in $(find $abiSrcDir/goes16 $abiSrcDir/goes17 $abiSrcDir/goes18 $abiSrcDir/composite -name "*" -type f)
+for file in $(find $abiSrcDir/goes16 $abiSrcDir/goes18 $abiSrcDir/composite -name "*" -type f)
 do
 	datestr=$(echo $file | awk -F/ '{print $NF}' | awk -F_ '{print $NF}' | cut -d . -f 1)
 	if [[ $datestr < $twoWeeksAgoABI ]]

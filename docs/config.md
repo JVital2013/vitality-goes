@@ -1,18 +1,12 @@
 # How to Configure Vitality GOES
 
-Configuration files should be placed in the `config` folder where Vitality GOES is installed. To get started, [copy the contents of a provided example config](/configs) into the config folder where Vitality GOES is installed. Scriptconfig.ini is not needed for Vitality GOES itself, so skip it if present.
+Configuration files should be placed in the `config` folder where Vitality GOES is installed. To get started, [copy the contents of a provided example config](/configs) into the `config` folder where Vitality GOES is installed. Scriptconfig.ini is not needed for Vitality GOES itself, so skip it if present.
+
+Example configs for using goestools data source are prefixed with "goestools-", while configs for SatDump are prefixed with "satdump-".
 
 ![Example Copy Configs](https://user-images.githubusercontent.com/24253715/213600531-dbd89150-309d-4695-b276-0df8e414ae55.png)
 
-Configurations are highly customizable and can be modified to fit your ground station. A typical configuration will consist of 5 ini files:
-
-* **config.ini**: The main configuration file
-* **emwin.ini**: Stores information about the emwin images you want to display. This file has no effect on emwin text that is displayed, and does not need changed if you're switching between GOES-16 and 18.
-* **abi.ini**: Contains information about your full-disk images. If you're doing any Sanchez renders, I'd put them in this file as well
-* **meso.ini**: Contains information about your mesoscale images.
-* **l2.ini**: Contains infromation about your ABI Level 2 products. These images contain information about estimated rainfall, land surface temp, sea surface temp, and more. Note that goestools does not receive these unless your goesproc config is set up to do so, and SatDump is currently not supported. The sample goesproc config in this repository is configured correctly, but if you're not saving these files, delete l2.ini.
-
-Any comments must begin with a semicolon (;). Example configs for using goestools data source are prefixed with "goestools-", while configs for SatDump are prefixed with "satdump-".
+Configurations are highly customizable and can be modified to fit your ground station. A typical configuration will consist of several ini files as described in the following sections. Any comments must begin with a semicolon (;).
 
 ## config.ini
 
@@ -23,13 +17,13 @@ This is the main config file. It will likely need configured when you first depl
 * `siteTheme`: The theme for Vitality GOES. Leave unset to use the built-in theme, or set it to an installed theme. The included themes are "light", "purple", "red", and "uos". This option can be overridden per-browser by using the "Local Settings" screen. For more on theming, [look here](/docs/themes.md).
 * `graphiteAPI`: If you're using goestools and want to view its decoder/demodulator statistcs, this should point to your graphite host. It must include the `/render/` path at the end to work properly. If you're not using goestools/graphite, comment/remove this line. For information on how to set up graphite, [look here](/docs/graphite.md).
 * `satdumpAPI`: Points to the SatDump REST API to pull decoder/demodulator statistics. You must run SatDump with the `--http_server` flag to get statistics. If you're not using SatDump or don't want statistics, comment/delete this line.
-* `emwinPath`: Point to the emwin repository of your choice. If you're picking up both GOES West and East, you can use either's EMWIN files. Comment/delete this line to completely disable emwin data (text and images), or if you're not picking up data from a GOES satellite.
+* `emwinPath`: Point to the emwin repository of your choice. If you're picking up both GOES 16 and 18, you can use either's EMWIN files. Comment/delete this line to disable emwin text data parsing (Current Weather, Hurricane Center, and Other EMWIN).
 * `adminPath`: The directory with admin text you want to display. SatDump will save these files out-of-the-box, but goestools must be patched with [this patch for it to show up](https://github.com/pietern/goestools/pull/105/files). Comment/delete this line to disable. For GOES satellites only.
 * `showSysInfo`: Set to true if you want to display information about your Vitality GOES server, such as system resource availability and system temps. Set to false to disable.
 * `debug`: Set to true to enable PHP errors. This breaks the AJAX requests within Vitality GOES if there are any errors, so only set this to true if you're debugging data returned by the DataHandler (advanced users only).
 
 ### Paths
-A path should be set up for each satellite downlink you're receiving. Each path defined in this section creates a variable that can be used in the `path` options of your abi, meso, and l2 ini files. One or more satellite should be listed here.
+A path should be set up for each satellite downlink you're receiving. Each path defined in this section creates a variable that can be used in the `path` options of your category ini files. One or more satellite should be listed here.
 
 **NOTE:** This does not define the path of the images from a particular satellite, but rather the path for the entire downlink. For example, let's assume you're receiving GOES16, and your images are at `/home/pi/goes/goes16/fd/fc/...`. The `goes16` setting under `[paths]` would be set to `/home/pi/goes` (the parent path for the entire satellite downlink), not `/home/pi/goes/goes16` (the path just for the images from GOES16).
 
@@ -37,16 +31,27 @@ A path should be set up for each satellite downlink you're receiving. Each path 
 - `GOES16 = /path/to/goestoolsdata` under `[paths]` of your config.ini
 - `path = {GOES16}/goes16/fd/fc/` is set under an image handler like `[fdfc_16]` in your abi.ini file
 
-With this configuration, Vitality GOES will expect your images to be at `/path/to/goestoolsdata/goes16/fd/fc/`. Images may be in a dated subfolder.
+With this configuration, Vitality GOES will expect your images to be at `/path/to/goestoolsdata/goes16/fd/fc/`. Images may be in subfolders.
 
 If hosted on Windows, set your paths to something like `GOES16 = C:\path\to\satdumpdata`
+
+### Categories
+The category section defines one or more menu items (or "categories") within Vitality GOES. Each category can have any ID you want, and must point to an ini file that's also in Vitality GOES's `config` directory. See the "Category ini files" section below for info on how to customize them.
+
+![Visual correlation between category ini and menu item](https://user-images.githubusercontent.com/24253715/214476111-a5c71e0d-abaf-497c-84e6-b2489b8a4eca.png)
 
 ### Location
 This section contains information about your physical location. If you're not displaying EMWIN data, the only thing you need to configure is `timezone`. A list of supported timezones can be found [here](https://www.php.net/manual/en/timezones.php).
 
 If you are displaying EMWIN/local weather data, here's what each of the other options mean. Note that these options can also be changed per client web browser by using the "Local Settings" screen in Vitality GOES.
 
-* `radarCode`: The last 5 letters of the radar file for your region. In the emwin directory, all radar files end with RAD{radarCode}.GIF. **The radar image you want to display must be configured as an available image in emwin.ini**
+*  `stateAbbr`: The post office abbreviation of your state. Also includes things like PR for Puerto Rico, AS for American Samoa, etc.
+*  `wxZone`: The weather zone of your location. This is typically your state abbreviation, a Z, and a 3 digit number. Example: PAZ066. You can either use the "Local Settings" section of Vitality GOES to figure this out, or use [this site](https://pnwpest.org/cgi-bin/wea3/wea3) to search for your town. "Weather Zone" shows up in the upper-right of that page.
+*  `orig`: The National Weather Service Forecast Office for your local weather information. The code needs to be the office call sign, plus the 2-letter state abbreviation. You can either use the "Local Settings" section of Vitality GOES to figure this out, or look at [https://en.wikipedia.org/wiki/List_of_National_Weather_Service_Weather_Forecast_Offices](https://en.wikipedia.org/wiki/List_of_National_Weather_Service_Weather_Forecast_Offices). For example, State College PA is "CTP", so orig needs to be set to `CTPPA`
+*  `lat` and `lon`: Your exact latitude and longitude. This is only used to determine if you're within an alert area as issued by the NWS. It must contain 2 decimal points to work correctly
+*  `rwrOrig` *(Optional)*: Accepts the same type of code as `orig`, but specifically for the Regional Weather Roundup information ("Current Weather" card in the Vitality GOES interface). It appears that the weather roundup is sometimes issued by a different office than the rest of your forecast. Use the "Local Settings" section within Vitality GOES to figure this out. *If not set, your `orig` value will be used in place of rwrOrig*
+*  `city` *(Optional)*: Your city/town name, exactly as it appears in the Regional Weather Roundup (RWR). The "Local Settings" screen in Vitality GOES can help you figure this out. *If not set, the "Current Weather" card in the current weather screen will not be shown.*
+* `radarCode`: The last 5 letters of the radar file for your region. In the emwin directory, all radar files end with RAD{radarCode}.GIF.
   
   At the time of writing, valid radarCodes are:
   *  ALLAK (Alaska)
@@ -65,26 +70,33 @@ If you are displaying EMWIN/local weather data, here's what each of the other op
   *  STHES (South East Region)
   *  STHPL (Southern Plains Region)
   *  UMSVY (Upper Mississippi Valley)
-*  `stateAbbr`: The post office abbreviation of your state. Also includes things like PR for Puerto Rico, AS for American Samoa, etc.
-*  `wxZone`: The weather zone of your location. This is typically your state abbreviation, a Z, and a 3 digit number. Example: PAZ066. You can either use the "Local Settings" section of Vitality GOES to figure this out, or use [this site](https://pnwpest.org/cgi-bin/wea3/wea3) to search for your town. "Weather Zone" shows up in the upper-right of that page.
-*  `orig`: The National Weather Service Forecast Office for your local weather information. The code needs to be the office call sign, plus the 2-letter state abbreviation. You can either use the "Local Settings" section of Vitality GOES to figure this out, or look at [https://en.wikipedia.org/wiki/List_of_National_Weather_Service_Weather_Forecast_Offices](https://en.wikipedia.org/wiki/List_of_National_Weather_Service_Weather_Forecast_Offices). For example, State College PA is "CTP", so orig needs to be set to `CTPPA`
-*  `lat` and `lon`: Your exact latitude and longitude. This is only used to determine if you're within an alert area as issued by the NWS. It must contain 2 decimal points to work correctly
-*  `rwrOrig` *(Optional)*: Accepts the same type of code as `orig`, but specifically for the Regional Weather Roundup information ("Current Weather" card in the Vitality GOES interface). It appears that the weather roundup is sometimes issued by a different office than the rest of your forecast. Use the "Local Settings" section within Vitality GOES to figure this out. *If not set, your `orig` value will be used in place of rwrOrig*
-*  `city` *(Optional)*: Your city/town name, exactly as it appears in the Regional Weather Roundup (RWR). The "Local Settings" screen in Vitality GOES can help you figure this out. *If not set, the "Current Weather" card in the current weather screen will not be shown.*
+
+As a bonus - if you have your local radar image configured in one of your category ini files, and you have video rendering enabled [with a secondary script](/docs/scripts.md#createvideos-emwin), the timelapse radar will be visible on the current weather page.
 
 You may find that the location section is the hardest part of the config to set up. I would recommend leaving it at its defaults, then use the "Local Settings" screen in Vitality GOES to determine what each value should be set to for your location. Once you have it working client-side, configure the settings as appropraite in this config file.
 
-## abi.ini, meso.ini, and l2.ini
+## Category ini files (abi.ini, meso.ini, etc)
+All category ini files will have a `[_category_]` section at the top, followed by any number of image sections.
 
-abi.ini, meso.ini, and l2.ini all work the same. These files specify which images you want to display in the "Full Disk", "Mesoscale Images", and "Level 2 Graphics" sections of Vitality GOES, respectively. If a file contains no configured images, its section will be hidden in Vitality GOES. *This file will probably not need to be configured by you, unless you're customizing what gets displayed*
+### \_category\_ definition
+```ini
+[_category_]
+title = "Full Disk"
+icon = globe-americas
+```
 
-To understand how these config files work, let's look at an example section:
+* `title`: The name of the category, as shown in the main menu and title bar
+* `icon`: The FontAwesome icon to use in the menu. Vitality GOES currently comes with FontAwesome 5, so [look here for available icons](https://fontawesome.com/v5/search).
+
+### Image sections
+You can have multiple image sections per ini file
 
 ```ini
 [fdfc_16]
 path = {GOES16}/goes16/fd/fc/
 title = "GOES 16 - Color"
-filter = "_FD_"
+mode = endz
+filter = _FD_
 color = #003241
 videoPath = GOES16FalseColor.mp4
 ```
@@ -92,12 +104,25 @@ videoPath = GOES16FalseColor.mp4
 * `[fdfc_16]`: A unique identifier for the image. This can be anything, but it must be unique and contain no spaces
 * `path`: The folder that holds all the images for a particular GOES product. In this example, it uses the `{GOES16}` variable defined in the `Paths` section of config.ini
 * `title`: How the image will be labeled in Vitality GOES
-* `filter` *(Optional)*: Only load images whose name on-disk contains the specified string. This can be used to select for a specific channel when you have multiple image channels in the same folder. It's only needed in some situations when you data is coming from goestools, but it's typically needed when your data comes from SatDump.
+* `mode` *(Default: endz)*: Defines the mode the internal image filename parser should use. This should be based on how your image files are named. See below for a table of supported filename parser modes
+* `filter` *(Optional)*: Only load images whose filename contains the specified string. This can be used to select for a specific channel when you have multiple image channels in the same folder. If all of your images of a unique type are in the same folder, this is not needed.
 * `color` *(Optional)*: Color of the image's card in the web interface. Any CSS color code can be used. The color setting is optional and is not configured by default.
 * `videoPath` *(Optional)*: the name of the video file that contains the timelapse of this product. Videos must be rendered seperately (by the [provided script](scripts.md#createvideos-abish) or any other means), and they must be kept in the `html/videos` folder of Vitality GOES. If you're not rendering timelapse videos, comment or remove this line.
 
-## emwin.ini
+If a file contains no configured images, or if it's `[_category_]` section is missing, it will be hidden in Vitality GOES. *These files will probably not need to be configured by you, unless you're customizing what gets displayed*
 
-emwin.ini contains information about the EMWIN image products you want to display. This config file works the same as the abi.ini, meso.ini, and l2.ini files with one exception: `path` is just the file name (including extension) for the product you want to display. No paths are included in this config file. *This file will probably not need to be configured by you, unless you're customizing what gets displayed*
+## Supported filename parser modes
+The mode selected for an image tells Vitality GOES how to parse its filename. It affects where the timestamp should be in the filename, how the timestamp should be formatted, and how the `filter` attribute is applied to the filename.
 
-A complete list of EMWIN image products can be found at [https://www.weather.gov/media/emwin/EMWIN_Image_and_Text_Data_Capture_Catalog_v1.3j.pdf](https://www.weather.gov/media/emwin/EMWIN_Image_and_Text_Data_Capture_Catalog_v1.3j.pdf). Use the GOES-N FN, but it must be in all caps in this config.
+The following filename parser modes are supported for use in the `mode` attribute of your category ini files:
+
+*Example Time: January 24, 2023 11:06:36 UTC*
+| Mode       | Timestamp Location        | Timestamp Format Example     | Filter matches any text...      | 
+| ---------- | ------------------------- | ---------------------------- | ------------------------------- |
+| begin      | Beginning of filename     | 20230124110636               | After the timestamp             |
+| beginu     | Beginning of filename     | 20230124_110636              | After the timestamp             |
+| beginz     | Beginning of filename     | 20230124T110636Z             | After the timestamp             |
+| emwin | In the middle of the filename as specified in the [EMWIN naming convention](https://www.weather.gov/emwin/format) | 20230124110636 | After the timestamp |
+| end        | End of filename           | 20230124110636               | Before the timestamp            |
+| endu       | End of filename           | 20230124_110636              | Before the timestamp            |
+| **endz**   | **End of filename**       | **20230124T110636Z**         | **Before the timestamp**        |

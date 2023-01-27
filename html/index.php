@@ -49,7 +49,7 @@ if($theme !== false)
 
 		<link rel="apple-touch-icon" href="/icon-512x512.png">
 		<link rel="manifest" href="/manifest.php">
-		<link rel="stylesheet" href="/styles.css?v=20221230">
+		<link rel="stylesheet" href="/styles.css?v=20230122">
 		<link rel="stylesheet" href="/opensans.css">
 		<link rel="stylesheet" href="/simplerpicker/simplerpicker.css">
 		<link rel="stylesheet" href="/fontawesome/css/all.css">
@@ -68,7 +68,7 @@ if($theme !== false)
 		<script src="/lightgallery/plugins/zoom/lg-zoom.umd.js?v=20221016"></script>
 		<script src="/lightgallery/plugins/jumpto/lg-jumpto.umd.js?v=20220811"></script>
 		<script src="/simplerpicker/simplerpicker.js"></script>
-		<script src='/script.js?v=20221230'></script>
+		<script src='/script.js?v=20230126'></script>
 	</head>
 	<body>
 		<div class='topBar'>

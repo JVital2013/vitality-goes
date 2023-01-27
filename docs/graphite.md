@@ -3,8 +3,6 @@ Goesrecv supports logging information about error correction rate, packet drop r
 
 Configuring Graphite is not necessary to use Vitality GOES, but no graphs will be available if you don't set it up. If Vitality GOES is on a different machine from goestools, graphite/statsd can be installed on either machine.
 
-**If you're currently using Grafana, you'll need to follow extra steps to keep using it.** [See here for more details](docs/grafana-compatibility.md). Alternatively, you can choose to stop using Grafana, or disable graphs within Vitality GOES.
-
 In a normal setup, here's how to configure graphits/statsd:
 
 1. If you're not using it already, install Docker on the target machine. This varies by distro, but you can find instructions for Ubuntu and its variants [here](https://docs.docker.com/engine/install/ubuntu/) and Raspberry Pi OS [here](https://dev.to/elalemanyo/how-to-install-docker-and-docker-compose-on-raspberry-pi-1mo). Docker Compose is not required.

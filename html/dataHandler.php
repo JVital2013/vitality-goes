@@ -29,21 +29,32 @@ if($config['general']['debug'])
 }
 else ini_set("display_errors", "Off");
 
+//Delete old cookie
+if(array_key_exists('currentSettings', $_COOKIE)) setcookie("currentSettings", "", time() - 3600, "/", ".".$_SERVER['SERVER_NAME']);
+
 //Load Current User Settings from Cookie
 $sendCookie = false;
-if(array_key_exists('currentSettings', $_COOKIE))
-{
-	$currentSettings = json_decode($_COOKIE['currentSettings'], true);
-	if(!is_array($currentSettings))
-	{
-		$currentSettings = [];
-		$sendCookie = true;
-	}
-}
+$currentSettings = [];
+if(!array_key_exists('localSettings', $_COOKIE)) $sendCookie = true;
 else
 {
-	$currentSettings = [];
-	$sendCookie = true;
+	$allLocations = explode("~", $_COOKIE['localSettings']);
+	foreach($allLocations as $thisLocation)
+	{
+		$profileParts = explode("!", $thisLocation);
+		if(count($profileParts) != 9) continue;
+		$currentSettings[] = [
+			'city' => $profileParts[0],
+			'lat' => $profileParts[1],
+			'lon' => $profileParts[2],
+			'orig' => $profileParts[3],
+			'radarCode' => $profileParts[4],
+			'rwrOrig' => $profileParts[5],
+			'stateAbbr' => $profileParts[6],
+			'timezone' => $profileParts[7],
+			'wxZone' => $profileParts[8]
+		];
+	}
 }
 
 //Overwrite first setting profile in array with all other settings on server
@@ -120,13 +131,6 @@ if($selectedProfile > 0)
 					break 2;
 				}
 				break;
-			
-			//Prevent injecting variables into the script from the cookie
-			default:
-				unset($currentSettings[$selectedProfile]);
-				$selectedProfile = 0;
-				$sendCookie = true;
-				break 2;
 		}
 	}
 }
@@ -134,8 +138,24 @@ if($selectedProfile > 0)
 //Save settings in case something changed
 if($sendCookie)
 {
+	$profileParts = [];
+	foreach($currentSettings as $thisLocation)
+	{
+		$profileParts[] = join("!", [
+			(array_key_exists('city', $thisLocation) ? rawurlencode($thisLocation['city']) : ""),
+			(array_key_exists('lat', $thisLocation) ? $thisLocation['lat'] : ""),
+			(array_key_exists('lon', $thisLocation) ? $thisLocation['lon'] : ""),
+			(array_key_exists('orig', $thisLocation) ? $thisLocation['orig'] : ""),
+			(array_key_exists('radarCode', $thisLocation) ? $thisLocation['radarCode'] : ""),
+			(array_key_exists('rwrOrig', $thisLocation) ? $thisLocation['rwrOrig'] : ""),
+			(array_key_exists('stateAbbr', $thisLocation) ? $thisLocation['stateAbbr'] : ""),
+			(array_key_exists('timezone', $thisLocation) ? rawurlencode($thisLocation['timezone']) : ""),
+			(array_key_exists('wxZone', $thisLocation) ? $thisLocation['wxZone'] : "")
+		]);
+	}
+	
 	setcookie("selectedProfile", "$selectedProfile", time() + 31536000, "/", ".".$_SERVER['SERVER_NAME']);
-	setcookie("currentSettings", json_encode(array_values($currentSettings), JSON_UNESCAPED_SLASHES), time() + 31536000, "/", ".".$_SERVER['SERVER_NAME']);
+	setrawcookie("localSettings", join("~", $profileParts), time() + 31536000, "/", ".".$_SERVER['SERVER_NAME']);
 }
 
 //Set the specified timezone
@@ -148,44 +168,30 @@ if($_GET['type'] == "preload")
 	$preloadData = [];
 	
 	$preloadData['localRadarVideo'] = "";
-	foreach($config['emwin'] as $value)
+	if(array_key_exists('emwin', $config['categories']) && array_key_exists('radarCode', $currentSettings[$selectedProfile]))
 	{
-		if($value['path'] == "RAD" . $currentSettings[$selectedProfile]['radarCode'] . ".GIF" && isset($value["videoPath"]))
+		foreach($config['categories']['emwin']['data'] as $value)
 		{
-			$preloadData['localRadarVideo'] = $value["videoPath"];
-			break;
+			if($value['filter'] == "RAD" . $currentSettings[$selectedProfile]['radarCode'] && isset($value["videoPath"]))
+			{
+				$preloadData['localRadarVideo'] = $value["videoPath"];
+				break;
+			}
 		}
 	}
 	
-	$abiSlugs = array_keys($config['abi']);
-	$mesoSlugs = array_keys($config['meso']);
-	$l2Slugs = array_keys($config['l2']);
-	$emwinSlugs = array_keys($config['emwin']);
-	for($i = 0; $i < count($config['abi']); $i++)
+	$preloadData['categories'] = [];
+	foreach($config['categories'] as $type => $typeProps)
 	{
-		unset($config['abi'][$abiSlugs[$i]]['path']);
-		unset($config['abi'][$abiSlugs[$i]]['filter']);
-	}
-	for($i = 0; $i < count($config['meso']); $i++)
-	{
-		unset($config['meso'][$mesoSlugs[$i]]['path']);
-		unset($config['meso'][$mesoSlugs[$i]]['filter']);
-	}
-	for($i = 0; $i < count($config['l2']); $i++)
-	{
-		unset($config['l2'][$l2Slugs[$i]]['path']);
-		unset($config['l2'][$l2Slugs[$i]]['filter']);
-	}
-	for($i = 0; $i < count($config['emwin']); $i++)
-	{
-		unset($config['emwin'][$emwinSlugs[$i]]['path']);
-		unset($config['emwin'][$emwinSlugs[$i]]['filter']);
+		foreach($config['categories'][$type]['data'] as $thisSlug => $thisValue)
+		{
+			unset($config['categories'][$type]['data'][$thisSlug]['path']);
+			unset($config['categories'][$type]['data'][$thisSlug]['filter']);
+		}
+		
+		$preloadData['categories'][$type] = $config['categories'][$type];
 	}
 	
-	$preloadData['abi'] = $config['abi'];
-	$preloadData['meso'] = $config['meso'];
-	$preloadData['l2'] = $config['l2'];
-	$preloadData['emwin'] = $config['emwin'];
 	$preloadData['showSysInfo'] = $config['general']['showSysInfo'];
 	$preloadData['showSatdumpInfo'] = array_key_exists('satdumpAPI', $config['general']);
 	$preloadData['showGraphs'] = array_key_exists('graphiteAPI', $config['general']);
@@ -199,408 +205,466 @@ if($_GET['type'] == "preload")
 	header('Content-Type: application/json; charset=utf-8');
 	echo json_encode($preloadData);
 }
-elseif($_GET['type'] == "abiMetadata")
-{
-	if(!array_key_exists($_GET['id'], $config['abi'])) die();
-	header('Content-Type: application/json; charset=utf-8');
-	echo json_encode(findMetadataABI($config['abi'][$_GET['id']]['path'], $config['abi'][$_GET['id']]['filter'], $config['abi'][$_GET['id']]['title']));
-}
-elseif($_GET['type'] == "l2Metadata")
-{
-	if(!array_key_exists($_GET['id'], $config['l2'])) die();
-	header('Content-Type: application/json; charset=utf-8');
-	echo json_encode(findMetadataABI($config['l2'][$_GET['id']]['path'], $config['l2'][$_GET['id']]['filter'], $config['l2'][$_GET['id']]['title']));
-}
-elseif($_GET['type'] == "mesoMetadata")
-{
-	if(!array_key_exists($_GET['id'], $config['meso'])) die();
-	header('Content-Type: application/json; charset=utf-8');
-	echo json_encode(findMetadataABI($config['meso'][$_GET['id']]['path'], $config['meso'][$_GET['id']]['filter'], $config['meso'][$_GET['id']]['title']));
-}
-elseif($_GET['type'] == "emwinMetadata")
-{
-	if(!array_key_exists($_GET['id'], $config['emwin'])) die();
-	header('Content-Type: application/json; charset=utf-8');
-	echo json_encode(findMetadataEMWIN(scandir_recursive($config['general']['emwinPath']), $config['emwin'][$_GET['id']]['path'], $config['emwin'][$_GET['id']]['title']));
-}
 elseif($_GET['type'] == "metadata")
 {
+	//Prepare Metadata Return Value
 	$metadata = [];
-	switch($_GET['id'])
+	if(!array_key_exists('id', $_GET)) die();
+	
+	//Various stats from goestools
+	if($_GET['id'] == 'packetsContent')
 	{
-		case "packetsContent":
+		set_error_handler("convertToException");
+		try
+		{
+			$tzUrl = urlencode($currentSettings[$selectedProfile]['timezone']);
+			$packetOK1hrArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-1hours&tz=$tzUrl&target=stats.packets_ok"))[0]->datapoints;
+			$packetOK1dayArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-24hours&tz=$tzUrl&target=stats.packets_ok"))[0]->datapoints;
+			$packetDrop1hrArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-1hours&tz=$tzUrl&target=stats.packets_dropped"))[0]->datapoints;
+			$packetDrop1dayArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-24hours&tz=$tzUrl&target=stats.packets_dropped"))[0]->datapoints;
+			$packetOK1hr = $packetOK1day = $packetDrop1hr = $packetDrop1day = 0;
+			
+			foreach($packetOK1hrArray as $thisPacket) {$packetOK1hr += $thisPacket[0];}
+			foreach($packetOK1dayArray as $thisPacket) {$packetOK1day += $thisPacket[0];}
+			foreach($packetDrop1hrArray as $thisPacket) {$packetDrop1hr += $thisPacket[0];}
+			foreach($packetDrop1dayArray as $thisPacket) {$packetDrop1day += $thisPacket[0];}
+			
+			$metadata['description'] = "1 Hour Average: " . round(($packetOK1hr / ($packetOK1hr + $packetDrop1hr)) * 100, 4) . "% OK | 1 Day Average: " . round(($packetOK1day / ($packetOK1day + $packetDrop1day)) * 100, 4) . "% OK";
+			$metadata['svg1hr'] = preg_replace("(clip-path.*clip-rule.*\")", "",
+				file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&colorList=green%2Cred&fontSize=14&title=HRIT%20Packets%20%2F%20Second%20(1%20Hour)&fgcolor=FFFFFF&lineWidth=2&from=-1hours&tz=$tzUrl&target=alias(stats.packets_ok%2C%22Packets%20OK%22)&target=alias(stats.packets_dropped%2C%22Packets%20Dropped%22)"));
+			$metadata['svg1day'] = preg_replace("(clip-path.*clip-rule.*\")", "",
+				file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&colorList=green%2Cred&fontSize=14&title=HRIT%20Packets%20%2F%20Second%20(1%20Day)&fgcolor=FFFFFF&lineWidth=2&from=-1days&tz=$tzUrl&target=alias(stats.packets_ok%2C%22Packets%20OK%22)&target=alias(stats.packets_dropped%2C%22Packets%20Dropped%22)"));
+		}
+		catch(exception $e)
+		{
+			$metadata = [];
+		}
+		restore_error_handler();
+	}
+	
+	elseif($_GET['id'] == 'viterbiContent')
+		parseGraphiteData($metadata, $currentSettings[$selectedProfile]['timezone'], $config['general']['graphiteAPI'], "divideSeries(stats_counts.viterbi_errors,sumSeries(stats_counts.packets_dropped,stats_counts.packets_ok))", "Avg Viterbi Error Corrections / Packet", "red");
+	
+	elseif($_GET['id'] == 'rsContent')
+		parseGraphiteData($metadata, $currentSettings[$selectedProfile]['timezone'], $config['general']['graphiteAPI'], "stats.reed_solomon_errors", "Reed-Solomon Errors / Second", "6464FF");
+	
+	elseif($_GET['id'] == 'gainContent')
+		parseGraphiteData($metadata, $currentSettings[$selectedProfile]['timezone'], $config['general']['graphiteAPI'], "stats.gauges.gain", "Gain Multiplier", "orange");
+		
+	elseif($_GET['id'] == 'freqContent')
+		parseGraphiteData($metadata, $currentSettings[$selectedProfile]['timezone'], $config['general']['graphiteAPI'], "stats.gauges.frequency", "Frequency Offset", "brown");
+	
+	elseif($_GET['id'] == 'omegaContent')
+		parseGraphiteData($metadata, $currentSettings[$selectedProfile]['timezone'], $config['general']['graphiteAPI'], "stats.gauges.omega", "Samples/Symbol in Clock Recovery", "008080");
+	
+	//Other EMWIN metadata
+	elseif($_GET['id'] == 'otherEmwin')
+	{
+		if(array_key_exists('emwinPath', $config['general']) && is_dir($config['general']['emwinPath']))
+		{
+			//Get all emwin files
+			$allEmwinFiles = scandir_recursive($config['general']['emwinPath']);
+			
+			//Load pertinent pieces of information where for cards with all available information
+			$spaceWeatherMessages = $radarOutages = $adminAlertList = $adminRegionalList = [];
+			$alertStateAbbrs = "(" . implode('|', array_unique(array($currentSettings[$selectedProfile]['stateAbbr'], substr($currentSettings[$selectedProfile]['orig'], -2), substr($currentSettings[$selectedProfile]['rwrOrig'], -2)))) . ")";
+			foreach($allEmwinFiles as $thisFile)
+			{
+				if(strpos($thisFile, "-ALT") !== false || strpos($thisFile, "-WAT") !== false) $spaceWeatherMessages[] = $thisFile;
+				if(preg_match("/-FTM.*$alertStateAbbrs\.TXT$/", $thisFile)) $radarOutages[] = $thisFile;
+				if(strpos($thisFile, "-ADA") !== false) $adminAlertList[] = $thisFile;
+				if(strpos($thisFile, "-ADR") !== false) $adminRegionalList[] = $thisFile;
+			}
+			
+			//Space Weather Messages
+			usort($spaceWeatherMessages, "sortEMWIN");
+			$metadata['spaceWeatherMessages'] = [];
+			if(count($spaceWeatherMessages) == 0) $metadata['spaceWeatherMessages'][] = "<div style='text-align: center; font-weight: bold; font-size: 13pt;'>No Messages</div>";
+			foreach($spaceWeatherMessages as $spaceWeatherMessage) $metadata['spaceWeatherMessages'][] = linesToParagraphs(file($spaceWeatherMessage), 3);
+			
+			//Radar Outages
+			usort($radarOutages, "sortEMWIN");
+			$metadata['radarOutages'] = [];
+			if(count($radarOutages) == 0) $metadata['radarOutages'][] = "<div style='text-align: center; font-weight: bold; font-size: 13pt;'>No Messages</div>";
+			foreach($radarOutages as $radarOutage) $metadata['radarOutages'][] = linesToParagraphs(file($radarOutage), 3);
+			
+			//EMWIN Administrative Alerts
+			usort($adminAlertList, "sortEMWIN");
+			$metadata['adminAlerts'] = [];
+			if(count($adminAlertList) == 0) $metadata['adminAlerts'][] = "<div style='text-align: center; font-weight: bold; font-size: 13pt;'>No Alerts</div>";
+			foreach($adminAlertList as $adminAlert) $metadata['adminAlerts'][] = linesToParagraphs(file($adminAlert), 3);
+			
+			//EMWIN Administrative (Regional)
+			usort($adminRegionalList, "sortEMWIN");
+			$metadata['adminRegional'] = [];
+			if(count($adminRegionalList) == 0) $metadata['adminRegional'][] = "<div style='text-align: center; font-weight: bold; font-size: 13pt;'>No Alerts</div>";
+			foreach($adminRegionalList as $adminRegional) $metadata['adminRegional'][] = linesToParagraphs(file($adminRegional), 4);
+			
+			//Satellite TLE
+			$latestTleFile = findNewestEmwin($allEmwinFiles, "EPHTWOUS");
+			$metadata['satelliteTle'] = [];
+			if($latestTleFile != "")
+			{
+				$latestTleArray = file($latestTleFile);
+				for($i = 0; $i < count($latestTleArray); $i += 3) $metadata['satelliteTle'][] = trim($latestTleArray[$i]);
+				sort($metadata['satelliteTle']);
+				$metadata['satelliteTleDate'] = getEMWINDate($latestTleFile);
+			}
+			
+			//EMWIN License
+			$emwinLicenseFile = findNewestEmwin($allEmwinFiles, "FEEBAC1S");
+			if($emwinLicenseFile == "")
+			{
+				$metadata['emwinLicense'] = "None Found";
+				$metadata['emwinLicenseDate'] = "N/A";
+			}
+			else
+			{
+				$metadata['emwinLicense'] = linesToParagraphs(file($emwinLicenseFile), 4);
+				$metadata['emwinLicenseDate'] = getEMWINDate($emwinLicenseFile);
+			}
+		}
+		
+		if(array_key_exists('adminPath', $config['general']) &&  is_dir($config['general']['adminPath']))
+		{
+			//Admin update
+			$allAdminFiles = scandir_recursive($config['general']['adminPath']);
+			$allAdminFiles = preg_grep("/[0-9]{4}\.[0-9]{2}\.[0-9]{2}\.(txt|TXT)$/", $allAdminFiles);
+			usort($allAdminFiles, "sortByBasename");
+			$adminDateParts = explode("_", basename($allAdminFiles[count($allAdminFiles) - 1]));
+			$metadata['latestAdminDate'] = DateTimeImmutable::createFromFormat("Y.m.d", substr($adminDateParts[count($adminDateParts) - 1], 0, -4))->format("M d, Y");
+			
+			//Detect if it's unicode, and if it's not, convert it to UTF-8 from an assumed WINDOWS-1252
+			$latestAdminData = file_get_contents($allAdminFiles[count($allAdminFiles) - 1]);
+			if(!preg_match('//u', $latestAdminData)) $latestAdminData = iconv('WINDOWS-1252', 'UTF-8', $latestAdminData);
+			$metadata['latestAdmin'] = $latestAdminData;
+		}
+	}
+	
+	//System Info
+	elseif($_GET['id'] == 'sysInfo')
+	{
+		if(!$config['general']['showSysInfo']) die();
+		$metadata['sysData'] = [];
+		
+		//Windows System Info
+		if(PHP_OS_FAMILY == "Windows")
+		{
+			//Windows Version
+			$metadata['sysData'][] = array("name" => "Windows Version", "value" => ucfirst(php_uname('v')));
+			
+			//Get Data from PowerShell
+			$powershellData = json_decode(shell_exec("powershell -EncodedCommand " .
+				"JABtAGUAbQBvAHIAeQAgAD0AIABnAGMAaQBtACAAdwBpAG4AMwAyAF8AbwBwAGU" .
+				"AcgBhAHQAaQBuAGcAcwB5AHMAdABlAG0AIAAtAFAAcgBvAHAAZQByAHQAeQAgAF" .
+				"QAbwB0AGEAbABWAGkAcwBpAGIAbABlAE0AZQBtAG8AcgB5AFMAaQB6AGUALABGA" .
+				"HIAZQBlAFAAaAB5AHMAaQBjAGEAbABNAGUAbQBvAHIAeQA7ACAAJABiAGEAdAB0" .
+				"AGUAcgB5ACAAPQAgAGcAYwBpAG0AIAB3AGkAbgAzADIAXwBiAGEAdAB0AGUAcgB" .
+				"5ADsAIAAkAHIAZQB0AFYAYQBsACAAPQAgAEAAewB1AHAAdABpAG0AZQAgAD0AIA" .
+				"AkACgAKABnAGUAdAAtAGQAYQB0AGUAKQAgAC0AIAAoAGcAYwBpAG0AIABXAGkAb" .
+				"gAzADIAXwBPAHAAZQByAGEAdABpAG4AZwBTAHkAcwB0AGUAbQApAC4ATABhAHMA" .
+				"dABCAG8AbwB0AFUAcABUAGkAbQBlACkALgBUAG8AdABhAGwAUwBlAGMAbwBuAGQ" .
+				"AcwA7ACAAYwBwAHUATABvAGEAZAAgAD0AIAAkACgAZwBjAGkAbQAgAFcAaQBuAD" .
+				"MAMgBfAFAAcgBvAGMAZQBzAHMAbwByACAALQBQAHIAbwBwAGUAcgB0AHkAIABMA" .
+				"G8AYQBkAFAAZQByAGMAZQBuAHQAYQBnAGUAKQAuAEwAbwBhAGQAUABlAHIAYwBl" .
+				"AG4AdABhAGcAZQA7ACAAbQBlAG0AVABvAHQAYQBsACAAPQAgACQAbQBlAG0AbwB" .
+				"yAHkALgBUAG8AdABhAGwAVgBpAHMAaQBiAGwAZQBNAGUAbQBvAHIAeQBTAGkAeg" .
+				"BlADsAIABtAGUAbQBBAHYAYQBpAGwAYQBiAGwAZQAgAD0AIAAkAG0AZQBtAG8Ac" .
+				"gB5AC4ARgByAGUAZQBQAGgAeQBzAGkAYwBhAGwATQBlAG0AbwByAHkAOwB9ADsA" .
+				"IABpAGYAKAAkAGIAYQB0AHQAZQByAHkAIAAtAG4AZQAgACQAbgB1AGwAbAApAHs" .
+				"AJAByAGUAdABWAGEAbAAuAEEAZABkACgAIgBwAG8AdwBlAHIAUwB0AGEAdAB1AH" .
+				"MAIgAsACAAQAAoADIALAAzACwANgAsADcALAA4ACwAOQApACAALQBjAG8AbgB0A" .
+				"GEAaQBuAHMAIAAkAGIAYQB0AHQAZQByAHkALgBCAGEAdAB0AGUAcgB5AFMAdABh" .
+				"AHQAdQBzACkAOwAgACQAcgBlAHQAVgBhAGwALgBBAGQAZAAoACIAYgBhAHQAdAB" .
+				"lAHIAeQBQAGUAcgBjAGUAbgB0AGEAZwBlACIALAAgACQAYgBhAHQAdABlAHIAeQ" .
+				"AuAEUAcwB0AGkAbQBhAHQAZQBkAEMAaABhAHIAZwBlAFIAZQBtAGEAaQBuAGkAb" .
+				"gBnACkAOwB9ACAAJAByAGUAdABWAGEAbAAgAHwAIABDAG8AbgB2AGUAcgB0AFQA" .
+				"bwAtAEoAUwBPAE4AIAAtAEMAbwBtAHAAcgBlAHMAcwA="));
+			
+			//Parse data - hand some of it off for later
+			if(property_exists($powershellData, "powerStatus"))
+				$metadata['sysData'][] = array("name" => "Power Status", "value" => $powershellData->powerStatus ? "Plugged In" : "<span style='color: red;'>Unplugged</span>");
+			if(property_exists($powershellData, "batteryPercentage"))
+			$metadata['sysData'][] = array("name" => "Battery Percentage", "value" => $powershellData->batteryPercentage . "%");
+			$metadata['sysData'][] = array("name" => "CPU Load Average", "value" => $powershellData->cpuLoad . "%");
+			$uptimeStr = $powershellData->uptime;
+			$memTotal = $powershellData->memTotal;
+			$memAvailable = $powershellData->memAvailable;
+			
+			//Info about running processes (parsed later)
+			$runningProcesses = shell_exec("tasklist");
+			
+			//System temp data on Windows is not supported
+			$metadata['tempData'] = [];
+		}
+		
+		//Other Systems (assume Linux-like system)
+		else
+		{
+			//Kernel Info
+			$metadata['sysData'][] = array("name" => "OS Version", "value" => trim(shell_exec("lsb_release -ds")));
+			$metadata['sysData'][] = array("name" => "Kernel Version", "value" => php_uname('s') . " " . php_uname('r'));
+			
+			//Uptime
+			$uptimeStr = file_get_contents('/proc/uptime');
+			
+			//CPU Load
+			$loadAvg = sys_getloadavg();
+			$metadata['sysData'][] = array("name" => "CPU Load (1min, 5min, 15min)", "value" => $loadAvg[0] . ", " . $loadAvg[1] . ", " . $loadAvg[2]);
+			
+			//Memory Usage (parsed later)
+			$memFile = fopen('/proc/meminfo','r');
+			$memTotal = 0;
+			$memAvailable = 0;
+			while ($line = fgets($memFile))
+			{
+				$memPieces = [];
+				if (preg_match('/^MemTotal:\s+(\d+)\skB$/', $line, $memPieces)) $memTotal = $memPieces[1];
+				if (preg_match('/^MemAvailable:\s+(\d+)\skB$/', $line, $memPieces)) $memAvailable = $memPieces[1];
+			}
+			fclose($memFile);
+			
+			//Power Status
+			if(file_exists("/sys/class/power_supply/AC/online"))
+				$metadata['sysData'][] = array("name" => "Power Status", "value" => file_get_contents("/sys/class/power_supply/AC/online") == 1 ? "Plugged In" : "<span style='color: red;'>Unplugged</span>");
+			
+			//Battery
+			if(file_exists("/sys/class/power_supply/BAT0/capacity"))
+				$metadata['sysData'][] = array("name" => "Battery Percentage", "value" => trim(file_get_contents("/sys/class/power_supply/BAT0/capacity")) . "%");
+			
+			//System Temps
+			$hwmonDirs = scandir("/sys/class/hwmon/");
+			$metadata['tempData'] = [];
+			foreach($hwmonDirs as $thisHwmon)
+			{
+				if($thisHwmon == "." || $thisHwmon == "..") continue;
+				$thisDevicesSensors = glob("/sys/class/hwmon/" . $thisHwmon . "/{temp,fan}*_input", GLOB_BRACE);
+				if(count($thisDevicesSensors) == 0) continue;
+				
+				$tempBaseName = ucfirst(str_replace("_", " ", trim(file_get_contents("/sys/class/hwmon/" . $thisHwmon . "/name"))));
+				$tempCount = $fanCount = 1;
+				foreach($thisDevicesSensors as $thisSensor)
+				{
+					$metadata['tempData'][] = [];
+					
+					if(strpos($thisSensor, "temp") !== false)
+					{
+						if(file_exists(str_replace("input", "label", $thisSensor))) $thisSensorName = trim(file_get_contents(str_replace("input", "label", $thisSensor))) . " Temp";
+						else $thisSensorName = "$tempBaseName Temp" . (count($thisDevicesSensors) > 1 ? " $tempCount" : "");
+						
+						$metadata['tempData'][count($metadata['tempData']) - 1]['name'] = $thisSensorName;
+						
+						//Some sensors error when below 0 degrees - catch these errors
+						set_error_handler("convertToException");
+						try
+						{
+							$thisSensorData = file_get_contents($thisSensor);
+							$metadata['tempData'][count($metadata['tempData']) - 1]['value'] = intval(trim($thisSensorData)) / 1000 . "&deg; C";
+						}
+						catch (exception $e)
+						{
+							//Failed; return an error
+							$metadata['tempData'][count($metadata['tempData']) - 1]['value'] = "Error!";
+						}
+						
+						//Return to typical error handler
+						restore_error_handler();
+						$tempCount++;
+					}
+					
+					else
+					{
+						if(file_exists(str_replace("input", "label", $thisSensor))) $thisSensorName = trim(file_get_contents(str_replace("input", "label", $thisSensor)));
+						else $thisSensorName = "$tempBaseName Fan" . (count($thisDevicesSensors) > 1 ? " $fanCount" : "");
+						
+						$metadata['tempData'][count($metadata['tempData']) - 1]['name'] = $thisSensorName . " Speed";
+						$metadata['tempData'][count($metadata['tempData']) - 1]['value'] = trim(file_get_contents($thisSensor)) . " RPM";
+						$fanCount++;
+					}
+				}
+			}
+			
+			//Info about running processes
+			$runningProcesses = shell_exec("ps acxo command");
+		}
+		
+		//Disk Usage (all OSs)
+		$totalDiskSpace = round(disk_total_space($_SERVER['DOCUMENT_ROOT']) / 1073741824, 2);
+		$usedDiskSpace = $totalDiskSpace - round(disk_free_space($_SERVER['DOCUMENT_ROOT']) / 1073741824, 2);
+		$metadata['sysData'][] = array("name" => "Disk Used", "value" => $usedDiskSpace . "GB / " . $totalDiskSpace . "GB  - " . round(($usedDiskSpace / $totalDiskSpace) * 100, 2) . "%");
+		
+		//Memory Usage
+		$metadata['sysData'][] = array("name" => "Memory Used", "value" => round(($memTotal - $memAvailable) / 1048576, 2) . "GB / " . round($memTotal / 1048576, 2) . "GB - " . round((($memTotal - $memAvailable) / $memTotal) * 100, 2) . "%");
+		
+		//Uptime (all OSs)
+		$num = (int)floatval($uptimeStr);
+		$uptimeStr = str_pad(round(fmod($num, 60)), 2, "0", STR_PAD_LEFT);
+		$num = intdiv($num, 60);
+		$uptimeStr = str_pad($num % 60, 2, "0", STR_PAD_LEFT) . ":" . $uptimeStr;
+		$num = intdiv($num, 60);
+		$uptimeStr = str_pad($num % 24, 2, "0", STR_PAD_LEFT) . ":" . $uptimeStr;
+		$uptimeStr = intdiv($num, 24) . " days, " . $uptimeStr;
+		$metadata['sysData'][] = array("name" => "Uptime", "value" => $uptimeStr);
+		
+		//Find running satellite decoders (all OSs)
+		$noDecoderFound = true;
+		if(stripos($runningProcesses, "goesrecv") !== false || stripos($runningProcesses, "goesproc") !== false)
+		{
+			$noDecoderFound = false;
+			$metadata['sysData'][] = array("name" => "Goesrecv Status", "value" => stripos($runningProcesses, "goesrecv") !== false ? "Running" : "<span style='color: red;'>Not Running</span>");
+			$metadata['sysData'][] = array("name" => "Goesproc Status", "value" => stripos($runningProcesses, "goesproc") !== false ? "Running" : "<span style='color: red;'>Not Running</span>");
+			if(verifyCommand("goesrecv")) $metadata['sysData'][] = array("name" => "Goestools Version", "value" => explode(" ", str_replace("goesrecv -- ", "", explode(PHP_EOL, shell_exec("goesrecv --version"))[0]))[0]);
+		}
+		if(stripos($runningProcesses, "satdump") !== false)
+		{
+			$noDecoderFound = false;
+			$metadata['sysData'][] = array("name" => "SatDump Status", "value" => "Running");
+		}
+		if($noDecoderFound) $metadata['sysData'][] = array("name" => "Satellite Decoder", "value" => "None Found!");
+		
+		//SatDump Statistics (all OSs)
+		if(array_key_exists('satdumpAPI', $config['general']))
+		{
+			$metadata['satdumpData'] = [];
 			set_error_handler("convertToException");
 			try
 			{
-				$tzUrl = urlencode($currentSettings[$selectedProfile]['timezone']);
-				$packetOK1hrArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-1hours&tz=$tzUrl&target=stats.packets_ok"))[0]->datapoints;
-				$packetOK1dayArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-24hours&tz=$tzUrl&target=stats.packets_ok"))[0]->datapoints;
-				$packetDrop1hrArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-1hours&tz=$tzUrl&target=stats.packets_dropped"))[0]->datapoints;
-				$packetDrop1dayArray = json_decode(file_get_contents($config['general']['graphiteAPI']."?format=json&from=-24hours&tz=$tzUrl&target=stats.packets_dropped"))[0]->datapoints;
-				$packetOK1hr = $packetOK1day = $packetDrop1hr = $packetDrop1day = 0;
-				
-				foreach($packetOK1hrArray as $thisPacket) {$packetOK1hr += $thisPacket[0];}
-				foreach($packetOK1dayArray as $thisPacket) {$packetOK1day += $thisPacket[0];}
-				foreach($packetDrop1hrArray as $thisPacket) {$packetDrop1hr += $thisPacket[0];}
-				foreach($packetDrop1dayArray as $thisPacket) {$packetDrop1day += $thisPacket[0];}
-				
-				$metadata['description'] = "1 Hour Average: " . round(($packetOK1hr / ($packetOK1hr + $packetDrop1hr)) * 100, 4) . "% OK | 1 Day Average: " . round(($packetOK1day / ($packetOK1day + $packetDrop1day)) * 100, 4) . "% OK";
-				$metadata['svg1hr'] = preg_replace("(clip-path.*clip-rule.*\")", "",
-					file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&colorList=green%2Cred&fontSize=14&title=HRIT%20Packets%20%2F%20Second%20(1%20Hour)&fgcolor=FFFFFF&lineWidth=2&from=-1hours&tz=$tzUrl&target=alias(stats.packets_ok%2C%22Packets%20OK%22)&target=alias(stats.packets_dropped%2C%22Packets%20Dropped%22)"));
-				$metadata['svg1day'] = preg_replace("(clip-path.*clip-rule.*\")", "",
-					file_get_contents($config['general']['graphiteAPI']."?width=600&height=350&format=svg&colorList=green%2Cred&fontSize=14&title=HRIT%20Packets%20%2F%20Second%20(1%20Day)&fgcolor=FFFFFF&lineWidth=2&from=-1days&tz=$tzUrl&target=alias(stats.packets_ok%2C%22Packets%20OK%22)&target=alias(stats.packets_dropped%2C%22Packets%20Dropped%22)"));
+				$satdumpStats = json_decode(file_get_contents($config['general']['satdumpAPI']));
 			}
 			catch(exception $e)
 			{
-				$metadata = [];
+				$satdumpStats = [];
 			}
 			restore_error_handler();
-			break;
 			
-		case "viterbiContent":
-			parseGraphiteData($metadata, $currentSettings[$selectedProfile]['timezone'], $config['general']['graphiteAPI'], "divideSeries(stats_counts.viterbi_errors,sumSeries(stats_counts.packets_dropped,stats_counts.packets_ok))", "Avg Viterbi Error Corrections / Packet", "red");
-			break;
-			
-		case "rsContent":
-			parseGraphiteData($metadata, $currentSettings[$selectedProfile]['timezone'], $config['general']['graphiteAPI'], "stats.reed_solomon_errors", "Reed-Solomon Errors / Second", "6464FF");
-			break;
-			
-		case "gainContent":
-			parseGraphiteData($metadata, $currentSettings[$selectedProfile]['timezone'], $config['general']['graphiteAPI'], "stats.gauges.gain", "Gain Multiplier", "orange");
-			break;
-			
-		case "freqContent":
-			parseGraphiteData($metadata, $currentSettings[$selectedProfile]['timezone'], $config['general']['graphiteAPI'], "stats.gauges.frequency", "Frequency Offset", "brown");
-			break;
-			
-		case "omegaContent":
-			parseGraphiteData($metadata, $currentSettings[$selectedProfile]['timezone'], $config['general']['graphiteAPI'], "stats.gauges.omega", "Samples/Symbol in Clock Recovery", "008080");
-			break;
-			
-		case "otherEmwin":
-			$DateTime = new DateTime("now", new DateTimeZone(date_default_timezone_get()));
-			
-			if(array_key_exists('emwinPath', $config['general']) && is_dir($config['general']['emwinPath']))
+			foreach($satdumpStats as $stat => $value)
 			{
-				//Get all emwin files
-				$allEmwinFiles = scandir_recursive($config['general']['emwinPath']);
-				
-				//Load pertinent pieces of information where for cards with all available information
-				$spaceWeatherMessages = $radarOutages = $adminAlertList = $adminRegionalList = [];
-				$alertStateAbbrs = "(" . implode('|', array_unique(array($currentSettings[$selectedProfile]['stateAbbr'], substr($currentSettings[$selectedProfile]['orig'], -2), substr($currentSettings[$selectedProfile]['rwrOrig'], -2)))) . ")";
-				foreach($allEmwinFiles as $thisFile)
+				$metadata['satdumpData'][]['title'] = ucwords(str_replace("_", " ", $stat));
+				$metadata['satdumpData'][count($metadata['satdumpData']) - 1]['values'] = [];
+				foreach($value as $subName => $subValue)
 				{
-					if(strpos($thisFile, "-ALT") !== false || strpos($thisFile, "-WAT") !== false) $spaceWeatherMessages[] = $thisFile;
-					if(preg_match("/-FTM.*$alertStateAbbrs\.TXT$/", $thisFile)) $radarOutages[] = $thisFile;
-					if(strpos($thisFile, "-ADA") !== false) $adminAlertList[] = $thisFile;
-					if(strpos($thisFile, "-ADR") !== false) $adminRegionalList[] = $thisFile;
-				}
-				
-				//Space Weather Messages
-				usort($spaceWeatherMessages, "sortEMWIN");
-				$metadata['spaceWeatherMessages'] = [];
-				if(count($spaceWeatherMessages) == 0) $metadata['spaceWeatherMessages'][] = "<div style='text-align: center; font-weight: bold; font-size: 13pt;'>No Messages</div>";
-				foreach($spaceWeatherMessages as $spaceWeatherMessage) $metadata['spaceWeatherMessages'][] = linesToParagraphs(file($spaceWeatherMessage), 3);
-				
-				//Radar Outages
-				usort($radarOutages, "sortEMWIN");
-				$metadata['radarOutages'] = [];
-				if(count($radarOutages) == 0) $metadata['radarOutages'][] = "<div style='text-align: center; font-weight: bold; font-size: 13pt;'>No Messages</div>";
-				foreach($radarOutages as $radarOutage) $metadata['radarOutages'][] = linesToParagraphs(file($radarOutage), 3);
-				
-				//EMWIN Administrative Alerts
-				usort($adminAlertList, "sortEMWIN");
-				$metadata['adminAlerts'] = [];
-				if(count($adminAlertList) == 0) $metadata['adminAlerts'][] = "<div style='text-align: center; font-weight: bold; font-size: 13pt;'>No Alerts</div>";
-				foreach($adminAlertList as $adminAlert) $metadata['adminAlerts'][] = linesToParagraphs(file($adminAlert), 3);
-				
-				//EMWIN Administrative (Regional)
-				usort($adminRegionalList, "sortEMWIN");
-				$metadata['adminRegional'] = [];
-				if(count($adminRegionalList) == 0) $metadata['adminRegional'][] = "<div style='text-align: center; font-weight: bold; font-size: 13pt;'>No Alerts</div>";
-				foreach($adminRegionalList as $adminRegional) $metadata['adminRegional'][] = linesToParagraphs(file($adminRegional), 4);
-				
-				//Satellite TLE
-				$latestTleFile = findNewestEmwin($allEmwinFiles, "EPHTWOUS");
-				$metadata['satelliteTle'] = [];
-				if($latestTleFile != "")
-				{
-					$latestTleArray = file($latestTleFile);
-					for($i = 0; $i < count($latestTleArray); $i += 3) $metadata['satelliteTle'][] = trim($latestTleArray[$i]);
-					sort($metadata['satelliteTle']);
-					$metadata['satelliteTleDate'] = date("M d, Y Hi", findMetadataEMWIN($allEmwinFiles, $latestTleFile, "")[0]['timestamp']) . " " . $DateTime->format('T');
-				}
-				
-				//EMWIN License
-				$emwinLicenseFile = findNewestEmwin($allEmwinFiles, "FEEBAC1S");
-				if($emwinLicenseFile == "")
-				{
-					$metadata['emwinLicense'] = "None Found";
-					$metadata['emwinLicenseDate'] = "N/A";
-				}
-				else
-				{
-					$metadata['emwinLicense'] = linesToParagraphs(file($emwinLicenseFile), 4);
-					$metadata['emwinLicenseDate'] = date("M d, Y Hi", findMetadataEMWIN($allEmwinFiles, $emwinLicenseFile, "")[0]['timestamp']) . " " . $DateTime->format('T');
+					if(is_float($subValue)) $valToUse = round($subValue, 5);
+					elseif(is_bool($subValue)) $valToUse = $subValue ? "True" : "False";
+					else $valToUse = $subValue;
+					$metadata['satdumpData'][count($metadata['satdumpData']) - 1]['values'][] = array("name" => ucwords(str_replace("_", " ", $subName)), "value" => $valToUse);
 				}
 			}
-			
-			if(array_key_exists('adminPath', $config['general']) &&  is_dir($config['general']['adminPath']))
-			{
-				//Admin update
-				$allAdminFiles = scandir_recursive($config['general']['adminPath']);
-				$allAdminFiles = preg_grep("/[0-9]{4}\.[0-9]{2}\.[0-9]{2}\.(txt|TXT)$/", $allAdminFiles);
-				usort($allAdminFiles, "sortABI");
-				$adminDateParts = explode("_", basename($allAdminFiles[count($allAdminFiles) - 1]));
-				$metadata['latestAdminDate'] = DateTimeImmutable::createFromFormat("Y.m.d", substr($adminDateParts[count($adminDateParts) - 1], 0, -4))->format("M d, Y");
-				
-				//Detect if it's unicode, and if it's not, convert it to UTF-8 from an assumed WINDOWS-1252
-				$latestAdminData = file_get_contents($allAdminFiles[count($allAdminFiles) - 1]);
-				if(!preg_match('//u', $latestAdminData)) $latestAdminData = iconv('WINDOWS-1252', 'UTF-8', $latestAdminData);
-				$metadata['latestAdmin'] = $latestAdminData;
-			}
-			
-			break;
-			
-		case "sysInfo":
-			if(!$config['general']['showSysInfo']) die();
-			$metadata['sysData'] = [];
-			
-			//Windows System Info
-			if(PHP_OS_FAMILY == "Windows")
-			{
-				//Windows Version
-				$metadata['sysData'][] = array("name" => "Windows Version", "value" => ucfirst(php_uname('v')));
-				
-				//Get Data from PowerShell
-				$powershellData = json_decode(shell_exec("powershell -EncodedCommand " .
-					"JABtAGUAbQBvAHIAeQAgAD0AIABnAGMAaQBtACAAdwBpAG4AMwAyAF8AbwBwAGU" .
-					"AcgBhAHQAaQBuAGcAcwB5AHMAdABlAG0AIAAtAFAAcgBvAHAAZQByAHQAeQAgAF" .
-					"QAbwB0AGEAbABWAGkAcwBpAGIAbABlAE0AZQBtAG8AcgB5AFMAaQB6AGUALABGA" .
-					"HIAZQBlAFAAaAB5AHMAaQBjAGEAbABNAGUAbQBvAHIAeQA7ACAAJABiAGEAdAB0" .
-					"AGUAcgB5ACAAPQAgAGcAYwBpAG0AIAB3AGkAbgAzADIAXwBiAGEAdAB0AGUAcgB" .
-					"5ADsAIAAkAHIAZQB0AFYAYQBsACAAPQAgAEAAewB1AHAAdABpAG0AZQAgAD0AIA" .
-					"AkACgAKABnAGUAdAAtAGQAYQB0AGUAKQAgAC0AIAAoAGcAYwBpAG0AIABXAGkAb" .
-					"gAzADIAXwBPAHAAZQByAGEAdABpAG4AZwBTAHkAcwB0AGUAbQApAC4ATABhAHMA" .
-					"dABCAG8AbwB0AFUAcABUAGkAbQBlACkALgBUAG8AdABhAGwAUwBlAGMAbwBuAGQ" .
-					"AcwA7ACAAYwBwAHUATABvAGEAZAAgAD0AIAAkACgAZwBjAGkAbQAgAFcAaQBuAD" .
-					"MAMgBfAFAAcgBvAGMAZQBzAHMAbwByACAALQBQAHIAbwBwAGUAcgB0AHkAIABMA" .
-					"G8AYQBkAFAAZQByAGMAZQBuAHQAYQBnAGUAKQAuAEwAbwBhAGQAUABlAHIAYwBl" .
-					"AG4AdABhAGcAZQA7ACAAbQBlAG0AVABvAHQAYQBsACAAPQAgACQAbQBlAG0AbwB" .
-					"yAHkALgBUAG8AdABhAGwAVgBpAHMAaQBiAGwAZQBNAGUAbQBvAHIAeQBTAGkAeg" .
-					"BlADsAIABtAGUAbQBBAHYAYQBpAGwAYQBiAGwAZQAgAD0AIAAkAG0AZQBtAG8Ac" .
-					"gB5AC4ARgByAGUAZQBQAGgAeQBzAGkAYwBhAGwATQBlAG0AbwByAHkAOwB9ADsA" .
-					"IABpAGYAKAAkAGIAYQB0AHQAZQByAHkAIAAtAG4AZQAgACQAbgB1AGwAbAApAHs" .
-					"AJAByAGUAdABWAGEAbAAuAEEAZABkACgAIgBwAG8AdwBlAHIAUwB0AGEAdAB1AH" .
-					"MAIgAsACAAQAAoADIALAAzACwANgAsADcALAA4ACwAOQApACAALQBjAG8AbgB0A" .
-					"GEAaQBuAHMAIAAkAGIAYQB0AHQAZQByAHkALgBCAGEAdAB0AGUAcgB5AFMAdABh" .
-					"AHQAdQBzACkAOwAgACQAcgBlAHQAVgBhAGwALgBBAGQAZAAoACIAYgBhAHQAdAB" .
-					"lAHIAeQBQAGUAcgBjAGUAbgB0AGEAZwBlACIALAAgACQAYgBhAHQAdABlAHIAeQ" .
-					"AuAEUAcwB0AGkAbQBhAHQAZQBkAEMAaABhAHIAZwBlAFIAZQBtAGEAaQBuAGkAb" .
-					"gBnACkAOwB9ACAAJAByAGUAdABWAGEAbAAgAHwAIABDAG8AbgB2AGUAcgB0AFQA" .
-					"bwAtAEoAUwBPAE4AIAAtAEMAbwBtAHAAcgBlAHMAcwA="));
-				
-				//Parse data - hand some of it off for later
-				if(property_exists($powershellData, "powerStatus"))
-					$metadata['sysData'][] = array("name" => "Power Status", "value" => $powershellData->powerStatus ? "Plugged In" : "<span style='color: red;'>Unplugged</span>");
-				if(property_exists($powershellData, "batteryPercentage"))
-				$metadata['sysData'][] = array("name" => "Battery Percentage", "value" => $powershellData->batteryPercentage . "%");
-				$metadata['sysData'][] = array("name" => "CPU Load Average", "value" => $powershellData->cpuLoad . "%");
-				$uptimeStr = $powershellData->uptime;
-				$memTotal = $powershellData->memTotal;
-				$memAvailable = $powershellData->memAvailable;
-				
-				//Info about running processes (parsed later)
-				$runningProcesses = shell_exec("tasklist");
-				
-				//System temp data on Windows is not supported
-				$metadata['tempData'] = [];
-			}
-			
-			//Other Systems (assume Linux-like system)
-			else
-			{
-				//Kernel Info
-				$metadata['sysData'][] = array("name" => "OS Version", "value" => trim(shell_exec("lsb_release -ds")));
-				$metadata['sysData'][] = array("name" => "Kernel Version", "value" => php_uname('s') . " " . php_uname('r'));
-				
-				//Uptime
-				$uptimeStr = file_get_contents('/proc/uptime');
-				
-				//CPU Load
-				$loadAvg = sys_getloadavg();
-				$metadata['sysData'][] = array("name" => "CPU Load (1min, 5min, 15min)", "value" => $loadAvg[0] . ", " . $loadAvg[1] . ", " . $loadAvg[2]);
-				
-				//Memory Usage (parsed later)
-				$memFile = fopen('/proc/meminfo','r');
-				$memTotal = 0;
-				$memAvailable = 0;
-				while ($line = fgets($memFile))
-				{
-					$memPieces = [];
-					if (preg_match('/^MemTotal:\s+(\d+)\skB$/', $line, $memPieces)) $memTotal = $memPieces[1];
-					if (preg_match('/^MemAvailable:\s+(\d+)\skB$/', $line, $memPieces)) $memAvailable = $memPieces[1];
-				}
-				fclose($memFile);
-				
-				//Power Status
-				if(file_exists("/sys/class/power_supply/AC/online"))
-					$metadata['sysData'][] = array("name" => "Power Status", "value" => file_get_contents("/sys/class/power_supply/AC/online") == 1 ? "Plugged In" : "<span style='color: red;'>Unplugged</span>");
-				
-				//Battery
-				if(file_exists("/sys/class/power_supply/BAT0/capacity"))
-					$metadata['sysData'][] = array("name" => "Battery Percentage", "value" => trim(file_get_contents("/sys/class/power_supply/BAT0/capacity")) . "%");
-				
-				//System Temps
-				$hwmonDirs = scandir("/sys/class/hwmon/");
-				$metadata['tempData'] = [];
-				foreach($hwmonDirs as $thisHwmon)
-				{
-					if($thisHwmon == "." || $thisHwmon == "..") continue;
-					$thisDevicesSensors = glob("/sys/class/hwmon/" . $thisHwmon . "/{temp,fan}*_input", GLOB_BRACE);
-					if(count($thisDevicesSensors) == 0) continue;
-					
-					$tempBaseName = ucfirst(str_replace("_", " ", trim(file_get_contents("/sys/class/hwmon/" . $thisHwmon . "/name"))));
-					$tempCount = $fanCount = 1;
-					foreach($thisDevicesSensors as $thisSensor)
-					{
-						$metadata['tempData'][] = [];
-						
-						if(strpos($thisSensor, "temp") !== false)
-						{
-							if(file_exists(str_replace("input", "label", $thisSensor))) $thisSensorName = trim(file_get_contents(str_replace("input", "label", $thisSensor))) . " Temp";
-							else $thisSensorName = "$tempBaseName Temp" . (count($thisDevicesSensors) > 1 ? " $tempCount" : "");
-							
-							$metadata['tempData'][count($metadata['tempData']) - 1]['name'] = $thisSensorName;
-							
-							//Some sensors error when below 0 degrees - catch these errors
-							set_error_handler("convertToException");
-							try
-							{
-								$thisSensorData = file_get_contents($thisSensor);
-								$metadata['tempData'][count($metadata['tempData']) - 1]['value'] = intval(trim($thisSensorData)) / 1000 . "&deg; C";
-							}
-							catch (exception $e)
-							{
-								//Failed; return an error
-								$metadata['tempData'][count($metadata['tempData']) - 1]['value'] = "Error!";
-							}
-							
-							//Return to typical error handler
-							restore_error_handler();
-							$tempCount++;
-						}
-						
-						else
-						{
-							if(file_exists(str_replace("input", "label", $thisSensor))) $thisSensorName = trim(file_get_contents(str_replace("input", "label", $thisSensor)));
-							else $thisSensorName = "$tempBaseName Fan" . (count($thisDevicesSensors) > 1 ? " $fanCount" : "");
-							
-							$metadata['tempData'][count($metadata['tempData']) - 1]['name'] = $thisSensorName . " Speed";
-							$metadata['tempData'][count($metadata['tempData']) - 1]['value'] = trim(file_get_contents($thisSensor)) . " RPM";
-							$fanCount++;
-						}
-					}
-				}
-				
-				//Info about running processes
-				$runningProcesses = shell_exec("ps acxo command");
-			}
-			
-			//Disk Usage (all OSs)
-			$totalDiskSpace = round(disk_total_space($_SERVER['DOCUMENT_ROOT']) / 1073741824, 2);
-			$usedDiskSpace = $totalDiskSpace - round(disk_free_space($_SERVER['DOCUMENT_ROOT']) / 1073741824, 2);
-			$metadata['sysData'][] = array("name" => "Disk Used", "value" => $usedDiskSpace . "GB / " . $totalDiskSpace . "GB  - " . round(($usedDiskSpace / $totalDiskSpace) * 100, 2) . "%");
-			
-			//Memory Usage
-			$metadata['sysData'][] = array("name" => "Memory Used", "value" => round(($memTotal - $memAvailable) / 1048576, 2) . "GB / " . round($memTotal / 1048576, 2) . "GB - " . round((($memTotal - $memAvailable) / $memTotal) * 100, 2) . "%");
-			
-			//Uptime (all OSs)
-			$num = (int)floatval($uptimeStr);
-			$uptimeStr = str_pad(round(fmod($num, 60)), 2, "0", STR_PAD_LEFT);
-			$num = intdiv($num, 60);
-			$uptimeStr = str_pad($num % 60, 2, "0", STR_PAD_LEFT) . ":" . $uptimeStr;
-			$num = intdiv($num, 60);
-			$uptimeStr = str_pad($num % 24, 2, "0", STR_PAD_LEFT) . ":" . $uptimeStr;
-			$uptimeStr = intdiv($num, 24) . " days, " . $uptimeStr;
-			$metadata['sysData'][] = array("name" => "Uptime", "value" => $uptimeStr);
-			
-			//Find running satellite decoders (all OSs)
-			$noDecoderFound = true;
-			if(stripos($runningProcesses, "goesrecv") !== false || stripos($runningProcesses, "goesproc") !== false)
-			{
-				$noDecoderFound = false;
-				$metadata['sysData'][] = array("name" => "Goesrecv Status", "value" => stripos($runningProcesses, "goesrecv") !== false ? "Running" : "<span style='color: red;'>Not Running</span>");
-				$metadata['sysData'][] = array("name" => "Goesproc Status", "value" => stripos($runningProcesses, "goesproc") !== false ? "Running" : "<span style='color: red;'>Not Running</span>");
-				if(verifyCommand("goesrecv")) $metadata['sysData'][] = array("name" => "Goestools Version", "value" => explode(" ", str_replace("goesrecv -- ", "", explode(PHP_EOL, shell_exec("goesrecv --version"))[0]))[0]);
-			}
-			if(stripos($runningProcesses, "satdump") !== false)
-			{
-				$noDecoderFound = false;
-				$metadata['sysData'][] = array("name" => "SatDump Status", "value" => "Running");
-			}
-			if($noDecoderFound) $metadata['sysData'][] = array("name" => "Satellite Decoder", "value" => "None Found!");
-			
-			//SatDump Statistics (all OSs)
-			if(array_key_exists('satdumpAPI', $config['general']))
-			{
-				$metadata['satdumpData'] = [];
-				set_error_handler("convertToException");
-				try
-				{
-					$satdumpStats = json_decode(file_get_contents($config['general']['satdumpAPI']));
-				}
-				catch(exception $e)
-				{
-					$satdumpStats = [];
-				}
-				restore_error_handler();
-				
-				foreach($satdumpStats as $stat => $value)
-				{
-					$metadata['satdumpData'][]['title'] = ucwords(str_replace("_", " ", $stat));
-					$metadata['satdumpData'][count($metadata['satdumpData']) - 1]['values'] = [];
-					foreach($value as $subName => $subValue)
-					{
-						if(is_float($subValue)) $valToUse = round($subValue, 5);
-						elseif(is_bool($subValue)) $valToUse = $subValue ? "True" : "False";
-						else $valToUse = $subValue;
-						$metadata['satdumpData'][count($metadata['satdumpData']) - 1]['values'][] = array("name" => ucwords(str_replace("_", " ", $subName)), "value" => $valToUse);
-					}
-				}
-			}
-			break;
-			
-		default:
-			die();
-			break;
+		}
 	}
+	
+	//Check if it's an image metadata request
+	elseif(array_key_exists($_GET['id'], $config['categories']) && array_key_exists('subid', $_GET) && array_key_exists($_GET['subid'], $config['categories'][$_GET['id']]['data']))
+	{
+		//Query looks valid; load from disk if available
+		if(is_dir($config['categories'][$_GET['id']]['data'][$_GET['subid']]['path']))
+		{
+			switch($config['categories'][$_GET['id']]['data'][$_GET['subid']]['mode'])
+			{
+				case "begin":
+					$regex = "/(\\\\|\/)(?<date>[0-9]{14})[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
+					$dateFormat = "YmdHis";
+					break;
+				case "beginu":
+					$regex = "/(\\\\|\/)(?<date>[0-9]{8}_[0-9]{6})[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
+					$dateFormat = "Ymd_His";
+					break;
+				case "beginz":
+					$regex = "/(\\\\|\/)(?<date>[0-9]{8}T[0-9]{6}Z)[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
+					$dateFormat = "Ymd\THis\Z";
+					break;
+				case "emwin":
+					$regex = "/_(?<date>[0-9]{14})_[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
+					$dateFormat = "YmdHis";
+					break;
+				case "end":
+					$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*(?<date>[0-9]{14})\..{3}$/i";
+					$dateFormat = "YmdHis";
+					break;
+				case "endu":
+					$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*(?<date>[0-9]{8}_[0-9]{6})\..{3}$/i";
+					$dateFormat = "Ymd_His";
+					break;
+				case "endz":
+					$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*(?<date>[0-9]{8}T[0-9]{6}Z)\..{3}$/i";
+					$dateFormat = "Ymd\THis\Z";
+					break;
+				default: die("Invalid server config: " . $config['categories'][$_GET['id']]['data'][$_GET['subid']]['mode'] . "is not a valid file parser mode!"); break;
+			}
+			
+			$metadata['title'] = $config['categories'][$_GET['id']]['data'][$_GET['subid']]['title'];
+			$metadata['images'] = [];
+			
+			$fileList = scandir_recursive($config['categories'][$_GET['id']]['data'][$_GET['subid']]['path']);
+			foreach($fileList as $file)
+			{
+				if(!preg_match($regex, $file, $regexMatches)) continue;
+				$DateTime = DateTime::createFromFormat($dateFormat, $regexMatches['date'], new DateTimeZone("UTC"));
+				if($DateTime === false) continue;
+				
+				$DateTime->setTimezone(new DateTimeZone(date_default_timezone_get()));
+				$metadata['images'][]['description'] = $DateTime->format('F j, Y g:i A T');
+				$metadata['images'][count($metadata['images']) - 1]['timestamp'] = $DateTime->getTimestamp();
+			}
+			
+			usort($metadata['images'], 'sortByTimestamp');
+		}
+	}
+	
+	//Nothing matched - request invalid
+	else die();
 	
 	header('Content-Type: application/json; charset=utf-8');
 	echo json_encode($metadata);
 }
-elseif($_GET['type'] == "abiData")
+elseif($_GET['type'] == "data")
 {
-	if(!array_key_exists($_GET['id'], $config['abi']) || !array_key_exists('timestamp', $_GET)) die();
-	$path = findImageABI($config['abi'][$_GET['id']]['path'], $config['abi'][$_GET['id']]['filter'], $_GET['timestamp']);
-	header('Content-Type: ' . mime_content_type($path));
-	header('Content-Disposition: inline; filename=' . basename($path));
-	header('Content-Length: ' . filesize($path));
-	readfile($path);
-}
-elseif($_GET['type'] == "l2Data")
-{
-	if(!array_key_exists($_GET['id'], $config['l2']) || !array_key_exists('timestamp', $_GET)) die();
-	$path = findImageABI($config['l2'][$_GET['id']]['path'], $config['l2'][$_GET['id']]['filter'], $_GET['timestamp']);
-	header('Content-Type: ' . mime_content_type($path));
-	header('Content-Disposition: inline; filename=' . basename($path));
-	header('Content-Length: ' . filesize($path));
-	readfile($path);
-}
-elseif($_GET['type'] == "mesoData")
-{
-	if(!array_key_exists($_GET['id'], $config['meso']) || !array_key_exists('timestamp', $_GET)) die();
-	$path = findImageABI($config['meso'][$_GET['id']]['path'], $config['meso'][$_GET['id']]['filter'], $_GET['timestamp']);
+	if(!array_key_exists('id', $_GET) ||
+		!array_key_exists($_GET['id'], $config['categories']) ||
+		!array_key_exists('subid', $_GET) ||
+		!array_key_exists($_GET['subid'], $config['categories'][$_GET['id']]['data']) ||
+		!array_key_exists('timestamp', $_GET))
+		die();
+		
+	$DateTime = new DateTime("now", new DateTimeZone("UTC"));
+	$DateTime->setTimestamp($_GET['timestamp']);
+	
+	switch($config['categories'][$_GET['id']]['data'][$_GET['subid']]['mode'])
+	{
+		case "begin":
+			$regex = "/(\\\\|\/)" . $DateTime->format('YmdHis') . "[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
+			break;
+		case "beginu":
+			$regex = "/(\\\\|\/)" . $DateTime->format('Ymd_His') . "[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
+			break;
+		case "beginz":
+			$regex = "/(\\\\|\/)" . $DateTime->format('Ymd\THis\Z') . "[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
+			break;
+		case "emwin":
+			$regex = "/_" . $DateTime->format('YmdHis') . "_[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
+			break;
+		case "end":
+			$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*" . $DateTime->format('YmdHis') . "\..{3}$/i";
+			break;
+		case "endu":
+			$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*" . $DateTime->format('Ymd_His') . "\..{3}$/i";
+			break;
+		case "endz":
+			$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*" . $DateTime->format('Ymd\THis\Z') . "\..{3}$/i";
+			break;
+		default: die(); break;
+	}
+
+	$fileList = scandir_recursive($config['categories'][$_GET['id']]['data'][$_GET['subid']]['path']);
+	foreach($fileList as $thisFile)
+	{
+		if(preg_match($regex, $thisFile))
+		{
+			$path = $thisFile;
+			break;
+		}
+	}
+	if(!isset($path)) die();
+	
 	header('Content-Type: ' . mime_content_type($path));
 	header('Content-Disposition: inline; filename=' . basename($path));
 	header('Content-Length: ' . filesize($path));
@@ -612,15 +676,6 @@ elseif($_GET['type'] == "hurricaneData")
 		|| !array_key_exists('product', $_GET) || preg_match("/^[A-Z0-9]{6}$/", $_GET['product']) == 0) die();
 		
 	$path = findSpecificEMWIN(scandir_recursive($config['general']['emwinPath']), $_GET['product'].$_GET['id'], $_GET['timestamp']);
-	header('Content-Type: ' . mime_content_type($path));
-	header('Content-Disposition: inline; filename=' . basename($path));
-	header('Content-Length: ' . filesize($path));
-	readfile($path);
-}
-elseif($_GET['type'] == "emwinData")
-{
-	if(!array_key_exists($_GET['id'], $config['emwin']) || !array_key_exists('timestamp', $_GET)) die();
-	$path = findSpecificEMWIN(scandir_recursive($config['general']['emwinPath']), $config['emwin'][$_GET['id']]['path'], $_GET['timestamp']);
 	header('Content-Type: ' . mime_content_type($path));
 	header('Content-Disposition: inline; filename=' . basename($path));
 	header('Content-Length: ' . filesize($path));
@@ -791,10 +846,9 @@ elseif($_GET['type'] == "alertJSON")
 				$thisLine = trim($hurricaneStatementLine);
 				if($thisLine != "" && is_numeric($thisLine[0]))
 				{
-					$DateTime = new DateTime("now", new DateTimeZone(date_default_timezone_get()));
-					$issueTimeParts = explode(" " . $DateTime->format('T') . " ", $thisLine);
-					$issueTimeParts[0] = substr_replace($issueTimeParts[0], ":", -5, 0);
-					$thisHurricaneMessageTime = strtotime($issueTimeParts[1] . " " . $issueTimeParts[0]);
+					preg_match("/^(?<time>[0-9]* [A-Z]*)(\s+[A-Z]*\s+)(?<date>.*)$/i", trim($thisLine), $issueTimeParts);
+					$issueTimeParts['time'] = substr_replace($issueTimeParts['time'], ":", -5, 0);
+					$thisHurricaneMessageTime = strtotime($issueTimeParts['date']." ".$issueTimeParts['time']);
 					
 					if($thisHurricaneMessageTime > $latestHurricaneMessage)
 					{
@@ -837,13 +891,12 @@ elseif($_GET['type'] == "alertJSON")
 				if(stripos($weatherData[$i], "* Until") === 0)
 				{
 					//Convert issue time to something PHP can understand
-					$DateTime = new DateTime("now", new DateTimeZone(date_default_timezone_get()));
-					$issueTimeParts = explode(" " . $DateTime->format('T') . " ", $issueTime);
-					$issueTimeParts[0] = substr_replace($issueTimeParts[0], ":", -5, 0);
+					preg_match("/^(?<time>[0-9]* [A-Z]*)(\s+[A-Z]*\s+)(?<date>.*)$/i", $issueTime, $issueTimeParts);
+					$issueTimeParts['time'] = substr_replace($issueTimeParts['time'], ":", -5, 0);
 					
 					//Convert the expire time to something PHP can understand
 					$expireTimeStr = substr_replace(substr(str_replace("* Until ", "", trim($weatherData[$i])), 0, -1), ":", -9, 0);
-					$expireTime = strtotime($expireTimeStr, strtotime($issueTimeParts[1]." ".$issueTimeParts[0]));
+					$expireTime = strtotime($expireTimeStr, strtotime($issueTimeParts['date']." ".$issueTimeParts['time']));
 				}
 				
 				//Get geofencing of warning
@@ -869,7 +922,7 @@ elseif($_GET['type'] == "alertJSON")
 			}
 			
 			//Run checks to see if execution should continue
-			if(!isset($expireTime) || time() > $expireTime) continue;
+			if(isset($expireTime) && time() > $expireTime) continue;
 			if(!is_in_polygon(count($geoLat) - 1, $geoLon, $geoLat, $currentSettings[$selectedProfile]['lon'], $currentSettings[$selectedProfile]['lat'])) continue;
 			
 			//Geolocation and time limits checked out OK; send warning to client
@@ -935,6 +988,7 @@ elseif($_GET['type'] == "hurricaneJSON")
 						$nameLine = trim($hurricaneStatementLines[++$i]);
 						$identifierLine = trim($hurricaneStatementLines[++$i]);
 						$advisoryTime = trim($hurricaneStatementLines[++$i]);
+						if(stripos($advisoryTime, "ISSUED BY") === 0) $advisoryTime = trim($hurricaneStatementLines[++$i]);
 						
 						//Get Storm Identifier
 						$identifierParts = preg_split('/\s+/', $identifierLine);
@@ -952,6 +1006,7 @@ elseif($_GET['type'] == "hurricaneJSON")
 						//Get Advisory Time
 						$advisoryTimezone = preg_split('/\s+/', $advisoryTime)[2];
 						$advisoryTimeParts = explode(" $advisoryTimezone ", $advisoryTime);
+						
 						$DateTime = new DateTime($advisoryTimeParts[1] . " " . substr_replace($advisoryTimeParts[0], ":", -5, 0) . " $advisoryTimezone", new DateTimeZone("$advisoryTimezone"));
 						$DateTime->setTimezone(new DateTimeZone(date_default_timezone_get()));
 						$returnData[$stormIdentifier]['latestAdvTime'] = $DateTime->format("F j, Y g:i A T");
@@ -1004,7 +1059,11 @@ elseif($_GET['type'] == "hurricaneJSON")
 						if(stripos($thisLine, "test") !== false) break;
 						$fullName = $thisLine;
 					}
-					if($i == 5) $advisoryTime = $thisLine;
+					if($i == 5)
+					{
+						if(stripos($thisLine, "ISSUED BY") === 0) $advisoryTime = trim($hurricaneStatementLines[$i + 1]);
+						else $advisoryTime = $thisLine;
+					}
 					
 					//Get Storm Identifier
 					if($i == 4)
@@ -1050,11 +1109,16 @@ elseif($_GET['type'] == "hurricaneJSON")
 					if(stripos($thisLine, "MOV:") === 0)
 					{
 						$dataValue = preg_split('/:\s+/', $thisLine)[1];
-						$movementParts = explode(" ", $dataValue);
-						$speedKnots = ltrim(preg_replace("/[^0-9]/", "", $movementParts[1]), "0 ");
-						$speedMph = round($speedKnots * 1.15078);
-						$speedKph = round($speedKnots * 1.852);
-						$returnData[$stormIdentifier]['movement'] = $movementParts[0] . ", $speedKnots Knots / $speedMph MPH / $speedKph KPH";
+						if($dataValue == "STNRY") $returnData[$stormIdentifier]['movement'] = "Stationary";
+						else 
+						{
+							$movementParts = explode(" ", $dataValue);
+							
+							$speedKnots = ltrim(preg_replace("/[^0-9]/", "", $movementParts[1]), "0 ");
+							$speedMph = round($speedKnots * 1.15078);
+							$speedKph = round($speedKnots * 1.852);
+							$returnData[$stormIdentifier]['movement'] = $movementParts[0] . ", $speedKnots Knots / $speedMph MPH / $speedKph KPH";
+						}
 					}
 					
 					//Current Status
@@ -1098,19 +1162,12 @@ elseif($_GET['type'] == "hurricaneJSON")
 			}
 		}
 		
-		//Sort Images, add titles to them
+		//Sort Images
 		krsort($returnData);
 		foreach($returnData as $stormKey => $stormValues)
-		{
 			foreach($stormValues as $dataKey => $dataValue)
-			{
 				if(is_array($dataValue))
-				{
 					usort($returnData[$stormKey][$dataKey], 'sortByTimestamp');
-					for($i = 0; $i < count($returnData[$stormKey][$dataKey]); $i++) $returnData[$stormKey][$dataKey][$i]['subHtml'] = "<b>" . $returnData[$stormKey]['title'] . "</b><div class='lgLabel'>" . $returnData[$stormKey][$dataKey][$i]['description'] . "</div>";
-				}
-			}
-		}
 	}
 	
 	header('Content-Type: application/json; charset=utf-8');
@@ -1126,7 +1183,9 @@ elseif($_GET['type'] == "weatherJSON")
 	$allEmwinFiles = scandir_recursive($config['general']['emwinPath']);
 	
 	//Current Radar
-	$returnData['localRadarMetadata'] = findMetadataEMWIN($allEmwinFiles, "RAD" . $currentSettings[$selectedProfile]['radarCode'] . ".GIF", "Local Composite Weather Radar");
+	$returnData['localRadarMetadata'] = [];
+	$returnData['localRadarMetadata']['title'] = "Local Composite Weather Radar";
+	$returnData['localRadarMetadata']['images'] = findMetadataEMWIN($allEmwinFiles, "RAD" . $currentSettings[$selectedProfile]['radarCode'] . ".GIF");
 	
 	//Current Weather Conditions
 	$rwrFile = findNewestEMWIN($allEmwinFiles, "RWR".$currentSettings[$selectedProfile]['rwrOrig']);
