@@ -193,6 +193,15 @@ function findNewestEMWIN($allEmwinFiles, $product)
 	return $path;
 }
 
+function getEMWINDate($path)
+{
+	//This assumes the path is already validated as EMWIN!
+	$fileNameParts = explode("_", basename($path));
+	$DateTime = new DateTime($fileNameParts[4], new DateTimeZone("UTC"));
+	$DateTime->setTimezone(new DateTimeZone(date_default_timezone_get()));
+	return $DateTime->format("M d, Y Hi T");
+}
+
 function findSpecificEMWIN($allEmwinFiles, $product, $timestamp)
 {
 	$DateTime = new DateTime("now", new DateTimeZone(date_default_timezone_get()));
@@ -207,21 +216,19 @@ function findSpecificEMWIN($allEmwinFiles, $product, $timestamp)
 	return false;
 }
 
-function findMetadataEMWIN($allEmwinFiles, $product, $title)
+function findMetadataEMWIN($allEmwinFiles, $product)
 {
 	$retVal = [];
 	foreach($allEmwinFiles as $thisFile)
 	{
-		if(strpos($thisFile, $product) === false) continue;
+		if(stripos($thisFile, $product) === false) continue;
 		
 		$fileNameParts = explode("_", basename($thisFile));
 		if(count($fileNameParts) != 6) continue;
 		
 		$DateTime = new DateTime($fileNameParts[4], new DateTimeZone("UTC"));
 		$DateTime->setTimezone(new DateTimeZone(date_default_timezone_get()));
-		$date = $DateTime->format("F j, Y g:i A");
-		$retVal[]['subHtml'] = "<b>$title</b><div class='lgLabel'>Rendered: $date " . $DateTime->format('T') . "</div>";
-		$retVal[count($retVal) - 1]['description'] = "Rendered: $date " . $DateTime->format('T');
+		$retVal[]['description'] = "Rendered: ". $DateTime->format("F j, Y g:i A T");
 		$retVal[count($retVal) - 1]['timestamp'] = $DateTime->getTimestamp();
 	}	
 	usort($retVal, 'sortByTimestamp');

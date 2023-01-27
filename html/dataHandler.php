@@ -260,7 +260,6 @@ elseif($_GET['type'] == "metadata")
 	//Other EMWIN metadata
 	elseif($_GET['id'] == 'otherEmwin')
 	{
-		$DateTime = new DateTime("now", new DateTimeZone(date_default_timezone_get()));
 		if(array_key_exists('emwinPath', $config['general']) && is_dir($config['general']['emwinPath']))
 		{
 			//Get all emwin files
@@ -309,7 +308,7 @@ elseif($_GET['type'] == "metadata")
 				$latestTleArray = file($latestTleFile);
 				for($i = 0; $i < count($latestTleArray); $i += 3) $metadata['satelliteTle'][] = trim($latestTleArray[$i]);
 				sort($metadata['satelliteTle']);
-				$metadata['satelliteTleDate'] = date("M d, Y Hi", findMetadataEMWIN($allEmwinFiles, $latestTleFile, "")[0]['timestamp']) . " " . $DateTime->format('T');
+				$metadata['satelliteTleDate'] = getEMWINDate($latestTleFile);
 			}
 			
 			//EMWIN License
@@ -322,7 +321,7 @@ elseif($_GET['type'] == "metadata")
 			else
 			{
 				$metadata['emwinLicense'] = linesToParagraphs(file($emwinLicenseFile), 4);
-				$metadata['emwinLicenseDate'] = date("M d, Y Hi", findMetadataEMWIN($allEmwinFiles, $emwinLicenseFile, "")[0]['timestamp']) . " " . $DateTime->format('T');
+				$metadata['emwinLicenseDate'] = getEMWINDate($emwinLicenseFile);
 			}
 		}
 		
@@ -591,7 +590,10 @@ elseif($_GET['type'] == "metadata")
 					break;
 				default: die("Invalid server config: " . $config['categories'][$_GET['id']]['data'][$_GET['subid']]['mode'] . "is not a valid file parser mode!"); break;
 			}
-	
+			
+			$metadata['title'] = $config['categories'][$_GET['id']]['data'][$_GET['subid']]['title'];
+			$metadata['images'] = [];
+			
 			$fileList = scandir_recursive($config['categories'][$_GET['id']]['data'][$_GET['subid']]['path']);
 			foreach($fileList as $file)
 			{
@@ -600,12 +602,11 @@ elseif($_GET['type'] == "metadata")
 				if($DateTime === false) continue;
 				
 				$DateTime->setTimezone(new DateTimeZone(date_default_timezone_get()));
-				$metadata[]['subHtml'] = "<b>{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['title']}</b><div class='lgLabel'>" . $DateTime->format('F j, Y g:i A T') . "</div>";
-				$metadata[count($metadata) - 1]['description'] = $DateTime->format('F j, Y g:i A T');
-				$metadata[count($metadata) - 1]['timestamp'] = $DateTime->getTimestamp();
+				$metadata['images'][]['description'] = $DateTime->format('F j, Y g:i A T');
+				$metadata['images'][count($metadata['images']) - 1]['timestamp'] = $DateTime->getTimestamp();
 			}
 			
-			usort($metadata, 'sortByTimestamp');
+			usort($metadata['images'], 'sortByTimestamp');
 		}
 	}
 	
@@ -1150,19 +1151,12 @@ elseif($_GET['type'] == "hurricaneJSON")
 			}
 		}
 		
-		//Sort Images, add titles to them
+		//Sort Images
 		krsort($returnData);
 		foreach($returnData as $stormKey => $stormValues)
-		{
 			foreach($stormValues as $dataKey => $dataValue)
-			{
 				if(is_array($dataValue))
-				{
 					usort($returnData[$stormKey][$dataKey], 'sortByTimestamp');
-					for($i = 0; $i < count($returnData[$stormKey][$dataKey]); $i++) $returnData[$stormKey][$dataKey][$i]['subHtml'] = "<b>" . $returnData[$stormKey]['title'] . "</b><div class='lgLabel'>" . $returnData[$stormKey][$dataKey][$i]['description'] . "</div>";
-				}
-			}
-		}
 	}
 	
 	header('Content-Type: application/json; charset=utf-8');
@@ -1178,7 +1172,9 @@ elseif($_GET['type'] == "weatherJSON")
 	$allEmwinFiles = scandir_recursive($config['general']['emwinPath']);
 	
 	//Current Radar
-	$returnData['localRadarMetadata'] = findMetadataEMWIN($allEmwinFiles, "RAD" . $currentSettings[$selectedProfile]['radarCode'] . ".GIF", "Local Composite Weather Radar");
+	$returnData['localRadarMetadata'] = [];
+	$returnData['localRadarMetadata']['title'] = "Local Composite Weather Radar";
+	$returnData['localRadarMetadata']['images'] = findMetadataEMWIN($allEmwinFiles, "RAD" . $currentSettings[$selectedProfile]['radarCode'] . ".GIF");
 	
 	//Current Weather Conditions
 	$rwrFile = findNewestEMWIN($allEmwinFiles, "RWR".$currentSettings[$selectedProfile]['rwrOrig']);

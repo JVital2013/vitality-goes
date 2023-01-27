@@ -812,7 +812,7 @@ function menuSelect(menuSlug)
 							rsItem = document.createElement('div');
 							rsItem.className = 'prettyBoxList';
 							thisCardBody.appendChild(rsItem);
-							loadHurricane(rsItem, "RS", thisHurricane, hurricaneInfo[thisHurricane].RS);
+							loadHurricane(rsItem, "RS", thisHurricane, hurricaneInfo[thisHurricane].title, hurricaneInfo[thisHurricane].RS);
 						}
 						
 						//WS images
@@ -821,7 +821,7 @@ function menuSelect(menuSlug)
 							wsItem = document.createElement('div');
 							wsItem.className = 'prettyBoxList';
 							thisCardBody.appendChild(wsItem);
-							loadHurricane(wsItem, "WS", thisHurricane, hurricaneInfo[thisHurricane].WS);
+							loadHurricane(wsItem, "WS", thisHurricane, hurricaneInfo[thisHurricane].title, hurricaneInfo[thisHurricane].WS);
 						}
 						
 						//5D images
@@ -830,7 +830,7 @@ function menuSelect(menuSlug)
 							fdItem = document.createElement('div');
 							fdItem.className = 'prettyBoxList';
 							fdItem.style.paddingTop = "5px";
-							loadHurricane(fdItem, "5D", thisHurricane, hurricaneInfo[thisHurricane]["5D"]);
+							loadHurricane(fdItem, "5D", thisHurricane, hurricaneInfo[thisHurricane].title, hurricaneInfo[thisHurricane]["5D"]);
 							
 							fdHeader = document.createElement('div');
 							fdHeader.className = 'hurricaneForecastHeader';
@@ -1376,7 +1376,7 @@ function loadLocalRadar(targetedContent, metadata)
 	goesImg = document.createElement('img');
 	goesImg.className = "goesimg";
 	goesImg.id = 'lightbox-localRadar';
-	goesImg.src = "/dataHandler.php?type=localRadarData&timestamp=" + metadata[metadata.length - 1]['timestamp'];
+	goesImg.src = "/dataHandler.php?type=localRadarData&timestamp=" + metadata.images[metadata.images.length - 1]['timestamp'];
 	goesImg.addEventListener('click', function(event){lightGalleries[event.target.id].openGallery(lightGalleries[event.target.id].galleryItems.length - 1);});
 	goesImg.addEventListener('lgBeforeOpen', function(event){
 		document.getElementsByTagName('body')[0].style.overflow = "hidden";
@@ -1391,12 +1391,14 @@ function loadLocalRadar(targetedContent, metadata)
 
 	goesLabel = document.createElement('div');
 	goesLabel.className = "goeslabel";
-	goesLabel.innerHTML = metadata[metadata.length - 1]['description'];
+	goesLabel.innerHTML = metadata.images[metadata.images.length - 1]['description'];
 	targetedContent.appendChild(goesLabel);
 
 
 	dynamicEl = [];
-	metadata.forEach(thisImg => {dynamicEl.push({src: "/dataHandler.php?type=localRadarData&timestamp=" + thisImg['timestamp'], subHtml: thisImg['subHtml'], timestamp: thisImg['timestamp']});});
+	metadata.images.forEach(thisImg => {dynamicEl.push({src: "/dataHandler.php?type=localRadarData&timestamp=" + thisImg['timestamp'],
+		subHtml: "<b>" + metadata.title + "</b><div class='lgLabel'>" + thisImg['description'] + "</div>", timestamp: thisImg['timestamp']});});
+	
 	lightGalleries['lightbox-localRadar'] = lightGallery(goesImg, {
 		plugins: [lgZoom, lgJumpTo],
 		loop: false,
@@ -1407,7 +1409,7 @@ function loadLocalRadar(targetedContent, metadata)
 		mobileSettings: {download: true, controls: false, showCloseIcon: false}
 	});
 }
-function loadHurricane(targetedContent, id, product, metadata)
+function loadHurricane(targetedContent, id, product, title, metadata)
 {
 	targetedContent.innerHTML = "";
 	goesImg = document.createElement('img');
@@ -1433,7 +1435,9 @@ function loadHurricane(targetedContent, id, product, metadata)
 
 
 	dynamicEl = [];
-	metadata.forEach(thisImg => {dynamicEl.push({src: "/dataHandler.php?type=hurricaneData&id=" + id + "&product=" + product + "&timestamp=" + thisImg['timestamp'], subHtml: thisImg['subHtml'], timestamp: thisImg['timestamp']});});
+	metadata.forEach(thisImg => {dynamicEl.push({src: "/dataHandler.php?type=hurricaneData&id=" + id + "&product=" + product + "&timestamp=" + thisImg['timestamp'],
+		subHtml: "<b>" + title + "</b><div class='lgLabel'>" + thisImg['description'] + "</div>", timestamp: thisImg['timestamp']});});
+	
 	lightGalleries["lightbox-" + product + id] = lightGallery(goesImg, {
 		plugins: [lgZoom, lgJumpTo],
 		loop: false,
@@ -1471,7 +1475,7 @@ function loadImageMetadata(targetedContent)
 function loadImage(targetedContent, metadata)
 {
 	contentId = targetedContent.id.replace('Content', '');
-	if(metadata.length == 0)
+	if(metadata.images.length == 0)
 	{
 		targetedContent.innerHTML = "<div style='margin-bottom: 5px;'>No images found</div>";
 		return;
@@ -1481,7 +1485,7 @@ function loadImage(targetedContent, metadata)
 	goesImg = document.createElement('img');
 	goesImg.className = "goesimg";
 	goesImg.id = 'lightbox-' + contentId;
-	goesImg.src = "/dataHandler.php?type=data&id=" + selectedMenu + "&subid=" + contentId + "&timestamp=" + metadata[metadata.length - 1]['timestamp'];
+	goesImg.src = "/dataHandler.php?type=data&id=" + selectedMenu + "&subid=" + contentId + "&timestamp=" + metadata.images[metadata.images.length - 1]['timestamp'];
 	goesImg.addEventListener('click', function(event){lightGalleries[event.target.id].openGallery(lightGalleries[event.target.id].galleryItems.length - 1);});
 	goesImg.addEventListener('lgBeforeOpen', function(event){
 		document.getElementsByTagName('body')[0].style.overflow = "hidden";
@@ -1496,11 +1500,14 @@ function loadImage(targetedContent, metadata)
 	
 	goesLabel = document.createElement('div');
 	goesLabel.className = "goeslabel";
-	goesLabel.innerHTML = metadata[metadata.length - 1]['description'];
+	goesLabel.innerHTML = metadata.images[metadata.images.length - 1]['description'];
 	targetedContent.appendChild(goesLabel);
 	
 	dynamicEl = [];
-	metadata.forEach(thisImg => {dynamicEl.push({src: "/dataHandler.php?type=data&id=" + selectedMenu + "&subid=" + contentId + "&timestamp=" + thisImg['timestamp'], description: thisImg['description'], subHtml: thisImg['subHtml'], timestamp: thisImg['timestamp']});});
+	metadata.images.forEach(thisImg => {dynamicEl.push({src: "/dataHandler.php?type=data&id=" + selectedMenu + "&subid=" + contentId + "&timestamp=" + thisImg['timestamp'],
+		description: thisImg['description'], subHtml: "<b>" + metadata.title + "</b><div class='lgLabel'>" + thisImg['description'] + "</div>",
+		timestamp: thisImg['timestamp']});});
+		
 	lightGalleries["lightbox-" + contentId] = lightGallery(goesImg, {
 		plugins: [lgZoom, lgJumpTo],
 		loop: false,
