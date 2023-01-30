@@ -556,58 +556,56 @@ elseif($_GET['type'] == "metadata")
 	elseif(array_key_exists($_GET['id'], $config['categories']) && array_key_exists('subid', $_GET) && array_key_exists($_GET['subid'], $config['categories'][$_GET['id']]['data']))
 	{
 		//Query looks valid; load from disk if available
-		if(is_dir($config['categories'][$_GET['id']]['data'][$_GET['subid']]['path']))
+		if(!is_dir($config['categories'][$_GET['id']]['data'][$_GET['subid']]['path'])) die("Invalid server config: path for this image type does not exist");
+		$metadata['title'] = $config['categories'][$_GET['id']]['data'][$_GET['subid']]['title'];
+		$metadata['images'] = [];
+		
+		switch($config['categories'][$_GET['id']]['data'][$_GET['subid']]['mode'])
 		{
-			switch($config['categories'][$_GET['id']]['data'][$_GET['subid']]['mode'])
-			{
-				case "begin":
-					$regex = "/(\\\\|\/)(?<date>[0-9]{14})[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
-					$dateFormat = "YmdHis";
-					break;
-				case "beginu":
-					$regex = "/(\\\\|\/)(?<date>[0-9]{8}_[0-9]{6})[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
-					$dateFormat = "Ymd_His";
-					break;
-				case "beginz":
-					$regex = "/(\\\\|\/)(?<date>[0-9]{8}T[0-9]{6}Z)[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
-					$dateFormat = "Ymd\THis\Z";
-					break;
-				case "emwin":
-					$regex = "/_(?<date>[0-9]{14})_[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
-					$dateFormat = "YmdHis";
-					break;
-				case "end":
-					$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*(?<date>[0-9]{14})\..{3}$/i";
-					$dateFormat = "YmdHis";
-					break;
-				case "endu":
-					$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*(?<date>[0-9]{8}_[0-9]{6})\..{3}$/i";
-					$dateFormat = "Ymd_His";
-					break;
-				case "endz":
-					$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*(?<date>[0-9]{8}T[0-9]{6}Z)\..{3}$/i";
-					$dateFormat = "Ymd\THis\Z";
-					break;
-				default: die("Invalid server config: " . $config['categories'][$_GET['id']]['data'][$_GET['subid']]['mode'] . "is not a valid file parser mode!"); break;
-			}
-			
-			$metadata['title'] = $config['categories'][$_GET['id']]['data'][$_GET['subid']]['title'];
-			$metadata['images'] = [];
-			
-			$fileList = scandir_recursive($config['categories'][$_GET['id']]['data'][$_GET['subid']]['path']);
-			foreach($fileList as $file)
-			{
-				if(!preg_match($regex, $file, $regexMatches)) continue;
-				$DateTime = DateTime::createFromFormat($dateFormat, $regexMatches['date'], new DateTimeZone("UTC"));
-				if($DateTime === false) continue;
-				
-				$DateTime->setTimezone(new DateTimeZone(date_default_timezone_get()));
-				$metadata['images'][]['description'] = $DateTime->format('F j, Y g:i A T');
-				$metadata['images'][count($metadata['images']) - 1]['timestamp'] = $DateTime->getTimestamp();
-			}
-			
-			usort($metadata['images'], 'sortByTimestamp');
+			case "begin":
+				$regex = "/(\\\\|\/)(?<date>[0-9]{14})[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
+				$dateFormat = "YmdHis";
+				break;
+			case "beginu":
+				$regex = "/(\\\\|\/)(?<date>[0-9]{8}_[0-9]{6})[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
+				$dateFormat = "Ymd_His";
+				break;
+			case "beginz":
+				$regex = "/(\\\\|\/)(?<date>[0-9]{8}T[0-9]{6}Z)[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
+				$dateFormat = "Ymd\THis\Z";
+				break;
+			case "emwin":
+				$regex = "/_(?<date>[0-9]{14})_[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
+				$dateFormat = "YmdHis";
+				break;
+			case "end":
+				$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*(?<date>[0-9]{14})\..{3}$/i";
+				$dateFormat = "YmdHis";
+				break;
+			case "endu":
+				$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*(?<date>[0-9]{8}_[0-9]{6})\..{3}$/i";
+				$dateFormat = "Ymd_His";
+				break;
+			case "endz":
+				$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*(?<date>[0-9]{8}T[0-9]{6}Z)\..{3}$/i";
+				$dateFormat = "Ymd\THis\Z";
+				break;
+			default: die("Invalid server config: " . $config['categories'][$_GET['id']]['data'][$_GET['subid']]['mode'] . "is not a valid file parser mode!"); break;
 		}
+		
+		$fileList = scandir_recursive($config['categories'][$_GET['id']]['data'][$_GET['subid']]['path']);
+		foreach($fileList as $file)
+		{
+			if(!preg_match($regex, $file, $regexMatches)) continue;
+			$DateTime = DateTime::createFromFormat($dateFormat, $regexMatches['date'], new DateTimeZone("UTC"));
+			if($DateTime === false) continue;
+			
+			$DateTime->setTimezone(new DateTimeZone(date_default_timezone_get()));
+			$metadata['images'][]['description'] = $DateTime->format('F j, Y g:i A T');
+			$metadata['images'][count($metadata['images']) - 1]['timestamp'] = $DateTime->getTimestamp();
+		}
+		
+		usort($metadata['images'], 'sortByTimestamp');
 	}
 	
 	//Nothing matched - request invalid
