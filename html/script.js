@@ -1520,7 +1520,7 @@ function loadImageMetadata(targetedContent)
 				return;
 			}
 			
-			loadImage(targetedContent, metadata);
+			loadImage(targetedContent, metadata.images, metadata.title);
 		}
 		
 		else targetedContent.innerHTML = "The server returned error code " + this.status + "<br /><span class='goeslabel'>" + this.statusText + "</div>";
@@ -1530,10 +1530,10 @@ function loadImageMetadata(targetedContent)
 	xhttp.loadImage.open("GET", "dataHandler.php?type=metadata&id=" + selectedMenu + "&subid=" + targetedContent.id.replace('Content', ''), true);
 	xhttp.loadImage.send();
 }
-function loadImage(targetedContent, metadata)
+function loadImage(targetedContent, metadata, title = "")
 {
 	contentId = targetedContent.id.replace('Content', '');
-	if(metadata.images.length == 0)
+	if(metadata.length == 0)
 	{
 		targetedContent.innerHTML = "<div style='margin-bottom: 5px;'>No images found</div>";
 		return;
@@ -1543,7 +1543,7 @@ function loadImage(targetedContent, metadata)
 	goesImg = document.createElement('img');
 	goesImg.className = "goesimg";
 	goesImg.id = 'lightbox-' + contentId;
-	goesImg.src = "/dataHandler.php?type=data&id=" + selectedMenu + "&subid=" + contentId + "&timestamp=" + metadata.images[metadata.images.length - 1]['timestamp'];
+	goesImg.src = "/dataHandler.php?type=data&id=" + selectedMenu + "&subid=" + contentId + "&timestamp=" + metadata[metadata.length - 1]['timestamp'];
 	goesImg.addEventListener('click', function(event){lightGalleries[event.target.id].openGallery(lightGalleries[event.target.id].galleryItems.length - 1);});
 	goesImg.addEventListener('lgBeforeOpen', function(event){
 		document.getElementsByTagName('body')[0].style.overflow = "hidden";
@@ -1558,13 +1558,18 @@ function loadImage(targetedContent, metadata)
 	
 	goesLabel = document.createElement('div');
 	goesLabel.className = "goeslabel";
-	goesLabel.innerHTML = metadata.images[metadata.images.length - 1]['description'];
+	goesLabel.innerHTML = metadata[metadata.length - 1]['description'];
 	targetedContent.appendChild(goesLabel);
 	
 	dynamicEl = [];
-	metadata.images.forEach(thisImg => {dynamicEl.push({src: "/dataHandler.php?type=data&id=" + selectedMenu + "&subid=" + contentId + "&timestamp=" + thisImg['timestamp'],
-		description: thisImg['description'], subHtml: "<b>" + metadata.title + "</b><div class='lgLabel'>" + thisImg['description'] + "</div>",
-		timestamp: thisImg['timestamp']});});
+	metadata.forEach(thisImg => {
+		if('subHtml' in thisImg) thisSub = thisImg['subHtml'];
+		else thisSub = "<b>" + title + "</b><div class='lgLabel'>" + thisImg['description'] + "</div>";
+		dynamicEl.push({
+			src: "/dataHandler.php?type=data&id=" + selectedMenu + "&subid=" + contentId + "&timestamp=" + thisImg['timestamp'],
+			description: thisImg['description'], subHtml: thisSub, timestamp: thisImg['timestamp']
+		});
+	});
 		
 	lightGalleries["lightbox-" + contentId] = lightGallery(goesImg, {
 		plugins: [lgZoom, lgJumpTo],
