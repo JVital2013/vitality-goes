@@ -405,7 +405,8 @@ function menuSelect(menuSlug)
 		xhttp.weatherJSON = new XMLHttpRequest();
 		xhttp.weatherJSON.onreadystatechange = function()
 		{
-			if(this.readyState == 4 && this.status == 200)
+			if(this.readyState != 4) return;
+			if(this.status == 200)
 			{
 				try{weatherInfo = JSON.parse(this.responseText);}
 				catch(error)
@@ -571,9 +572,18 @@ function menuSelect(menuSlug)
 					Object.keys(weatherInfo.forecast).forEach((key) => {target.innerHTML += "<p><b>" + key + ": </b>" + weatherInfo.forecast[key] + "</p>";});
 					target.innerHTML += "<div class='goeslabel'>Last Update: " + weatherInfo.forecastTime + "</div>";
 				}
-				
-				delete xhttp.weatherJSON;
 			}
+			else
+			{
+				mainContent.innerHTML = "";
+				renderStiffCard("serverError", "The server returned error " + this.status);
+				targetedContent = document.getElementById('serverErrorCardBody');
+				targetedContent.style.textAlign = 'center';
+				targetedContent.innerHTML = this.statusText;
+				mainContent.className = "singleCard";
+			}
+			
+			delete xhttp.weatherJSON;
 		}
 		
 		xhttp.weatherJSON.open("GET", "dataHandler.php?type=weatherJSON", true);
@@ -583,7 +593,8 @@ function menuSelect(menuSlug)
 		xhttp.alertJSON = new XMLHttpRequest();
 		xhttp.alertJSON.onreadystatechange = function()
 		{
-			if(this.readyState == 4 && this.status == 200)
+			if(this.readyState != 4) return;
+			if(this.status == 200)
 			{
 				try{alertInfo = JSON.parse(this.responseText);}
 				catch(error)
@@ -601,9 +612,10 @@ function menuSelect(menuSlug)
 				alertInfo.blueAlerts.forEach(function(element){renderAlert(element, "blue")});
 				alertInfo.amberAlerts.forEach(function(element){renderAlert(element, "amber")});
 				alertInfo.civilDangerWarnings.forEach(function(element){renderAlert(element, "purple")});
-				
-				delete xhttp.alertJSON;
 			}
+			
+			else renderAlert("The server returned status code " + this.statusText + " (" + this.statusText + ") when trying to load weather alerts", "red");
+			delete xhttp.alertJSON;
 		}
 		xhttp.alertJSON.open("GET", "dataHandler.php?type=alertJSON", true);
 		xhttp.alertJSON.send();
@@ -633,7 +645,8 @@ function menuSelect(menuSlug)
 		xhttp.otherEMWIN = new XMLHttpRequest();
 		xhttp.otherEMWIN.onreadystatechange = function()
 		{
-			if(this.readyState == 4 && this.status == 200)
+			if(this.readyState != 4) return;
+			if(this.status == 200)
 			{
 				try{otherEmwinInfo = JSON.parse(this.responseText);}
 				catch(error)
@@ -746,9 +759,18 @@ function menuSelect(menuSlug)
 					adminMessageLastUpdate.innerHTML = "Last Updated: " + otherEmwinInfo.latestAdminDate;
 					target.parentElement.appendChild(adminMessageLastUpdate);
 				}
-				
-				delete xhttp.otherEMWIN;
 			}
+			else
+			{
+				mainContent.innerHTML = "";
+				renderStiffCard("serverError", "The server returned error " + this.status);
+				targetedContent = document.getElementById('serverErrorCardBody');
+				targetedContent.style.textAlign = 'center';
+				targetedContent.innerHTML = this.statusText;
+				mainContent.className = "singleCard";
+			}
+			
+			delete xhttp.otherEMWIN;
 		}
 		xhttp.otherEMWIN.open("GET", "dataHandler.php?type=metadata&id=otherEmwin", true);
 		xhttp.otherEMWIN.send();
@@ -762,7 +784,8 @@ function menuSelect(menuSlug)
 		xhttp.hurricaneInfo = new XMLHttpRequest();
 		xhttp.hurricaneInfo.onreadystatechange = function()
 		{
-			if(this.readyState == 4 && this.status == 200)
+			if(this.readyState != 4) return;
+			if(this.status == 200)
 			{
 				try{hurricaneInfo = JSON.parse(this.responseText);}
 				catch(error)
@@ -841,12 +864,15 @@ function menuSelect(menuSlug)
 						}
 					});
 				}
-				
-				if(mainContent.childElementCount <= 2) mainContent.className = "singleCard";
-				else if(mainContent.childElementCount <= 4) mainContent.className = "dualCard";
-				else mainContent.className = "mainContent";
-				delete xhttp.hurricaneInfo;
 			}
+			else
+			{
+				target = document.getElementById('loadingNoticeCardBody');
+				target.style.textAlign = "center";
+				target.innerHTML = "The server returned error code " + this.status + " (" + this.statusText + ")";
+			}
+			
+			delete xhttp.hurricaneInfo;
 		}
 		xhttp.hurricaneInfo.open("GET", "dataHandler.php?type=hurricaneJSON", true);
 		xhttp.hurricaneInfo.send();
@@ -1048,7 +1074,8 @@ function menuSelect(menuSlug)
 			xhttp.dropdowns = new XMLHttpRequest();
 			xhttp.dropdowns.onreadystatechange = function()
 			{
-				if(this.readyState == 4 && this.status == 200)
+				if(this.readyState != 4) return;
+				if(this.status == 200)
 				{
 					try{returnVal = JSON.parse(this.responseText);}
 					catch(error)
@@ -1115,8 +1142,16 @@ function menuSelect(menuSlug)
 					});
 					
 					target.value = currentSettings[selectedProfile].timezone;
-					delete xhttp.dropdowns;
 				}
+				else
+				{
+					target = document.getElementById('selectedProfileCardBody');
+					target.style.textAlign = 'center';
+					target.innerHTML = "The server returned error code " + this.status + " (" + this.statusText + ")";
+					mainContent.className = "singleCard";
+				}
+				
+				delete xhttp.dropdowns;
 			}
 
 			xhttp.dropdowns.open("GET", "dataHandler.php?type=settings&dropdown=general", true);
@@ -1127,11 +1162,12 @@ function menuSelect(menuSlug)
 		xhttp.theme = new XMLHttpRequest();
 		xhttp.theme.onreadystatechange = function()
 		{
-			if(this.readyState == 4 && this.status == 200)
+			if(this.readyState != 4) return;
+			target = document.getElementById('selectedThemeCardBody');
+			target.innerHTML = "";
+			
+			if(this.status == 200)
 			{
-				target = document.getElementById('selectedThemeCardBody');
-				target.innerHTML = "";
-				
 				try{returnVal = JSON.parse(this.responseText);}
 				catch(error)
 				{
@@ -1160,8 +1196,14 @@ function menuSelect(menuSlug)
 				});
 				
 				target.appendChild(themeSelector);
-				delete xhttp.theme;
 			}
+			else
+			{
+				target.innerHTML = "The server returned error code " + this.status + " (" + this.statusText + ")";
+				target.style.textAlign = "center";
+			}
+			
+			delete xhttp.theme;
 		}
 		
 		xhttp.theme.open("GET", "dataHandler.php?type=settings&dropdown=theme", true);
@@ -1195,10 +1237,12 @@ function menuSelect(menuSlug)
 			xhttp.sysInfo = new XMLHttpRequest();
 			xhttp.sysInfo.onreadystatechange = function()
 			{
-				if(this.readyState == 4 && this.status == 200)
+				if(this.readyState != 4) return;
+				target = document.getElementById('sysCardBody');
+				
+				if(this.status == 200)
 				{
 					//General System Information
-					target = document.getElementById('sysCardBody');
 					try{sysInfo = JSON.parse(this.responseText);}
 					catch(error)
 					{
@@ -1267,14 +1311,18 @@ function menuSelect(menuSlug)
 							});
 						}
 					}
-					
-					delete xhttp.sysInfo;
-					
-					//Fix style based on number of cards
-					if(mainContent.childElementCount <= 2) mainContent.className = "singleCard";
-					else if(mainContent.childElementCount <= 4) mainContent.className = "dualCard";
-					else mainContent.className = "mainContent";
 				}
+				else
+				{
+					target.innerHTML = "The server returned error code " + this.status + " (" + this.statusText + ")";
+					target.style.textAlign = "center";
+					
+					target = document.getElementById('sysTempCardBody');
+					target.parentElement.parentElement.nextSibling.remove();
+					target.parentElement.parentElement.remove();
+				}
+				
+				delete xhttp.sysInfo;
 			}
 			
 			xhttp.sysInfo.open("GET", "dataHandler.php?type=metadata&id=sysInfo", true);
@@ -1331,7 +1379,8 @@ function loadStats(targetedContent)
 		xhttp.loadStats = new XMLHttpRequest();
 		xhttp.loadStats.onreadystatechange = function()
 		{
-			if(this.readyState == 4 && this.status == 200)
+			if(this.readyState != 4) return;
+			if(this.status == 200)
 			{
 				try{metadata = JSON.parse(this.responseText);}
 				catch(error)
@@ -1361,9 +1410,14 @@ function loadStats(targetedContent)
 				description.className = "goeslabel";
 				description.innerHTML = metadata['description'];
 				targetedContent.appendChild(description);
-				
-				delete xhttp.loadStats;
 			}
+			else
+			{
+				targetedContent.innerHTML = "The server returned error code " + this.status + "<br /><span class='goeslabel'>" + this.statusText + "</div>";
+				targetedContent.style.textAlign = 'center';
+			}
+			
+			delete xhttp.loadStats;
 		}
 		
 		xhttp.loadStats.open("GET", "dataHandler.php?type=metadata&id=" + targetedContent.id, true);
@@ -1453,7 +1507,8 @@ function loadImageMetadata(targetedContent)
 	xhttp.loadImage = new XMLHttpRequest();
 	xhttp.loadImage.onreadystatechange = function()
 	{
-		if(this.readyState == 4 && this.status == 200)
+		if(this.readyState != 4) return;
+		if(this.status == 200)
 		{
 			try{metadata = JSON.parse(this.responseText);}
 			catch(error)
@@ -1462,11 +1517,14 @@ function loadImageMetadata(targetedContent)
 				targetedContent.appendChild(document.createTextNode("The server returned bad data: " + this.responseText));
 				targetedContent.className += " otherEmwinBody";
 				delete xhttp.loadImage;
+				return;
 			}
 			
 			loadImage(targetedContent, metadata);
-			delete xhttp.loadImage;
 		}
+		
+		else targetedContent.innerHTML = "The server returned error code " + this.status + "<br /><span class='goeslabel'>" + this.statusText + "</div>";
+		delete xhttp.loadImage;
 	}
 	
 	xhttp.loadImage.open("GET", "dataHandler.php?type=metadata&id=" + selectedMenu + "&subid=" + targetedContent.id.replace('Content', ''), true);
@@ -1575,7 +1633,8 @@ window.addEventListener("load", function()
 	xhttp.preload = new XMLHttpRequest();
 	xhttp.preload.onreadystatechange = function()
 	{
-		if(this.readyState == 4 && this.status == 200)
+		if(this.readyState != 4) return;
+		if(this.status == 200)
 		{
 			try {config = JSON.parse(this.responseText);}
 			catch(error)
@@ -1597,8 +1656,17 @@ window.addEventListener("load", function()
 			if(config.showGraphs || config.showSysInfo) renderMenuItem('systemInfo', 'info-circle', 'System Info');
 	
 			menuSelect(selectedMenu);
-			delete xhttp.preload;
 		}
+		else
+		{
+			renderStiffCard("serverError", "The server returned error " + this.status);
+			targetedContent = document.getElementById('serverErrorCardBody');
+			targetedContent.style.textAlign = 'center';
+			targetedContent.innerHTML = this.statusText;
+			mainContent.className = "singleCard";
+		}
+		
+		delete xhttp.preload;
 	}
 	
 	xhttp.preload.open("GET", "dataHandler.php?type=preload", true);
