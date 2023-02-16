@@ -119,6 +119,11 @@ function renderMenuItem(index, icon, name)
 	newMenuItem.innerHTML = "<div class='menuItemIconHolder'><i class='fa fa-" + icon + "' aria-hidden='true'></i></div><div style='vertical-align: middle; display: inline-block;'>" + name + "</div>";
 	document.getElementById('sideBar').appendChild(newMenuItem);
 }
+function removeCard(target)
+{
+	target.parentElement.parentElement.nextSibling.remove();
+	target.parentElement.parentElement.remove();
+}
 function renderImageCard(slug, color)
 {
 	card = document.createElement('div');
@@ -246,9 +251,6 @@ function renderAlert(content, color)
 	
 	document.getElementById('mainContent').prepend(document.createElement('div'));
 	document.getElementById('mainContent').prepend(message);
-	
-	//Extra Element to Help with Card Flow
-	mainContent.appendChild(document.createElement('div'));
 }
 function renderOtherEmwinContent(slug, index)
 {
@@ -325,6 +327,13 @@ function renderLeftRightLine(target, tempsName, tempsValue)
 	clearDiv = document.createElement('div');
 	clearDiv.style.clear = 'both';
 	target.appendChild(clearDiv);
+}
+function columnCalc()
+{
+	mainContent = document.getElementById('mainContent');
+	if(mainContent.childElementCount <= 2) mainContent.className = "singleCard";
+	else if(mainContent.childElementCount <= 4) mainContent.className = "dualCard";
+	else mainContent.className = "mainContent";
 }
 function getForecastZone(orig)
 {
@@ -496,7 +505,9 @@ function menuSelect(menuSlug)
 				}
 				
 				//Render Radar Card
-				loadLocalRadar(document.getElementById("radarWeatherCardBody"), responseData.localRadarMetadata);
+				target = document.getElementById("radarWeatherCardBody");
+				if(responseData.localRadarMetadata.images.length == 0) removeCard(target);
+				else loadLocalRadar(target, responseData.localRadarMetadata);
 				
 				//Render Weather Card
 				target = document.getElementById("currentWeatherCardBody");
@@ -542,16 +553,17 @@ function menuSelect(menuSlug)
 				if("windGust" in responseData && responseData.windGust != "N/A") renderLeftRightLine(target, "Wind Gust", responseData.windGust);
 				if("remarks" in responseData && responseData.remarks != "") renderLeftRightLine(target, "Remarks", responseData.remarks);
 				
-				if(target.innerHTML == "") target.parentElement.parentElement.style.display = 'none';
+				if(target.innerHTML == "") removeCard(target);
 				else target.innerHTML += "<div class='goeslabel'>Last Update: " + responseData.weatherTime + "</div>";
 				
 				//Weather Summary
-				if(responseData.summary == "") document.getElementById("summaryWeatherCardBody").parentElement.parentElement.style.display = 'none';
+				target = document.getElementById("summaryWeatherCardBody");
+				if(responseData.summary == "") removeCard(target);
 				else document.getElementById("summaryWeatherCardBody").innerHTML = responseData.summary + "<div class='goeslabel'>Last Update: " + responseData.summaryTime + "</div>";
 				
 				//7 day forcast
 				target = document.getElementById("sevenDayWeatherCardBody");
-				if(responseData.sevenDayForcast.length == 0) target.parentElement.parentElement.style.display = 'none';
+				if(responseData.sevenDayForcast.length == 0) removeCard(target);
 				else
 				{
 					target.innerHTML = "";
@@ -624,7 +636,7 @@ function menuSelect(menuSlug)
 				
 				//Forecast
 				target = document.getElementById("forecastWeatherCardBody");
-				if(responseData.forecast.length == 0) target.parentElement.parentElement.style.display = 'none';
+				if(responseData.forecast.length == 0) removeCard(target);
 				else
 				{
 					target.previousSibling.innerHTML += " - " + toTitleCase(responseData.city) + ", " + responseData.state;
@@ -644,6 +656,7 @@ function menuSelect(menuSlug)
 			}
 			
 			delete xhttp.weatherJSON;
+			columnCalc();
 		}
 		
 		xhttp.weatherJSON.open("GET", "dataHandler.php?type=weatherJSON", true);
@@ -676,6 +689,7 @@ function menuSelect(menuSlug)
 			
 			else renderAlert("The server returned status code " + this.statusText + " (" + this.statusText + ") when trying to load weather alerts", "red");
 			delete xhttp.alertJSON;
+			columnCalc();
 		}
 		xhttp.alertJSON.open("GET", "dataHandler.php?type=alertJSON", true);
 		xhttp.alertJSON.send();
@@ -890,6 +904,8 @@ function menuSelect(menuSlug)
 							thisCardBody.appendChild(fdItem);
 						}
 					});
+					
+					columnCalc();
 				}
 			}
 			else
@@ -1278,17 +1294,12 @@ function menuSelect(menuSlug)
 						target.className += " otherEmwinBody";
 						
 						target = document.getElementById('sysTempCardBody');
-						target.parentElement.parentElement.nextSibling.remove();
-						target.parentElement.parentElement.remove();
+						removeCard(target);
 						delete xhttp.sysInfo;
 						return;
 					}
 					
-					if(responseData.sysData.length == 0)
-					{
-						target.parentElement.parentElement.nextSibling.remove();
-						target.parentElement.parentElement.remove();
-					}
+					if(responseData.sysData.length == 0) removeCard(target);
 					else
 					{
 						target.innerHTML = "";
@@ -1297,11 +1308,7 @@ function menuSelect(menuSlug)
 					
 					//Temp Info
 					target = document.getElementById('sysTempCardBody');
-					if(responseData.tempData.length == 0)
-					{
-						target.parentElement.parentElement.nextSibling.remove();
-						target.parentElement.parentElement.remove();
-					}
+					if(responseData.tempData.length == 0) removeCard(target);
 					else
 					{
 						target.innerHTML = "";
@@ -1345,8 +1352,7 @@ function menuSelect(menuSlug)
 					target.style.textAlign = "center";
 					
 					target = document.getElementById('sysTempCardBody');
-					target.parentElement.parentElement.nextSibling.remove();
-					target.parentElement.parentElement.remove();
+					removeCard(target);
 				}
 				
 				delete xhttp.sysInfo;
@@ -1366,11 +1372,7 @@ function menuSelect(menuSlug)
 			}
 			break;
 	}
-	
-	//Change styling for specific screens
-	if(mainContent.childElementCount <= 2) mainContent.className = "singleCard";
-	else if(mainContent.childElementCount <= 4) mainContent.className = "dualCard";
-	else mainContent.className = "mainContent";
+	columnCalc();
 }
 
 function showCollapseCard(event)
