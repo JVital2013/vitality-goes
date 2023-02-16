@@ -266,13 +266,14 @@ elseif($_GET['type'] == "metadata")
 			$allEmwinFiles = scandir_recursive($config['general']['emwinPath']);
 			
 			//Load pertinent pieces of information where for cards with all available information
-			$spaceWeatherMessages = $radarOutages = $adminAlertList = $adminRegionalList = [];
+			$spaceWeatherMessages = $radarOutages = $sdmOpsList = $adminAlertList = $adminRegionalList = [];
 			$alertStateAbbrs = "(" . implode('|', array_unique(array($currentSettings[$selectedProfile]['stateAbbr'], substr($currentSettings[$selectedProfile]['orig'], -2), substr($currentSettings[$selectedProfile]['rwrOrig'], -2)))) . ")";
 			foreach($allEmwinFiles as $thisFile)
 			{
 				if(strpos($thisFile, "-ALT") !== false || strpos($thisFile, "-WAT") !== false) $spaceWeatherMessages[] = $thisFile;
 				if(preg_match("/-FTM.*$alertStateAbbrs\.TXT$/", $thisFile)) $radarOutages[] = $thisFile;
 				if(strpos($thisFile, "-ADA") !== false) $adminAlertList[] = $thisFile;
+				if(strpos($thisFile, "-ADMSDM") !== false) $sdmOpsList[] = $thisFile;
 				if(strpos($thisFile, "-ADR") !== false) $adminRegionalList[] = $thisFile;
 			}
 			
@@ -287,6 +288,12 @@ elseif($_GET['type'] == "metadata")
 			$metadata['radarOutages'] = [];
 			if(count($radarOutages) == 0) $metadata['radarOutages'][] = "<div style='text-align: center; font-weight: bold; font-size: 13pt;'>No Messages</div>";
 			foreach($radarOutages as $radarOutage) $metadata['radarOutages'][] = linesToParagraphs(file($radarOutage), 3);
+			
+			//SDM Ops Status Messages
+			usort($sdmOpsList, "sortEMWIN");
+			$metadata['sdmOps'] = [];
+			if(count($sdmOpsList) == 0) $metadata['sdmOps'][] = "<div style='text-align: center; font-weight: bold; font-size: 13pt;'>No Messages</div>";
+			foreach($sdmOpsList as $sdmOpsMsg) $metadata['sdmOps'][] = linesToParagraphs(file($sdmOpsMsg), 3);
 			
 			//EMWIN Administrative Alerts
 			usort($adminAlertList, "sortEMWIN");

@@ -635,6 +635,7 @@ function menuSelect(menuSlug)
 		{
 			renderCollapsingCard("spaceWeatherMessage", "Space Weather Messages", "prettyBoxContent noPadding", "weatherBody");
 			renderCollapsingCard("radarOutage", "Local Radar Outages", "prettyBoxContent noPadding", "weatherBody");
+			renderCollapsingCard("sdmOps", "SDM Ops Status Messages", "prettyBoxContent noPadding", "weatherBody");
 			renderCollapsingCard("adminAlert", "EMWIN Admin Alerts", "prettyBoxContent noPadding", "weatherBody");
 			renderCollapsingCard("adminRegional", "EMWIN Regional Admin Message", "prettyBoxContent noPadding", "weatherBody");
 			renderCollapsingCard("satelliteTle", "Weather Satellite TLE", "prettyBoxContent", "weatherBody");
@@ -677,6 +678,16 @@ function menuSelect(menuSlug)
 					target = document.getElementById('radarOutageContent').firstChild;
 					target.innerHTML = "";
 					otherEmwinInfo.radarOutages.forEach((element) => {
+						newAlert = document.createElement('div');
+						newAlert.className = 'prettyBoxList';
+						newAlert.innerHTML = element;
+						target.appendChild(newAlert);
+					});
+					
+					//SDM Ops Status Messages
+					target = document.getElementById('sdmOpsContent').firstChild;
+					target.innerHTML = "";
+					otherEmwinInfo.sdmOps.forEach((element) => {
 						newAlert = document.createElement('div');
 						newAlert.className = 'prettyBoxList';
 						newAlert.innerHTML = element;
