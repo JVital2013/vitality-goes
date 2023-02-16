@@ -162,7 +162,7 @@ function sortEMWIN($a, $b)
 	$explodedB = explode("_", basename($b));
 	
 	if(count($explodedA) != 6 || count($explodedB) != 6) return 0;
-	return $explodedB[4] - $explodedA[4];
+	return $explodedA[4] - $explodedB[4];
 }
 
 function sortByBasename($a, $b)

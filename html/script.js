@@ -20,7 +20,7 @@
 var sideBar = false;
 var lightGalleries = [];
 var xhttp = [];
-var config;
+var config, responseData;
 
 //Load current state from sessionStorage
 var selectedMenu = sessionStorage.getItem('selectedMenu');
@@ -52,7 +52,7 @@ function getCookie(name)
 }
 function setCookie(name, value)
 {
-	var e = new Date;
+	e = new Date;
 	e.setDate(e.getDate() + 365);
 	document.cookie = name + "=" + encodeURIComponent(value) + ';expires=' + e.toUTCString() + ';path=/;domain=.' + document.domain;
 }
@@ -250,6 +250,66 @@ function renderAlert(content, color)
 	//Extra Element to Help with Card Flow
 	mainContent.appendChild(document.createElement('div'));
 }
+function renderOtherEmwinContent(slug, index)
+{
+	//Build the GUI on first load
+	document.getElementById(slug + 'Content').className = 'prettyBoxContent noPadding';
+	target = document.getElementById(slug + 'Content').firstChild;
+	if(target.innerHTML == "Loading, please wait...")
+	{
+		if(responseData[slug].length == 0)
+		{
+			target.innerHTML = "<div class='prettyBoxList' style='text-align: center; font-weight: bold; font-size: 13pt;'>No Messages</div>";
+			return;
+		}
+		
+		target.innerHTML = "";
+		messageHolder = document.createElement('div');
+		messageHolder.id = slug + "MessageHolder";
+		messageHolder.className = "prettyBoxList";
+		target.appendChild(messageHolder);
+		
+		navigationHolder = document.createElement('div');
+		navigationHolder.className = 'prettyBoxList otherEmwinNavigation';
+		goBack = document.createElement('div');
+		goBack.id = slug + "GoBack";
+		goBack.className = 'otherEmwinNavigationArrow';
+		goBack.innerHTML = "<i class='fa fa-chevron-left'></i>";
+		goBack.addEventListener('click', otherEmwinNavAction);
+		navigationHolder.appendChild(goBack);
+		
+		numIndicator = document.createElement('div');
+		numIndicator.className = "otherEmwinNumIndicator";
+		numIndicator.id = slug + "NumIndicator";
+		navigationHolder.appendChild(numIndicator);
+		
+		goForward = document.createElement('div');
+		goForward.id = slug + "GoForward";
+		goForward.className = 'otherEmwinNavigationArrow';
+		goForward.innerHTML = "<i class='fa fa-chevron-right'></i>";
+		goForward.addEventListener('click', otherEmwinNavAction);
+		navigationHolder.appendChild(goForward);
+		target.appendChild(navigationHolder);
+	}
+	
+	//Display the message
+	document.getElementById(slug + "MessageHolder").innerHTML = responseData[slug][index];
+	document.getElementById(slug + "NumIndicator").innerHTML = "Message " + (index + 1) + " / " + responseData[slug].length;
+	
+	goBack = document.getElementById(slug + "GoBack");
+	goForward = document.getElementById(slug + "GoForward");
+	if(index == 0) goBack.className = 'otherEmwinNavigationArrow disabled';
+	else goBack.className = 'otherEmwinNavigationArrow';
+	if(index == responseData[slug].length - 1) goForward.className = 'otherEmwinNavigationArrow disabled';
+	else goForward.className = 'otherEmwinNavigationArrow';
+}
+function otherEmwinNavAction(event)
+{
+	forward = /GoForward$/.test(event.currentTarget.id);
+	slug = event.currentTarget.id.replace((forward ? "GoForward" : "GoBack"), '');
+	goToMsg = parseInt(document.getElementById(slug + "NumIndicator").innerHTML.match(/^Message ([0-9]+)/)[1]) - 1 + (forward ? 1 : -1);
+	if(goToMsg >= 0 && goToMsg < responseData[slug].length) renderOtherEmwinContent(slug, goToMsg);
+}
 function renderLeftRightLine(target, tempsName, tempsValue)
 {
 	nameSide = document.createElement('div');
@@ -408,7 +468,7 @@ function menuSelect(menuSlug)
 			if(this.readyState != 4) return;
 			if(this.status == 200)
 			{
-				try{weatherInfo = JSON.parse(this.responseText);}
+				try{responseData = JSON.parse(this.responseText);}
 				catch(error)
 				{
 					mainContent.innerHTML = "";
@@ -422,13 +482,13 @@ function menuSelect(menuSlug)
 				}
 				
 				//Weather Alert
-				if(weatherInfo.alert != "")
+				if(responseData.alert != "")
 				{
 					weatherAlert = document.createElement('div');
 					weatherAlert.className = "prettyBox weatherAlert teal";
 					weatherAlertContent = document.createElement('div');
 					weatherAlertContent.className = "prettyBoxContent";
-					weatherAlertContent.innerHTML = weatherInfo.alert;
+					weatherAlertContent.innerHTML = responseData.alert;
 					weatherAlert.appendChild(weatherAlertContent);
 					
 					document.getElementById('mainContent').prepend(document.createElement('div'));
@@ -436,17 +496,17 @@ function menuSelect(menuSlug)
 				}
 				
 				//Render Radar Card
-				loadLocalRadar(document.getElementById("radarWeatherCardBody"), weatherInfo.localRadarMetadata);
+				loadLocalRadar(document.getElementById("radarWeatherCardBody"), responseData.localRadarMetadata);
 				
 				//Render Weather Card
 				target = document.getElementById("currentWeatherCardBody");
-				target.previousSibling.innerHTML += " - " + toTitleCase(weatherInfo.city) + ", " + weatherInfo.state;
+				target.previousSibling.innerHTML += " - " + toTitleCase(responseData.city) + ", " + responseData.state;
 				target.innerHTML = "";
 				
-				if("weatherDesc" in weatherInfo)
+				if("weatherDesc" in responseData)
 				{
-					conditions = weatherInfo.weatherDesc;
-					switch(weatherInfo.weatherDesc)
+					conditions = responseData.weatherDesc;
+					switch(responseData.weatherDesc)
 					{
 						case "CLEAR": conditions = "Clear"; break;
 						case "SUNNY": conditions = "Sunny"; break;
@@ -474,31 +534,31 @@ function menuSelect(menuSlug)
 					renderLeftRightLine(target, "Weather", conditions);
 				}
 				
-				if("temp" in weatherInfo) renderLeftRightLine(target, "Temperature", weatherInfo.temp + "&deg; F");
-				if("humidity" in weatherInfo) renderLeftRightLine(target, "Humidity", weatherInfo.humidity + "%");
-				if("dewPoint" in weatherInfo) renderLeftRightLine(target, "Dew Point", weatherInfo.dewPoint + "&deg; F");
-				if("pressure" in weatherInfo) renderLeftRightLine(target, "Barometric Pressure", weatherInfo.pressure);
-				if("wind" in weatherInfo && "windDirection" in weatherInfo) renderLeftRightLine(target, "Wind", (weatherInfo.wind == 0 ? "Calm" : weatherInfo.windDirection + ", " + weatherInfo.wind + " MPH"));
-				if("windGust" in weatherInfo && weatherInfo.windGust != "N/A") renderLeftRightLine(target, "Wind Gust", weatherInfo.windGust);
-				if("remarks" in weatherInfo && weatherInfo.remarks != "") renderLeftRightLine(target, "Remarks", weatherInfo.remarks);
+				if("temp" in responseData) renderLeftRightLine(target, "Temperature", responseData.temp + "&deg; F");
+				if("humidity" in responseData) renderLeftRightLine(target, "Humidity", responseData.humidity + "%");
+				if("dewPoint" in responseData) renderLeftRightLine(target, "Dew Point", responseData.dewPoint + "&deg; F");
+				if("pressure" in responseData) renderLeftRightLine(target, "Barometric Pressure", responseData.pressure);
+				if("wind" in responseData && "windDirection" in responseData) renderLeftRightLine(target, "Wind", (responseData.wind == 0 ? "Calm" : responseData.windDirection + ", " + responseData.wind + " MPH"));
+				if("windGust" in responseData && responseData.windGust != "N/A") renderLeftRightLine(target, "Wind Gust", responseData.windGust);
+				if("remarks" in responseData && responseData.remarks != "") renderLeftRightLine(target, "Remarks", responseData.remarks);
 				
 				if(target.innerHTML == "") target.parentElement.parentElement.style.display = 'none';
-				else target.innerHTML += "<div class='goeslabel'>Last Update: " + weatherInfo.weatherTime + "</div>";
+				else target.innerHTML += "<div class='goeslabel'>Last Update: " + responseData.weatherTime + "</div>";
 				
 				//Weather Summary
-				if(weatherInfo.summary == "") document.getElementById("summaryWeatherCardBody").parentElement.parentElement.style.display = 'none';
-				else document.getElementById("summaryWeatherCardBody").innerHTML = weatherInfo.summary + "<div class='goeslabel'>Last Update: " + weatherInfo.summaryTime + "</div>";
+				if(responseData.summary == "") document.getElementById("summaryWeatherCardBody").parentElement.parentElement.style.display = 'none';
+				else document.getElementById("summaryWeatherCardBody").innerHTML = responseData.summary + "<div class='goeslabel'>Last Update: " + responseData.summaryTime + "</div>";
 				
 				//7 day forcast
 				target = document.getElementById("sevenDayWeatherCardBody");
-				if(weatherInfo.sevenDayForcast.length == 0) target.parentElement.parentElement.style.display = 'none';
+				if(responseData.sevenDayForcast.length == 0) target.parentElement.parentElement.style.display = 'none';
 				else
 				{
 					target.innerHTML = "";
 					sevenDayForcastContainer = document.createElement('div');
 					sevenDayForcastContainer.className = "forcastCardHolder";
 					
-					weatherInfo.sevenDayForcast.forEach(todaysForcast => {
+					responseData.sevenDayForcast.forEach(todaysForcast => {
 						forcastCard = document.createElement('div');
 						forcastCard.className = 'forecastCard';
 						forcastCard.innerHTML = "<div class='forecastHeader'>" + todaysForcast.date + "</div>";
@@ -557,20 +617,20 @@ function menuSelect(menuSlug)
 					
 					sevenDayForecastLastUpdate = document.createElement('div');
 					sevenDayForecastLastUpdate.className = "goeslabel";
-					sevenDayForecastLastUpdate.innerHTML = "Last Update: " + weatherInfo.sevenDayForecastDate;
+					sevenDayForecastLastUpdate.innerHTML = "Last Update: " + responseData.sevenDayForecastDate;
 					target.appendChild(sevenDayForecastLastUpdate);
 				}
 				
 				
 				//Forecast
 				target = document.getElementById("forecastWeatherCardBody");
-				if(weatherInfo.forecast.length == 0) target.parentElement.parentElement.style.display = 'none';
+				if(responseData.forecast.length == 0) target.parentElement.parentElement.style.display = 'none';
 				else
 				{
-					target.previousSibling.innerHTML += " - " + toTitleCase(weatherInfo.city) + ", " + weatherInfo.state;
+					target.previousSibling.innerHTML += " - " + toTitleCase(responseData.city) + ", " + responseData.state;
 					target.innerHTML = "";
-					Object.keys(weatherInfo.forecast).forEach((key) => {target.innerHTML += "<p><b>" + key + ": </b>" + weatherInfo.forecast[key] + "</p>";});
-					target.innerHTML += "<div class='goeslabel'>Last Update: " + weatherInfo.forecastTime + "</div>";
+					Object.keys(responseData.forecast).forEach((key) => {target.innerHTML += "<p><b>" + key + ": </b>" + responseData.forecast[key] + "</p>";});
+					target.innerHTML += "<div class='goeslabel'>Last Update: " + responseData.forecastTime + "</div>";
 				}
 			}
 			else
@@ -633,11 +693,11 @@ function menuSelect(menuSlug)
 		
 		if(config.showEmwinInfo)
 		{
-			renderCollapsingCard("spaceWeatherMessage", "Space Weather Messages", "prettyBoxContent noPadding", "weatherBody");
-			renderCollapsingCard("radarOutage", "Local Radar Outages", "prettyBoxContent noPadding", "weatherBody");
-			renderCollapsingCard("sdmOps", "SDM Ops Status Messages", "prettyBoxContent noPadding", "weatherBody");
-			renderCollapsingCard("adminAlert", "EMWIN Admin Alerts", "prettyBoxContent noPadding", "weatherBody");
-			renderCollapsingCard("adminRegional", "EMWIN Regional Admin Message", "prettyBoxContent noPadding", "weatherBody");
+			renderCollapsingCard("sdmOps", "SDM Ops Status Messages", "prettyBoxContent", "weatherBody");
+			renderCollapsingCard("spaceWeatherMessages", "Space Weather Messages", "prettyBoxContent", "weatherBody");
+			renderCollapsingCard("radarOutages", "Local Radar Outages", "prettyBoxContent", "weatherBody");
+			renderCollapsingCard("adminAlerts", "EMWIN Admin Alerts", "prettyBoxContent", "weatherBody");
+			renderCollapsingCard("adminRegional", "EMWIN Regional Admin Message", "prettyBoxContent", "weatherBody");
 			renderCollapsingCard("satelliteTle", "Weather Satellite TLE", "prettyBoxContent", "weatherBody");
 			renderCollapsingCard("emwinLicense", "EMWIN Licensing Info", "prettyBoxContent", "weatherBody");
 		}
@@ -649,7 +709,7 @@ function menuSelect(menuSlug)
 			if(this.readyState != 4) return;
 			if(this.status == 200)
 			{
-				try{otherEmwinInfo = JSON.parse(this.responseText);}
+				try{responseData = JSON.parse(this.responseText);}
 				catch(error)
 				{
 					mainContent.innerHTML = "";
@@ -664,63 +724,19 @@ function menuSelect(menuSlug)
 				
 				if(config.showEmwinInfo)
 				{
-					//Space Weather Messages
-					target = document.getElementById('spaceWeatherMessageContent').firstChild;
-					target.innerHTML = "";
-					otherEmwinInfo.spaceWeatherMessages.forEach((element) => {
-						newAlert = document.createElement('div');
-						newAlert.className = 'prettyBoxList';
-						newAlert.innerHTML = element;
-						target.appendChild(newAlert);
-					});
-					
-					//Radar Outages
-					target = document.getElementById('radarOutageContent').firstChild;
-					target.innerHTML = "";
-					otherEmwinInfo.radarOutages.forEach((element) => {
-						newAlert = document.createElement('div');
-						newAlert.className = 'prettyBoxList';
-						newAlert.innerHTML = element;
-						target.appendChild(newAlert);
-					});
-					
-					//SDM Ops Status Messages
-					target = document.getElementById('sdmOpsContent').firstChild;
-					target.innerHTML = "";
-					otherEmwinInfo.sdmOps.forEach((element) => {
-						newAlert = document.createElement('div');
-						newAlert.className = 'prettyBoxList';
-						newAlert.innerHTML = element;
-						target.appendChild(newAlert);
-					});
-					
-					//EMWIN Admin Alerts
-					target = document.getElementById('adminAlertContent').firstChild;
-					target.innerHTML = "";
-					otherEmwinInfo.adminAlerts.forEach((element) => {
-						newAlert = document.createElement('div');
-						newAlert.className = 'prettyBoxList';
-						newAlert.innerHTML = element;
-						target.appendChild(newAlert);
-					});
-					
-					//EMWIN Regional Alerts
-					target = document.getElementById('adminRegionalContent').firstChild;
-					target.innerHTML = "";
-					otherEmwinInfo.adminRegional.forEach((element) => {
-						newAlert = document.createElement('div');
-						newAlert.className = 'prettyBoxList';
-						newAlert.innerHTML = element;
-						target.appendChild(newAlert);
-					});
+					renderOtherEmwinContent('sdmOps', responseData.sdmOps.length - 1);
+					renderOtherEmwinContent('radarOutages', responseData.radarOutages.length - 1);
+					renderOtherEmwinContent('spaceWeatherMessages', responseData.spaceWeatherMessages.length - 1);
+					renderOtherEmwinContent('adminRegional', responseData.adminRegional.length - 1);
+					renderOtherEmwinContent('adminAlerts', responseData.adminAlerts.length - 1);
 					
 					//Weather Satellite TLE
 					target = document.getElementById('satelliteTleContent').firstChild;
-					if(otherEmwinInfo.satelliteTle.length == 0) target.innerHTML = "<div style='text-align: center; font-weight: bold; font-size: 13pt;'>Satellite TLEs are currently unavailable</div>";
+					if(responseData.satelliteTle.length == 0) target.innerHTML = "<div style='text-align: center; font-weight: bold; font-size: 13pt;'>Satellite TLEs are currently unavailable</div>";
 					else
 					{
 						target.innerHTML = "<p style='font-weight: bold;'>TLEs for the following satellites are available from GOES</p>";
-						otherEmwinInfo.satelliteTle.forEach((element) => {
+						responseData.satelliteTle.forEach((element) => {
 							newSatellite = document.createElement('div');
 							newSatellite.style.width = 'calc(49% - 10px)';
 							newSatellite.style.display = 'inline-block';
@@ -745,17 +761,17 @@ function menuSelect(menuSlug)
 						
 						satelliteTleLastUpdate = document.createElement('div');
 						satelliteTleLastUpdate.className = "goeslabel";
-						satelliteTleLastUpdate.innerHTML = "Last Broadcast: " + otherEmwinInfo.satelliteTleDate;
+						satelliteTleLastUpdate.innerHTML = "Last Broadcast: " + responseData.satelliteTleDate;
 						target.parentElement.appendChild(satelliteTleLastUpdate);
 					}
 					
 					//EMWIN Licensing Info
 					target = document.getElementById('emwinLicenseContent').firstChild;
-					target.innerHTML = otherEmwinInfo.emwinLicense;
+					target.innerHTML = responseData.emwinLicense;
 					
 					adminMessageLastUpdate = document.createElement('div');
 					adminMessageLastUpdate.className = "goeslabel";
-					adminMessageLastUpdate.innerHTML = "Last Broadcast: " + otherEmwinInfo.emwinLicenseDate;
+					adminMessageLastUpdate.innerHTML = "Last Broadcast: " + responseData.emwinLicenseDate;
 					target.parentElement.appendChild(adminMessageLastUpdate);
 				}
 				
@@ -763,11 +779,11 @@ function menuSelect(menuSlug)
 				{
 					//Latest Admin message
 					target = document.getElementById('adminMessageContent').firstChild;
-					target.innerHTML = otherEmwinInfo.latestAdmin;
+					target.innerHTML = responseData.latestAdmin;
 					
 					adminMessageLastUpdate = document.createElement('div');
 					adminMessageLastUpdate.className = "goeslabel";
-					adminMessageLastUpdate.innerHTML = "Last Updated: " + otherEmwinInfo.latestAdminDate;
+					adminMessageLastUpdate.innerHTML = "Last Updated: " + responseData.latestAdminDate;
 					target.parentElement.appendChild(adminMessageLastUpdate);
 				}
 			}
@@ -798,7 +814,7 @@ function menuSelect(menuSlug)
 			if(this.readyState != 4) return;
 			if(this.status == 200)
 			{
-				try{hurricaneInfo = JSON.parse(this.responseText);}
+				try{responseData = JSON.parse(this.responseText);}
 				catch(error)
 				{
 					target = document.getElementById('loadingNoticeCardBody');
@@ -810,61 +826,61 @@ function menuSelect(menuSlug)
 					return;
 				}
 				
-				if(Object.keys(hurricaneInfo).length == 0)
+				if(Object.keys(responseData).length == 0)
 				{
 					document.getElementById('loadingNoticeCardBody').innerHTML = "<div style='text-align: center;'>No tropical activity at this time</div>";
 				}
 				else
 				{
 					mainContent.innerHTML = "";
-					Object.keys(hurricaneInfo).forEach(thisHurricane => {
-						renderCollapsingCard(thisHurricane, hurricaneInfo[thisHurricane].title, "prettyBoxContent noPadding", "weatherBody");
+					Object.keys(responseData).forEach(thisHurricane => {
+						renderCollapsingCard(thisHurricane, responseData[thisHurricane].title, "prettyBoxContent noPadding", "weatherBody");
 						thisCardBody = document.getElementById(thisHurricane + "Content").firstChild;
 						thisCardBody.innerHTML = "";
 						
 						//Display advisory information if we have it
-						if("latestAdvisory" in hurricaneInfo[thisHurricane])
+						if("latestAdvisory" in responseData[thisHurricane])
 						{
 							advisoryItem = document.createElement('div');
 							advisoryItem.className = 'prettyBoxList';
 
-							if("latestAdvTime" in hurricaneInfo[thisHurricane]) renderLeftRightLine(advisoryItem, "Advisory Time", hurricaneInfo[thisHurricane].latestAdvTime);
-							renderLeftRightLine(advisoryItem, "Advisory Number", hurricaneInfo[thisHurricane].latestAdvisory);
-							if("position" in hurricaneInfo[thisHurricane]) renderLeftRightLine(advisoryItem, "Position", hurricaneInfo[thisHurricane].position);
-							if("movement" in hurricaneInfo[thisHurricane]) renderLeftRightLine(advisoryItem, "Moving", hurricaneInfo[thisHurricane].movement);
-							if("pressure" in hurricaneInfo[thisHurricane]) renderLeftRightLine(advisoryItem, "Pressure", hurricaneInfo[thisHurricane].pressure);
-							if("maxWind" in hurricaneInfo[thisHurricane]) renderLeftRightLine(advisoryItem, "Max Winds", hurricaneInfo[thisHurricane].maxWind);
-							if("status" in hurricaneInfo[thisHurricane]) renderLeftRightLine(advisoryItem, "Status", hurricaneInfo[thisHurricane].status);
-							if("nextMessage" in hurricaneInfo[thisHurricane]) renderLeftRightLine(advisoryItem, "Next Message", hurricaneInfo[thisHurricane].nextMessage);
+							if("latestAdvTime" in responseData[thisHurricane]) renderLeftRightLine(advisoryItem, "Advisory Time", responseData[thisHurricane].latestAdvTime);
+							renderLeftRightLine(advisoryItem, "Advisory Number", responseData[thisHurricane].latestAdvisory);
+							if("position" in responseData[thisHurricane]) renderLeftRightLine(advisoryItem, "Position", responseData[thisHurricane].position);
+							if("movement" in responseData[thisHurricane]) renderLeftRightLine(advisoryItem, "Moving", responseData[thisHurricane].movement);
+							if("pressure" in responseData[thisHurricane]) renderLeftRightLine(advisoryItem, "Pressure", responseData[thisHurricane].pressure);
+							if("maxWind" in responseData[thisHurricane]) renderLeftRightLine(advisoryItem, "Max Winds", responseData[thisHurricane].maxWind);
+							if("status" in responseData[thisHurricane]) renderLeftRightLine(advisoryItem, "Status", responseData[thisHurricane].status);
+							if("nextMessage" in responseData[thisHurricane]) renderLeftRightLine(advisoryItem, "Next Message", responseData[thisHurricane].nextMessage);
 							
 							thisCardBody.appendChild(advisoryItem);
 						}
 						
 						//RS images
-						if("RS" in hurricaneInfo[thisHurricane])
+						if("RS" in responseData[thisHurricane])
 						{
 							rsItem = document.createElement('div');
 							rsItem.className = 'prettyBoxList';
 							thisCardBody.appendChild(rsItem);
-							loadHurricane(rsItem, "RS", thisHurricane, hurricaneInfo[thisHurricane].title, hurricaneInfo[thisHurricane].RS);
+							loadHurricane(rsItem, "RS", thisHurricane, responseData[thisHurricane].title, responseData[thisHurricane].RS);
 						}
 						
 						//WS images
-						if("WS" in hurricaneInfo[thisHurricane])
+						if("WS" in responseData[thisHurricane])
 						{
 							wsItem = document.createElement('div');
 							wsItem.className = 'prettyBoxList';
 							thisCardBody.appendChild(wsItem);
-							loadHurricane(wsItem, "WS", thisHurricane, hurricaneInfo[thisHurricane].title, hurricaneInfo[thisHurricane].WS);
+							loadHurricane(wsItem, "WS", thisHurricane, responseData[thisHurricane].title, responseData[thisHurricane].WS);
 						}
 						
 						//5D images
-						if("5D" in hurricaneInfo[thisHurricane])
+						if("5D" in responseData[thisHurricane])
 						{
 							fdItem = document.createElement('div');
 							fdItem.className = 'prettyBoxList';
 							fdItem.style.paddingTop = "5px";
-							loadHurricane(fdItem, "5D", thisHurricane, hurricaneInfo[thisHurricane].title, hurricaneInfo[thisHurricane]["5D"]);
+							loadHurricane(fdItem, "5D", thisHurricane, responseData[thisHurricane].title, responseData[thisHurricane]["5D"]);
 							
 							fdHeader = document.createElement('div');
 							fdHeader.className = 'hurricaneForecastHeader';
@@ -1254,7 +1270,7 @@ function menuSelect(menuSlug)
 				if(this.status == 200)
 				{
 					//General System Information
-					try{sysInfo = JSON.parse(this.responseText);}
+					try{responseData = JSON.parse(this.responseText);}
 					catch(error)
 					{
 						target.innerHTML = "";
@@ -1268,7 +1284,7 @@ function menuSelect(menuSlug)
 						return;
 					}
 					
-					if(sysInfo.sysData.length == 0)
+					if(responseData.sysData.length == 0)
 					{
 						target.parentElement.parentElement.nextSibling.remove();
 						target.parentElement.parentElement.remove();
@@ -1276,12 +1292,12 @@ function menuSelect(menuSlug)
 					else
 					{
 						target.innerHTML = "";
-						sysInfo.sysData.forEach((sysValue) => {renderLeftRightLine(target, sysValue.name, sysValue.value);});
+						responseData.sysData.forEach((sysValue) => {renderLeftRightLine(target, sysValue.name, sysValue.value);});
 					}
 					
 					//Temp Info
 					target = document.getElementById('sysTempCardBody');
-					if(sysInfo.tempData.length == 0)
+					if(responseData.tempData.length == 0)
 					{
 						target.parentElement.parentElement.nextSibling.remove();
 						target.parentElement.parentElement.remove();
@@ -1289,18 +1305,18 @@ function menuSelect(menuSlug)
 					else
 					{
 						target.innerHTML = "";
-						sysInfo.tempData.forEach((tempValue) => {renderLeftRightLine(target, tempValue.name, tempValue.value);});
+						responseData.tempData.forEach((tempValue) => {renderLeftRightLine(target, tempValue.name, tempValue.value);});
 					}
 					
 					//SatDump Info
 					if(config.showSatdumpInfo)
 					{
 						target = document.getElementById('satDumpInfoCardBody');
-						if(sysInfo.satdumpData.length == 0) target.innerHTML = "<div style='text-align: center;'>SatDump Statistics Unavailable!</div>";
+						if(responseData.satdumpData.length == 0) target.innerHTML = "<div style='text-align: center;'>SatDump Statistics Unavailable!</div>";
 						else
 						{
 							target.innerHTML = "";
-							sysInfo.satdumpData.forEach((value) => {
+							responseData.satdumpData.forEach((value) => {
 								satdumpDataTitle = document.createElement('div');
 								satdumpDataTitle.className = 'prettyBoxList';
 								satdumpDataTitle.style.padding = 0;
@@ -1635,7 +1651,7 @@ function switchRadarView(event)
 	} while(sibling != null);
 	me.classList.add("selected");
 	
-	if(me.id.endsWith("-Recent")) loadLocalRadar(me.parentNode.previousSibling, weatherInfo.localRadarMetadata);
+	if(me.id.endsWith("-Recent")) loadLocalRadar(me.parentNode.previousSibling, responseData.localRadarMetadata);
 	else
 	{
 		lightGalleries['lightbox-localRadar'].destroy();

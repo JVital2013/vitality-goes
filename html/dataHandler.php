@@ -280,31 +280,26 @@ elseif($_GET['type'] == "metadata")
 			//Space Weather Messages
 			usort($spaceWeatherMessages, "sortEMWIN");
 			$metadata['spaceWeatherMessages'] = [];
-			if(count($spaceWeatherMessages) == 0) $metadata['spaceWeatherMessages'][] = "<div style='text-align: center; font-weight: bold; font-size: 13pt;'>No Messages</div>";
 			foreach($spaceWeatherMessages as $spaceWeatherMessage) $metadata['spaceWeatherMessages'][] = linesToParagraphs(file($spaceWeatherMessage), 3);
 			
 			//Radar Outages
 			usort($radarOutages, "sortEMWIN");
 			$metadata['radarOutages'] = [];
-			if(count($radarOutages) == 0) $metadata['radarOutages'][] = "<div style='text-align: center; font-weight: bold; font-size: 13pt;'>No Messages</div>";
-			foreach($radarOutages as $radarOutage) $metadata['radarOutages'][] = linesToParagraphs(file($radarOutage), 3);
+			foreach($radarOutages as $radarOutage) $metadata['radarOutages'][] = linesToParagraphs(file($radarOutage), 0);
 			
 			//SDM Ops Status Messages
 			usort($sdmOpsList, "sortEMWIN");
 			$metadata['sdmOps'] = [];
-			if(count($sdmOpsList) == 0) $metadata['sdmOps'][] = "<div style='text-align: center; font-weight: bold; font-size: 13pt;'>No Messages</div>";
 			foreach($sdmOpsList as $sdmOpsMsg) $metadata['sdmOps'][] = linesToParagraphs(file($sdmOpsMsg), 3);
 			
 			//EMWIN Administrative Alerts
 			usort($adminAlertList, "sortEMWIN");
 			$metadata['adminAlerts'] = [];
-			if(count($adminAlertList) == 0) $metadata['adminAlerts'][] = "<div style='text-align: center; font-weight: bold; font-size: 13pt;'>No Alerts</div>";
 			foreach($adminAlertList as $adminAlert) $metadata['adminAlerts'][] = linesToParagraphs(file($adminAlert), 3);
 			
 			//EMWIN Administrative (Regional)
 			usort($adminRegionalList, "sortEMWIN");
 			$metadata['adminRegional'] = [];
-			if(count($adminRegionalList) == 0) $metadata['adminRegional'][] = "<div style='text-align: center; font-weight: bold; font-size: 13pt;'>No Alerts</div>";
 			foreach($adminRegionalList as $adminRegional) $metadata['adminRegional'][] = linesToParagraphs(file($adminRegional), 4);
 			
 			//Satellite TLE

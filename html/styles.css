@@ -336,6 +336,29 @@ select, input
 {
 	background: #888888;
 }
+.prettyBoxList.otherEmwinNavigation
+{
+	display: flex;
+	justify-content: space-between;
+	padding: 0 10px;
+}
+.otherEmwinNavigation div
+{
+	padding: 5px;
+}
+.otherEmwinNavigationArrow
+{
+	cursor: pointer;
+}
+.otherEmwinNavigationArrow.disabled
+{
+	cursor: not-allowed;
+	opacity: 0.5;
+}
+.otherEmwinNumIndicator
+{
+	font-style: oblique;
+}
 .prettyBoxContent
 {
 	padding: 20px 20px 0px 20px;
