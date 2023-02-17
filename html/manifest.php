@@ -17,18 +17,17 @@
  * along with Vitality GOES.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-//Load data from config
 require_once($_SERVER['DOCUMENT_ROOT'] . "/functions.php");
-$config = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini", true, INI_SCANNER_RAW);
+$siteTitle = "Vitality GOES";
+$themeColor = "#111111";
 
-//Get title of site
-if(array_key_exists('siteTitle', $config['general'])) $siteTitle = htmlspecialchars(strip_tags($config['general']['siteTitle']));
-else $siteTitle = "Vitality GOES";
-
-//Get theme information
-$theme = loadTheme($config);
-if($theme !== false && array_key_exists('themeColor', $theme)) $themeColor = addslashes($theme['themeColor']);
-else $themeColor = "#111111";
+if(file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini"))
+{
+	$config = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini", true, INI_SCANNER_RAW);
+	$theme = loadTheme($config);
+	if(array_key_exists('siteTitle', $config['general'])) $siteTitle = htmlspecialchars(strip_tags($config['general']['siteTitle']));
+	if($theme !== false && array_key_exists('themeColor', $theme)) $themeColor = addslashes($theme['themeColor']);
+}
 
 header('Content-Type: application/json; charset=utf-8');
 ?>
