@@ -19,22 +19,26 @@
 
 //Load data from config
 require_once($_SERVER['DOCUMENT_ROOT'] . "/functions.php");
-$config = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini", true, INI_SCANNER_RAW);
-
-//Get title of site
-if(array_key_exists('siteTitle', $config['general'])) $siteTitle = htmlspecialchars(strip_tags($config['general']['siteTitle']));
-else $siteTitle = "Vitality GOES";
-
-//Load Theme
+$siteTitle = "Vitality GOES";
 $themeblock = "";
-$theme = loadTheme($config);
-if($theme !== false)
+
+if(file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini"))
 {
-	foreach($theme['stylesheets'] as $stylesheet)
+	$config = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini", true, INI_SCANNER_RAW);
+
+	//Get title of site
+	if(array_key_exists('siteTitle', $config['general'])) $siteTitle = htmlspecialchars(strip_tags($config['general']['siteTitle']));
+
+	//Load Theme
+	$theme = loadTheme($config);
+	if($theme !== false)
 	{
-		if(preg_match("/^https?:\/\/.*$/", $stylesheet)) $stylesheetURL = $stylesheet;
-		else $stylesheetURL = "/themes/{$theme['slug']}/$stylesheet";
-		$themeblock .= "<link rel=\"stylesheet\" href=\"$stylesheetURL\">\n\t\t";
+		foreach($theme['stylesheets'] as $stylesheet)
+		{
+			if(preg_match("/^https?:\/\/.*$/", $stylesheet)) $stylesheetURL = $stylesheet;
+			else $stylesheetURL = "/themes/{$theme['slug']}/$stylesheet";
+			$themeblock .= "<link rel=\"stylesheet\" href=\"$stylesheetURL\">\n\t\t";
+		}
 	}
 }
 ?>
