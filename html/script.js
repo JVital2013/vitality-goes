@@ -428,13 +428,6 @@ function menuSelect(menuSlug)
 	Object.keys(xhttp).forEach(thisxhttp => {xhttp[thisxhttp].abort();});
 	xhttp = [];
 	
-	if(typeof(EventSource) == "undefined")
-	{
-		mainContent.innerHTML = "<div style='height: 30px;'></div><div class='errorMessage'>Sorry! Internet Explorer does not support this site. Please use a real browser.</div>";
-		mainContent.className = "singleCard";
-		return;
-	}
-	
 	//Load the selected menu
 	switch(selectedMenu)
 	{

@@ -42,7 +42,6 @@ select, input
 }
 .topBar
 {
-	background: #000080;
 	background: linear-gradient(#000080, #000040);
 	position: fixed;
 	width:100%;
@@ -75,9 +74,6 @@ select, input
 	display: inline-block;
 	vertical-align: middle;
 	font-weight: bold;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
 	user-select: none;
 	text-shadow: 0px 1px 1px #000000;
 	font-size: 16pt;
@@ -118,7 +114,6 @@ select, input
 	transform: translateX(-305px);
 	box-shadow: 0px 0px 5px #000000;
 	background: #333333;
-	-webkit-transition-duration: 0.33s;
 	transition-duration: 0.33s;
 	overflow-y: auto;
 }
@@ -136,11 +131,7 @@ select, input
 	line-height: 20px; 
 	font-weight: bold;
 	color: #eeeeee;
-	-webkit-transition-duration: default;
 	transition-duration: default;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
 	user-select: none; 
 }
 .menuItemIconHolder
