@@ -6,8 +6,8 @@ rest:
       - unique_id: sensor.vitality_goes_conditions
         name: "Vitality GOES - Conditions"
         value_template: >
-          {% if (is_state('sun.sun', 'below_horizon') and value_json.weatherDesc == 'CLEAR') or value_json.weatherDesc == 'FAIR' %}clear-night
-          {% elif (is_state('sun.sun', 'above_horizon') and value_json.weatherDesc == 'CLEAR') or value_json.weatherDesc == 'SUNNY' or value_json.weatherDesc == 'MOSUNNY' %}sunny
+          {% if is_state('sun.sun', 'below_horizon') and (value_json.weatherDesc == 'CLEAR' or value_json.weatherDesc == 'FAIR') %}clear-night
+          {% elif (is_state('sun.sun', 'above_horizon') and (value_json.weatherDesc == 'CLEAR' or value_json.weatherDesc == 'FAIR')) or value_json.weatherDesc == 'SUNNY' or value_json.weatherDesc == 'MOSUNNY' %}sunny
           {% elif value_json.weatherDesc == 'PTSUNNY' or value_json.weatherDesc == 'PTCLDY' or value_json.weatherDesc == 'HAZE' %}partlycloudy
           {% elif value_json.weatherDesc == 'MOCLDY' or value_json.weatherDesc == 'CLOUDY' %}cloudy
           {% elif value_json.weatherDesc == 'FLURRIES' or value_json.weatherDesc == 'LGT SNOW' or value_json.weatherDesc == 'SNOW' or value_json.weatherDesc == 'HVY SNOW' %}snowy
