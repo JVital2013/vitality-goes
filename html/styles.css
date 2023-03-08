@@ -157,8 +157,7 @@ select, input
 }
 .mainContent
 {
-	column-count: 3;
-	column-width: 400px;
+	column-width: 500px;
 	column-gap: 20px;
 	padding: 0 10px;
 }
@@ -460,5 +459,19 @@ select, input
 	{
 		font-size: 10pt;
 		padding: 15px 20px;
+	}
+}
+@media (max-width: 1600px)
+{
+	.mainContent
+	{
+		column-width: 400px;
+	}
+}
+@media (max-width: 1000px)
+{
+	.mainContent
+	{
+		column-width: 350px;
 	}
 }

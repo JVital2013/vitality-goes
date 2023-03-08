@@ -53,7 +53,7 @@ if(file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini"))
 
 		<link rel="apple-touch-icon" href="/icon-512x512.png">
 		<link rel="manifest" href="/manifest.php">
-		<link rel="stylesheet" href="/styles.css?v=20230216">
+		<link rel="stylesheet" href="/styles.css?v=20230307">
 		<link rel="stylesheet" href="/opensans.css">
 		<link rel="stylesheet" href="/simplerpicker/simplerpicker.css">
 		<link rel="stylesheet" href="/fontawesome/css/all.css">
