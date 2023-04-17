@@ -41,17 +41,20 @@ The category section defines one or more menu items (or "categories") within Vit
 ![Visual correlation between category ini and menu item](https://user-images.githubusercontent.com/24253715/214476111-a5c71e0d-abaf-497c-84e6-b2489b8a4eca.png)
 
 ### Location
-This section contains information about your physical location. The only required option is `timezone`. A list of supported timezones can be found [here](https://www.php.net/manual/en/timezones.php).
+**The only required location option for all users is `timezone`.** A list of supported timezones can be found [here](https://www.php.net/manual/en/timezones.php).
 
 If you are under the jurisdiction of the National Weather service and want to display local weather data, you need to configure the options below. Settings marked as "optional" will disable some functionality if not set. If a non-optional setting is not configured, the Current Weather screen will be hidden. These options can also be changed per client web browser by using the "Local Settings" screen in Vitality GOES.
 
- *  `stateAbbr`: The post office abbreviation of your state. Also includes things like PR for Puerto Rico, AS for American Samoa, etc.
- *  `wxZone`: The weather zone of your location. This is typically your state abbreviation, a Z, and a 3 digit number. Example: PAZ066. You can either use the "Local Settings" section of Vitality GOES to figure this out, or use [this site](https://pnwpest.org/cgi-bin/wea3/wea3) to search for your town. "Weather Zone" shows up in the upper-right of that page.
- *  `orig`: The National Weather Service Forecast Office for your local weather information. The code needs to be the office call sign, plus the 2-letter state abbreviation. You can either use the "Local Settings" section of Vitality GOES to figure this out, or look at [https://en.wikipedia.org/wiki/List_of_National_Weather_Service_Weather_Forecast_Offices](https://en.wikipedia.org/wiki/List_of_National_Weather_Service_Weather_Forecast_Offices). For example, State College PA is "CTP", so orig needs to be set to `CTPPA`
- *  `lat` and `lon` *(Optional)*: Your exact latitude and longitude. This is only used to determine if you're within an alert area as issued by the NWS. It must contain 2 decimal points to work correctly.  *If not set, all supported EMWIN alerts issued by your local office will be shown*
- *  `rwrOrig` *(Optional)*: Accepts the same type of code as `orig`, but specifically for the Regional Weather Roundup information ("Current Weather" card in the Vitality GOES interface). It appears that the weather roundup is sometimes issued by a different office than the rest of your forecast. Use the "Local Settings" section within Vitality GOES to figure this out. *If not set, your `orig` value will be used in place of rwrOrig*
- *  `city` *(Optional)*: Your city/town name, exactly as it appears in the Regional Weather Roundup (RWR). The "Local Settings" screen in Vitality GOES can help you figure this out. *If not set, the "Current Weather" card in the current weather screen will not be shown.*
- *  `radarCode` *(Optional)*: The last 5 letters of the radar file for your region. In the emwin directory, all radar files end with RAD{radarCode}.GIF.  *If not set, your local radar will not be shown*
+| Option | Description | Required |
+| - | - | - |
+| `timezone` | Your local timezone | Required |
+| `stateAbbr` | The post office abbreviation of your state. Also includes things like PR for Puerto Rico, AS for American Samoa, etc. | Required |
+| `wxZone` | The weather zone of your location. This is typically your state abbreviation, a Z, and a 3 digit number. Example: PAZ066. You can either use the "Local Settings" section of Vitality GOES to figure this out, or use [this site](https://pnwpest.org/cgi-bin/wea3/wea3) to search for your town. "Weather Zone" shows up in the upper-right of that page. | Required |
+| `orig` | The National Weather Service Forecast Office for your local weather information. The code needs to be the office call sign, plus the 2-letter state abbreviation. You can either use the "Local Settings" section of Vitality GOES to figure this out, or look at [https://en.wikipedia.org/wiki/List_of_National_Weather_Service_Weather_Forecast_Offices](https://en.wikipedia.org/wiki/List_of_National_Weather_Service_Weather_Forecast_Offices). For example, State College PA is "CTP", so orig needs to be set to `CTPPA` | Required |
+| `lat` and `lon` | Your exact latitude and longitude. This is only used to determine if you're within an alert area as issued by the NWS. It must contain 2 decimal points to work correctly. | If not set, all supported EMWIN alerts issued by your local office will be shown |
+| `rwrOrig` | Accepts the same type of code as `orig`, but specifically for the Regional Weather Roundup information ("Current Weather" card in the Vitality GOES interface). It appears that the weather roundup is sometimes issued by a different office than the rest of your forecast. Use the "Local Settings" section within Vitality GOES to figure this out. | If not set, your `orig` value will be used in place of rwrOrig |
+| `city` | Your city/town name, exactly as it appears in the Regional Weather Roundup (RWR). The "Local Settings" screen in Vitality GOES can help you figure this out. | If not set, the "Current Weather" card in the current weather screen will not be shown. |
+| `radarCode` | The last 5 letters of the radar file for your region. In the emwin directory, all radar files end with RAD{radarCode}.GIF. | If not set, your local radar will not be shown on the current weather screen |
   
   At the time of writing, valid radarCodes are:
   *  ALLAK (Alaska)
