@@ -1675,7 +1675,7 @@ window.addEventListener("load", function()
 			}
 			
 			//Render Menu Items
-			if(config.showEmwinInfo) renderMenuItem('currentWeather', 'cloud', 'Current Weather');
+			if(config.showCurrentWeather) renderMenuItem('currentWeather', 'cloud', 'Current Weather');
 			Object.keys(config.categories).forEach((type) => { renderMenuItem(type, config.categories[type].icon, config.categories[type].title); });
 			if(config.showAdminInfo || config.showEmwinInfo) renderMenuItem('otherEmwin', 'align-left', 'Other EMWIN');
 			if(config.showEmwinInfo) renderMenuItem('hurricaneCenter', 'wind', 'Hurricane Center');

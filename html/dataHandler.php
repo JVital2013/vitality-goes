@@ -198,6 +198,11 @@ if($_GET['type'] == "preload")
 	$preloadData['showEmwinInfo'] = array_key_exists('emwinPath', $config['general']) && is_dir($config['general']['emwinPath']);
 	$preloadData['showAdminInfo'] = array_key_exists('adminPath', $config['general']) && is_dir($config['general']['adminPath']);
 	
+	$preloadData['showCurrentWeather'] = $preloadData['showEmwinInfo'] && 
+		array_key_exists('stateAbbr', $currentSettings[$selectedProfile]) && 
+		array_key_exists('wxZone', $currentSettings[$selectedProfile]) &&
+		array_key_exists('orig', $currentSettings[$selectedProfile]);
+	
 	$currentTheme = loadTheme($config);
 	if($currentTheme === false) $preloadData['theme'] = "default";
 	else $preloadData['theme'] = $currentTheme['slug'];
@@ -267,7 +272,8 @@ elseif($_GET['type'] == "metadata")
 			
 			//Load pertinent pieces of information where for cards with all available information
 			$spaceWeatherMessages = $radarOutages = $sdmOpsList = $adminAlertList = $adminRegionalList = [];
-			$alertStateAbbrs = "(" . implode('|', array_unique(array($currentSettings[$selectedProfile]['stateAbbr'], substr($currentSettings[$selectedProfile]['orig'], -2), substr($currentSettings[$selectedProfile]['rwrOrig'], -2)))) . ")";
+			if(array_key_exists('orig', $currentSettings[$selectedProfile]) && array_key_exists('stateAbbr', $currentSettings[$selectedProfile])) $alertStateAbbrs = "(" . implode('|', array_unique(array($currentSettings[$selectedProfile]['stateAbbr'], substr($currentSettings[$selectedProfile]['orig'], -2), substr($currentSettings[$selectedProfile]['rwrOrig'], -2)))) . ")";
+			else $alertStateAbbrs = "";
 			foreach($allEmwinFiles as $thisFile)
 			{
 				if(strpos($thisFile, "-ALT") !== false || strpos($thisFile, "-WAT") !== false) $spaceWeatherMessages[] = $thisFile;
@@ -923,7 +929,9 @@ elseif($_GET['type'] == "alertJSON")
 			
 			//Run checks to see if execution should continue
 			if(isset($expireTime) && time() > $expireTime) continue;
-			if(!is_in_polygon(count($geoLat) - 1, $geoLon, $geoLat, $currentSettings[$selectedProfile]['lon'], $currentSettings[$selectedProfile]['lat'])) continue;
+			if(array_key_exists('lat', $currentSettings[$selectedProfile]) && 
+				array_key_exists('lon', $currentSettings[$selectedProfile]) && 
+				!is_in_polygon(count($geoLat) - 1, $geoLon, $geoLat, $currentSettings[$selectedProfile]['lon'], $currentSettings[$selectedProfile]['lat'])) continue;
 			
 			//Geolocation and time limits checked out OK; send warning to client
 			$returnData['weatherWarnings'][] = "<b>Alert type: </b>$alertType<br />" .
@@ -1184,8 +1192,12 @@ elseif($_GET['type'] == "weatherJSON")
 	
 	//Current Radar
 	$returnData['localRadarMetadata'] = [];
-	$returnData['localRadarMetadata']['title'] = "Local Composite Weather Radar";
-	$returnData['localRadarMetadata']['images'] = findMetadataEMWIN($allEmwinFiles, "RAD" . $currentSettings[$selectedProfile]['radarCode'] . ".GIF");
+	$returnData['localRadarMetadata']['images'] = [];
+	if(array_key_exists('radarCode', $currentSettings[$selectedProfile]))
+	{
+		$returnData['localRadarMetadata']['title'] = "Local Composite Weather Radar";
+		$returnData['localRadarMetadata']['images'] = findMetadataEMWIN($allEmwinFiles, "RAD" . $currentSettings[$selectedProfile]['radarCode'] . ".GIF");
+	}
 	
 	//Current Weather Conditions
 	$rwrFile = findNewestEMWIN($allEmwinFiles, "RWR".$currentSettings[$selectedProfile]['rwrOrig']);
