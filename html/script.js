@@ -687,12 +687,6 @@ function menuSelect(menuSlug)
 		xhttp.alertJSON.open("GET", "dataHandler.php?type=alertJSON", true);
 		xhttp.alertJSON.send();
 		break;
-
-		case 'emwinImagery':
-		barTitle.innerHTML = "EMWIN Imagery";
-		mainContent.innerHTML = "";
-		Object.keys(config.emwin).forEach(function(key){renderImageCard(key, config.emwin[key].color);});
-		break;
 		
 		case 'otherEmwin':
 		barTitle.innerHTML = "Other EMWIN";
