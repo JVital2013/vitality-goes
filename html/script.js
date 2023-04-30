@@ -254,12 +254,17 @@ function renderAlert(content, color)
 }
 function renderOtherEmwinContent(slug, index)
 {
+	//Find data
+	if(/^systemEmwin/.test(slug)) thisData = responseData.system[parseInt(slug.replace("systemEmwin", ""))];
+	else thisData = responseData.user[parseInt(slug.replace("userEmwin", ""))];
+	
 	//Build the GUI on first load
 	document.getElementById(slug + 'Content').className = 'prettyBoxContent noPadding';
 	target = document.getElementById(slug + 'Content').firstChild;
+	
 	if(target.innerHTML == "Loading, please wait...")
 	{
-		if(responseData[slug].length == 0)
+		if(thisData.length == 0)
 		{
 			target.innerHTML = "<div class='prettyBoxList' style='text-align: center; font-weight: bold; font-size: 13pt;'>No Messages</div>";
 			return;
@@ -295,22 +300,24 @@ function renderOtherEmwinContent(slug, index)
 	}
 	
 	//Display the message
-	document.getElementById(slug + "MessageHolder").innerHTML = responseData[slug][index];
-	document.getElementById(slug + "NumIndicator").innerHTML = "Message " + (index + 1) + " / " + responseData[slug].length;
+	document.getElementById(slug + "MessageHolder").innerHTML = thisData[index];
+	document.getElementById(slug + "NumIndicator").innerHTML = "Message " + (index + 1) + " / " + thisData.length;
 	
 	goBack = document.getElementById(slug + "GoBack");
 	goForward = document.getElementById(slug + "GoForward");
 	if(index == 0) goBack.className = 'otherEmwinNavigationArrow disabled';
 	else goBack.className = 'otherEmwinNavigationArrow';
-	if(index == responseData[slug].length - 1) goForward.className = 'otherEmwinNavigationArrow disabled';
+	if(index == thisData.length - 1) goForward.className = 'otherEmwinNavigationArrow disabled';
 	else goForward.className = 'otherEmwinNavigationArrow';
 }
 function otherEmwinNavAction(event)
 {
 	forward = /GoForward$/.test(event.currentTarget.id);
 	slug = event.currentTarget.id.replace((forward ? "GoForward" : "GoBack"), '');
+	if(/^systemEmwin/.test(slug)) thisData = responseData.system[parseInt(slug.replace("systemEmwin", ""))];
+	else thisData = responseData.user[parseInt(slug.replace("userEmwin", ""))];
 	goToMsg = parseInt(document.getElementById(slug + "NumIndicator").innerHTML.match(/^Message ([0-9]+)/)[1]) - 1 + (forward ? 1 : -1);
-	if(goToMsg >= 0 && goToMsg < responseData[slug].length) renderOtherEmwinContent(slug, goToMsg);
+	if(goToMsg >= 0 && goToMsg < thisData.length) renderOtherEmwinContent(slug, goToMsg);
 }
 function renderLeftRightLine(target, tempsName, tempsValue)
 {
@@ -694,11 +701,24 @@ function menuSelect(menuSlug)
 		
 		if(config.showEmwinInfo)
 		{
-			renderCollapsingCard("sdmOps", "SDM Ops Status Messages", "prettyBoxContent", "weatherBody");
-			renderCollapsingCard("spaceWeatherMessages", "Space Weather Messages", "prettyBoxContent", "weatherBody");
-			renderCollapsingCard("radarOutages", "Local Radar Outages", "prettyBoxContent", "weatherBody");
-			renderCollapsingCard("adminAlerts", "EMWIN Admin Alerts", "prettyBoxContent", "weatherBody");
-			renderCollapsingCard("adminRegional", "EMWIN Regional Admin Message", "prettyBoxContent", "weatherBody");
+			renderStiffCard("emwinLoader", "Load Additional Data");
+			
+			//System EMWIN Data
+			cardNum = 0;
+			config.otherEmwin.system.forEach(function(element){
+				renderCollapsingCard("systemEmwin" + cardNum, element.title, "prettyBoxContent", (element.format == 'paragraph' ? "weatherBody" : "otherEmwinBody"));
+				cardNum++;
+			});
+			
+			//User EMWIN Data
+			cardNum = 0;
+			config.otherEmwin.user.forEach(function(element){
+				//TODO: Somehow make this look different to have a "remove" button
+				renderCollapsingCard("userEmwin" + cardNum, element.title, "prettyBoxContent", (element.format == 'paragraph' ? "weatherBody" : "otherEmwinBody"));
+				cardNum++;
+			});
+			
+			//Hard-coded cards
 			renderCollapsingCard("satelliteTle", "Weather Satellite TLE", "prettyBoxContent", "weatherBody");
 			renderCollapsingCard("emwinLicense", "EMWIN Licensing Info", "prettyBoxContent", "weatherBody");
 		}
@@ -725,11 +745,21 @@ function menuSelect(menuSlug)
 				
 				if(config.showEmwinInfo)
 				{
-					renderOtherEmwinContent('sdmOps', responseData.sdmOps.length - 1);
-					renderOtherEmwinContent('radarOutages', responseData.radarOutages.length - 1);
-					renderOtherEmwinContent('spaceWeatherMessages', responseData.spaceWeatherMessages.length - 1);
-					renderOtherEmwinContent('adminRegional', responseData.adminRegional.length - 1);
-					renderOtherEmwinContent('adminAlerts', responseData.adminAlerts.length - 1);
+					//Additional Data Loader
+					target = document.getElementById('emwinLoaderCardBody');
+					target.innerHTML = "TODO";
+					
+					//Loop through system/user-defined data
+					cardNum = 0;
+					responseData.system.forEach(function(element){
+						renderOtherEmwinContent('systemEmwin' + cardNum, element.length - 1);
+						cardNum++;
+					});
+					cardNum = 0;
+					responseData.user.forEach(function(element){
+						renderOtherEmwinContent('userEmwin' + cardNum, element.length - 1);
+						cardNum++;
+					});
 					
 					//Weather Satellite TLE
 					target = document.getElementById('satelliteTleContent').firstChild;

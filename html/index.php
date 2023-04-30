@@ -72,7 +72,7 @@ if(file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini"))
 		<script src="/lightgallery/plugins/zoom/lg-zoom.umd.js?v=20221016"></script>
 		<script src="/lightgallery/plugins/jumpto/lg-jumpto.umd.js?v=20220811"></script>
 		<script src="/simplerpicker/simplerpicker.js"></script>
-		<script src='/script.js?v=20230417'></script>
+		<script src='/script.js?v=20230429'></script>
 	</head>
 	<body>
 		<div class='topBar'>

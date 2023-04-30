@@ -29,10 +29,10 @@ if($config['general']['debug'])
 }
 else ini_set("display_errors", "Off");
 
-//Delete old cookie
+//Delete old style cookie
 if(array_key_exists('currentSettings', $_COOKIE)) setcookie("currentSettings", "", time() - 3600, "/", ".".$_SERVER['SERVER_NAME']);
 
-//Load Current User Settings from Cookie
+//Load location settings from cookie
 $sendCookie = false;
 $currentSettings = [];
 if(!array_key_exists('localSettings', $_COOKIE)) $sendCookie = true;
@@ -187,6 +187,7 @@ if($_GET['type'] == "preload")
 		{
 			unset($config['categories'][$type]['data'][$thisSlug]['path']);
 			unset($config['categories'][$type]['data'][$thisSlug]['filter']);
+			unset($config['categories'][$type]['data'][$thisSlug]['mode']);
 		}
 		
 		$preloadData['categories'][$type] = $config['categories'][$type];
@@ -197,6 +198,8 @@ if($_GET['type'] == "preload")
 	$preloadData['showGraphs'] = array_key_exists('graphiteAPI', $config['general']);
 	$preloadData['showEmwinInfo'] = array_key_exists('emwinPath', $config['general']) && is_dir($config['general']['emwinPath']);
 	$preloadData['showAdminInfo'] = array_key_exists('adminPath', $config['general']) && is_dir($config['general']['adminPath']);
+	
+	if($preloadData['showEmwinInfo']) $preloadData['otherEmwin'] = loadOtherEmwin();
 	
 	$preloadData['showCurrentWeather'] = $preloadData['showEmwinInfo'] && 
 		array_key_exists('stateAbbr', $currentSettings[$selectedProfile]) && 
@@ -267,46 +270,48 @@ elseif($_GET['type'] == "metadata")
 	{
 		if(array_key_exists('emwinPath', $config['general']) && is_dir($config['general']['emwinPath']))
 		{
-			//Get all emwin files
+			//Get all emwin files and config
 			$allEmwinFiles = scandir_recursive($config['general']['emwinPath']);
+			$otherEmwinConfig = loadOtherEmwin();
 			
 			//Load pertinent pieces of information where for cards with all available information
-			$spaceWeatherMessages = $radarOutages = $sdmOpsList = $adminAlertList = $adminRegionalList = [];
-			if(array_key_exists('orig', $currentSettings[$selectedProfile]) && array_key_exists('stateAbbr', $currentSettings[$selectedProfile])) $alertStateAbbrs = "(" . implode('|', array_unique(array($currentSettings[$selectedProfile]['stateAbbr'], substr($currentSettings[$selectedProfile]['orig'], -2), substr($currentSettings[$selectedProfile]['rwrOrig'], -2)))) . ")";
-			else $alertStateAbbrs = "";
+			$otherEmwinFiles = [];
+			$otherEmwinFiles['system'] = $otherEmwinFiles['user'] = $metadata['system'] = $metadata['user'] = [];
+			for($i = 0; $i < count($otherEmwinConfig['system']); $i++) $otherEmwinFiles['system'][$i] = $metadata['system'][$i] = [];
+			for($i = 0; $i < count($otherEmwinConfig['user']); $i++) $otherEmwinFiles['user'][$i] = $metadata['user'][$i] = [];
+			
 			foreach($allEmwinFiles as $thisFile)
 			{
-				if(strpos($thisFile, "-ALT") !== false || strpos($thisFile, "-WAT") !== false) $spaceWeatherMessages[] = $thisFile;
-				if(preg_match("/-FTM.*$alertStateAbbrs\.TXT$/", $thisFile)) $radarOutages[] = $thisFile;
-				if(strpos($thisFile, "-ADA") !== false) $adminAlertList[] = $thisFile;
-				if(strpos($thisFile, "-ADMSDM") !== false) $sdmOpsList[] = $thisFile;
-				if(strpos($thisFile, "-ADR") !== false) $adminRegionalList[] = $thisFile;
+				for($i = 0; $i < count($otherEmwinConfig['system']); $i++)
+					if(preg_match("/-{$otherEmwinConfig['system'][$i]['identifier']}\.TXT$/", $thisFile))
+						$otherEmwinFiles['system'][$i][] = $thisFile;
 			}
 			
-			//Space Weather Messages
-			usort($spaceWeatherMessages, "sortEMWIN");
-			$metadata['spaceWeatherMessages'] = [];
-			foreach($spaceWeatherMessages as $spaceWeatherMessage) $metadata['spaceWeatherMessages'][] = linesToParagraphs(file($spaceWeatherMessage), 3);
-			
-			//Radar Outages
-			usort($radarOutages, "sortEMWIN");
-			$metadata['radarOutages'] = [];
-			foreach($radarOutages as $radarOutage) $metadata['radarOutages'][] = linesToParagraphs(file($radarOutage), 0);
-			
-			//SDM Ops Status Messages
-			usort($sdmOpsList, "sortEMWIN");
-			$metadata['sdmOps'] = [];
-			foreach($sdmOpsList as $sdmOpsMsg) $metadata['sdmOps'][] = linesToParagraphs(file($sdmOpsMsg), 3);
-			
-			//EMWIN Administrative Alerts
-			usort($adminAlertList, "sortEMWIN");
-			$metadata['adminAlerts'] = [];
-			foreach($adminAlertList as $adminAlert) $metadata['adminAlerts'][] = linesToParagraphs(file($adminAlert), 3);
-			
-			//EMWIN Administrative (Regional)
-			usort($adminRegionalList, "sortEMWIN");
-			$metadata['adminRegional'] = [];
-			foreach($adminRegionalList as $adminRegional) $metadata['adminRegional'][] = linesToParagraphs(file($adminRegional), 4);
+			//Sort and parse messages
+			foreach(array('system', 'user') as $thisType)
+			{
+				for($i = 0; $i < count($otherEmwinConfig[$thisType]); $i++)
+				{
+					usort($otherEmwinFiles[$thisType][$i], "sortEMWIN");
+					foreach($otherEmwinFiles[$thisType][$i] as $thisFile)
+					{
+						$thisFileData = file($thisFile);
+						switch($otherEmwinConfig[$thisType][$i]['format'])
+						{
+							case 'paragraph': $metadata[$thisType][$i][] = linesToParagraphs($thisFileData, $otherEmwinConfig[$thisType][$i]['truncate']); break;
+							case 'formatted':
+								$thisFileString = "";
+								foreach($thisFileData as $key => $value)
+								{
+									if($key < $otherEmwinConfig[$thisType][$i]['truncate']) continue;
+									$thisFileString .= trim($value) . "\n";
+								}
+								$metadata[$thisType][$i][] = $thisFileString;
+								break;
+						}
+					}
+				}
+			}
 			
 			//Satellite TLE
 			$latestTleFile = findNewestEmwin($allEmwinFiles, "EPHTWOUS");

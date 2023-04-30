@@ -72,6 +72,67 @@ function loadConfig()
 	return $config;
 }
 
+function loadOtherEmwin()
+{
+	//Load Other Emwin Config
+	$otheremwin = [];
+	$otheremwin['user'] = [];
+	$otheremwin['system'] = false;
+	if(file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/otheremwin.ini")) $otheremwin['system'] = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/otheremwin.ini", true, INI_SCANNER_RAW);
+	if($otheremwin['system'] === false) $otheremwin['system'] = [];
+	else $otheremwin['system'] = array_values($otheremwin['system']);
+	
+	//Verify Other Emwin Config
+	for($i = 0; $i < count($otheremwin['system']); $i++)
+		if(!in_array($otheremwin['system'][$i]['format'], array('paragraph', 'formatted')))
+			$otheremwin['system'][$i]['format'] = 'formatted';
+	
+	//Load Other Emwin info from cookie
+	$sendCookie = false;
+	if(array_key_exists('otheremwin', $_COOKIE))
+	{
+		$allCards = explode("~", $_COOKIE['otheremwin']);
+		foreach($allCards as $thisCard)
+		{
+			$cardParts = explode("!", $thisLocation);
+			
+			//Verify data
+			if(count($cardParts) != 4 || !is_numeric($cardParts[3]) || !in_array($cardParts[2], array('paragraph', 'formatted')))
+			{
+				$sendCookie = true;
+				continue;
+			}
+			
+			//Pass data along from cookie if OK
+			$otheremwin['user'][] = [
+				'identifier' => $cardParts[0],
+				'title' => $cardParts[1],
+				'format' => $cardParts[2],
+				'truncate' => $cardParts[3]
+			];
+		}
+	}
+
+	//Save other emwin settings in case something changed
+	if($sendCookie)
+	{
+		$profileParts = [];
+		foreach($otheremwin['user'] as $thisCard)
+		{
+			$profileParts[] = join("!", [
+				rawurlencode($thisCard['identifier']),
+				rawurlencode($thisCard['title']),
+				$thisCard['format'],
+				$thisCard['truncate']
+			]);
+		}
+
+		setrawcookie("otheremwin", join("~", $profileParts), time() + 31536000, "/", ".".$_SERVER['SERVER_NAME']);
+	}
+	
+	return $otheremwin;
+}
+
 function findAllThemes()
 {
 	$themes = [];
