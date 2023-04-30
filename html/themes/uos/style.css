@@ -56,7 +56,7 @@ body
 {
 	border-top: solid 1px #47976e;
 }
-.otherEmwinBody
+.adminMessageBody, .emwinMessageBody .prettyBoxList:first-child
 {
 	font-family: inherit;
 	font-size: 10pt;
@@ -111,13 +111,15 @@ body
 {
 	outline: none;
 }
-.otherEmwinBody::-webkit-scrollbar-track,
-.forcastCardHolder::-webkit-scrollbar-track
+.adminMessageBody::-webkit-scrollbar-track,
+.forcastCardHolder::-webkit-scrollbar-track,
+.emwinMessageBody .prettyBoxList:first-child::-webkit-scrollbar-track
 {
 	background: #183425;
 }
-.otherEmwinBody::-webkit-scrollbar-thumb,
-.forcastCardHolder::-webkit-scrollbar-thumb
+.adminMessageBody::-webkit-scrollbar-thumb,
+.forcastCardHolder::-webkit-scrollbar-thumb,
+.emwinMessageBody .prettyBoxList:first-child::-webkit-scrollbar-thumb
 {
 	background: #47976e;
 }

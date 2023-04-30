@@ -303,7 +303,7 @@ select, input
 {
 	max-width: 200px;
 }
-.otherEmwinBody
+.adminMessageBody, .emwinMessageBody .prettyBoxList:first-child
 {
 	font-size: 9pt;
 	text-align: left;
@@ -311,17 +311,20 @@ select, input
 	white-space: pre;
 	overflow-x: auto;
 }
-.otherEmwinBody::-webkit-scrollbar,
+.emwinMessageBody .prettyBoxList:first-child::-webkit-scrollbar,
+.adminMessageBody::-webkit-scrollbar,
 .forcastCardHolder::-webkit-scrollbar
 {
 	height: 10px;
 }
-.otherEmwinBody::-webkit-scrollbar-track,
+.emwinMessageBody .prettyBoxList:first-child::-webkit-scrollbar-track
+.adminMessageBody::-webkit-scrollbar-track,
 .forcastCardHolder::-webkit-scrollbar-track
 {
 	background: #444444;
 }
-.otherEmwinBody::-webkit-scrollbar-thumb,
+.emwinMessageBody .prettyBoxList:first-child::-webkit-scrollbar-thumb,
+.adminMessageBody::-webkit-scrollbar-thumb,
 .forcastCardHolder::-webkit-scrollbar-thumb
 {
 	background: #888888;
@@ -331,6 +334,7 @@ select, input
 	display: flex;
 	justify-content: space-between;
 	padding: 0 10px;
+	font-size: 10pt;
 }
 .otherEmwinNavigation div
 {

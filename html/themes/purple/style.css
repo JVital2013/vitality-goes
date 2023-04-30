@@ -86,12 +86,16 @@ body
     border-bottom: 1px solid #8a66bd;
 }
 
-.otherEmwinBody::-webkit-scrollbar-track, .forcastCardHolder::-webkit-scrollbar-track 
+.otherEmwinBody::-webkit-scrollbar-track,
+.forcastCardHolder::-webkit-scrollbar-track,
+.emwinMessageBody .prettyBoxList:first-child::-webkit-scrollbar-track
 {
 	background: #543a78;
 }
 
-.otherEmwinBody::-webkit-scrollbar-thumb, .forcastCardHolder::-webkit-scrollbar-thumb 
+.otherEmwinBody::-webkit-scrollbar-thumb,
+.forcastCardHolder::-webkit-scrollbar-thumb,
+.emwinMessageBody .prettyBoxList:first-child::-webkit-scrollbar-thumb
 {
 	background: #8a66bd;
 }

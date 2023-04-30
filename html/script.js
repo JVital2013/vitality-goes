@@ -481,7 +481,7 @@ function menuSelect(menuSlug)
 				catch(error)
 				{
 					mainContent.innerHTML = "";
-					renderCollapsingCard("serverError", "The server returned bad data. Click to expand", "prettyBoxContent", "otherEmwinBody");
+					renderCollapsingCard("serverError", "The server returned bad data. Click to expand", "prettyBoxContent", "adminMessageBody");
 					target = document.getElementById('serverErrorContent').firstChild;
 					target.innerHTML = "";
 					target.appendChild(document.createTextNode(this.responseText));
@@ -706,7 +706,7 @@ function menuSelect(menuSlug)
 			//System EMWIN Data
 			cardNum = 0;
 			config.otherEmwin.system.forEach(function(element){
-				renderCollapsingCard("systemEmwin" + cardNum, element.title, "prettyBoxContent", (element.format == 'paragraph' ? "weatherBody" : "otherEmwinBody"));
+				renderCollapsingCard("systemEmwin" + cardNum, element.title, "prettyBoxContent", (element.format == 'paragraph' ? "weatherBody" : "emwinMessageBody"));
 				cardNum++;
 			});
 			
@@ -714,7 +714,7 @@ function menuSelect(menuSlug)
 			cardNum = 0;
 			config.otherEmwin.user.forEach(function(element){
 				//TODO: Somehow make this look different to have a "remove" button
-				renderCollapsingCard("userEmwin" + cardNum, element.title, "prettyBoxContent", (element.format == 'paragraph' ? "weatherBody" : "otherEmwinBody"));
+				renderCollapsingCard("userEmwin" + cardNum, element.title, "prettyBoxContent", (element.format == 'paragraph' ? "weatherBody" : "emwinMessageBody"));
 				cardNum++;
 			});
 			
@@ -722,7 +722,7 @@ function menuSelect(menuSlug)
 			renderCollapsingCard("satelliteTle", "Weather Satellite TLE", "prettyBoxContent", "weatherBody");
 			renderCollapsingCard("emwinLicense", "EMWIN Licensing Info", "prettyBoxContent", "weatherBody");
 		}
-		if(config.showAdminInfo) renderCollapsingCard("adminMessage", "Latest Admin Message", "prettyBoxContent", "otherEmwinBody");
+		if(config.showAdminInfo) renderCollapsingCard("adminMessage", "Latest Admin Message", "prettyBoxContent", "adminMessageBody");
 		
 		xhttp.otherEMWIN = new XMLHttpRequest();
 		xhttp.otherEMWIN.onreadystatechange = function()
@@ -734,7 +734,7 @@ function menuSelect(menuSlug)
 				catch(error)
 				{
 					mainContent.innerHTML = "";
-					renderCollapsingCard("serverError", "The server returned bad data. Click to expand", "prettyBoxContent", "otherEmwinBody");
+					renderCollapsingCard("serverError", "The server returned bad data. Click to expand", "prettyBoxContent", "adminMessageBody");
 					target = document.getElementById('serverErrorContent').firstChild;
 					target.innerHTML = "";
 					target.appendChild(document.createTextNode(this.responseText));
@@ -851,7 +851,7 @@ function menuSelect(menuSlug)
 					target = document.getElementById('loadingNoticeCardBody');
 					target.innerHTML = "";
 					target.appendChild(document.createTextNode("The server returned bad data:" + this.responseText));
-					target.className += " otherEmwinBody";
+					target.className += " adminMessageBody";
 					
 					delete xhttp.hurricaneInfo;
 					return;
@@ -1142,7 +1142,7 @@ function menuSelect(menuSlug)
 					{
 						target = document.getElementById('selectedProfileCardBody');
 						target.innerHTML = "";
-						target.className += " otherEmwinBody";
+						target.className += " adminMessageBody";
 						target.appendChild(document.createTextNode("The server returned bad data: " + this.responseText));
 						delete xhttp.dropdowns;
 						return;
@@ -1232,7 +1232,7 @@ function menuSelect(menuSlug)
 				catch(error)
 				{
 					target.appendChild(document.createTextNode("The server returned bad data:" + this.responseText));
-					target.className += " otherEmwinBody";
+					target.className += " adminMessageBody";
 					delete xhttp.theme;
 					return;
 				}
@@ -1308,7 +1308,7 @@ function menuSelect(menuSlug)
 					{
 						target.innerHTML = "";
 						target.appendChild(document.createTextNode("The server returned bad data: " + this.responseText));
-						target.className += " otherEmwinBody";
+						target.className += " adminMessageBody";
 						
 						target = document.getElementById('sysTempCardBody');
 						removeCard(target);
@@ -1433,7 +1433,7 @@ function loadStats(targetedContent)
 				{
 					targetedContent.innerHTML = "";
 					targetedContent.appendChild(document.createTextNode("The server returned bad data: " + this.responseText));
-					targetedContent.className += " otherEmwinBody";
+					targetedContent.className += " adminMessageBody";
 					delete xhttp.loadStats;
 					return;
 				}
@@ -1561,7 +1561,7 @@ function loadImageMetadata(targetedContent)
 			{
 				targetedContent.innerHTML = "";
 				targetedContent.appendChild(document.createTextNode("The server returned bad data: " + this.responseText));
-				targetedContent.className += " otherEmwinBody";
+				targetedContent.className += " adminMessageBody";
 				delete xhttp.loadImage;
 				return;
 			}
@@ -1690,7 +1690,7 @@ window.addEventListener("load", function()
 			try {config = JSON.parse(this.responseText);}
 			catch(error)
 			{
-				renderCollapsingCard("serverError", "The server returned bad data. Click to expand", "prettyBoxContent", "otherEmwinBody");
+				renderCollapsingCard("serverError", "The server returned bad data. Click to expand", "prettyBoxContent", "adminMessageBody");
 				target = document.getElementById('serverErrorContent').firstChild;
 				target.innerHTML = this.responseText;
 				mainContent.className = "singleCard";

@@ -107,13 +107,16 @@ body
 	border: solid 1px #808080;
 	color: #808080;
 }
-.otherEmwinBody::-webkit-scrollbar-track,
-.forcastCardHolder::-webkit-scrollbar-track
+.adminMessageBody::-webkit-scrollbar-track,
+.forcastCardHolder::-webkit-scrollbar-track,
+.emwinMessageBody .prettyBoxList:first-child::-webkit-scrollbar-track
+
 {
 	background: #e0e0e0;
 }
-.otherEmwinBody::-webkit-scrollbar-thumb,
-.forcastCardHolder::-webkit-scrollbar-thumb
+.adminMessageBody::-webkit-scrollbar-thumb,
+.forcastCardHolder::-webkit-scrollbar-thumb,
+.emwinMessageBody .prettyBoxList:first-child::-webkit-scrollbar-thumb
 {
 	background: #a0a0a0;
 }
