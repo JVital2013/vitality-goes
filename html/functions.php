@@ -84,8 +84,10 @@ function loadOtherEmwin()
 	
 	//Verify Other Emwin Config
 	for($i = 0; $i < count($otheremwin['system']); $i++)
-		if(!in_array($otheremwin['system'][$i]['format'], array('paragraph', 'formatted')))
-			$otheremwin['system'][$i]['format'] = 'formatted';
+	{
+		if(!in_array($otheremwin['system'][$i]['format'], array('paragraph', 'formatted'))) $otheremwin['system'][$i]['format'] = 'formatted';
+		if(!is_numeric($otheremwin['system'][$i]['truncate'])) $otheremwin['system'][$i]['truncate'] = 0;
+	}
 	
 	//Load Other Emwin info from cookie
 	$sendCookie = false;
@@ -108,7 +110,7 @@ function loadOtherEmwin()
 				'identifier' => $cardParts[0],
 				'title' => $cardParts[1],
 				'format' => $cardParts[2],
-				'truncate' => $cardParts[3]
+				'truncate' => intval($cardParts[3])
 			];
 		}
 	}
