@@ -37,7 +37,11 @@ body
 {
 	background: #47976e;
 }
-.menuItem:hover, .prettyBox input:enabled:hover, .prettyBox select:enabled:hover
+.menuItem:hover,
+.prettyBox input[type="text"]:enabled:hover,
+.prettyBox input[type="button"]:enabled:hover,
+.prettyBox input[type="radio"]:enabled:not(:checked):hover,
+.prettyBox select:enabled:hover
 {
 	background: #183425;
 }
@@ -96,6 +100,27 @@ body
 .prettyBox select
 {
 	appearance: none;
+}
+.prettyBox option
+{
+	background: #031a0b;
+}
+.prettyBox input[type="radio"]
+{
+	appearance: none;
+    border-radius: 50%;
+	border: 2px solid #47976e;
+	background-clip: content-box;
+	width: 14px;
+	height: 14px;
+	vertical-align: middle;
+	padding: 3px;
+	margin-top: 6px;
+	margin-bottom: 6px;
+}
+.prettyBox input[type="radio"]:checked
+{
+	background-color: #47976e;
 }
 .prettyBox input:enabled, .prettyBox select:enabled
 {

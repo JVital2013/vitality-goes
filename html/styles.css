@@ -35,6 +35,15 @@ select, input
 	margin: 2px;
 	max-width: 100%;
 }
+input[type="radio"]
+{
+	margin-bottom: 10px;
+	margin-right: 10px;
+}
+label
+{
+	user-select: none;
+}
 .errorMessage
 {
 	color: white;

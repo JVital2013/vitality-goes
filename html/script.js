@@ -747,7 +747,32 @@ function menuSelect(menuSlug)
 				{
 					//Additional Data Loader
 					target = document.getElementById('emwinLoaderCardBody');
-					target.innerHTML = "TODO";
+					target.innerHTML = "";
+					
+					radioButton = document.createElement('input');
+					radioButton.type = 'radio';
+					radioButton.name = 'inputMethod';
+					radioButton.id = 'useBuilder';
+					radioButton.value = 'useBuilder';
+					radioButton.checked = true;
+					target.appendChild(radioButton);
+					buttonLabel = document.createElement('label');
+					buttonLabel.htmlFor = 'useBuilder';
+					buttonLabel.innerHTML = "Automatic Data Selector";
+					target.appendChild(buttonLabel);
+					target.appendChild(document.createElement('br'));
+					
+					radioButton = document.createElement('input');
+					radioButton.type = 'radio';
+					radioButton.name = 'inputMethod';
+					radioButton.id = 'manualRegex';
+					radioButton.value = 'manualRegex';
+					target.appendChild(radioButton);
+					buttonLabel = document.createElement('label');
+					buttonLabel.htmlFor = 'manualRegex';
+					buttonLabel.innerHTML = "Enter Selector Regex";
+					target.appendChild(buttonLabel);
+					//TODO: More Here
 					
 					//Loop through system/user-defined data
 					cardNum = 0;
