@@ -755,23 +755,110 @@ function menuSelect(menuSlug)
 					radioButton.id = 'useBuilder';
 					radioButton.value = 'useBuilder';
 					radioButton.checked = true;
+					radioButton.addEventListener('click', function(){
+						document.getElementById('selectorRegex').disabled = true;
+						document.getElementById('productList').disabled = false;
+						document.getElementById('originatorList').disabled = false;
+						document.getElementById('stateList').disabled = false;
+					});
+					
 					target.appendChild(radioButton);
 					buttonLabel = document.createElement('label');
 					buttonLabel.htmlFor = 'useBuilder';
 					buttonLabel.innerHTML = "Automatic Data Selector";
 					target.appendChild(buttonLabel);
-					target.appendChild(document.createElement('br'));
 					
+					autoFilterFlex = document.createElement('div');
+					autoFilterFlex.className = 'autoFilterFlex';
+					
+					productFilter = document.createElement('div');
+					productFilter.className = 'autoFilterCategory';
+					productFilter.innerHTML = "Product";
+					productFilter.appendChild(document.createElement('br'));
+					productList = document.createElement('select');
+					productList.id = 'productList';
+					productList.size = 10;
+					newOption = document.createElement('option');
+					newOption.value = "[A-Z]{3}";
+					newOption.text = "[Any]";
+					productList.appendChild(newOption);
+					responseData.allProducts.forEach(function(element){
+						newOption = document.createElement('option');
+						newOption.value = newOption.text = element;
+						productList.appendChild(newOption);
+					});
+					productList.value = '[A-Z]{3}';
+					productFilter.appendChild(productList);
+					autoFilterFlex.appendChild(productFilter);
+					
+					originatorFilter = document.createElement('div');
+					originatorFilter.className = 'autoFilterCategory';
+					originatorFilter.innerHTML = "Originator";
+					originatorFilter.appendChild(document.createElement('br'));
+					originatorList = document.createElement('select');
+					originatorList.id = 'originatorList';
+					originatorList.size = 10;
+					newOption = document.createElement('option');
+					newOption.value = "[A-Z0-9]{3}";
+					newOption.text = "[Any]";
+					originatorList.appendChild(newOption);
+					responseData.allOriginators.forEach(function(element){
+						newOption = document.createElement('option');
+						newOption.value = newOption.text = element;
+						originatorList.appendChild(newOption);
+					});
+					originatorList.value = '[A-Z0-9]{3}';
+					originatorFilter.appendChild(originatorList);
+					autoFilterFlex.appendChild(originatorFilter);
+					
+					stateFilter = document.createElement('div');
+					stateFilter.className = 'autoFilterCategory';
+					stateFilter.innerHTML = "State";
+					stateFilter.appendChild(document.createElement('br'));
+					stateList = document.createElement('select');
+					stateList.id = 'stateList';
+					stateList.size = 10;
+					newOption = document.createElement('option');
+					newOption.value = "[A-Z0-9]{2}";
+					newOption.text = "[Any]";
+					stateList.appendChild(newOption);
+					responseData.allStates.forEach(function(element){
+						newOption = document.createElement('option');
+						newOption.value = newOption.text = element;
+						stateList.appendChild(newOption);
+					});
+					stateList.value = '[A-Z0-9]{2}';
+					stateFilter.appendChild(stateList);
+					autoFilterFlex.appendChild(stateFilter);
+					target.appendChild(autoFilterFlex);
+					
+					regexFlex = document.createElement('div');
+					regexFlex.className = 'regexFlex';
 					radioButton = document.createElement('input');
 					radioButton.type = 'radio';
 					radioButton.name = 'inputMethod';
 					radioButton.id = 'manualRegex';
 					radioButton.value = 'manualRegex';
-					target.appendChild(radioButton);
+					radioButton.addEventListener('click', function(){
+						document.getElementById('selectorRegex').disabled = false;
+						document.getElementById('productList').disabled = true;
+						document.getElementById('originatorList').disabled = true;
+						document.getElementById('stateList').disabled = true;
+					});
+					
+					regexFlex.appendChild(radioButton);
 					buttonLabel = document.createElement('label');
 					buttonLabel.htmlFor = 'manualRegex';
 					buttonLabel.innerHTML = "Enter Selector Regex";
-					target.appendChild(buttonLabel);
+					regexFlex.appendChild(buttonLabel);
+					
+					selectorRegex = document.createElement('input');
+					selectorRegex.type = 'text';
+					selectorRegex.id = 'selectorRegex';
+					selectorRegex.disabled = true;
+					regexFlex.appendChild(selectorRegex);
+					target.appendChild(regexFlex);
+					
 					//TODO: More Here
 					
 					//Loop through system/user-defined data

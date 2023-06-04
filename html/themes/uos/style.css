@@ -120,7 +120,7 @@ body
 }
 .prettyBox input[type="radio"]:checked
 {
-	background-color: #47976e;
+	background-color: #5cdc95;
 }
 .prettyBox input:enabled, .prettyBox select:enabled
 {

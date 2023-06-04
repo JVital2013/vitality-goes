@@ -312,6 +312,34 @@ label
 {
 	max-width: 200px;
 }
+.regexFlex
+{
+	display: flex;
+	align-items: center;
+}
+.regexFlex label
+{
+	margin-right: 10px;
+}
+.regexFlex input[type="text"]
+{
+	flex: 1;
+	width: 30px;
+}
+.autoFilterFlex
+{
+	display: flex;
+	margin-bottom: 10px;
+}
+.autoFilterCategory
+{
+	flex: 1;
+	text-align: center;
+}
+.autoFilterCategory select
+{
+	width: 80%;
+}
 .adminMessageBody, .emwinMessageBody .prettyBoxList:first-child
 {
 	font-size: 9pt;
