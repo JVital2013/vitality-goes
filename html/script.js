@@ -319,6 +319,91 @@ function otherEmwinNavAction(event)
 	goToMsg = parseInt(document.getElementById(slug + "NumIndicator").innerHTML.match(/^Message ([0-9]+)/)[1]) - 1 + (forward ? 1 : -1);
 	if(goToMsg >= 0 && goToMsg < thisData.length) renderOtherEmwinContent(slug, goToMsg);
 }
+function renderAutoFilterPicklist(dataProperty)
+{
+	thisPicklistHolder = document.createElement('div');
+	thisPicklistHolder.className = 'autoFilterPicklistHolder';
+	
+	thisSearchHolder = document.createElement('div');
+	thisSearchHolder.className = 'autoFilterSearchHolder';
+	thisSearch = document.createElement('input');
+	thisSearch.type = 'text';
+	thisSearchHolder.addEventListener("input", function(event) {renderPicklistItems(event.target.parentElement.nextSibling, dataProperty, event.target.value);});
+	thisSearchHolder.appendChild(thisSearch);
+	thisSearchIcon = document.createElement('i');
+	thisSearchIcon.className = "fa fa-search";
+	thisSearchHolder.appendChild(thisSearchIcon);
+	thisPicklistHolder.appendChild(thisSearchHolder);
+	
+	thisPicklistBox = document.createElement('div');
+	thisPicklistBox.className = 'autoFilterPicklist';
+	thisPicklistBox.id = dataProperty + "Picklist";
+	renderPicklistItems(thisPicklistBox, dataProperty);
+	thisPicklistHolder.appendChild(thisPicklistBox);
+	return thisPicklistHolder;
+}
+function renderPicklistItems(picklistBox, dataProperty, inputData = "")
+{
+	currentlySelectedElement = picklistBox.querySelector('.selectedFilterItem');
+	if(currentlySelectedElement == null) newSelectedElement = null;
+	else newSelectedElement = currentlySelectedElement.innerHTML;
+	
+	picklistBox.innerHTML = "";
+	didSelectElement = false;
+	if(inputData == "")
+	{
+		newOption = document.createElement('div');
+		newOption.className = 'autoFilterItem';
+		newOption.innerHTML = "[Any]";
+		newOption.addEventListener('click', function(event) {
+			event.target.parentElement.querySelector('.selectedFilterItem').className = "autoFilterItem";
+			event.target.className += " selectedFilterItem";
+			checkIfValidOtherEmwin();
+		});
+		picklistBox.appendChild(newOption);
+	}
+	
+	responseData[dataProperty].forEach(function(element){
+		if(inputData == "" || element.toLowerCase().includes(inputData.toLowerCase()))
+		{
+			newOption = document.createElement('div');
+			newOption.className = 'autoFilterItem';
+			if(element == newSelectedElement)
+			{
+				didSelectElement = true;
+				newOption.className += " selectedFilterItem";
+			}
+			
+			newOption.innerHTML = element;
+			newOption.addEventListener('click', function(event) {
+				event.target.parentElement.querySelector('.selectedFilterItem').className = "autoFilterItem";
+				event.target.className += " selectedFilterItem";
+				checkIfValidOtherEmwin();
+			});
+			picklistBox.appendChild(newOption);
+		}
+	});
+	
+	if(!didSelectElement && picklistBox.childElementCount > 0)
+	{
+		picklistBox.firstChild.className += " selectedFilterItem";
+		checkIfValidOtherEmwin();
+	}
+}
+function checkIfValidOtherEmwin()
+{
+	inputMethodSelector = document.querySelector('input[name="inputMethod"]:checked');
+	if(inputMethodSelector == null) return;
+	if(inputMethodSelector.value == 'useBuilder')
+	{
+		productSelector = document.querySelector('#allProductsPicklist .selectedFilterItem'); 
+		//TODO: Finish
+	}
+	else
+	{
+		
+	}
+}
 function renderLeftRightLine(target, tempsName, tempsValue)
 {
 	nameSide = document.createElement('div');
@@ -749,6 +834,11 @@ function menuSelect(menuSlug)
 					target = document.getElementById('emwinLoaderCardBody');
 					target.innerHTML = "";
 					
+					selectorSection = document.createElement('div');
+					selectorSection.className = 'prettyBoxList';
+					selectorSection.style.padding = 0;
+					selectorSection.style.paddingBottom = "10px";
+					
 					radioButton = document.createElement('input');
 					radioButton.type = 'radio';
 					radioButton.name = 'inputMethod';
@@ -757,83 +847,42 @@ function menuSelect(menuSlug)
 					radioButton.checked = true;
 					radioButton.addEventListener('click', function(){
 						document.getElementById('selectorRegex').disabled = true;
-						document.getElementById('productList').disabled = false;
-						document.getElementById('originatorList').disabled = false;
-						document.getElementById('stateList').disabled = false;
+						document.getElementById('autoFilterFlex').className = 'autoFilterFlex';
+						checkIfValidOtherEmwin();
 					});
 					
-					target.appendChild(radioButton);
+					selectorSection.appendChild(radioButton);
 					buttonLabel = document.createElement('label');
 					buttonLabel.htmlFor = 'useBuilder';
 					buttonLabel.innerHTML = "Automatic Data Selector";
-					target.appendChild(buttonLabel);
+					selectorSection.appendChild(buttonLabel);
 					
 					autoFilterFlex = document.createElement('div');
+					autoFilterFlex.id = 'autoFilterFlex';
 					autoFilterFlex.className = 'autoFilterFlex';
 					
 					productFilter = document.createElement('div');
 					productFilter.className = 'autoFilterCategory';
 					productFilter.innerHTML = "Product";
-					productFilter.appendChild(document.createElement('br'));
-					productList = document.createElement('select');
-					productList.id = 'productList';
-					productList.size = 10;
-					newOption = document.createElement('option');
-					newOption.value = "[A-Z]{3}";
-					newOption.text = "[Any]";
-					productList.appendChild(newOption);
-					responseData.allProducts.forEach(function(element){
-						newOption = document.createElement('option');
-						newOption.value = newOption.text = element;
-						productList.appendChild(newOption);
-					});
-					productList.value = '[A-Z]{3}';
-					productFilter.appendChild(productList);
+					productFilter.appendChild(renderAutoFilterPicklist("allProducts"));
 					autoFilterFlex.appendChild(productFilter);
 					
 					originatorFilter = document.createElement('div');
 					originatorFilter.className = 'autoFilterCategory';
 					originatorFilter.innerHTML = "Originator";
-					originatorFilter.appendChild(document.createElement('br'));
-					originatorList = document.createElement('select');
-					originatorList.id = 'originatorList';
-					originatorList.size = 10;
-					newOption = document.createElement('option');
-					newOption.value = "[A-Z0-9]{3}";
-					newOption.text = "[Any]";
-					originatorList.appendChild(newOption);
-					responseData.allOriginators.forEach(function(element){
-						newOption = document.createElement('option');
-						newOption.value = newOption.text = element;
-						originatorList.appendChild(newOption);
-					});
-					originatorList.value = '[A-Z0-9]{3}';
-					originatorFilter.appendChild(originatorList);
+					originatorFilter.appendChild(renderAutoFilterPicklist("allOriginators"));
 					autoFilterFlex.appendChild(originatorFilter);
-					
+
 					stateFilter = document.createElement('div');
 					stateFilter.className = 'autoFilterCategory';
 					stateFilter.innerHTML = "State";
-					stateFilter.appendChild(document.createElement('br'));
-					stateList = document.createElement('select');
-					stateList.id = 'stateList';
-					stateList.size = 10;
-					newOption = document.createElement('option');
-					newOption.value = "[A-Z0-9]{2}";
-					newOption.text = "[Any]";
-					stateList.appendChild(newOption);
-					responseData.allStates.forEach(function(element){
-						newOption = document.createElement('option');
-						newOption.value = newOption.text = element;
-						stateList.appendChild(newOption);
-					});
-					stateList.value = '[A-Z0-9]{2}';
-					stateFilter.appendChild(stateList);
+					stateFilter.appendChild(renderAutoFilterPicklist("allStates"));
 					autoFilterFlex.appendChild(stateFilter);
-					target.appendChild(autoFilterFlex);
+					
+					selectorSection.appendChild(autoFilterFlex);
 					
 					regexFlex = document.createElement('div');
-					regexFlex.className = 'regexFlex';
+					regexFlex.className = 'inputFlex';
 					radioButton = document.createElement('input');
 					radioButton.type = 'radio';
 					radioButton.name = 'inputMethod';
@@ -841,9 +890,8 @@ function menuSelect(menuSlug)
 					radioButton.value = 'manualRegex';
 					radioButton.addEventListener('click', function(){
 						document.getElementById('selectorRegex').disabled = false;
-						document.getElementById('productList').disabled = true;
-						document.getElementById('originatorList').disabled = true;
-						document.getElementById('stateList').disabled = true;
+						document.getElementById('autoFilterFlex').className = 'autoFilterFlex disabled';
+						checkIfValidOtherEmwin();
 					});
 					
 					regexFlex.appendChild(radioButton);
@@ -856,10 +904,91 @@ function menuSelect(menuSlug)
 					selectorRegex.type = 'text';
 					selectorRegex.id = 'selectorRegex';
 					selectorRegex.disabled = true;
+					selectorRegex.addEventListener('input', function() {checkIfValidOtherEmwin();} );
 					regexFlex.appendChild(selectorRegex);
-					target.appendChild(regexFlex);
+					selectorSection.appendChild(regexFlex);
+					target.appendChild(selectorSection);
 					
-					//TODO: More Here
+					nameSection = document.createElement('div');
+					nameSection.className = 'prettyBoxList';
+					nameSection.style.padding = 0;
+					nameSection.style.paddingBottom = "10px";
+					
+					nameFlex = document.createElement('div');
+					nameFlex.className = 'inputFlex';
+					nameLabel = document.createElement('label');
+					nameLabel.htmlFor = 'nameInput';
+					nameLabel.innerHTML = "Display Name:";
+					nameFlex.appendChild(nameLabel);
+					
+					nameInput = document.createElement('input');
+					nameInput.type = 'text';
+					nameInput.id = 'nameInput';
+					nameInput.addEventListener('input', function() {checkIfValidOtherEmwin();} );
+					nameFlex.appendChild(nameInput);
+					nameSection.appendChild(nameFlex);
+					target.appendChild(nameSection);
+					
+					settingsSetion = document.createElement('div');
+					settingsSetion.className = 'prettyBoxList';
+					settingsSetion.style.padding = 0;
+					settingsSetion.style.paddingBottom = "10px";
+					
+					formatHeader = document.createElement('div');
+					formatHeader.innerHTML = "Text File Type";
+					formatHeader.style.fontWeight = 'bold';
+					settingsSetion.appendChild(formatHeader);
+					
+					preOptFlex = document.createElement('div');
+					preOptFlex.className = 'fileTypeRow';
+					preOptRadio = document.createElement('input');
+					preOptRadio.type = 'radio';
+					preOptRadio.name = 'formatMethod';
+					preOptRadio.id = 'preOptRadio';
+					preOptRadio.checked = true;
+					preOptRadio.value = 'preformatted';
+
+					preOptFlex.appendChild(preOptRadio);
+					preOptLabel = document.createElement('label');
+					preOptLabel.htmlFor = 'preOptRadio';
+					preOptLabel.innerHTML = "<b>Preformatted: </b> The data contains tables or other pre-formatted data that does not convert nicely into paragraphs";
+					preOptFlex.appendChild(preOptLabel);
+					settingsSetion.appendChild(preOptFlex);
+					
+					paraOptFlex = document.createElement('div');
+					paraOptFlex.className = 'fileTypeRow';
+					paraOptRadio = document.createElement('input');
+					paraOptRadio.type = 'radio';
+					paraOptRadio.name = 'formatMethod';
+					paraOptRadio.id = 'paraOptRadio';
+					preOptRadio.value = 'paragraph';
+
+					paraOptFlex.appendChild(paraOptRadio);
+					paraOptLabel = document.createElement('label');
+					paraOptLabel.htmlFor = 'paraOptRadio';
+					paraOptLabel.innerHTML = "<b>Paragraph: </b> the data consits of sentences that can be converted easily into paragraph form";
+					paraOptFlex.appendChild(paraOptLabel);
+					settingsSetion.appendChild(paraOptFlex);
+					target.appendChild(settingsSetion);
+					
+					saveButtonSection = document.createElement('div');
+					saveButtonSection.className = 'prettyBoxList';
+					saveButtonSection.style.padding = 0;
+					saveButtonSection.style.marginBottom = 0;
+					saveButtonSection.style.textAlign = 'center';
+					saveButton = document.createElement('input');
+					saveButton.type = 'button';
+					saveButton.id = 'saveButton';
+					saveButton.style.fontWeight = 'bold';
+					saveButton.value = "Save";
+					saveButton.disabled = true;
+					saveButton.style.width = "100%";
+					saveButton.addEventListener('click', function() {
+						//TODO
+						console.log("TODO");
+					});
+					saveButtonSection.appendChild(saveButton);
+					target.appendChild(saveButtonSection);
 					
 					//Loop through system/user-defined data
 					cardNum = 0;

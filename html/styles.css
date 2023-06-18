@@ -37,7 +37,6 @@ select, input
 }
 input[type="radio"]
 {
-	margin-bottom: 10px;
 	margin-right: 10px;
 }
 label
@@ -312,33 +311,84 @@ label
 {
 	max-width: 200px;
 }
-.regexFlex
+.inputFlex
 {
 	display: flex;
 	align-items: center;
 }
-.regexFlex label
+.fileTypeRow
 {
-	margin-right: 10px;
+	display: flex;
+	align-items: flex-start;
+	margin: 10px 0;
 }
-.regexFlex input[type="text"]
+.inputFlex input[type="text"]
 {
 	flex: 1;
+	margin-left: 10px;
 	width: 30px;
 }
 .autoFilterFlex
 {
 	display: flex;
-	margin-bottom: 10px;
+	margin: 10px 0;
+}
+.autoFilterFlex.disabled
+{
+	pointer-events: none;
+	opacity: 0.5;
 }
 .autoFilterCategory
 {
 	flex: 1;
 	text-align: center;
 }
-.autoFilterCategory select
+.autoFilterPicklistHolder
 {
-	width: 80%;
+	border: solid 1px #aaaaaa;
+	height: 200px;
+	margin: 5px;
+	display: flex;
+	flex-direction: column;
+}
+.autoFilterSearchHolder
+{
+	display: flex;
+}
+.autoFilterSearchHolder input
+{
+	margin: 0;
+	width: 100%;
+	border: none;
+	background: transparent;
+	color: #efefef;
+	flex: 1;
+}
+.autoFilterSearchHolder input:focus
+{
+	outline: none;
+}
+.autoFilterSearchHolder i
+{
+	margin: 7px;
+	color: #aaaaaa;
+}
+.autoFilterPicklist
+{
+	border-top: solid 1px #aaaaaa;
+	overflow-y: scroll;
+	flex: 1;
+	user-select: none;
+}
+.autoFilterItem
+{
+	overflow-x: hidden;
+	padding: 4px;
+}
+.selectedFilterItem
+{
+	background: #efefef;
+	color: #111111;
 }
 .adminMessageBody, .emwinMessageBody .prettyBoxList:first-child
 {

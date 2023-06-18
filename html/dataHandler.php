@@ -288,9 +288,10 @@ elseif($_GET['type'] == "metadata")
 					$allOriginators[] = $matches[2];
 					$allStates[] = $matches[3];
 					
-					for($i = 0; $i < count($otherEmwinConfig['system']); $i++)
-						if(preg_match("/-{$otherEmwinConfig['system'][$i]['identifier']}\.TXT$/i", $thisFile))
-							$otherEmwinFiles['system'][$i][] = $thisFile;
+					foreach(array('system', 'user') as $thisType)
+						for($i = 0; $i < count($otherEmwinConfig[$thisType]); $i++)
+							if(preg_match("/-{$otherEmwinConfig['system'][$i]['identifier']}\.TXT$/i", $thisFile))
+								$otherEmwinFiles[$thisType][$i][] = $thisFile;
 				}
 			}
 			
