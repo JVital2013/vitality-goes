@@ -375,7 +375,7 @@ function renderAutoFilterPicklist(dataProperty)
 }
 function renderPicklistItems(picklistBox, dataProperty, inputData = "")
 {
-	currentlySelectedElement = picklistBox.querySelector('.selectedFilterItem');
+	currentlySelectedElement = picklistBox.querySelector('.autoFilterItem.selected');
 	if(currentlySelectedElement == null) newSelectedElement = null;
 	else newSelectedElement = currentlySelectedElement.innerHTML;
 	
@@ -387,8 +387,8 @@ function renderPicklistItems(picklistBox, dataProperty, inputData = "")
 		newOption.className = 'autoFilterItem';
 		newOption.innerHTML = "[Any]";
 		newOption.addEventListener('click', function(event) {
-			event.target.parentElement.querySelector('.selectedFilterItem').className = "autoFilterItem";
-			event.target.className += " selectedFilterItem";
+			event.target.parentElement.querySelector('.autoFilterItem.selected').className = "autoFilterItem";
+			event.target.className += " selected";
 			checkIfValidOtherEmwin();
 		});
 		picklistBox.appendChild(newOption);
@@ -402,13 +402,13 @@ function renderPicklistItems(picklistBox, dataProperty, inputData = "")
 			if(element == newSelectedElement)
 			{
 				didSelectElement = true;
-				newOption.className += " selectedFilterItem";
+				newOption.className += " selected";
 			}
 			
 			newOption.innerHTML = element;
 			newOption.addEventListener('click', function(event) {
-				event.target.parentElement.querySelector('.selectedFilterItem').className = "autoFilterItem";
-				event.target.className += " selectedFilterItem";
+				event.target.parentElement.querySelector('.autoFilterItem.selected').className = "autoFilterItem";
+				event.target.className += " selected";
 				checkIfValidOtherEmwin();
 			});
 			picklistBox.appendChild(newOption);
@@ -417,7 +417,7 @@ function renderPicklistItems(picklistBox, dataProperty, inputData = "")
 	
 	if(!didSelectElement)
 	{
-		if(picklistBox.childElementCount > 0) picklistBox.firstChild.className += " selectedFilterItem";
+		if(picklistBox.childElementCount > 0) picklistBox.firstChild.className += " selected";
 		checkIfValidOtherEmwin();
 	}
 }
@@ -431,9 +431,9 @@ function checkIfValidOtherEmwin()
 	isValid = true;
 	if(inputMethodSelector.value == 'useBuilder')
 	{
-		productSelector = document.querySelector('#allProductsPicklist .selectedFilterItem');
-		originatorSelector = document.querySelector('#allOriginatorsPicklist .selectedFilterItem'); 
-		statesSelector = document.querySelector('#allStatesPicklist .selectedFilterItem');
+		productSelector = document.querySelector('#allProductsPicklist .selected');
+		originatorSelector = document.querySelector('#allOriginatorsPicklist .selected'); 
+		statesSelector = document.querySelector('#allStatesPicklist .selected');
 		if(productSelector == null || originatorSelector == null || statesSelector == null) isValid = false;
 		else if(productSelector.innerHTML == "[Any]" && originatorSelector.innerHTML == "[Any]" && statesSelector.innerHTML == "[Any]") isValid = false;
 	}
@@ -837,20 +837,39 @@ function menuSelect(menuSlug)
 		
 		if(config.showEmwinInfo)
 		{
-			renderStiffCard("emwinLoader", "Load Additional Data");
+			renderCollapsingCard("emwinLoader", "Load Additional Data", "prettyBoxContent", "weatherBody");
+			
+			//User EMWIN Data
+			cardNum = 0;
+			config.otherEmwin.user.forEach(function(element){
+				renderCollapsingCard("userEmwin" + cardNum, element.title, "prettyBoxContent", (element.format == 'paragraph' ? "weatherBody" : "emwinMessageBody"));
+				deleteHolder = document.createElement('div');
+				deleteHolder.className = 'otherEmwinDeleteHolder';
+				
+				deleteButton = document.createElement('i');
+				deleteButton.className = 'fa fa-trash-alt';
+				deleteButton.addEventListener('click', function(event){
+					target = parseInt(event.target.parentElement.parentElement.nextSibling.id.replace('userEmwin', '').replace('Content', ''));
+					otherEmwinConfig = decodeOtherEmwinConfig(getCookie('otheremwin'));
+					
+					if(confirm("OK to stop viewing \"" + otherEmwinConfig[target].title + "\"?"))
+					{
+						otherEmwinConfig.splice(target, 1);
+						setCookie("otheremwin", encodeOtherEmwinConfig(otherEmwinConfig));
+						location.reload();
+					}
+					event.stopPropagation();
+				});
+				deleteHolder.appendChild(deleteButton);
+				
+				document.getElementById("userEmwin" + cardNum + "Content").previousSibling.appendChild(deleteHolder);
+				cardNum++;
+			});
 			
 			//System EMWIN Data
 			cardNum = 0;
 			config.otherEmwin.system.forEach(function(element){
 				renderCollapsingCard("systemEmwin" + cardNum, element.title, "prettyBoxContent", (element.format == 'paragraph' ? "weatherBody" : "emwinMessageBody"));
-				cardNum++;
-			});
-			
-			//User EMWIN Data
-			cardNum = 0;
-			config.otherEmwin.user.forEach(function(element){
-				//TODO: Somehow make this look different to have a "remove" button
-				renderCollapsingCard("userEmwin" + cardNum, element.title, "prettyBoxContent", (element.format == 'paragraph' ? "weatherBody" : "emwinMessageBody"));
 				cardNum++;
 			});
 			
@@ -882,7 +901,7 @@ function menuSelect(menuSlug)
 				if(config.showEmwinInfo)
 				{
 					//Additional Data Loader
-					target = document.getElementById('emwinLoaderCardBody');
+					target = document.getElementById('emwinLoaderContent').firstChild;
 					target.innerHTML = "";
 					
 					selectorSection = document.createElement('div');
@@ -1019,7 +1038,7 @@ function menuSelect(menuSlug)
 					preOptRadio.name = 'formatMethod';
 					preOptRadio.id = 'preOptRadio';
 					preOptRadio.checked = true;
-					preOptRadio.value = 'preformatted';
+					preOptRadio.value = 'formatted';
 
 					preOptFlex.appendChild(preOptRadio);
 					preOptLabel = document.createElement('label');
@@ -1034,7 +1053,7 @@ function menuSelect(menuSlug)
 					paraOptRadio.type = 'radio';
 					paraOptRadio.name = 'formatMethod';
 					paraOptRadio.id = 'paraOptRadio';
-					preOptRadio.value = 'formatted';
+					paraOptRadio.value = 'paragraph';
 
 					paraOptFlex.appendChild(paraOptRadio);
 					paraOptLabel = document.createElement('label');
@@ -1061,9 +1080,9 @@ function menuSelect(menuSlug)
 						inputMethodSelector = document.querySelector('input[name="inputMethod"]:checked');
 						if(inputMethodSelector.value == 'useBuilder')
 						{
-							productSelector = document.querySelector('#allProductsPicklist .selectedFilterItem').innerHTML;
-							originatorSelector = document.querySelector('#allOriginatorsPicklist .selectedFilterItem').innerHTML; 
-							statesSelector = document.querySelector('#allStatesPicklist .selectedFilterItem').innerHTML;
+							productSelector = document.querySelector('#allProductsPicklist .selected').innerHTML;
+							originatorSelector = document.querySelector('#allOriginatorsPicklist .selected').innerHTML; 
+							statesSelector = document.querySelector('#allStatesPicklist .selected').innerHTML;
 							identifier = (productSelector == "[Any]" ? "[A-Z0-9]{3}" : productSelector) +
 								(originatorSelector == "[Any]" ? "[A-Z0-9]{3}" : originatorSelector) +
 								(statesSelector == "[Any]" ? "[A-Z0-9]{2}" : statesSelector);
@@ -1075,8 +1094,7 @@ function menuSelect(menuSlug)
 						format = document.querySelector('input[name="formatMethod"]:checked').value;
 						truncate = document.getElementById('truncInput').value;
 						
-						otherEmwinConfigString = getCookie('otherEmwin');
-						otherEmwinConfig = decodeOtherEmwinConfig(otherEmwinConfigString);
+						otherEmwinConfig = decodeOtherEmwinConfig(getCookie('otheremwin'));
 						otherEmwinConfig.push({
 							'identifier': identifier,
 							'title': title,

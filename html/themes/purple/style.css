@@ -1,7 +1,13 @@
+html
+{
+	scrollbar-color: #8a66bd #543a78;
+}
+
 body
 {
 	background: #221a2a;
 	-webkit-tap-highlight-color: #76559f8c;
+	scrollbar-color: #8a66bd #543a78;
 }
 
 .prettyBox input[type="radio"]
@@ -26,6 +32,27 @@ body
 .prettyBox input[type="radio"]:enabled:not(:checked):hover
 {
 	background: #5b447c;
+}
+
+.autoFilterPicklistHolder
+{
+	border: solid 1px #8a66bd;
+}
+
+.autoFilterItem.selected
+{
+	background: #d8c6f1;
+	color: #3a3048;
+}
+
+.autoFilterPicklist
+{
+	border-top: solid 1px #8a66bd;
+}
+
+.autoFilterSearchHolder i
+{
+	color: inherit;
 }
 
 .sideBar
@@ -110,16 +137,24 @@ body
     border-bottom: 1px solid #8a66bd;
 }
 
-.otherEmwinBody::-webkit-scrollbar-track,
-.forcastCardHolder::-webkit-scrollbar-track,
-.emwinMessageBody .prettyBoxList:first-child::-webkit-scrollbar-track
+::-webkit-scrollbar-track
 {
 	background: #543a78;
 }
 
-.otherEmwinBody::-webkit-scrollbar-thumb,
-.forcastCardHolder::-webkit-scrollbar-thumb,
-.emwinMessageBody .prettyBoxList:first-child::-webkit-scrollbar-thumb
+::-webkit-scrollbar-thumb
 {
 	background: #8a66bd;
+}
+::-webkit-scrollbar-button:vertical:decrement
+{
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='5' fill='rgb(216, 198, 241)'><polygon points='5,0 0,5 10,5'/></svg>");
+}
+::-webkit-scrollbar-button:vertical:increment
+{
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='5' fill='rgb(216, 198, 241)'><polygon points='0,0 10,0 5,5'/></svg>");
+}
+::-webkit-scrollbar-button:vertical:hover
+{
+	background-color: #3a3048;
 }

@@ -200,6 +200,11 @@ if($_GET['type'] == "preload")
 	$preloadData['showAdminInfo'] = array_key_exists('adminPath', $config['general']) && is_dir($config['general']['adminPath']);
 	
 	if($preloadData['showEmwinInfo']) $preloadData['otherEmwin'] = loadOtherEmwin();
+	foreach($preloadData['otherEmwin']['system'] as $key => $value)
+	{
+		unset($preloadData['otherEmwin']['system'][$key]['truncate']);
+		unset($preloadData['otherEmwin']['system'][$key]['identifier']);
+	}
 	
 	$preloadData['showCurrentWeather'] = $preloadData['showEmwinInfo'] && 
 		array_key_exists('stateAbbr', $currentSettings[$selectedProfile]) && 

@@ -78,6 +78,8 @@ function loadOtherEmwin()
 	$otheremwin = [];
 	$otheremwin['user'] = [];
 	$otheremwin['system'] = false;
+	
+	//TODO: Load config from otheremwin section of main config
 	if(file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/otheremwin.ini")) $otheremwin['system'] = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/otheremwin.ini", true, INI_SCANNER_RAW);
 	if($otheremwin['system'] === false) $otheremwin['system'] = [];
 	else $otheremwin['system'] = array_values($otheremwin['system']);
@@ -105,12 +107,22 @@ function loadOtherEmwin()
 				continue;
 			}
 			
+			//Re-send the cookie if something will be changed changed
+			$titleNoTags = strip_tags($cardParts[1]);
+			$truncateInt = intval($cardParts[3]);
+			if($truncateInt < 0 || $truncateInt > 10)
+			{
+				$sendCookie = true;
+				$truncateInt = 0;
+			}
+			if($cardParts[1] != $titleNoTags) $sendCookie = true;
+			
 			//Pass data along from cookie if OK
 			$otheremwin['user'][] = [
 				'identifier' => $cardParts[0],
-				'title' => $cardParts[1],
+				'title' => $titleNoTags,
 				'format' => $cardParts[2],
-				'truncate' => intval($cardParts[3])
+				'truncate' => $truncateInt
 			];
 		}
 	}
@@ -124,7 +136,7 @@ function loadOtherEmwin()
 			$profileParts[] = join("!", [
 				rawurlencode($thisCard['identifier']),
 				rawurlencode($thisCard['title']),
-				$thisCard['format'],
+				rawurlencode($thisCard['format']),
 				$thisCard['truncate']
 			]);
 		}

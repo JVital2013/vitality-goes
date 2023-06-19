@@ -1,9 +1,14 @@
+html
+{
+	scrollbar-color: #47976e #183425;
+}
 body
 {
 	background: repeating-linear-gradient(to bottom, #031a0b, #09160d, #031a0b 10px);
 	background-attachment: fixed;
 	font-family: "Perfect DOS VGA 437 Win", monospace;
 	-webkit-tap-highlight-color: #47976e9e;
+	scrollbar-color: #47976e #183425;
 }
 .topBar
 {
@@ -39,11 +44,22 @@ body
 }
 .menuItem:hover,
 .prettyBox input[type="text"]:enabled:hover,
+.prettyBox input[type="number"]:enabled:hover,
 .prettyBox input[type="button"]:enabled:hover,
 .prettyBox input[type="radio"]:enabled:not(:checked):hover,
-.prettyBox select:enabled:hover
+.prettyBox select:enabled:hover,
+.autoFilterItem:hover
 {
 	background: #183425;
+}
+.autoFilterPicklist
+{
+	border-top: solid 1px #47976e;
+}
+.autoFilterItem.selected
+{
+	background: #5cdc95;
+	color: #031a0b;
 }
 .menuItem.selected:hover
 {
@@ -136,15 +152,46 @@ body
 {
 	outline: none;
 }
-.adminMessageBody::-webkit-scrollbar-track,
-.forcastCardHolder::-webkit-scrollbar-track,
-.emwinMessageBody .prettyBoxList:first-child::-webkit-scrollbar-track
+.autoFilterPicklistHolder
+{
+	border: solid 1px #47976e;
+}
+.autoFilterSearchHolder input:enabled
+{
+	border: none;
+}
+::-webkit-scrollbar-track
 {
 	background: #183425;
 }
-.adminMessageBody::-webkit-scrollbar-thumb,
-.forcastCardHolder::-webkit-scrollbar-thumb,
-.emwinMessageBody .prettyBoxList:first-child::-webkit-scrollbar-thumb
+::-webkit-scrollbar-thumb
 {
 	background: #47976e;
+}
+::-webkit-scrollbar-button:vertical
+{
+	background-color: #09160d;
+}
+::-webkit-scrollbar-button:vertical:decrement
+{
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='5' fill='rgb(92, 220, 149)'><polygon points='5,0 0,5 10,5'/></svg>");
+}
+::-webkit-scrollbar-button:vertical:increment
+{
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='5' fill='rgb(92, 220, 149)'><polygon points='0,0 10,0 5,5'/></svg>");
+}
+::-webkit-scrollbar-button:vertical:hover
+{
+	background-color: #152d20;
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button
+{ 
+	-webkit-appearance: none; 
+	margin: 0; 
+}
+input[type="number"]
+{ 
+	-moz-appearance: textfield;
+	appearance: textfield;
 }

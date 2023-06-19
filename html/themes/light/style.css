@@ -107,17 +107,42 @@ body
 	border: solid 1px #808080;
 	color: #808080;
 }
-.adminMessageBody::-webkit-scrollbar-track,
-.forcastCardHolder::-webkit-scrollbar-track,
-.emwinMessageBody .prettyBoxList:first-child::-webkit-scrollbar-track
-
+.autoFilterSearchHolder input:enabled
+{
+	border: none;
+	border-radius: 0;
+}
+.autoFilterPicklistHolder
+{
+	border-radius: 10px;
+	border: solid 1px #44739e;
+}
+.autoFilterPicklist
+{
+	border-top: solid 1px #44739e;
+}
+.prettyBox input:focus, .prettyBox select:focus
+{
+	outline: none;
+}
+::-webkit-scrollbar-track
 {
 	background: #e0e0e0;
 }
-.adminMessageBody::-webkit-scrollbar-thumb,
-.forcastCardHolder::-webkit-scrollbar-thumb,
-.emwinMessageBody .prettyBoxList:first-child::-webkit-scrollbar-thumb
+::-webkit-scrollbar-thumb
 {
 	background: #a0a0a0;
 }
-
+::-webkit-scrollbar-button:vertical:decrement
+{
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='5' fill='rgb(68, 115, 158)'><polygon points='5,0 0,5 10,5'/></svg>");
+}
+::-webkit-scrollbar-button:vertical:increment
+{
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='5' fill='rgb(68, 115, 158)'><polygon points='0,0 10,0 5,5'/></svg>");
+	border-bottom-right-radius: 10px;
+}
+::-webkit-scrollbar-button:vertical:hover
+{
+	background-color: #d0d0d0;
+}

@@ -37,7 +37,7 @@ if(file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini"))
 		{
 			if(preg_match("/^https?:\/\/.*$/", $stylesheet)) $stylesheetURL = $stylesheet;
 			else $stylesheetURL = "/themes/{$theme['slug']}/$stylesheet";
-			$themeblock .= "<link rel=\"stylesheet\" href=\"$stylesheetURL?v=20230430\">\n\t\t";
+			$themeblock .= "<link rel=\"stylesheet\" href=\"$stylesheetURL?v=20230619\">\n\t\t";
 		}
 	}
 }

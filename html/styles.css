@@ -273,6 +273,7 @@ label
 	cursor: pointer;
 	user-select: none;
 	font-size: 10pt;
+	position: relative;
 }
 .prettyBoxHeader .fa
 {
@@ -327,6 +328,10 @@ label
 	align-items: flex-start;
 	margin: 10px 0;
 }
+.fileTypeRow label
+{
+	flex: 1;
+}
 .inputFlex input[type="text"]
 {
 	flex: 1;
@@ -366,7 +371,7 @@ label
 	width: 100%;
 	border: none;
 	background: transparent;
-	color: #efefef;
+	color: inherit;
 	flex: 1;
 }
 .autoFilterSearchHolder input:focus
@@ -376,7 +381,7 @@ label
 .autoFilterSearchHolder i
 {
 	margin: 7px;
-	color: #aaaaaa;
+	color: inherit;
 }
 .autoFilterPicklist
 {
@@ -390,7 +395,7 @@ label
 	overflow-x: hidden;
 	padding: 4px;
 }
-.selectedFilterItem
+.autoFilterItem.selected
 {
 	background: #efefef;
 	color: #111111;
@@ -403,23 +408,47 @@ label
 	white-space: pre;
 	overflow-x: auto;
 }
-.emwinMessageBody .prettyBoxList:first-child::-webkit-scrollbar,
-.adminMessageBody::-webkit-scrollbar,
-.forcastCardHolder::-webkit-scrollbar
+::-webkit-scrollbar
 {
 	height: 10px;
 }
-.emwinMessageBody .prettyBoxList:first-child::-webkit-scrollbar-track
-.adminMessageBody::-webkit-scrollbar-track,
-.forcastCardHolder::-webkit-scrollbar-track
+::-webkit-scrollbar-track
 {
 	background: #444444;
 }
-.emwinMessageBody .prettyBoxList:first-child::-webkit-scrollbar-thumb,
-.adminMessageBody::-webkit-scrollbar-thumb,
-.forcastCardHolder::-webkit-scrollbar-thumb
+::-webkit-scrollbar-button:vertical:decrement
+{
+	background-position: center;
+	background-repeat: no-repeat;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='5' fill='rgb(239, 239, 239)'><polygon points='5,0 0,5 10,5'/></svg>");
+}
+::-webkit-scrollbar-button:vertical:increment
+{
+	background-position: center;
+	background-repeat: no-repeat;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='5' fill='rgb(239, 239, 239)'><polygon points='0,0 10,0 5,5'/></svg>");
+}
+::-webkit-scrollbar-button:vertical:hover
+{
+	background-color: #555555;
+}
+::-webkit-scrollbar-thumb
 {
 	background: #888888;
+}
+.otherEmwinDeleteHolder
+{
+	position: absolute;
+	top: 50%;
+    transform: translateY(-50%);
+	font-size: 12pt;
+	right: 0;
+}
+.otherEmwinDeleteHolder .fa-trash-alt
+{
+	color: #d54040;
+	margin: 0;
+	padding: 10px;
 }
 .prettyBoxList.otherEmwinNavigation
 {
