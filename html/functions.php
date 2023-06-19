@@ -96,7 +96,7 @@ function loadOtherEmwin()
 		$allCards = explode("~", $_COOKIE['otheremwin']);
 		foreach($allCards as $thisCard)
 		{
-			$cardParts = explode("!", $thisLocation);
+			$cardParts = explode("!", $thisCard);
 			
 			//Verify data
 			if(count($cardParts) != 4 || !is_numeric($cardParts[3]) || !in_array($cardParts[2], array('paragraph', 'formatted')))

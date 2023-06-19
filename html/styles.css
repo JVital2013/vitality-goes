@@ -295,6 +295,11 @@ label
 	font-size: 10pt;
 	text-align: left;
 }
+.truncLeft
+{
+	float: left;
+	padding-top: 10px;
+}
 .weatherLeft
 {
 	float: left;

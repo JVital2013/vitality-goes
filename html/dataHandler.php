@@ -290,7 +290,7 @@ elseif($_GET['type'] == "metadata")
 					
 					foreach(array('system', 'user') as $thisType)
 						for($i = 0; $i < count($otherEmwinConfig[$thisType]); $i++)
-							if(preg_match("/-{$otherEmwinConfig['system'][$i]['identifier']}\.TXT$/i", $thisFile))
+							if(preg_match("/-{$otherEmwinConfig[$thisType][$i]['identifier']}\.TXT$/i", $thisFile))
 								$otherEmwinFiles[$thisType][$i][] = $thisFile;
 				}
 			}
@@ -303,6 +303,7 @@ elseif($_GET['type'] == "metadata")
 			sort($metadata['allStates']);
 			
 			//Sort and parse messages
+			//TODO: Limit user-queried files to some number
 			foreach(array('system', 'user') as $thisType)
 			{
 				for($i = 0; $i < count($otherEmwinConfig[$thisType]); $i++)

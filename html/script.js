@@ -75,6 +75,20 @@ function encodeProfile(profileArray)
 	
 	return profileParts.join('~');
 }
+function encodeOtherEmwinConfig(emwinArray)
+{
+	emwinParts = [];
+	emwinArray.forEach((thisEmwin) => {
+		emwinParts.push([
+			(thisEmwin.hasOwnProperty('identifier') ? thisEmwin.identifier : ""),
+			(thisEmwin.hasOwnProperty('title') ? thisEmwin.title : ""),
+			(thisEmwin.hasOwnProperty('format') ? thisEmwin.format : ""),
+			(thisEmwin.hasOwnProperty('truncate') ? thisEmwin.truncate : "")
+		].join("!"));
+	});
+	
+	return emwinParts.join('~');
+}
 function decodeProfile(profileString)
 {
 	profileArray = [];
@@ -96,6 +110,23 @@ function decodeProfile(profileString)
 	});
 	
 	return profileArray;
+}
+function decodeOtherEmwinConfig(emwinString)
+{
+	emwinArray = [];
+	allEmwins = emwinString.split("~");
+	allEmwins.forEach((thisLocation) => {
+		emwinParts = thisLocation.split("!");
+		if(emwinParts.length != 4) return;
+		emwinArray.push({
+			'identifier': emwinParts[0],
+			'title': emwinParts[1],
+			'format': emwinParts[2],
+			'truncate': emwinParts[3]
+		});
+	});
+	
+	return emwinArray;
 }
 function slideDrawer()
 {
@@ -384,25 +415,45 @@ function renderPicklistItems(picklistBox, dataProperty, inputData = "")
 		}
 	});
 	
-	if(!didSelectElement && picklistBox.childElementCount > 0)
+	if(!didSelectElement)
 	{
-		picklistBox.firstChild.className += " selectedFilterItem";
+		if(picklistBox.childElementCount > 0) picklistBox.firstChild.className += " selectedFilterItem";
 		checkIfValidOtherEmwin();
 	}
 }
 function checkIfValidOtherEmwin()
 {
+	//Sanity Check (this runs before the DOM is complete)
 	inputMethodSelector = document.querySelector('input[name="inputMethod"]:checked');
 	if(inputMethodSelector == null) return;
+	
+	//Not all 3 selectors can be set to [All]
+	isValid = true;
 	if(inputMethodSelector.value == 'useBuilder')
 	{
-		productSelector = document.querySelector('#allProductsPicklist .selectedFilterItem'); 
-		//TODO: Finish
+		productSelector = document.querySelector('#allProductsPicklist .selectedFilterItem');
+		originatorSelector = document.querySelector('#allOriginatorsPicklist .selectedFilterItem'); 
+		statesSelector = document.querySelector('#allStatesPicklist .selectedFilterItem');
+		if(productSelector == null || originatorSelector == null || statesSelector == null) isValid = false;
+		else if(productSelector.innerHTML == "[Any]" && originatorSelector.innerHTML == "[Any]" && statesSelector.innerHTML == "[Any]") isValid = false;
 	}
+	
+	//Make sure the regex is valid
 	else
 	{
-		
+		selectorRegex = document.getElementById('selectorRegex').value;
+		if(selectorRegex == "") isValid = false;
+		else
+		{
+			try {new RegExp(selectorRegex);}
+			catch(e) {isValid = false;}
+		}
 	}
+	
+	//Make sure the name is set
+	if(document.getElementById('nameInput').value == '') isValid = false;
+	
+	document.getElementById('saveButton').disabled = !isValid;
 }
 function renderLeftRightLine(target, tempsName, tempsValue)
 {
@@ -927,6 +978,28 @@ function menuSelect(menuSlug)
 					nameInput.addEventListener('input', function() {checkIfValidOtherEmwin();} );
 					nameFlex.appendChild(nameInput);
 					nameSection.appendChild(nameFlex);
+					
+					truncLabel = document.createElement('div');
+					truncLabel.className = 'truncLeft';
+					truncLabel.innerHTML = "Lines to remove from beginning:";
+					nameSection.appendChild(truncLabel);
+					
+					truncInput = document.createElement('input');
+					truncInput.type = 'number';
+					truncInput.style.width = '3em';
+					truncInput.style.textAlign = 'left';
+					truncInput.value = 0;
+					truncInput.pattern = '\d*';
+					truncInput.inputMode = 'numeric';
+					truncInput.min = 0;
+					truncInput.max = 10;
+					truncInput.id = 'truncInput';
+					truncInput.className = 'weatherRight';
+					nameSection.appendChild(truncInput);
+					
+					clearDiv = document.createElement('div');
+					clearDiv.style.clear = 'both';
+					nameSection.appendChild(clearDiv);
 					target.appendChild(nameSection);
 					
 					settingsSetion = document.createElement('div');
@@ -951,7 +1024,7 @@ function menuSelect(menuSlug)
 					preOptFlex.appendChild(preOptRadio);
 					preOptLabel = document.createElement('label');
 					preOptLabel.htmlFor = 'preOptRadio';
-					preOptLabel.innerHTML = "<b>Preformatted: </b> The data contains tables or other pre-formatted data that does not convert nicely into paragraphs";
+					preOptLabel.innerHTML = "<b>Pre-formatted: </b> The data contains tables or other pre-formatted data that does not convert nicely into paragraphs";
 					preOptFlex.appendChild(preOptLabel);
 					settingsSetion.appendChild(preOptFlex);
 					
@@ -961,7 +1034,7 @@ function menuSelect(menuSlug)
 					paraOptRadio.type = 'radio';
 					paraOptRadio.name = 'formatMethod';
 					paraOptRadio.id = 'paraOptRadio';
-					preOptRadio.value = 'paragraph';
+					preOptRadio.value = 'formatted';
 
 					paraOptFlex.appendChild(paraOptRadio);
 					paraOptLabel = document.createElement('label');
@@ -984,8 +1057,35 @@ function menuSelect(menuSlug)
 					saveButton.disabled = true;
 					saveButton.style.width = "100%";
 					saveButton.addEventListener('click', function() {
-						//TODO
-						console.log("TODO");
+						//Get Regex
+						inputMethodSelector = document.querySelector('input[name="inputMethod"]:checked');
+						if(inputMethodSelector.value == 'useBuilder')
+						{
+							productSelector = document.querySelector('#allProductsPicklist .selectedFilterItem').innerHTML;
+							originatorSelector = document.querySelector('#allOriginatorsPicklist .selectedFilterItem').innerHTML; 
+							statesSelector = document.querySelector('#allStatesPicklist .selectedFilterItem').innerHTML;
+							identifier = (productSelector == "[Any]" ? "[A-Z0-9]{3}" : productSelector) +
+								(originatorSelector == "[Any]" ? "[A-Z0-9]{3}" : originatorSelector) +
+								(statesSelector == "[Any]" ? "[A-Z0-9]{2}" : statesSelector);
+						}
+						else identifier = document.getElementById('selectorRegex').value;
+						
+						//Get title, Lines to truncate, and format
+						title = document.getElementById('nameInput').value;
+						format = document.querySelector('input[name="formatMethod"]:checked').value;
+						truncate = document.getElementById('truncInput').value;
+						
+						otherEmwinConfigString = getCookie('otherEmwin');
+						otherEmwinConfig = decodeOtherEmwinConfig(otherEmwinConfigString);
+						otherEmwinConfig.push({
+							'identifier': identifier,
+							'title': title,
+							'format': format,
+							'truncate': truncate
+						});
+						
+						setCookie("otheremwin", encodeOtherEmwinConfig(otherEmwinConfig));
+						location.reload();
 					});
 					saveButtonSection.appendChild(saveButton);
 					target.appendChild(saveButtonSection);
