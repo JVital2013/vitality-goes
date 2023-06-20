@@ -1163,6 +1163,10 @@ function menuSelect(menuSlug)
 					document.getElementById('saveButton').value = "Update \"" + config.otherEmwin.user[target].title + "\"";
 					if(editorCard.style.display == 'none') editorCard.previousSibling.click();
 					
+					document.getElementById('nameInput').value = config.otherEmwin.user[target].title;
+					document.getElementById('truncInput').value = config.otherEmwin.user[target].truncate;
+					document.getElementById(config.otherEmwin.user[target].format == "paragraph" ? "paraOptRadio" : "preOptRadio").checked = true;
+					
 					identifierParts = /^\(([A-Z0-9]{3}|\[A-Z0-9\]\{3\})\)\(([A-Z0-9]{3}|\[A-Z0-9\]\{3\})\)\(([A-Z0-9]{2}|\[A-Z0-9\]\{2\})\)$/.exec(config.otherEmwin.user[target].identifier);
 					if(identifierParts != null)
 					{
@@ -1179,9 +1183,6 @@ function menuSelect(menuSlug)
 					}
 					
 					//TODO: Change style in edit mode?
-					document.getElementById('nameInput').value = config.otherEmwin.user[target].title;
-					document.getElementById('truncInput').value = config.otherEmwin.user[target].truncate;
-					document.getElementById(config.otherEmwin.user[target].format == "paragraph" ? "paraOptRadio" : "preOptRadio").checked = true;
 					event.stopPropagation();
 				});
 				deleteHolder.appendChild(editButton);
