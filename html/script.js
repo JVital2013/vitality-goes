@@ -508,11 +508,20 @@ function renderPicklistItems(useAny = false)
 		allStatesPicklist.appendChild(newOption);
 	});
 	
+	//Scroll to selected
+	selectedProductElement = document.querySelector('#allProductsPicklist .selected');
+	selectedOriginatorElement = document.querySelector('#allOriginatorsPicklist .selected'); 
+	selectedStateElement = document.querySelector('#allStatesPicklist .selected');
+	if(selectedProductElement != null && !isInView(selectedProductElement)) selectedProductElement.scrollIntoView({ behavior: 'instant', block: 'nearest', inline: 'start' });
+	if(selectedOriginatorElement != null && !isInView(selectedOriginatorElement)) selectedOriginatorElement.scrollIntoView({ behavior: 'instant', block: 'nearest', inline: 'start' });
+	if(selectedStateElement != null && !isInView(selectedStateElement)) selectedStateElement.scrollIntoView({ behavior: 'instant', block: 'nearest', inline: 'start' });
+	
+	//Validate
 	checkIfValidOtherEmwin();
 }
 function checkIfValidOtherEmwin()
 {
-	//Sanity Check (this runs before the DOM is complete)
+	//Sanity Check (this may run before the DOM is complete)
 	inputMethodSelector = document.querySelector('input[name="inputMethod"]:checked');
 	if(inputMethodSelector == null) return;
 	
@@ -543,6 +552,12 @@ function checkIfValidOtherEmwin()
 	if(document.getElementById('nameInput').value == '') isValid = false;
 	
 	document.getElementById('saveButton').disabled = !isValid;
+}
+function isInView(ele)
+{
+	position = ele.getBoundingClientRect();
+	parentPosition = ele.parentElement.getBoundingClientRect();
+	return position.top >= parentPosition.top && position.bottom <= parentPosition.bottom;
 }
 function renderLeftRightLine(target, tempsName, tempsValue)
 {
