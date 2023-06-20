@@ -389,6 +389,7 @@ label
 	overflow-y: scroll;
 	flex: 1;
 	user-select: none;
+	-webkit-overflow-scrolling: touch;
 }
 .autoFilterItem
 {
@@ -407,6 +408,7 @@ label
 	font-family: monospace;
 	white-space: pre;
 	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
 }
 ::-webkit-scrollbar
 {
@@ -515,6 +517,7 @@ label
 .forcastCardHolder
 {
 	overflow-x: scroll;
+	-webkit-overflow-scrolling: touch;
 	white-space: nowrap;
 	padding-bottom: 10px;
 	user-select: none;
