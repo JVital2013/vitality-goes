@@ -359,7 +359,8 @@ function renderAutoFilterPicklist(dataProperty)
 	thisSearchHolder.className = 'autoFilterSearchHolder';
 	thisSearch = document.createElement('input');
 	thisSearch.type = 'text';
-	thisSearchHolder.addEventListener("input", function(event) {renderPicklistItems(event.target.parentElement.nextSibling, dataProperty, event.target.value);});
+	thisSearch.id = dataProperty + 'Search';
+	thisSearchHolder.addEventListener("input", function(event) {renderPicklistItems();});
 	thisSearchHolder.appendChild(thisSearch);
 	thisSearchIcon = document.createElement('i');
 	thisSearchIcon.className = "fa fa-search";
@@ -369,57 +370,145 @@ function renderAutoFilterPicklist(dataProperty)
 	thisPicklistBox = document.createElement('div');
 	thisPicklistBox.className = 'autoFilterPicklist';
 	thisPicklistBox.id = dataProperty + "Picklist";
-	renderPicklistItems(thisPicklistBox, dataProperty);
+	
+	tempOption = document.createElement('div');
+	tempOption.className = 'autoFilterItem';
+	tempOption.innerHTML = "Loading...";
+	thisPicklistBox.appendChild(tempOption);
 	thisPicklistHolder.appendChild(thisPicklistBox);
 	return thisPicklistHolder;
 }
-function renderPicklistItems(picklistBox, dataProperty, inputData = "")
+function renderPicklistItems(useAny = false)
 {
-	currentlySelectedElement = picklistBox.querySelector('.autoFilterItem.selected');
-	if(currentlySelectedElement == null) newSelectedElement = null;
-	else newSelectedElement = currentlySelectedElement.innerHTML;
-	
-	picklistBox.innerHTML = "";
-	didSelectElement = false;
-	if(inputData == "")
+	//Fetch pertinent informaton
+	if(useAny)
 	{
-		newOption = document.createElement('div');
-		newOption.className = 'autoFilterItem';
-		newOption.innerHTML = "[Any]";
-		newOption.addEventListener('click', function(event) {
-			event.target.parentElement.querySelector('.autoFilterItem.selected').className = "autoFilterItem";
-			event.target.className += " selected";
-			checkIfValidOtherEmwin();
-		});
-		picklistBox.appendChild(newOption);
+		selectedProduct = selectedOriginator = selectedState = "[Any]";
+	}
+	else
+	{
+		selectedProductElement = document.querySelector('#allProductsPicklist .selected');
+		selectedOriginatorElement = document.querySelector('#allOriginatorsPicklist .selected'); 
+		selectedStateElement = document.querySelector('#allStatesPicklist .selected');
+		selectedProduct = (selectedProductElement == null ? "" : selectedProductElement.innerHTML);
+		selectedOriginator = (selectedOriginatorElement == null ? "" : selectedOriginatorElement.innerHTML);
+		selectedState = (selectedStateElement == null ? "" : selectedStateElement.innerHTML);
 	}
 	
-	responseData[dataProperty].forEach(function(element){
-		if(inputData == "" || element.toLowerCase().includes(inputData.toLowerCase()))
-		{
-			newOption = document.createElement('div');
-			newOption.className = 'autoFilterItem';
-			if(element == newSelectedElement)
-			{
-				didSelectElement = true;
-				newOption.className += " selected";
-			}
+	allProductsSearch = document.getElementById('allProductsSearch').value;
+	allOriginatorsSearch = document.getElementById('allOriginatorsSearch').value;
+	allStatesSearch = document.getElementById('allStatesSearch').value;
+	
+	allProductsPicklist = document.getElementById('allProductsPicklist');
+	allOriginatorsPicklist = document.getElementById('allOriginatorsPicklist');
+	allStatesPicklist = document.getElementById('allStatesPicklist');
+	
+	//Break down all products
+	allProducts = [];
+	allOriginators = [];
+	allStates = [];
+	responseData['allUnique'].forEach(function(element){
+		thisProduct = element.substring(0, 3);
+		thisOriginator = element.substring(3, 6);
+		thisState = element.substring(6);
+		
+		if((selectedOriginator == thisOriginator || selectedOriginator == "[Any]" || selectedOriginator == "") &&
+			(selectedState == thisState || selectedState == "[Any]" || selectedState == "") &&
+			(allProductsSearch == "" || thisProduct.toLowerCase().includes(allProductsSearch.toLowerCase()))) allProducts.push(thisProduct);
 			
-			newOption.innerHTML = element;
-			newOption.addEventListener('click', function(event) {
-				event.target.parentElement.querySelector('.autoFilterItem.selected').className = "autoFilterItem";
-				event.target.className += " selected";
-				checkIfValidOtherEmwin();
-			});
-			picklistBox.appendChild(newOption);
-		}
+		if((selectedProduct == thisProduct || selectedProduct == "[Any]" || selectedProduct == "") &&
+			(selectedState == thisState || selectedState == "[Any]" || selectedState == "") &&
+			(allOriginatorsSearch == "" || thisOriginator.toLowerCase().includes(allOriginatorsSearch.toLowerCase()))) allOriginators.push(thisOriginator);
+			
+		if((selectedProduct == thisProduct || selectedProduct == "[Any]" || selectedProduct == "") &&
+			(selectedOriginator == thisOriginator || selectedOriginator == "[Any]" || selectedOriginator == "") &&
+			(allStatesSearch == "" || thisState.toLowerCase().includes(allStatesSearch.toLowerCase()))) allStates.push(thisState);
 	});
 	
-	if(!didSelectElement)
-	{
-		if(picklistBox.childElementCount > 0) picklistBox.firstChild.className += " selected";
-		checkIfValidOtherEmwin();
-	}
+	allProducts = [...new Set(allProducts)].sort();
+	allOriginators = [...new Set(allOriginators)].sort();
+	allStates = [...new Set(allStates)].sort();
+	
+	//Render Lists
+	allProductsPicklist.innerHTML = "";
+	newOption = document.createElement('div');
+	newOption.className = 'autoFilterItem';
+	if(selectedProduct == "[Any]") newOption.className += " selected";
+	newOption.innerHTML = "[Any]";
+	newOption.addEventListener('click', function(event) {
+		lastSelected = event.target.parentElement.querySelector('.autoFilterItem.selected');
+		if(lastSelected != null) event.target.parentElement.querySelector('.autoFilterItem.selected').className = "autoFilterItem";
+		event.target.className += " selected";
+		renderPicklistItems();
+	});
+	allProductsPicklist.appendChild(newOption);
+	allProducts.forEach(function(element){
+		newOption = document.createElement('div');
+		newOption.className = 'autoFilterItem';
+		if(selectedProduct == element) newOption.className += " selected";
+		newOption.innerHTML = element;
+		newOption.addEventListener('click', function(event) {
+			lastSelected = event.target.parentElement.querySelector('.autoFilterItem.selected');
+			if(lastSelected != null) event.target.parentElement.querySelector('.autoFilterItem.selected').className = "autoFilterItem";
+			event.target.className += " selected";
+			renderPicklistItems();
+		});
+		allProductsPicklist.appendChild(newOption);
+	});
+	
+	allOriginatorsPicklist.innerHTML = "";
+	newOption = document.createElement('div');
+	newOption.className = 'autoFilterItem';
+	if(selectedOriginator == "[Any]") newOption.className += " selected";
+	newOption.innerHTML = "[Any]";
+	newOption.addEventListener('click', function(event) {
+		lastSelected = event.target.parentElement.querySelector('.autoFilterItem.selected');
+		if(lastSelected != null) event.target.parentElement.querySelector('.autoFilterItem.selected').className = "autoFilterItem";
+		event.target.className += " selected";
+		renderPicklistItems();
+	});
+	allOriginatorsPicklist.appendChild(newOption);
+	allOriginators.forEach(function(element){
+		newOption = document.createElement('div');
+		newOption.className = 'autoFilterItem';
+		if(selectedOriginator == element) newOption.className += " selected";
+		newOption.innerHTML = element;
+		newOption.addEventListener('click', function(event) {
+			lastSelected = event.target.parentElement.querySelector('.autoFilterItem.selected');
+			if(lastSelected != null) event.target.parentElement.querySelector('.autoFilterItem.selected').className = "autoFilterItem";
+			event.target.className += " selected";
+			renderPicklistItems();
+		});
+		allOriginatorsPicklist.appendChild(newOption);
+	});
+	
+	allStatesPicklist.innerHTML = "";
+	newOption = document.createElement('div');
+	newOption.className = 'autoFilterItem';
+	if(selectedState == "[Any]") newOption.className += " selected";
+	newOption.innerHTML = "[Any]";
+	newOption.addEventListener('click', function(event) {
+		lastSelected = event.target.parentElement.querySelector('.autoFilterItem.selected');
+		if(lastSelected != null) event.target.parentElement.querySelector('.autoFilterItem.selected').className = "autoFilterItem";
+		event.target.className += " selected";
+		renderPicklistItems();
+	});
+	allStatesPicklist.appendChild(newOption);
+	allStates.forEach(function(element){
+		newOption = document.createElement('div');
+		newOption.className = 'autoFilterItem';
+		if(selectedState == element) newOption.className += " selected";
+		newOption.innerHTML = element;
+		newOption.addEventListener('click', function(event) {
+			lastSelected = event.target.parentElement.querySelector('.autoFilterItem.selected');
+			if(lastSelected != null) event.target.parentElement.querySelector('.autoFilterItem.selected').className = "autoFilterItem";
+			event.target.className += " selected";
+			renderPicklistItems();
+		});
+		allStatesPicklist.appendChild(newOption);
+	});
+	
+	checkIfValidOtherEmwin();
 }
 function checkIfValidOtherEmwin()
 {
@@ -838,6 +927,211 @@ function menuSelect(menuSlug)
 		if(config.showEmwinInfo)
 		{
 			renderCollapsingCard("emwinLoader", "Load Additional Data", "prettyBoxContent", "weatherBody");
+			target = document.getElementById('emwinLoaderContent').firstChild;
+			target.innerHTML = "";
+			
+			selectorSection = document.createElement('div');
+			selectorSection.className = 'prettyBoxList';
+			selectorSection.style.padding = 0;
+			selectorSection.style.paddingBottom = "10px";
+			
+			radioButton = document.createElement('input');
+			radioButton.type = 'radio';
+			radioButton.name = 'inputMethod';
+			radioButton.id = 'useBuilder';
+			radioButton.value = 'useBuilder';
+			radioButton.checked = true;
+			radioButton.addEventListener('click', function(){
+				document.getElementById('selectorRegex').disabled = true;
+				document.getElementById('autoFilterFlex').className = 'autoFilterFlex';
+				checkIfValidOtherEmwin();
+			});
+			
+			selectorSection.appendChild(radioButton);
+			buttonLabel = document.createElement('label');
+			buttonLabel.htmlFor = 'useBuilder';
+			buttonLabel.innerHTML = "Automatic Data Selector";
+			selectorSection.appendChild(buttonLabel);
+			
+			autoFilterFlex = document.createElement('div');
+			autoFilterFlex.id = 'autoFilterFlex';
+			autoFilterFlex.className = 'autoFilterFlex';
+			
+			productFilter = document.createElement('div');
+			productFilter.className = 'autoFilterCategory';
+			productFilter.innerHTML = "Product";
+			productFilter.appendChild(renderAutoFilterPicklist("allProducts"));
+			autoFilterFlex.appendChild(productFilter);
+			
+			originatorFilter = document.createElement('div');
+			originatorFilter.className = 'autoFilterCategory';
+			originatorFilter.innerHTML = "Originator";
+			originatorFilter.appendChild(renderAutoFilterPicklist("allOriginators"));
+			autoFilterFlex.appendChild(originatorFilter);
+
+			stateFilter = document.createElement('div');
+			stateFilter.className = 'autoFilterCategory';
+			stateFilter.innerHTML = "State";
+			stateFilter.appendChild(renderAutoFilterPicklist("allStates"));
+			autoFilterFlex.appendChild(stateFilter);
+			selectorSection.appendChild(autoFilterFlex);
+			
+			regexFlex = document.createElement('div');
+			regexFlex.className = 'inputFlex';
+			radioButton = document.createElement('input');
+			radioButton.type = 'radio';
+			radioButton.name = 'inputMethod';
+			radioButton.id = 'manualRegex';
+			radioButton.value = 'manualRegex';
+			radioButton.addEventListener('click', function(){
+				document.getElementById('selectorRegex').disabled = false;
+				document.getElementById('autoFilterFlex').className = 'autoFilterFlex disabled';
+				checkIfValidOtherEmwin();
+			});
+			
+			regexFlex.appendChild(radioButton);
+			buttonLabel = document.createElement('label');
+			buttonLabel.htmlFor = 'manualRegex';
+			buttonLabel.innerHTML = "Manual Data Selector";
+			regexFlex.appendChild(buttonLabel);
+			
+			selectorRegex = document.createElement('input');
+			selectorRegex.type = 'text';
+			selectorRegex.id = 'selectorRegex';
+			selectorRegex.disabled = true;
+			selectorRegex.addEventListener('input', function() {checkIfValidOtherEmwin();} );
+			regexFlex.appendChild(selectorRegex);
+			selectorSection.appendChild(regexFlex);
+			target.appendChild(selectorSection);
+			
+			nameSection = document.createElement('div');
+			nameSection.className = 'prettyBoxList';
+			nameSection.style.padding = 0;
+			nameSection.style.paddingBottom = "10px";
+			
+			nameFlex = document.createElement('div');
+			nameFlex.className = 'inputFlex';
+			nameLabel = document.createElement('label');
+			nameLabel.htmlFor = 'nameInput';
+			nameLabel.innerHTML = "Display Name:";
+			nameFlex.appendChild(nameLabel);
+			
+			nameInput = document.createElement('input');
+			nameInput.type = 'text';
+			nameInput.id = 'nameInput';
+			nameInput.addEventListener('input', function() {checkIfValidOtherEmwin();} );
+			nameFlex.appendChild(nameInput);
+			nameSection.appendChild(nameFlex);
+			
+			truncLabel = document.createElement('div');
+			truncLabel.className = 'truncLeft';
+			truncLabel.innerHTML = "Lines to remove from beginning:";
+			nameSection.appendChild(truncLabel);
+			
+			truncInput = document.createElement('input');
+			truncInput.type = 'number';
+			truncInput.style.width = '3em';
+			truncInput.style.textAlign = 'left';
+			truncInput.value = 0;
+			truncInput.pattern = '\d*';
+			truncInput.inputMode = 'numeric';
+			truncInput.min = 0;
+			truncInput.max = 10;
+			truncInput.id = 'truncInput';
+			truncInput.className = 'weatherRight';
+			nameSection.appendChild(truncInput);
+			
+			clearDiv = document.createElement('div');
+			clearDiv.style.clear = 'both';
+			nameSection.appendChild(clearDiv);
+			target.appendChild(nameSection);
+			
+			settingsSetion = document.createElement('div');
+			settingsSetion.className = 'prettyBoxList';
+			settingsSetion.style.padding = 0;
+			settingsSetion.style.paddingBottom = "10px";
+			
+			formatHeader = document.createElement('div');
+			formatHeader.innerHTML = "Text File Type";
+			formatHeader.style.fontWeight = 'bold';
+			settingsSetion.appendChild(formatHeader);
+			
+			preOptFlex = document.createElement('div');
+			preOptFlex.className = 'fileTypeRow';
+			preOptRadio = document.createElement('input');
+			preOptRadio.type = 'radio';
+			preOptRadio.name = 'formatMethod';
+			preOptRadio.id = 'preOptRadio';
+			preOptRadio.checked = true;
+			preOptRadio.value = 'formatted';
+
+			preOptFlex.appendChild(preOptRadio);
+			preOptLabel = document.createElement('label');
+			preOptLabel.htmlFor = 'preOptRadio';
+			preOptLabel.innerHTML = "<b>Pre-formatted: </b> The data contains tables or other pre-formatted data that does not convert nicely into paragraphs";
+			preOptFlex.appendChild(preOptLabel);
+			settingsSetion.appendChild(preOptFlex);
+			
+			paraOptFlex = document.createElement('div');
+			paraOptFlex.className = 'fileTypeRow';
+			paraOptRadio = document.createElement('input');
+			paraOptRadio.type = 'radio';
+			paraOptRadio.name = 'formatMethod';
+			paraOptRadio.id = 'paraOptRadio';
+			paraOptRadio.value = 'paragraph';
+
+			paraOptFlex.appendChild(paraOptRadio);
+			paraOptLabel = document.createElement('label');
+			paraOptLabel.htmlFor = 'paraOptRadio';
+			paraOptLabel.innerHTML = "<b>Paragraph: </b> the data consits of sentences that can be converted easily into paragraph form";
+			paraOptFlex.appendChild(paraOptLabel);
+			settingsSetion.appendChild(paraOptFlex);
+			target.appendChild(settingsSetion);
+			
+			saveButtonSection = document.createElement('div');
+			saveButtonSection.className = 'prettyBoxList';
+			saveButtonSection.style.padding = 0;
+			saveButtonSection.style.marginBottom = 0;
+			saveButtonSection.style.textAlign = 'center';
+			saveButton = document.createElement('input');
+			saveButton.type = 'button';
+			saveButton.id = 'saveButton';
+			saveButton.style.fontWeight = 'bold';
+			saveButton.value = "Save";
+			saveButton.disabled = true;
+			saveButton.style.width = "100%";
+			saveButton.addEventListener('click', function() {
+				//Get Regex
+				inputMethodSelector = document.querySelector('input[name="inputMethod"]:checked');
+				if(inputMethodSelector.value == 'useBuilder')
+				{
+					productSelector = document.querySelector('#allProductsPicklist .selected').innerHTML;
+					originatorSelector = document.querySelector('#allOriginatorsPicklist .selected').innerHTML; 
+					statesSelector = document.querySelector('#allStatesPicklist .selected').innerHTML;
+					identifier = (productSelector == "[Any]" ? "[A-Z0-9]{3}" : productSelector) +
+						(originatorSelector == "[Any]" ? "[A-Z0-9]{3}" : originatorSelector) +
+						(statesSelector == "[Any]" ? "[A-Z0-9]{2}" : statesSelector);
+				}
+				else identifier = document.getElementById('selectorRegex').value;
+				
+				//Get title, Lines to truncate, and format
+				title = document.getElementById('nameInput').value;
+				format = document.querySelector('input[name="formatMethod"]:checked').value;
+				truncate = document.getElementById('truncInput').value;
+				
+				otherEmwinConfig = decodeOtherEmwinConfig(getCookie('otheremwin'));
+				otherEmwinConfig.push({
+					'identifier': identifier,
+					'title': title,
+					'format': format,
+					'truncate': truncate
+				});
+				
+				setCookie("otheremwin", encodeOtherEmwinConfig(otherEmwinConfig));
+				location.reload();
+			});
+			saveButtonSection.appendChild(saveButton);
+			target.appendChild(saveButtonSection);
 			
 			//User EMWIN Data
 			cardNum = 0;
@@ -901,212 +1195,7 @@ function menuSelect(menuSlug)
 				if(config.showEmwinInfo)
 				{
 					//Additional Data Loader
-					target = document.getElementById('emwinLoaderContent').firstChild;
-					target.innerHTML = "";
-					
-					selectorSection = document.createElement('div');
-					selectorSection.className = 'prettyBoxList';
-					selectorSection.style.padding = 0;
-					selectorSection.style.paddingBottom = "10px";
-					
-					radioButton = document.createElement('input');
-					radioButton.type = 'radio';
-					radioButton.name = 'inputMethod';
-					radioButton.id = 'useBuilder';
-					radioButton.value = 'useBuilder';
-					radioButton.checked = true;
-					radioButton.addEventListener('click', function(){
-						document.getElementById('selectorRegex').disabled = true;
-						document.getElementById('autoFilterFlex').className = 'autoFilterFlex';
-						checkIfValidOtherEmwin();
-					});
-					
-					selectorSection.appendChild(radioButton);
-					buttonLabel = document.createElement('label');
-					buttonLabel.htmlFor = 'useBuilder';
-					buttonLabel.innerHTML = "Automatic Data Selector";
-					selectorSection.appendChild(buttonLabel);
-					
-					autoFilterFlex = document.createElement('div');
-					autoFilterFlex.id = 'autoFilterFlex';
-					autoFilterFlex.className = 'autoFilterFlex';
-					
-					productFilter = document.createElement('div');
-					productFilter.className = 'autoFilterCategory';
-					productFilter.innerHTML = "Product";
-					productFilter.appendChild(renderAutoFilterPicklist("allProducts"));
-					autoFilterFlex.appendChild(productFilter);
-					
-					originatorFilter = document.createElement('div');
-					originatorFilter.className = 'autoFilterCategory';
-					originatorFilter.innerHTML = "Originator";
-					originatorFilter.appendChild(renderAutoFilterPicklist("allOriginators"));
-					autoFilterFlex.appendChild(originatorFilter);
-
-					stateFilter = document.createElement('div');
-					stateFilter.className = 'autoFilterCategory';
-					stateFilter.innerHTML = "State";
-					stateFilter.appendChild(renderAutoFilterPicklist("allStates"));
-					autoFilterFlex.appendChild(stateFilter);
-					
-					selectorSection.appendChild(autoFilterFlex);
-					
-					regexFlex = document.createElement('div');
-					regexFlex.className = 'inputFlex';
-					radioButton = document.createElement('input');
-					radioButton.type = 'radio';
-					radioButton.name = 'inputMethod';
-					radioButton.id = 'manualRegex';
-					radioButton.value = 'manualRegex';
-					radioButton.addEventListener('click', function(){
-						document.getElementById('selectorRegex').disabled = false;
-						document.getElementById('autoFilterFlex').className = 'autoFilterFlex disabled';
-						checkIfValidOtherEmwin();
-					});
-					
-					regexFlex.appendChild(radioButton);
-					buttonLabel = document.createElement('label');
-					buttonLabel.htmlFor = 'manualRegex';
-					buttonLabel.innerHTML = "Enter Selector Regex";
-					regexFlex.appendChild(buttonLabel);
-					
-					selectorRegex = document.createElement('input');
-					selectorRegex.type = 'text';
-					selectorRegex.id = 'selectorRegex';
-					selectorRegex.disabled = true;
-					selectorRegex.addEventListener('input', function() {checkIfValidOtherEmwin();} );
-					regexFlex.appendChild(selectorRegex);
-					selectorSection.appendChild(regexFlex);
-					target.appendChild(selectorSection);
-					
-					nameSection = document.createElement('div');
-					nameSection.className = 'prettyBoxList';
-					nameSection.style.padding = 0;
-					nameSection.style.paddingBottom = "10px";
-					
-					nameFlex = document.createElement('div');
-					nameFlex.className = 'inputFlex';
-					nameLabel = document.createElement('label');
-					nameLabel.htmlFor = 'nameInput';
-					nameLabel.innerHTML = "Display Name:";
-					nameFlex.appendChild(nameLabel);
-					
-					nameInput = document.createElement('input');
-					nameInput.type = 'text';
-					nameInput.id = 'nameInput';
-					nameInput.addEventListener('input', function() {checkIfValidOtherEmwin();} );
-					nameFlex.appendChild(nameInput);
-					nameSection.appendChild(nameFlex);
-					
-					truncLabel = document.createElement('div');
-					truncLabel.className = 'truncLeft';
-					truncLabel.innerHTML = "Lines to remove from beginning:";
-					nameSection.appendChild(truncLabel);
-					
-					truncInput = document.createElement('input');
-					truncInput.type = 'number';
-					truncInput.style.width = '3em';
-					truncInput.style.textAlign = 'left';
-					truncInput.value = 0;
-					truncInput.pattern = '\d*';
-					truncInput.inputMode = 'numeric';
-					truncInput.min = 0;
-					truncInput.max = 10;
-					truncInput.id = 'truncInput';
-					truncInput.className = 'weatherRight';
-					nameSection.appendChild(truncInput);
-					
-					clearDiv = document.createElement('div');
-					clearDiv.style.clear = 'both';
-					nameSection.appendChild(clearDiv);
-					target.appendChild(nameSection);
-					
-					settingsSetion = document.createElement('div');
-					settingsSetion.className = 'prettyBoxList';
-					settingsSetion.style.padding = 0;
-					settingsSetion.style.paddingBottom = "10px";
-					
-					formatHeader = document.createElement('div');
-					formatHeader.innerHTML = "Text File Type";
-					formatHeader.style.fontWeight = 'bold';
-					settingsSetion.appendChild(formatHeader);
-					
-					preOptFlex = document.createElement('div');
-					preOptFlex.className = 'fileTypeRow';
-					preOptRadio = document.createElement('input');
-					preOptRadio.type = 'radio';
-					preOptRadio.name = 'formatMethod';
-					preOptRadio.id = 'preOptRadio';
-					preOptRadio.checked = true;
-					preOptRadio.value = 'formatted';
-
-					preOptFlex.appendChild(preOptRadio);
-					preOptLabel = document.createElement('label');
-					preOptLabel.htmlFor = 'preOptRadio';
-					preOptLabel.innerHTML = "<b>Pre-formatted: </b> The data contains tables or other pre-formatted data that does not convert nicely into paragraphs";
-					preOptFlex.appendChild(preOptLabel);
-					settingsSetion.appendChild(preOptFlex);
-					
-					paraOptFlex = document.createElement('div');
-					paraOptFlex.className = 'fileTypeRow';
-					paraOptRadio = document.createElement('input');
-					paraOptRadio.type = 'radio';
-					paraOptRadio.name = 'formatMethod';
-					paraOptRadio.id = 'paraOptRadio';
-					paraOptRadio.value = 'paragraph';
-
-					paraOptFlex.appendChild(paraOptRadio);
-					paraOptLabel = document.createElement('label');
-					paraOptLabel.htmlFor = 'paraOptRadio';
-					paraOptLabel.innerHTML = "<b>Paragraph: </b> the data consits of sentences that can be converted easily into paragraph form";
-					paraOptFlex.appendChild(paraOptLabel);
-					settingsSetion.appendChild(paraOptFlex);
-					target.appendChild(settingsSetion);
-					
-					saveButtonSection = document.createElement('div');
-					saveButtonSection.className = 'prettyBoxList';
-					saveButtonSection.style.padding = 0;
-					saveButtonSection.style.marginBottom = 0;
-					saveButtonSection.style.textAlign = 'center';
-					saveButton = document.createElement('input');
-					saveButton.type = 'button';
-					saveButton.id = 'saveButton';
-					saveButton.style.fontWeight = 'bold';
-					saveButton.value = "Save";
-					saveButton.disabled = true;
-					saveButton.style.width = "100%";
-					saveButton.addEventListener('click', function() {
-						//Get Regex
-						inputMethodSelector = document.querySelector('input[name="inputMethod"]:checked');
-						if(inputMethodSelector.value == 'useBuilder')
-						{
-							productSelector = document.querySelector('#allProductsPicklist .selected').innerHTML;
-							originatorSelector = document.querySelector('#allOriginatorsPicklist .selected').innerHTML; 
-							statesSelector = document.querySelector('#allStatesPicklist .selected').innerHTML;
-							identifier = (productSelector == "[Any]" ? "[A-Z0-9]{3}" : productSelector) +
-								(originatorSelector == "[Any]" ? "[A-Z0-9]{3}" : originatorSelector) +
-								(statesSelector == "[Any]" ? "[A-Z0-9]{2}" : statesSelector);
-						}
-						else identifier = document.getElementById('selectorRegex').value;
-						
-						//Get title, Lines to truncate, and format
-						title = document.getElementById('nameInput').value;
-						format = document.querySelector('input[name="formatMethod"]:checked').value;
-						truncate = document.getElementById('truncInput').value;
-						
-						otherEmwinConfig = decodeOtherEmwinConfig(getCookie('otheremwin'));
-						otherEmwinConfig.push({
-							'identifier': identifier,
-							'title': title,
-							'format': format,
-							'truncate': truncate
-						});
-						
-						setCookie("otheremwin", encodeOtherEmwinConfig(otherEmwinConfig));
-						location.reload();
-					});
-					saveButtonSection.appendChild(saveButton);
-					target.appendChild(saveButtonSection);
+					renderPicklistItems(true);
 					
 					//Loop through system/user-defined data
 					cardNum = 0;

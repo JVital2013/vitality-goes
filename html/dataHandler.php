@@ -280,19 +280,16 @@ elseif($_GET['type'] == "metadata")
 			$otherEmwinConfig = loadOtherEmwin();
 			
 			//Load pertinent pieces of information where for cards with all available information
-			$allProducts = $allOriginators = $allStates = $otherEmwinFiles = [];
+			$allUnique = $otherEmwinFiles = [];
 			$otherEmwinFiles['system'] = $otherEmwinFiles['user'] = $metadata['system'] = $metadata['user'] = [];
 			for($i = 0; $i < count($otherEmwinConfig['system']); $i++) $otherEmwinFiles['system'][$i] = $metadata['system'][$i] = [];
 			for($i = 0; $i < count($otherEmwinConfig['user']); $i++) $otherEmwinFiles['user'][$i] = $metadata['user'][$i] = [];
 			
 			foreach($allEmwinFiles as $thisFile)
 			{
-				if(preg_match("/-([A-Z0-9]{3})([A-Z0-9]{3})([A-Z0-9]{2})\.TXT$/i", $thisFile, $matches))
+				if(preg_match("/-([A-Z0-9]{8})\.TXT$/i", $thisFile, $matches))
 				{
-					$allProducts[] = $matches[1];
-					$allOriginators[] = $matches[2];
-					$allStates[] = $matches[3];
-					
+					$allUnique[] = $matches[1];
 					foreach(array('system', 'user') as $thisType)
 						for($i = 0; $i < count($otherEmwinConfig[$thisType]); $i++)
 							if(preg_match("/-{$otherEmwinConfig[$thisType][$i]['identifier']}\.TXT$/i", $thisFile))
@@ -300,12 +297,8 @@ elseif($_GET['type'] == "metadata")
 				}
 			}
 			
-			$metadata['allProducts'] = array_unique($allProducts);
-			$metadata['allOriginators'] = array_unique($allOriginators);
-			$metadata['allStates'] = array_unique($allStates);
-			sort($metadata['allProducts']);
-			sort($metadata['allOriginators']);
-			sort($metadata['allStates']);
+			$metadata['allUnique'] = array_unique($allUnique);
+			sort($metadata['allUnique']);
 			
 			//Sort and parse messages
 			//TODO: Limit user-queried files to some number
