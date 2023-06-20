@@ -111,23 +111,6 @@ function decodeProfile(profileString)
 	
 	return profileArray;
 }
-function decodeOtherEmwinConfig(emwinString)
-{
-	emwinArray = [];
-	allEmwins = emwinString.split("~");
-	allEmwins.forEach((thisLocation) => {
-		emwinParts = thisLocation.split("!");
-		if(emwinParts.length != 4) return;
-		emwinArray.push({
-			'identifier': emwinParts[0],
-			'title': emwinParts[1],
-			'format': emwinParts[2],
-			'truncate': emwinParts[3]
-		});
-	});
-	
-	return emwinArray;
-}
 function slideDrawer()
 {
 	document.getElementById('sideBar').style.transform = "translateX(" + (sideBar ? '-305px' : '0px') + ")";
@@ -378,20 +361,22 @@ function renderAutoFilterPicklist(dataProperty)
 	thisPicklistHolder.appendChild(thisPicklistBox);
 	return thisPicklistHolder;
 }
-function renderPicklistItems(useAny = false)
+function renderPicklistItems(selectedProduct = null, selectedOriginator = null, selectedState = null)
 {
 	//Fetch pertinent informaton
-	if(useAny)
-	{
-		selectedProduct = selectedOriginator = selectedState = "[Any]";
-	}
-	else
+	if(selectedProduct == null)
 	{
 		selectedProductElement = document.querySelector('#allProductsPicklist .selected');
-		selectedOriginatorElement = document.querySelector('#allOriginatorsPicklist .selected'); 
-		selectedStateElement = document.querySelector('#allStatesPicklist .selected');
 		selectedProduct = (selectedProductElement == null ? "" : selectedProductElement.innerHTML);
+	}
+	if(selectedOriginator == null)
+	{
+		selectedOriginatorElement = document.querySelector('#allOriginatorsPicklist .selected'); 
 		selectedOriginator = (selectedOriginatorElement == null ? "" : selectedOriginatorElement.innerHTML);
+	}
+	if(selectedState == null)
+	{
+		selectedStateElement = document.querySelector('#allStatesPicklist .selected');
 		selectedState = (selectedStateElement == null ? "" : selectedStateElement.innerHTML);
 	}
 	
@@ -437,7 +422,7 @@ function renderPicklistItems(useAny = false)
 	newOption.innerHTML = "[Any]";
 	newOption.addEventListener('click', function(event) {
 		lastSelected = event.target.parentElement.querySelector('.autoFilterItem.selected');
-		if(lastSelected != null) event.target.parentElement.querySelector('.autoFilterItem.selected').className = "autoFilterItem";
+		if(lastSelected != null) lastSelected.className = "autoFilterItem";
 		event.target.className += " selected";
 		renderPicklistItems();
 	});
@@ -449,7 +434,7 @@ function renderPicklistItems(useAny = false)
 		newOption.innerHTML = element;
 		newOption.addEventListener('click', function(event) {
 			lastSelected = event.target.parentElement.querySelector('.autoFilterItem.selected');
-			if(lastSelected != null) event.target.parentElement.querySelector('.autoFilterItem.selected').className = "autoFilterItem";
+			if(lastSelected != null) lastSelected.className = "autoFilterItem";
 			event.target.className += " selected";
 			renderPicklistItems();
 		});
@@ -463,7 +448,7 @@ function renderPicklistItems(useAny = false)
 	newOption.innerHTML = "[Any]";
 	newOption.addEventListener('click', function(event) {
 		lastSelected = event.target.parentElement.querySelector('.autoFilterItem.selected');
-		if(lastSelected != null) event.target.parentElement.querySelector('.autoFilterItem.selected').className = "autoFilterItem";
+		if(lastSelected != null) lastSelected.className = "autoFilterItem";
 		event.target.className += " selected";
 		renderPicklistItems();
 	});
@@ -475,7 +460,7 @@ function renderPicklistItems(useAny = false)
 		newOption.innerHTML = element;
 		newOption.addEventListener('click', function(event) {
 			lastSelected = event.target.parentElement.querySelector('.autoFilterItem.selected');
-			if(lastSelected != null) event.target.parentElement.querySelector('.autoFilterItem.selected').className = "autoFilterItem";
+			if(lastSelected != null) lastSelected.className = "autoFilterItem";
 			event.target.className += " selected";
 			renderPicklistItems();
 		});
@@ -489,7 +474,7 @@ function renderPicklistItems(useAny = false)
 	newOption.innerHTML = "[Any]";
 	newOption.addEventListener('click', function(event) {
 		lastSelected = event.target.parentElement.querySelector('.autoFilterItem.selected');
-		if(lastSelected != null) event.target.parentElement.querySelector('.autoFilterItem.selected').className = "autoFilterItem";
+		if(lastSelected != null) lastSelected.className = "autoFilterItem";
 		event.target.className += " selected";
 		renderPicklistItems();
 	});
@@ -501,7 +486,7 @@ function renderPicklistItems(useAny = false)
 		newOption.innerHTML = element;
 		newOption.addEventListener('click', function(event) {
 			lastSelected = event.target.parentElement.querySelector('.autoFilterItem.selected');
-			if(lastSelected != null) event.target.parentElement.querySelector('.autoFilterItem.selected').className = "autoFilterItem";
+			if(lastSelected != null) lastSelected.className = "autoFilterItem";
 			event.target.className += " selected";
 			renderPicklistItems();
 		});
@@ -1123,9 +1108,9 @@ function menuSelect(menuSlug)
 					productSelector = document.querySelector('#allProductsPicklist .selected').innerHTML;
 					originatorSelector = document.querySelector('#allOriginatorsPicklist .selected').innerHTML; 
 					statesSelector = document.querySelector('#allStatesPicklist .selected').innerHTML;
-					identifier = (productSelector == "[Any]" ? "[A-Z0-9]{3}" : productSelector) +
-						(originatorSelector == "[Any]" ? "[A-Z0-9]{3}" : originatorSelector) +
-						(statesSelector == "[Any]" ? "[A-Z0-9]{2}" : statesSelector);
+					identifier = "(" + (productSelector == "[Any]" ? "[A-Z0-9]{3}" : productSelector) + ")" +
+						"(" + (originatorSelector == "[Any]" ? "[A-Z0-9]{3}" : originatorSelector) + ")" +
+						"(" + (statesSelector == "[Any]" ? "[A-Z0-9]{2}" : statesSelector) + ")";
 				}
 				else identifier = document.getElementById('selectorRegex').value;
 				
@@ -1134,15 +1119,28 @@ function menuSelect(menuSlug)
 				format = document.querySelector('input[name="formatMethod"]:checked').value;
 				truncate = document.getElementById('truncInput').value;
 				
-				otherEmwinConfig = decodeOtherEmwinConfig(getCookie('otheremwin'));
-				otherEmwinConfig.push({
-					'identifier': identifier,
-					'title': title,
-					'format': format,
-					'truncate': truncate
-				});
+				//Check if we're editing a previous entry
+				cardHeader = document.getElementById('emwinLoaderContent').previousSibling.lastChild.data;
+				if(cardHeader != "Load Additional Data")
+				{
+					config.otherEmwin.user[parseInt(cardHeader.split("#")[1])] = {
+						'identifier': identifier,
+						'title': title,
+						'format': format,
+						'truncate': truncate
+					};
+				}
+				else
+				{
+					config.otherEmwin.user.push({
+						'identifier': identifier,
+						'title': title,
+						'format': format,
+						'truncate': truncate
+					});
+				}
 				
-				setCookie("otheremwin", encodeOtherEmwinConfig(otherEmwinConfig));
+				setCookie("otheremwin", encodeOtherEmwinConfig(config.otherEmwin.user));
 				location.reload();
 			});
 			saveButtonSection.appendChild(saveButton);
@@ -1155,16 +1153,49 @@ function menuSelect(menuSlug)
 				deleteHolder = document.createElement('div');
 				deleteHolder.className = 'otherEmwinDeleteHolder';
 				
+				editButton = document.createElement('i');
+				editButton.className = 'far fa-edit';
+				editButton.title = "Edit this card's settings";
+				editButton.addEventListener('click', function(event){
+					editorCard = document.getElementById('emwinLoaderContent');
+					target = parseInt(event.target.parentElement.parentElement.nextSibling.id.replace('userEmwin', '').replace('Content', ''));
+					editorCard.previousSibling.lastChild.data = "Editing Additional Card #" + target;
+					document.getElementById('saveButton').value = "Update \"" + config.otherEmwin.user[target].title + "\"";
+					if(editorCard.style.display == 'none') editorCard.previousSibling.click();
+					
+					identifierParts = /^\(([A-Z0-9]{3}|\[A-Z0-9\]\{3\})\)\(([A-Z0-9]{3}|\[A-Z0-9\]\{3\})\)\(([A-Z0-9]{2}|\[A-Z0-9\]\{2\})\)$/.exec(config.otherEmwin.user[target].identifier);
+					if(identifierParts != null)
+					{
+						document.getElementById('useBuilder').click();
+						thisProduct = (identifierParts[1] == "[A-Z0-9]{3}" ? "[Any]" : identifierParts[1]);
+						thisOriginator = (identifierParts[2] == "[A-Z0-9]{3}" ? "[Any]" : identifierParts[2]);
+						thisState = (identifierParts[3] == "[A-Z0-9]{2}" ? "[Any]" : identifierParts[3]);
+						renderPicklistItems(thisProduct, thisOriginator, thisState);
+					}
+					else
+					{
+						document.getElementById('manualRegex').click();
+						document.getElementById('selectorRegex').value = config.otherEmwin.user[target].identifier;
+					}
+					
+					//TODO: Change style in edit mode?
+					document.getElementById('nameInput').value = config.otherEmwin.user[target].title;
+					document.getElementById('truncInput').value = config.otherEmwin.user[target].truncate;
+					document.getElementById(config.otherEmwin.user[target].format == "paragraph" ? "paraOptRadio" : "preOptRadio").checked = true;
+					event.stopPropagation();
+				});
+				deleteHolder.appendChild(editButton);
+				
 				deleteButton = document.createElement('i');
 				deleteButton.className = 'fa fa-trash-alt';
+				deleteButton.title = "Remove this card";
 				deleteButton.addEventListener('click', function(event){
 					target = parseInt(event.target.parentElement.parentElement.nextSibling.id.replace('userEmwin', '').replace('Content', ''));
-					otherEmwinConfig = decodeOtherEmwinConfig(getCookie('otheremwin'));
 					
-					if(confirm("OK to stop viewing \"" + otherEmwinConfig[target].title + "\"?"))
+					if(confirm("Are you sure you want to delete the card for \"" + config.otherEmwin.user[target].title + "\"?"))
 					{
-						otherEmwinConfig.splice(target, 1);
-						setCookie("otheremwin", encodeOtherEmwinConfig(otherEmwinConfig));
+						config.otherEmwin.user.splice(target, 1);
+						setCookie("otheremwin", encodeOtherEmwinConfig(config.otherEmwin.user));
 						location.reload();
 					}
 					event.stopPropagation();
@@ -1210,7 +1241,7 @@ function menuSelect(menuSlug)
 				if(config.showEmwinInfo)
 				{
 					//Additional Data Loader
-					renderPicklistItems(true);
+					renderPicklistItems("[Any]", "[Any]", "[Any]");
 					
 					//Loop through system/user-defined data
 					cardNum = 0;

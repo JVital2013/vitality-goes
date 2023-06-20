@@ -446,11 +446,18 @@ label
 	font-size: 12pt;
 	right: 0;
 }
+.otherEmwinDeleteHolder .fa, .otherEmwinDeleteHolder .far
+{
+	margin: 0;
+	padding: 10px 7px;
+}
+.otherEmwinDeleteHolder .fa:last-child
+{
+	padding-right: 12px;
+}
 .otherEmwinDeleteHolder .fa-trash-alt
 {
 	color: #d54040;
-	margin: 0;
-	padding: 10px;
 }
 .prettyBoxList.otherEmwinNavigation
 {
