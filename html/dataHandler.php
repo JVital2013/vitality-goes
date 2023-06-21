@@ -1154,6 +1154,7 @@ elseif($_GET['type'] == "hurricaneJSON")
 						$dataValue = preg_split('/:\s+/', $thisLine)[1];
 						switch($dataValue)
 						{
+							case "NC": $returnData[$stormIdentifier]['status'] = "No Change"; break;
 							case "WKN": $returnData[$stormIdentifier]['status'] = "Weakening"; break;
 							case "INTSF": $returnData[$stormIdentifier]['status'] = "Intensifying"; break;
 							default: $returnData[$stormIdentifier]['status'] = $dataValue; break;
