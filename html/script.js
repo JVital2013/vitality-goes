@@ -1249,6 +1249,13 @@ function menuSelect(menuSlug)
 					//Additional Data Loader
 					renderPicklistItems("[Any]", "[Any]", "[Any]");
 					
+					//Show error if too much data is loaded
+					if(responseData.numUserFiles > responseData.maxUserFiles && responseData.maxUserFiles != 0)
+						renderAlert("<p style='font-weight: bold;'>Warning</p><p>You have attempted to load too much additional data from this browser. \
+							Either reduce the amount of data requested, increase the 'maxUserFiles' option in config.ini, or configure addtional data in your server config.</p> \
+							<p>No additional data will be loaded until this issue is resolved.</p> \
+							<p><b>Total Requested: </b>" + responseData.numUserFiles + "<br /><b>Max Allowed: </b>" + responseData.maxUserFiles + "</p>", "red");
+					
 					//Loop through system/user-defined data
 					cardNum = 0;
 					responseData.system.forEach(function(element){

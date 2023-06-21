@@ -199,7 +199,8 @@ if($_GET['type'] == "preload")
 	$preloadData['showEmwinInfo'] = array_key_exists('emwinPath', $config['general']) && is_dir($config['general']['emwinPath']);
 	$preloadData['showAdminInfo'] = array_key_exists('adminPath', $config['general']) && is_dir($config['general']['adminPath']);
 	
-	if($preloadData['showEmwinInfo']) $preloadData['otherEmwin'] = loadOtherEmwin();
+	//TODO: do not show other emwin loader if it's disabled in the system config
+	if($preloadData['showEmwinInfo']) $preloadData['otherEmwin'] = loadOtherEmwin($config);
 	foreach($preloadData['otherEmwin']['system'] as $key => $value)
 	{
 		unset($preloadData['otherEmwin']['system'][$key]['truncate']);
@@ -277,9 +278,10 @@ elseif($_GET['type'] == "metadata")
 		{
 			//Get all emwin files and config
 			$allEmwinFiles = scandir_recursive($config['general']['emwinPath']);
-			$otherEmwinConfig = loadOtherEmwin();
+			$otherEmwinConfig = loadOtherEmwin($config);
 			
 			//Load pertinent pieces of information where for cards with all available information
+			//TODO: Do not load user files if the system config says not to
 			$allUnique = $otherEmwinFiles = [];
 			$otherEmwinFiles['system'] = $otherEmwinFiles['user'] = $metadata['system'] = $metadata['user'] = [];
 			for($i = 0; $i < count($otherEmwinConfig['system']); $i++) $otherEmwinFiles['system'][$i] = $metadata['system'][$i] = [];
@@ -300,10 +302,16 @@ elseif($_GET['type'] == "metadata")
 			$metadata['allUnique'] = array_unique($allUnique);
 			sort($metadata['allUnique']);
 			
+			//Count user-queried files
+			$metadata['numUserFiles'] = 0;
+			foreach($otherEmwinFiles['user'] as $thisCardFiles) $metadata['numUserFiles'] += count($thisCardFiles);
+			$metadata['maxUserFiles'] = $config['otheremwin']['maxUserFiles'];
+			
 			//Sort and parse messages
-			//TODO: Limit user-queried files to some number
 			foreach(array('system', 'user') as $thisType)
 			{
+				//Safety for user-queried files
+				if($thisType == 'user' && $config['otheremwin']['maxUserFiles'] != 0 && $metadata['numUserFiles'] > $config['otheremwin']['maxUserFiles']) continue;
 				for($i = 0; $i < count($otherEmwinConfig[$thisType]); $i++)
 				{
 					usort($otherEmwinFiles[$thisType][$i], "sortEMWIN");

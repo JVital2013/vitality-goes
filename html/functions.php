@@ -23,8 +23,19 @@ function loadConfig()
 	$config = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini", true, INI_SCANNER_RAW);
 	if($config === false) die("Unable to parse config.ini");
 	
+	//Boolean Values
 	$config['general']['showSysInfo'] = (stripos($config['general']['showSysInfo'], "true") !== false);
 	$config['general']['debug'] = (stripos($config['general']['debug'], "true") !== false);
+	
+	//Other EMWIN config
+	if(!array_key_exists('otheremwin', $config)) $config['otheremwin'] = [];
+	if(!array_key_exists('ini', $config['otheremwin'])) $config['otheremwin']['ini'] = "otheremwin.ini";
+	if(!array_key_exists('maxUserFiles', $config['otheremwin'])) $config['otheremwin']['maxUserFiles'] = "1000";
+	if(!array_key_exists('allowUserLoader', $config['otheremwin'])) $config['otheremwin']['allowUserLoader'] = "true";
+	
+	$config['otheremwin']['ini'] = $config['otheremwin']['ini'] = $_SERVER['DOCUMENT_ROOT'] . '/config/' . $config['otheremwin']['ini'];
+	$config['otheremwin']['allowUserLoader'] = (stripos($config['otheremwin']['allowUserLoader'], "true") !== false);
+	$config['otheremwin']['maxUserFiles'] = intval($config['otheremwin']['maxUserFiles']);
 	
 	//Load Extra configs
 	if(!array_key_exists('categories', $config)) $config['categories'] = [];
@@ -64,7 +75,7 @@ function loadConfig()
 		}
 	}
 	
-	//Config touchups
+	//Other config touchups
 	if(array_key_exists('paths', $config)) unset($config['paths']);
 	if(!array_key_exists('city', $config['location'])) $config['location']['city'] = "";
 	if(!array_key_exists('rwrOrig', $config['location']) && array_key_exists('orig', $config['location'])) $config['location']['rwrOrig'] = $config['location']['orig'];
@@ -72,15 +83,14 @@ function loadConfig()
 	return $config;
 }
 
-function loadOtherEmwin()
+function loadOtherEmwin($config)
 {
 	//Load Other Emwin Config
 	$otheremwin = [];
 	$otheremwin['user'] = [];
 	$otheremwin['system'] = false;
 	
-	//TODO: Load config from otheremwin section of main config
-	if(file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/otheremwin.ini")) $otheremwin['system'] = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/otheremwin.ini", true, INI_SCANNER_RAW);
+	if(file_exists($config['otheremwin']['ini'])) $otheremwin['system'] = parse_ini_file($config['otheremwin']['ini'], true, INI_SCANNER_RAW);
 	if($otheremwin['system'] === false) $otheremwin['system'] = [];
 	else $otheremwin['system'] = array_values($otheremwin['system']);
 	
