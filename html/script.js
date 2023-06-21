@@ -1167,6 +1167,9 @@ function menuSelect(menuSlug)
 					
 					document.getElementById('nameInput').value = config.otherEmwin.user[target].title;
 					document.getElementById('truncInput').value = config.otherEmwin.user[target].truncate;
+					document.getElementById('allProductsSearch').value = '';
+					document.getElementById('allOriginatorsSearch').value = '';
+					document.getElementById('allStatesSearch').value = '';
 					document.getElementById(config.otherEmwin.user[target].format == "paragraph" ? "paraOptRadio" : "preOptRadio").checked = true;
 					
 					identifierParts = /^\(([A-Z0-9]{3}|\[A-Z0-9\]\{3\})\)\(([A-Z0-9]{3}|\[A-Z0-9\]\{3\})\)\(([A-Z0-9]{2}|\[A-Z0-9\]\{2\})\)$/.exec(config.otherEmwin.user[target].identifier);

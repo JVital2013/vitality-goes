@@ -318,14 +318,14 @@ function linesToParagraphs($lineArray, $linesToSkip)
 	$retVal = [];
 	$section = 0;
 	if(count($lineArray) > 0) $retVal[] = "<p style='font-weight: bold;'>";
-	foreach($lineArray as $key => $line)
+	for($i = $linesToSkip; $i < count($lineArray); $i++)
 	{
-		if($key < $linesToSkip) continue;
-		$thisLine = trim($line);
+		$thisLine = trim($lineArray[$i]);
 		
 		if($thisLine == "$$")
 		{
-			$retVal[$section++] .= "</p>";
+			if(!$startingParagraph) $retVal[$section] .= "</p>";
+			$startingParagraph = false;
 			$startingSection = true;
 			continue;
 		}
@@ -344,13 +344,14 @@ function linesToParagraphs($lineArray, $linesToSkip)
 			continue;
 		}
 		
-		if($startingSection)
+		if($startingSection && $i != count($lineArray) - 1)
 		{
-			$retVal[] = "$firstParagraphText<p>";
+			$retVal[] = "<p>";
+			$section++;
 			$startingSection = false;
 		}
 		
-		if($startingParagraph)
+		if($startingParagraph && $i != count($lineArray) - 1)
 		{
 			$retVal[$section] .= "<p>";
 			$startingParagraph = false;
@@ -360,6 +361,11 @@ function linesToParagraphs($lineArray, $linesToSkip)
 		if(strlen($thisLine) < 55) $retVal[$section] .= "<br />";
 	}
 	
+	//Clean up hanging tags
+	if(!$startingParagraph && !$startingSection) $retVal[$section] .= "</p>";
+	for($i = 1; $i < count($retVal); $i++) $retVal[$i] = $firstParagraphText . $retVal[$i];
+	
+	$retVal = array_values($retVal);
 	return $retVal;
 }
 
