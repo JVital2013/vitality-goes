@@ -312,8 +312,12 @@ function findMetadataEMWIN($allEmwinFiles, $product)
 
 function linesToParagraphs($lineArray, $linesToSkip)
 {
-	$startingParagraph = false;
-	$retVal = (count($lineArray) > 0 ? "<p style='font-weight: bold;'>" : "");
+	$startingParagraph = $startingSection = false;
+	$firstParagraph = true;
+	$firstParagraphText = "";
+	$retVal = [];
+	$section = 0;
+	if(count($lineArray) > 0) $retVal[] = "<p style='font-weight: bold;'>";
 	foreach($lineArray as $key => $line)
 	{
 		if($key < $linesToSkip) continue;
@@ -321,24 +325,39 @@ function linesToParagraphs($lineArray, $linesToSkip)
 		
 		if($thisLine == "$$")
 		{
-			$retVal .= "</p>";
-			break;
+			$retVal[$section++] .= "</p>";
+			$startingSection = true;
+			continue;
 		}
 		if(empty($thisLine))
 		{
-			$retVal .= "</p>";
-			$startingParagraph = true;
+			if(!$startingParagraph && !$startingSection)
+			{
+				$retVal[$section] .= "</p>";
+				if($firstParagraph)
+				{
+					$firstParagraphText = $retVal[$section];
+					$firstParagraph = false;
+				}
+				$startingParagraph = true;
+			}
 			continue;
+		}
+		
+		if($startingSection)
+		{
+			$retVal[] = "$firstParagraphText<p>";
+			$startingSection = false;
 		}
 		
 		if($startingParagraph)
 		{
-			$retVal .= "<p>";
+			$retVal[$section] .= "<p>";
 			$startingParagraph = false;
 		}
 		
-		$retVal .= "$thisLine ";
-		if(strlen($thisLine) < 55) $retVal .= "<br />";
+		$retVal[$section] .= "$thisLine ";
+		if(strlen($thisLine) < 55) $retVal[$section] .= "<br />";
 	}
 	
 	return $retVal;

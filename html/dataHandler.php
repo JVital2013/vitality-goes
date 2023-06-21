@@ -312,7 +312,7 @@ elseif($_GET['type'] == "metadata")
 						$thisFileData = file($thisFile);
 						switch($otherEmwinConfig[$thisType][$i]['format'])
 						{
-							case 'paragraph': $metadata[$thisType][$i][] = linesToParagraphs($thisFileData, $otherEmwinConfig[$thisType][$i]['truncate']); break;
+							case 'paragraph': $metadata[$thisType][$i] = array_merge($metadata[$thisType][$i], linesToParagraphs($thisFileData, $otherEmwinConfig[$thisType][$i]['truncate'])); break;
 							case 'formatted':
 								$thisFileString = "";
 								foreach($thisFileData as $key => $value)
@@ -347,7 +347,7 @@ elseif($_GET['type'] == "metadata")
 			}
 			else
 			{
-				$metadata['emwinLicense'] = linesToParagraphs(file($emwinLicenseFile), 4);
+				$metadata['emwinLicense'] = linesToParagraphs(file($emwinLicenseFile), 4)[0];
 				$metadata['emwinLicenseDate'] = getEMWINDate($emwinLicenseFile);
 			}
 		}
@@ -856,11 +856,11 @@ elseif($_GET['type'] == "alertJSON")
 	foreach($allEmwinFiles as $thisFile)
 	{
 		//Various alerts
-		if(preg_match("/-LAE.*$alertStateAbbrs\.TXT$/", $thisFile)) $returnData['localEmergencies'][] = linesToParagraphs(file($thisFile), 4);
-		if(preg_match("/-BLU.*$alertStateAbbrs\.TXT$/", $thisFile)) $returnData['blueAlerts'][] = linesToParagraphs(file($thisFile), 4);
-		if(preg_match("/-CAE.*$alertStateAbbrs\.TXT$/", $thisFile)) $returnData['amberAlerts'][] = linesToParagraphs(file($thisFile), 4);
-		if(preg_match("/-CDW.*$alertStateAbbrs\.TXT$/", $thisFile)) $returnData['civilDangerWarnings'][] = linesToParagraphs(file($thisFile), 4);
-		if(preg_match("/-EVI.*$alertStateAbbrs\.TXT$/", $thisFile)) $returnData['localEvacuations'][] = linesToParagraphs(file($thisFile), 4);
+		if(preg_match("/-LAE.*$alertStateAbbrs\.TXT$/", $thisFile)) $returnData['localEmergencies'] = array_merge($returnData['localEmergencies'], linesToParagraphs(file($thisFile), 4));
+		if(preg_match("/-BLU.*$alertStateAbbrs\.TXT$/", $thisFile)) $returnData['blueAlerts'] = array_merge($returnData['blueAlerts'], linesToParagraphs(file($thisFile), 4));
+		if(preg_match("/-CAE.*$alertStateAbbrs\.TXT$/", $thisFile)) $returnData['amberAlerts'] = array_merge($returnData['amberAlerts'], linesToParagraphs(file($thisFile), 4));
+		if(preg_match("/-CDW.*$alertStateAbbrs\.TXT$/", $thisFile)) $returnData['civilDangerWarnings'] = array_merge($returnData['civilDangerWarnings'], linesToParagraphs(file($thisFile), 4));
+		if(preg_match("/-EVI.*$alertStateAbbrs\.TXT$/", $thisFile)) $returnData['localEvacuations'] = array_merge($returnData['localEvacuations'], linesToParagraphs(file($thisFile), 4));
 		
 		//Hurricane Statement - Only get most recent
 		if(preg_match("/-HLS.*" . $currentSettings[$selectedProfile]['orig'] . "\.TXT$/", $thisFile))
@@ -877,7 +877,7 @@ elseif($_GET['type'] == "alertJSON")
 					
 					if($thisHurricaneMessageTime > $latestHurricaneMessage)
 					{
-						$returnData['hurricaneStatement'][0] = linesToParagraphs($hurricaneStatementLines, 4);
+						$returnData['hurricaneStatement'][0] = linesToParagraphs($hurricaneStatementLines, 4)[0];
 						$latestHurricaneMessage = $thisHurricaneMessageTime;
 					}
 					
@@ -956,7 +956,7 @@ elseif($_GET['type'] == "alertJSON")
 			$returnData['weatherWarnings'][] = "<b>Alert type: </b>$alertType<br />" .
 				"<b>Issued By: </b>$issuingOffice<br />" .
 				"<b>Issue Time: </b>$issueTime<br />" .
-				linesToParagraphs(array_slice($weatherData, $messageStart, $messageEnd - $messageStart + 1), 0);
+				linesToParagraphs(array_slice($weatherData, $messageStart, $messageEnd - $messageStart + 1), 0)[0];
 		}
 	}
 	
@@ -1312,17 +1312,17 @@ elseif($_GET['type'] == "weatherJSON")
 			}
 			
 			$returnData['summaryTime'] = trim($data[5]);
-			$returnData['summary'] = linesToParagraphs($dataBuffer, 0);
+			$returnData['summary'] = linesToParagraphs($dataBuffer, 0)[0];
 		}
 	}
 	else
 	{
 		$data = file($dataPath);
 		$startOfSummary = 0;
-		while(stripos($data[$startOfSummary], "SUMMARY") === false) $startOfSummary++;
+		while(stripos($data[$startOfSummary], "SUMMARY") === false && stripos($data[$startOfSummary], "FORECAST") === false) $startOfSummary++;
 		
 		$returnData['summaryTime'] = trim($data[$startOfSummary + 2]);
-		$returnData['summary'] = linesToParagraphs($data, $startOfSummary + 4);
+		$returnData['summary'] = linesToParagraphs($data, $startOfSummary + 4)[0];
 	}
 	
 	//7-day Forecast
