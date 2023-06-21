@@ -37,7 +37,7 @@ if(file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini"))
 		{
 			if(preg_match("/^https?:\/\/.*$/", $stylesheet)) $stylesheetURL = $stylesheet;
 			else $stylesheetURL = "/themes/{$theme['slug']}/$stylesheet";
-			$themeblock .= "<link rel=\"stylesheet\" href=\"$stylesheetURL?v=20230619\">\n\t\t";
+			$themeblock .= "<link rel=\"stylesheet\" href=\"$stylesheetURL?v=20230620\">\n\t\t";
 		}
 	}
 }
@@ -53,7 +53,7 @@ if(file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini"))
 
 		<link rel="apple-touch-icon" href="/icon-512x512.png">
 		<link rel="manifest" href="/manifest.php">
-		<link rel="stylesheet" href="/styles.css?v=20230619">
+		<link rel="stylesheet" href="/styles.css?v=20230620">
 		<link rel="stylesheet" href="/opensans.css">
 		<link rel="stylesheet" href="/simplerpicker/simplerpicker.css">
 		<link rel="stylesheet" href="/fontawesome/css/all.css">
@@ -72,7 +72,7 @@ if(file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini"))
 		<script src="/lightgallery/plugins/zoom/lg-zoom.umd.js?v=20221016"></script>
 		<script src="/lightgallery/plugins/jumpto/lg-jumpto.umd.js?v=20220811"></script>
 		<script src="/simplerpicker/simplerpicker.js"></script>
-		<script src='/script.js?v=20230619'></script>
+		<script src='/script.js?v=20230620'></script>
 	</head>
 	<body>
 		<div class='topBar'>

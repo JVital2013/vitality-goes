@@ -927,6 +927,7 @@ function menuSelect(menuSlug)
 		if(config.showEmwinInfo)
 		{
 			renderCollapsingCard("emwinLoader", "Load Additional Data", "prettyBoxContent", "weatherBody");
+			document.getElementById('emwinLoaderContent').parentElement.className += " emwinLoader";
 			target = document.getElementById('emwinLoaderContent').firstChild;
 			target.innerHTML = "";
 			
@@ -1123,7 +1124,7 @@ function menuSelect(menuSlug)
 				cardHeader = document.getElementById('emwinLoaderContent').previousSibling.lastChild.data;
 				if(cardHeader != "Load Additional Data")
 				{
-					config.otherEmwin.user[parseInt(cardHeader.split("#")[1])] = {
+					config.otherEmwin.user[parseInt(cardHeader.split("#")[1]) - 1] = {
 						'identifier': identifier,
 						'title': title,
 						'format': format,
@@ -1159,7 +1160,8 @@ function menuSelect(menuSlug)
 				editButton.addEventListener('click', function(event){
 					editorCard = document.getElementById('emwinLoaderContent');
 					target = parseInt(event.target.parentElement.parentElement.nextSibling.id.replace('userEmwin', '').replace('Content', ''));
-					editorCard.previousSibling.lastChild.data = "Editing Additional Card #" + target;
+					editorCard.parentElement.className += " highlighted";
+					editorCard.previousSibling.lastChild.data = "Editing Additional Card #" + (target + 1);
 					document.getElementById('saveButton').value = "Update \"" + config.otherEmwin.user[target].title + "\"";
 					if(editorCard.style.display == 'none') editorCard.previousSibling.click();
 					
@@ -1182,7 +1184,7 @@ function menuSelect(menuSlug)
 						document.getElementById('selectorRegex').value = config.otherEmwin.user[target].identifier;
 					}
 					
-					//TODO: Change style in edit mode?
+					window.scrollTo(0, 0);
 					event.stopPropagation();
 				});
 				deleteHolder.appendChild(editButton);

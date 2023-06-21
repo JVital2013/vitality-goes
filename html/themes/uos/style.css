@@ -72,6 +72,15 @@ body
 	border: solid 1px #47976e;
 	border-radius: 0px;
 }
+.prettyBox.emwinLoader
+{
+	background: #47976e10;
+}
+.prettyBox.emwinLoader.highlighted
+{
+	box-shadow: inherit;
+	box-shadow: 0px 0px 5px 2px #47976e80;
+}
 .prettyBoxContent
 {
 	border-top: solid 1px #47976e;
