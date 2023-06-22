@@ -197,9 +197,9 @@ if($_GET['type'] == "preload")
 	$preloadData['showSatdumpInfo'] = array_key_exists('satdumpAPI', $config['general']);
 	$preloadData['showGraphs'] = array_key_exists('graphiteAPI', $config['general']);
 	$preloadData['showEmwinInfo'] = array_key_exists('emwinPath', $config['general']) && is_dir($config['general']['emwinPath']);
+	$preloadData['allowUserLoader'] = array_key_exists('emwinPath', $config['general']) && is_dir($config['general']['emwinPath']) && $config['otheremwin']['allowUserLoader'];
 	$preloadData['showAdminInfo'] = array_key_exists('adminPath', $config['general']) && is_dir($config['general']['adminPath']);
 	
-	//TODO: do not show other emwin loader if it's disabled in the system config
 	if($preloadData['showEmwinInfo']) $preloadData['otherEmwin'] = loadOtherEmwin($config);
 	foreach($preloadData['otherEmwin']['system'] as $key => $value)
 	{
@@ -281,7 +281,6 @@ elseif($_GET['type'] == "metadata")
 			$otherEmwinConfig = loadOtherEmwin($config);
 			
 			//Load pertinent pieces of information where for cards with all available information
-			//TODO: Do not load user files if the system config says not to
 			$allUnique = $otherEmwinFiles = [];
 			$otherEmwinFiles['system'] = $otherEmwinFiles['user'] = $metadata['system'] = $metadata['user'] = [];
 			for($i = 0; $i < count($otherEmwinConfig['system']); $i++) $otherEmwinFiles['system'][$i] = $metadata['system'][$i] = [];
@@ -299,8 +298,12 @@ elseif($_GET['type'] == "metadata")
 				}
 			}
 			
-			$metadata['allUnique'] = array_unique($allUnique);
-			sort($metadata['allUnique']);
+			//Supress if additional data loader is disabled
+			if($config['otheremwin']['allowUserLoader'])
+			{
+				$metadata['allUnique'] = array_unique($allUnique);
+				sort($metadata['allUnique']);
+			}
 			
 			//Count user-queried files
 			$metadata['numUserFiles'] = 0;

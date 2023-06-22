@@ -103,7 +103,7 @@ function loadOtherEmwin($config)
 	
 	//Load Other Emwin info from cookie
 	$sendCookie = false;
-	if(array_key_exists('otheremwin', $_COOKIE))
+	if(array_key_exists('otheremwin', $_COOKIE) && $config['otheremwin']['allowUserLoader'])
 	{
 		$allCards = explode("~", $_COOKIE['otheremwin']);
 		foreach($allCards as $thisCard)

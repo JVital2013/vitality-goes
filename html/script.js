@@ -924,7 +924,7 @@ function menuSelect(menuSlug)
 		barTitle.innerHTML = "Other EMWIN";
 		mainContent.innerHTML = "";
 		
-		if(config.showEmwinInfo)
+		if(config.allowUserLoader)
 		{
 			renderCollapsingCard("emwinLoader", "Load Additional Data", "prettyBoxContent", "weatherBody");
 			document.getElementById('emwinLoaderContent').parentElement.className += " emwinLoader";
@@ -1146,7 +1146,7 @@ function menuSelect(menuSlug)
 			});
 			saveButtonSection.appendChild(saveButton);
 			target.appendChild(saveButtonSection);
-			
+		
 			//User EMWIN Data
 			cardNum = 0;
 			config.otherEmwin.user.forEach(function(element){
@@ -1212,6 +1212,9 @@ function menuSelect(menuSlug)
 				cardNum++;
 			});
 			
+		}
+		if(config.showEmwinInfo)
+		{
 			//System EMWIN Data
 			cardNum = 0;
 			config.otherEmwin.system.forEach(function(element){
@@ -1244,7 +1247,7 @@ function menuSelect(menuSlug)
 					return;
 				}
 				
-				if(config.showEmwinInfo)
+				if(config.allowUserLoader)
 				{
 					//Additional Data Loader
 					renderPicklistItems("[Any]", "[Any]", "[Any]");
@@ -1256,15 +1259,20 @@ function menuSelect(menuSlug)
 							<p>No additional data will be loaded until this issue is resolved.</p> \
 							<p><b>Total Requested: </b>" + responseData.numUserFiles + "<br /><b>Max Allowed: </b>" + responseData.maxUserFiles + "</p>", "red");
 					
-					//Loop through system/user-defined data
-					cardNum = 0;
-					responseData.system.forEach(function(element){
-						renderOtherEmwinContent('systemEmwin' + cardNum, element.length - 1);
-						cardNum++;
-					});
+					//User-Defined Data
 					cardNum = 0;
 					responseData.user.forEach(function(element){
 						renderOtherEmwinContent('userEmwin' + cardNum, element.length - 1);
+						cardNum++;
+					});
+				}
+				
+				if(config.showEmwinInfo)
+				{
+					//System-defined data
+					cardNum = 0;
+					responseData.system.forEach(function(element){
+						renderOtherEmwinContent('systemEmwin' + cardNum, element.length - 1);
 						cardNum++;
 					});
 					
