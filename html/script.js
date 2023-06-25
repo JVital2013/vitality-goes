@@ -1089,7 +1089,7 @@ function menuSelect(menuSlug)
 			paraOptFlex.appendChild(paraOptRadio);
 			paraOptLabel = document.createElement('label');
 			paraOptLabel.htmlFor = 'paraOptRadio';
-			paraOptLabel.innerHTML = "<b>Paragraph: </b> the data consits of sentences that can be converted easily into paragraph form";
+			paraOptLabel.innerHTML = "<b>Paragraph: </b> the data consists of sentences that can be converted easily into paragraph form";
 			paraOptFlex.appendChild(paraOptLabel);
 			settingsSetion.appendChild(paraOptFlex);
 			target.appendChild(settingsSetion);
