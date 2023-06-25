@@ -17,10 +17,11 @@
  * along with Vitality GOES.  If not, see <http://www.gnu.org/licenses/>.
  */
  
- //Get root directory of the application
+//Get root directory of the application
 $programPath = dirname(__FILE__);
-$programURL = str_replace($_SERVER['DOCUMENT_ROOT'], "",  $programPath);
+$programURL = str_replace(str_replace("/", DIRECTORY_SEPARATOR, $_SERVER['DOCUMENT_ROOT']), "",  $programPath);
 
+//Load data from config
 require_once("$programPath/functions.php");
 $siteTitle = "Vitality GOES";
 $themeColor = "#111111";
