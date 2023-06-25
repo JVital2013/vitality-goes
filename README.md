@@ -78,7 +78,12 @@ satdump live goes_hrit F:\path\to\satdumprepo --source rtlsdr --samplerate 2.4e6
 The `http_server` part is optional and is only needed to provide decoder/demodulator statistics to Vitality GOES. For more information, see [the config documentation](/docs/config.md#general).
 
 ### Vitality GOES Dependencies
-Vitality GOES itself is a set of PHP, HTML, JavaScript, and CSS files. As such, it needs to be hosted on a web server stack. For this readme, I'm going to assume you're not running another web server on the same machine.
+Vitality GOES needs to be hosted on a web server stack. Recommended software versions:
+
+ - **Web Server:** Apache2
+ - **PHP Version:** PHP 8.0+ (PHP 7.4 is supported)
+
+For this readme, I'm going to assume you're not running another web server on the same machine.
 
 ---
 
@@ -93,10 +98,9 @@ sudo a2enmod rewrite
 sudo systemctl restart apache2
 ```
 
-##### You may also need to enable .htaccess files in Apache2 for all functionality to work
-To do so, edit /etc/apache2/apache2.conf as root and update this section:
+You may also need to enable .htaccess files in Apache2 for all functionality to work. To do so, edit /etc/apache2/apache2.conf as root and update this section:
 
-```
+```apache
 <Directory /var/www/>
         Options Indexes FollowSymLinks
         AllowOverride None
@@ -106,9 +110,9 @@ To do so, edit /etc/apache2/apache2.conf as root and update this section:
 
 to this:
 
-```
+```apache
 <Directory /var/www/>
-        Options -Indexes FollowSymLinks
+        Options -Indexes
         AllowOverride All
         Require all granted
 </Directory>
