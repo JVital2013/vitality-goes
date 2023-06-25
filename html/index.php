@@ -19,7 +19,7 @@
 
 //Get root directory of the application
 $programPath = dirname(__FILE__);
-$programURL = str_replace(str_replace("/", DIRECTORY_SEPARATOR, $_SERVER['DOCUMENT_ROOT']), "",  $programPath);
+$programURL = str_replace(str_replace("\\", "/", $_SERVER['DOCUMENT_ROOT']), "",  str_replace("\\", "/", $programPath));
 
 //Load data from config
 require_once("$programPath/functions.php");
