@@ -12,7 +12,7 @@ Configurations are highly customizable and can be modified to fit your ground st
 
 This is the main config file. It will likely need configured when you first deploy Vitality GOES. It is broken out into the following sections:
 
-### General
+### general
 * `siteTitle`: Sets the title of the Vitality GOES Web App. If not set, the site title defaults to "Vitality GOES"
 * `siteTheme`: The theme for Vitality GOES. Leave unset to use the built-in theme, or set it to an installed theme. The included themes are "light", "purple", "red", and "uos". This option can be overridden per-browser by using the "Local Settings" screen. For more on theming, [look here](/docs/themes.md).
 * `graphiteAPI`: If you're using goestools and want to view its decoder/demodulator statistcs, this should point to your graphite host. It must include the `/render/` path at the end to work properly. If you're not using goestools/graphite, comment/remove this line. For information on how to set up graphite, [look here](/docs/graphite.md).
@@ -22,7 +22,7 @@ This is the main config file. It will likely need configured when you first depl
 * `showSysInfo`: Set to true if you want to display information about your Vitality GOES server, such as system resource availability and system temps. Set to false to disable.
 * `debug`: Set to true to enable PHP errors. This breaks the AJAX requests within Vitality GOES if there are any errors, so only set this to true if you're debugging data returned by the DataHandler (advanced users only).
 
-### Paths
+### paths
 A path should be set up for each satellite downlink you're receiving. Each path defined in this section creates a variable that can be used in the `path` options of your category ini files. One or more satellite should be listed here.
 
 **NOTE:** This does not define the path of the images from a particular satellite, but rather the path for the entire downlink. For example, let's assume you're receiving GOES16, and your images are at `/home/pi/goes/goes16/fd/fc/...`. The `goes16` setting under `[paths]` would be set to `/home/pi/goes` (the parent path for the entire satellite downlink), not `/home/pi/goes/goes16` (the path just for the images from GOES16).
@@ -35,12 +35,12 @@ With this configuration, Vitality GOES will expect your images to be at `/path/t
 
 If hosted on Windows, set your paths to something like `GOES16 = C:\path\to\satdumpdata`
 
-### Categories
+### categories
 The category section defines one or more menu items (or "categories") within Vitality GOES. Each category can have any ID you want, and must point to an ini file that's also in Vitality GOES's `config` directory. See the "Category ini files" section below for info on how to customize them.
 
 ![Visual correlation between category ini and menu item](https://user-images.githubusercontent.com/24253715/214476111-a5c71e0d-abaf-497c-84e6-b2489b8a4eca.png)
 
-### Location
+### location
 **The only required location option for all users is `timezone`.** A list of supported timezones can be found [here](https://www.php.net/manual/en/timezones.php).
 
 If you are under the jurisdiction of the National Weather service and want to display local weather data, you need to configure the options below. Settings marked as "optional" will disable some functionality if not set. If a non-optional setting is not configured, the Current Weather screen will be hidden. These options can also be changed per client web browser by using the "Local Settings" screen in Vitality GOES.
@@ -78,6 +78,21 @@ As a bonus - if you have your local radar image configured in one of your catego
 
 You may find that the location section is the hardest part of the config to set up. I would recommend leaving it at its defaults, then use the "Local Settings" screen in Vitality GOES to determine what each value should be set to for your location. Once you have it working client-side, configure the settings as appropraite in this config file.
 
+### otheremwin
+If you are displaying EMWIN data, this optional section controls data seen on the "Other EMWIN" screen. Weather satellite TLEs and the EMWIN license cannot be removed.
+
+* `ini`: The path of otheremwin.ini, which is a file that specifies what additional information to present to all users on the Other EMWIN screen.
+  * Defaults to /configs/otheremwin.ini.
+  * See the ["otheremwin.ini Configuration" section below](#otheremwinini-configuration) for more.
+* `allowUserLoader`: Turns the "Load Additional Data" functionality on/off on the Other EMWIN screen.
+  * Accepts "true" or "false".
+  * Defaults to "true".
+* `maxUserFiles`: The maximum number of files to allow user to query through the Additional Data loader.
+  * Defaults to 1000.
+  * Set to 0 to disable the limit, if you are absolutely insane.
+
+Note: `maxUserFiles` counts EMWIN text files read from the disk as a result of user-queried data only. Weather satellite TLEs, EMWIN licenses, and files configured in otheremwin.ini are not counted. If the user queries more files than they are allowed, it will return no data for user-queried files only.
+
 ## Category ini files (abi.ini, meso.ini, etc)
 All category ini files will have a `[_category_]` section at the top, followed by any number of image sections.
 
@@ -114,7 +129,7 @@ videoPath = GOES16FalseColor.mp4
 
 If a file contains no configured images, or if it's `[_category_]` section is missing, it will be hidden in Vitality GOES. *These files will probably not need to be configured by you, unless you're customizing what gets displayed*
 
-## Supported filename parser modes
+### Supported filename parser modes
 The mode selected for an image tells Vitality GOES how to parse its filename. It affects where the timestamp should be in the filename, how the timestamp should be formatted, and how the `filter` attribute is applied to the filename.
 
 The following filename parser modes are supported for use in the `mode` attribute of your category ini files:
@@ -129,3 +144,28 @@ The following filename parser modes are supported for use in the `mode` attribut
 | end        | End of filename           | 20230124110636               | Before the timestamp            |
 | endu       | End of filename           | 20230124_110636              | Before the timestamp            |
 | **endz**   | **End of filename**       | **20230124T110636Z**         | **Before the timestamp**        |
+
+## otheremwin.ini Configuration
+otheremwin.ini contains a list of one or more "selectors" that find and display files based on their Eight character EMWIN file name (the last 8 characters before the file extension). If otheremwin.ini is not found, only Weather satellite TLEs, the EMWIN license file, and user-queried data (if configured) will be displayed.
+
+Here is an example selector you can use in otheremwin.ini:
+
+```ini
+[ADMSDM]
+identifier = "ADMSDM.*"
+title = "SDM OPS Status Messages"
+truncate = 3
+format = paragraph
+```
+
+* `[ADMSDM]`: A unique identifier for the text data. This can be anything, but it must be unique and contain no spaces.
+* `identifier`: A regular expression that matches the Eight character EMWIN file name. The regular expression must match the entire eight-character name. In this example, the eight-character name must start with "ADMSDM", but it can end with anything.
+* `title`: How the text data will be labeled in Vitality GOES
+* `truncate`: How many lines to remove from the beginning of the file. This is to remove additional headers.
+* `format`: Can be "paragraph" or "formatted"
+  * `paragraph`: The data consists of sentences that can be converted easily into paragraph form.
+    * If Vitality GOES detects that a given file has more than one message, it will split the file up into its constituent messages
+    * The first "paragraph" of the file (usually a header) will be shown on all the parts when split.
+    * This means it's important to configure `truncate` correctly!
+  * `formatted`: The data contains tables or other pre-formatted data that does not convert nicely into paragraphs.
+    * If you have issues using "paragraph", use "formatted" instead.
