@@ -89,6 +89,29 @@ Assuming you're on a Debian/Ubuntu-based server, the following commands should i
 sudo apt update
 sudo apt upgrade
 sudo apt install apache2 php libapache2-mod-php
+sudo a2enmod rewrite
+sudo systemctl restart apache2
+```
+
+##### You may also need to enable .htaccess files in Apache2 for all functionality to work
+To do so, edit /etc/apache2/apache2.conf as root and update this section:
+
+```
+<Directory /var/www/>
+        Options Indexes FollowSymLinks
+        AllowOverride None
+        Require all granted
+</Directory>
+```
+
+to this:
+
+```
+<Directory /var/www/>
+        Options -Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+</Directory>
 ```
 
 #### Windows
