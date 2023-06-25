@@ -62,8 +62,7 @@ To configure the data shown on this screen for all users, or to disable the addi
 
 The additional data loader also contains an "Automatic Data Selector" that makes it easy to discover what data is available to view.
 
-TODO: Screenshot here
-
+![Other EMWIN screenshot](https://github-production-user-asset-6210df.s3.amazonaws.com/24253715/248586409-6b5f220f-a331-4ac9-b259-5489c585ac95.png)
 In addition to user and admin configured data, the following information is always available on this screen:
 
 | GOES-N Filename Part | Product Name                  | Card Title in Vitality GOES  | Latest/All Available | Notes |
