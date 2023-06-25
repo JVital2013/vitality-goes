@@ -16,9 +16,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Vitality GOES.  If not, see <http://www.gnu.org/licenses/>.
  */
+ 
+//Get root directory of the application
+$programPath = dirname(__FILE__);
 
 //Load External Functions
-require_once($_SERVER['DOCUMENT_ROOT'] . "/functions.php");
+require_once("$programPath/functions.php");
 $config = loadConfig();
 
 //Only display errors if set to in the config
@@ -166,7 +169,6 @@ if(!array_key_exists('type', $_GET)) die();
 if($_GET['type'] == "preload")
 {
 	$preloadData = [];
-	
 	$preloadData['localRadarVideo'] = "";
 	if(array_key_exists('emwin', $config['categories']) && array_key_exists('radarCode', $currentSettings[$selectedProfile]))
 	{
@@ -200,11 +202,14 @@ if($_GET['type'] == "preload")
 	$preloadData['allowUserLoader'] = array_key_exists('emwinPath', $config['general']) && is_dir($config['general']['emwinPath']) && $config['otheremwin']['allowUserLoader'];
 	$preloadData['showAdminInfo'] = array_key_exists('adminPath', $config['general']) && is_dir($config['general']['adminPath']);
 	
-	if($preloadData['showEmwinInfo']) $preloadData['otherEmwin'] = loadOtherEmwin($config);
-	foreach($preloadData['otherEmwin']['system'] as $key => $value)
+	if($preloadData['showEmwinInfo'])
 	{
-		unset($preloadData['otherEmwin']['system'][$key]['truncate']);
-		unset($preloadData['otherEmwin']['system'][$key]['identifier']);
+		$preloadData['otherEmwin'] = loadOtherEmwin($config);
+		foreach($preloadData['otherEmwin']['system'] as $key => $value)
+		{
+			unset($preloadData['otherEmwin']['system'][$key]['truncate']);
+			unset($preloadData['otherEmwin']['system'][$key]['identifier']);
+		}
 	}
 	
 	$preloadData['showCurrentWeather'] = $preloadData['showEmwinInfo'] && 
@@ -527,8 +532,8 @@ elseif($_GET['type'] == "metadata")
 		}
 		
 		//Disk Usage (all OSs)
-		$totalDiskSpace = round(disk_total_space($_SERVER['DOCUMENT_ROOT']) / 1073741824, 2);
-		$usedDiskSpace = $totalDiskSpace - round(disk_free_space($_SERVER['DOCUMENT_ROOT']) / 1073741824, 2);
+		$totalDiskSpace = round(disk_total_space($programPath) / 1073741824, 2);
+		$usedDiskSpace = $totalDiskSpace - round(disk_free_space($programPath) / 1073741824, 2);
 		$metadata['sysData'][] = array("name" => "Disk Used", "value" => $usedDiskSpace . "GB / " . $totalDiskSpace . "GB  - " . round(($usedDiskSpace / $totalDiskSpace) * 100, 2) . "%");
 		
 		//Memory Usage

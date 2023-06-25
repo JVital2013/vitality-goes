@@ -16,11 +16,16 @@
  * You should have received a copy of the GNU General Public License
  * along with Vitality GOES.  If not, see <http://www.gnu.org/licenses/>.
  */
+ 
+function getProgramDir()
+{
+	return dirname(__FILE__);
+}
 function loadConfig()
 {
 	//Load main config
-	if(!file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini")) die("config.ini is missing! Make sure\nyou have config files in:\n\n" . $_SERVER['DOCUMENT_ROOT'] . "/config/");
-	$config = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini", true, INI_SCANNER_RAW);
+	if(!file_exists(getProgramDir() . "/config/config.ini")) die("config.ini is missing! Make sure\nyou have config files in:\n\n" . getProgramDir() . "/config/");
+	$config = parse_ini_file(getProgramDir() . "/config/config.ini", true, INI_SCANNER_RAW);
 	if($config === false) die("Unable to parse config.ini");
 	
 	//Boolean Values
@@ -33,7 +38,7 @@ function loadConfig()
 	if(!array_key_exists('maxUserFiles', $config['otheremwin'])) $config['otheremwin']['maxUserFiles'] = "1000";
 	if(!array_key_exists('allowUserLoader', $config['otheremwin'])) $config['otheremwin']['allowUserLoader'] = "true";
 	
-	$config['otheremwin']['ini'] = $config['otheremwin']['ini'] = $_SERVER['DOCUMENT_ROOT'] . '/config/' . $config['otheremwin']['ini'];
+	$config['otheremwin']['ini'] = $config['otheremwin']['ini'] = getProgramDir() . '/config/' . $config['otheremwin']['ini'];
 	$config['otheremwin']['allowUserLoader'] = (stripos($config['otheremwin']['allowUserLoader'], "true") !== false);
 	$config['otheremwin']['maxUserFiles'] = intval($config['otheremwin']['maxUserFiles']);
 	
@@ -45,9 +50,9 @@ function loadConfig()
 		{
 			//Validate Extra Configs
 			unset($config['categories'][$type]);
-			if(!file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/$inifile")) continue;
+			if(!file_exists(getProgramDir() . "/config/$inifile")) continue;
 			
-			$configPart = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/$inifile", true, INI_SCANNER_RAW);
+			$configPart = parse_ini_file(getProgramDir() . "/config/$inifile", true, INI_SCANNER_RAW);
 			if($configPart === false ||
 				!array_key_exists('_category_', $configPart) || 
 				count($configPart) < 2 || 
@@ -160,9 +165,9 @@ function loadOtherEmwin($config)
 function findAllThemes()
 {
 	$themes = [];
-	if(!is_dir("{$_SERVER['DOCUMENT_ROOT']}/themes")) return $themes;
+	if(!is_dir(getProgramDir() . "/themes")) return $themes;
 	
-	$themeDirs = glob("{$_SERVER['DOCUMENT_ROOT']}/themes/*", GLOB_ONLYDIR);
+	$themeDirs = glob(getProgramDir() . "/themes/*", GLOB_ONLYDIR);
 	foreach($themeDirs as $themeDir)
 	{
 		//Make sure theme is valid

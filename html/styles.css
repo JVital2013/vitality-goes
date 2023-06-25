@@ -45,8 +45,14 @@ label
 }
 .errorMessage
 {
-	color: white;
+	color: #dddddd;
 	text-align: center;
+}
+.errorMessage .fa
+{
+	margin-bottom: 20px;
+	font-size: 250px;
+	color: #888888;
 }
 .topBar
 {

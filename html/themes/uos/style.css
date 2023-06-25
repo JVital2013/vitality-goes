@@ -10,6 +10,14 @@ body
 	-webkit-tap-highlight-color: #47976e9e;
 	scrollbar-color: #47976e #183425;
 }
+.errorMessage
+{
+	color: #5cdc95;
+}
+.errorMessage .fa
+{
+	color: #47976e;
+}
 .topBar
 {
 	background: repeating-linear-gradient(to bottom, #031a0b, #09160d, #031a0b 10px);

@@ -10,6 +10,15 @@ body
 	scrollbar-color: #8a66bd #543a78;
 }
 
+.errorMessage
+{
+	color: #d8c6f1;
+}
+.errorMessage .fa
+{
+	color: #d8c6f1;
+}
+
 .prettyBox input[type="radio"]
 {
 	appearance: none;
