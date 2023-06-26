@@ -116,27 +116,30 @@ function loadOtherEmwin($config)
 			$cardParts = explode("!", $thisCard);
 			
 			//Verify data
-			if(count($cardParts) != 4 || !is_numeric($cardParts[3]) || !in_array($cardParts[2], array('paragraph', 'formatted')))
+			if(count($cardParts) != 4 || !is_numeric($cardParts[2]) || !is_numeric($cardParts[3]))
 			{
 				$sendCookie = true;
 				continue;
 			}
 			
-			//Re-send the cookie if something will be changed changed
-			$titleNoTags = strip_tags($cardParts[1]);
+			$formatInt = intval($cardParts[2]);
 			$truncateInt = intval($cardParts[3]);
-			if($truncateInt < 0 || $truncateInt > 10)
+			$identifier = base64_decode(str_replace("-", "=", $cardParts[0]));
+			if(!in_array($formatInt, array(0, 1)) || $truncateInt < 0 || $truncateInt > 10 || $identifier === false)
 			{
 				$sendCookie = true;
-				$truncateInt = 0;
+				continue;
 			}
+			
+			//Keep cookie if there were tags in the title; just strip them
+			$titleNoTags = strip_tags($cardParts[1]);
 			if($cardParts[1] != $titleNoTags) $sendCookie = true;
 			
 			//Pass data along from cookie if OK
 			$otheremwin['user'][] = [
-				'identifier' => $cardParts[0],
+				'identifier' => $identifier,
 				'title' => $titleNoTags,
-				'format' => $cardParts[2],
+				'format' => ($formatInt == 0 ? "formatted" : "paragraph"),
 				'truncate' => $truncateInt
 			];
 		}
@@ -149,9 +152,9 @@ function loadOtherEmwin($config)
 		foreach($otheremwin['user'] as $thisCard)
 		{
 			$profileParts[] = join("!", [
-				rawurlencode($thisCard['identifier']),
+				str_replace("=", "-", base64_encode($thisCard['identifier'])),
 				rawurlencode($thisCard['title']),
-				rawurlencode($thisCard['format']),
+				($thisCard['format'] == "formatted" ? 0 : 1),
 				$thisCard['truncate']
 			]);
 		}

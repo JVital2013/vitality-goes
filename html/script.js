@@ -74,9 +74,9 @@ function encodeOtherEmwinConfig(emwinArray)
 	emwinParts = [];
 	emwinArray.forEach((thisEmwin) => {
 		emwinParts.push([
-			(thisEmwin.hasOwnProperty('identifier') ? thisEmwin.identifier : ""),
+			(thisEmwin.hasOwnProperty('identifier') ? btoa(thisEmwin.identifier).replace(/=/g, "-") : ""),
 			(thisEmwin.hasOwnProperty('title') ? thisEmwin.title : ""),
-			(thisEmwin.hasOwnProperty('format') ? thisEmwin.format : ""),
+			(thisEmwin.hasOwnProperty('format') ? (thisEmwin.format == "formatted" ? 0 : 1) : 0),
 			(thisEmwin.hasOwnProperty('truncate') ? thisEmwin.truncate : "")
 		].join("!"));
 	});
@@ -1121,7 +1121,7 @@ function menuSelect(menuSlug)
 				else identifier = document.getElementById('selectorRegex').value;
 				
 				//Get title, Lines to truncate, and format
-				title = document.getElementById('nameInput').value;
+				title = document.getElementById('nameInput').value.replace(/!/g, "").replace(/~/g, "");
 				format = document.querySelector('input[name="formatMethod"]:checked').value;
 				truncate = document.getElementById('truncInput').value;
 				
