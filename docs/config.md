@@ -146,7 +146,7 @@ The following filename parser modes are supported for use in the `mode` attribut
 | **endz**   | **End of filename**       | **20230124T110636Z**         | **Before the timestamp**        |
 
 ## otheremwin.ini Configuration
-otheremwin.ini contains a list of one or more "selectors" that find and display files based on their Eight character EMWIN file name (the last 8 characters before the file extension). If otheremwin.ini is not found, only Weather satellite TLEs, the EMWIN license file, and user-queried data (if configured) will be displayed.
+otheremwin.ini contains a list of one or more "selectors" that find and display EMWIN files based on their Eight-Character EMWIN file name (the last 8 characters before the file extension). If otheremwin.ini is not found, only Weather satellite TLEs, the EMWIN license file, and user-queried data (if configured) will be displayed.
 
 Here is an example selector you can use in otheremwin.ini:
 
