@@ -28,8 +28,9 @@ Vitality GOES has the following features:
 
 * It is easily usable by anyone with no knowledge of radio, satellites, or programming once set up by a ground station technician (you!).
 * Vitality GOES presents all full-disk images, and mesoscale imagery, and more in a user friendly and easily navigatable way.
-* Current weather conditions, forecasts, watches, and warnings from the GOES-16/18 HRIT/EMWIN data feed are presented to the user in a way that is appealing and easy to read. There is no need to parse through data for other locations: your configured location's data is the only thing you're shown. For a writeup on the EMWIN data Vitality GOES pulls and how it's used, see [here](docs/used-emwin-data.md).
-* Vitality GOES is able to monitor the status of the underlying goestools/SatDump stack, including systems temps, error correction rates, and packet drop rates.
+* Current weather conditions, forecasts, watches, and warnings from the GOES-16/18 HRIT/EMWIN data feed are presented to the user in a way that is appealing and easy to read. There is no need to parse through data for other locations: your configured location's data is the only thing you're shown.
+* Discover and browse addional data from the EMWIN data feed. For a writeup on the EMWIN data Vitality GOES pulls and how it's used, see [here](docs/used-emwin-data.md).
+* Monitor the status of the underlying goestools/SatDump stack, including systems temps, error correction rates, and packet drop rates.
 
 Sample configurations are provided for the following satellite/station setups:
 
@@ -51,6 +52,8 @@ A satellite downlink is picked up by your satellite dish, and is processed into 
 You need to set up a satellite dish and point it at the satellite of your choice to get started. Additionally, SatDump or goestools must be configured to save recieved data to disk. See the [additional resources section](#additional-resources) for info on how to set up a ground station with goestools, and [this YouTube Video](https://www.youtube.com/watch?v=XMDAiUjzkhw) for a quick-start guide to setting up a test station with SatDump.
 
 It is recommended that you host Vitality GOES on your ground station itself for the most up-to-date information and to simplify setup/maintenance. If you choose, it can be hosted on another machine if you have a sync process set up between the ground station and the Vitality GOES server. *Syncing received images from another machine is outside the scope of Vitality GOES.*
+
+
 
 It is also recommended that you use a Debian-based Linux distro to host the Vitality GOES server. Something like Raspberry Pi OS, Ubuntu, or Debian is preferred. If you host it on Windows, make sure your satellite data is on an NTFS drive.
 
