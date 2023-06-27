@@ -2234,7 +2234,7 @@ window.addEventListener("load", function()
 			if(config.showAdminInfo || config.showEmwinInfo) renderMenuItem('Other-EMWIN', 'align-left', 'Other EMWIN');
 			if(config.showEmwinInfo) renderMenuItem('Hurricane-Center', 'wind', 'Hurricane Center');
 			renderMenuItem('Local-Settings', 'cogs', 'Local Settings');
-			if(config.showGraphs || config.showSysInfo) renderMenuItem('System-Info', 'info-circle', 'System Info');
+			if(config.showSysInfo) renderMenuItem('System-Info', 'info-circle', 'System Info');
 			
 			//Select the topmost menu if one is not selected
 			pathnameSplit = window.location.pathname.split('/');
