@@ -19,7 +19,7 @@ This is the main config file. It will likely need configured when you first depl
 * `satdumpAPI`: Points to the SatDump REST API to pull decoder/demodulator statistics. You must run SatDump with the `--http_server` flag to get statistics. If you're not using SatDump or don't want statistics, comment/delete this line.
 * `emwinPath`: Point to the emwin repository of your choice. If you're picking up both GOES 16 and 18, you can use either's EMWIN files. Comment/delete this line to disable emwin text data parsing (Current Weather, Hurricane Center, and Other EMWIN).
 * `adminPath`: The directory with admin text you want to display. SatDump will save these files out-of-the-box, but goestools must be patched with [this patch for it to show up](https://github.com/pietern/goestools/pull/105/files). Comment/delete this line to disable. For GOES satellites only.
-* `spaceWeatherAlerts`: Set to true if you want to display space weather alerts. *Default = false*.
+* `spaceWeatherAlerts`: Set to true if you want to display space weather alerts along with other weather alerts. *Default = false*.
 * `showSysInfo`: Set to true if you want to display information about your Vitality GOES server, such as system resource availability and system temps. Set to false to disable.
 * `debug`: Set to true to enable PHP errors. Only set this to true if you're debugging data returned by the DataHandler (advanced users only).
 
