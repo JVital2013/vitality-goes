@@ -125,7 +125,7 @@ function loadOtherEmwin($config)
 			$formatInt = intval($cardParts[2]);
 			$truncateInt = intval($cardParts[3]);
 			$identifier = base64_decode(str_replace("-", "=", $cardParts[0]));
-			if(!in_array($formatInt, array(0, 1)) || $truncateInt < 0 || $truncateInt > 10 || $identifier === false)
+			if(!in_array($formatInt, array(0, 1)) || $truncateInt < 0 || $truncateInt > 10 || $identifier === false || !ctype_print($identifier))
 			{
 				$sendCookie = true;
 				continue;
