@@ -27,10 +27,15 @@ function loadConfig()
 	if(!file_exists(getProgramDir() . "/config/config.ini")) die("config.ini is missing! Make sure\nyou have config files in:\n\n" . getProgramDir() . "/config/");
 	$config = parse_ini_file(getProgramDir() . "/config/config.ini", true, INI_SCANNER_RAW);
 	if($config === false) die("Unable to parse config.ini");
+	if(!array_key_exists('general', $config)) die("Invalid config.ini - general section is missing");
 	
 	//Boolean Values
-	$config['general']['showSysInfo'] = (stripos($config['general']['showSysInfo'], "true") !== false);
-	$config['general']['debug'] = (stripos($config['general']['debug'], "true") !== false);
+	$config['general']['showSysInfo'] = (array_key_exists('showSysInfo', $config['general']) &&
+		stripos($config['general']['showSysInfo'], "true") !== false);
+	$config['general']['debug'] = (array_key_exists('debug', $config['general']) &&
+		stripos($config['general']['debug'], "true") !== false);
+	$config['general']['spaceWeatherAlerts'] = (array_key_exists('spaceWeatherAlerts', $config['general']) &&
+		stripos($config['general']['spaceWeatherAlerts'], "true") !== false);
 	
 	//Other EMWIN config
 	if(!array_key_exists('otheremwin', $config)) $config['otheremwin'] = [];

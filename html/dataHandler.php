@@ -862,7 +862,7 @@ elseif($_GET['type'] == "alertJSON")
 	$returnData = [];
 	$latestHurricaneMessage = 0;
 	$returnData['localEmergencies'] = $returnData['blueAlerts'] = $returnData['amberAlerts'] = $returnData['civilDangerWarnings'] = 
-		$returnData['localEvacuations'] = $returnData['hurricaneStatement'] = $returnData['weatherWarnings'] = [];
+		$returnData['localEvacuations'] = $returnData['hurricaneStatement'] = $returnData['weatherWarnings'] = $returnData['spaceWeatherAlerts'] = [];
 	
 	//Query all emwin files
 	$allEmwinFiles = scandir_recursive($config['general']['emwinPath']);
@@ -877,6 +877,10 @@ elseif($_GET['type'] == "alertJSON")
 		if(preg_match("/-CAE.*$alertStateAbbrs\.TXT$/", $thisFile)) $returnData['amberAlerts'] = array_merge($returnData['amberAlerts'], linesToParagraphs(file($thisFile), 4));
 		if(preg_match("/-CDW.*$alertStateAbbrs\.TXT$/", $thisFile)) $returnData['civilDangerWarnings'] = array_merge($returnData['civilDangerWarnings'], linesToParagraphs(file($thisFile), 4));
 		if(preg_match("/-EVI.*$alertStateAbbrs\.TXT$/", $thisFile)) $returnData['localEvacuations'] = array_merge($returnData['localEvacuations'], linesToParagraphs(file($thisFile), 4));
+		
+		//Space weather alerts, if enabled
+		if($config['general']['spaceWeatherAlerts'] && preg_match("/-(ALT(K07|K08|K09)|WAT(A50|A99))US\.TXT$/", $thisFile))
+			$returnData['spaceWeatherAlerts'] = array_merge($returnData['spaceWeatherAlerts'], linesToParagraphs(file($thisFile), 3));
 		
 		//Hurricane Statement - Only get most recent
 		if(preg_match("/-HLS.*" . $currentSettings[$selectedProfile]['orig'] . "\.TXT$/", $thisFile))

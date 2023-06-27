@@ -915,6 +915,7 @@ function menuSelect(menuSlug)
 				alertInfo.blueAlerts.forEach(function(element){renderAlert(element, "blue")});
 				alertInfo.amberAlerts.forEach(function(element){renderAlert(element, "amber")});
 				alertInfo.civilDangerWarnings.forEach(function(element){renderAlert(element, "purple")});
+				alertInfo.spaceWeatherAlerts.forEach(function(element){renderAlert(element, "blue")});
 			}
 			
 			else renderAlert("The server returned status code " + this.statusText + " (" + this.statusText + ") when trying to load weather alerts", "red");

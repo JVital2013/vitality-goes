@@ -13,14 +13,15 @@ Configurations are highly customizable and can be modified to fit your ground st
 This is the main config file. It will likely need configured when you first deploy Vitality GOES. It is broken out into the following sections:
 
 ### general
-* `siteTitle`: Sets the title of the Vitality GOES Web App. If not set, the site title defaults to "Vitality GOES"
+* `siteTitle`: Sets the title of the Vitality GOES Web App. *Default = Vitality GOES*
 * `siteTheme`: The theme for Vitality GOES. Leave unset to use the built-in theme, or set it to an installed theme. The included themes are "light", "purple", "red", and "uos". This option can be overridden per-browser by using the "Local Settings" screen. For more on theming, [look here](/docs/themes.md).
 * `graphiteAPI`: If you're using goestools and want to view its decoder/demodulator statistcs, this should point to your graphite host. It must include the `/render/` path at the end to work properly. If you're not using goestools/graphite, comment/remove this line. For information on how to set up graphite, [look here](/docs/graphite.md).
 * `satdumpAPI`: Points to the SatDump REST API to pull decoder/demodulator statistics. You must run SatDump with the `--http_server` flag to get statistics. If you're not using SatDump or don't want statistics, comment/delete this line.
 * `emwinPath`: Point to the emwin repository of your choice. If you're picking up both GOES 16 and 18, you can use either's EMWIN files. Comment/delete this line to disable emwin text data parsing (Current Weather, Hurricane Center, and Other EMWIN).
 * `adminPath`: The directory with admin text you want to display. SatDump will save these files out-of-the-box, but goestools must be patched with [this patch for it to show up](https://github.com/pietern/goestools/pull/105/files). Comment/delete this line to disable. For GOES satellites only.
+* `spaceWeatherAlerts`: Set to true if you want to display space weather alerts. *Default = false*.
 * `showSysInfo`: Set to true if you want to display information about your Vitality GOES server, such as system resource availability and system temps. Set to false to disable.
-* `debug`: Set to true to enable PHP errors. This breaks the AJAX requests within Vitality GOES if there are any errors, so only set this to true if you're debugging data returned by the DataHandler (advanced users only).
+* `debug`: Set to true to enable PHP errors. Only set this to true if you're debugging data returned by the DataHandler (advanced users only).
 
 ### paths
 A path should be set up for each satellite downlink you're receiving. Each path defined in this section creates a variable that can be used in the `path` options of your category ini files. One or more satellite should be listed here.
