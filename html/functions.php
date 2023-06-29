@@ -222,19 +222,13 @@ function loadTheme($config)
 	else return false;
 }
 
-function scandir_recursive($dir, &$results = array())
+function scandir_recursive($dir)
 {
-	$dirHandle = opendir($dir);
-	while(($currentFile = readdir($dirHandle)) !== false)
-	{
-		if($currentFile == '.' or $currentFile == '..') continue;
-		$path = $dir . DIRECTORY_SEPARATOR . $currentFile;
-		if(is_dir($path)) scandir_recursive($path, $results);
-		else $results[] = $path;
-	}
-	closedir($dirHandle);
-	
-    return $results;
+	$retVal = [];
+	$iterator = new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS | FilesystemIterator::CURRENT_AS_PATHNAME);
+	$results = new RecursiveIteratorIterator($iterator);
+	foreach($results as $result) $retVal[] = $result;
+	return $retVal;
 }
 
 function sortByTimestamp($a, $b)
