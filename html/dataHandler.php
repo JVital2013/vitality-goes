@@ -1457,7 +1457,11 @@ elseif($_GET['type'] == "weatherJSON")
 	}
 		
 	//Calculate Relative Humidity for Days 4-7
-	for($i = 0; $i < count($forecastDewpt); $i++) $forecastRh[] = round(100 * (exp(($forecastDewpt[$i] * 17.625) / ($forecastDewpt[$i] + 243.04)) / exp(($forecastTemp[$i] * 17.625) / ($forecastTemp[$i] + 243.04))));
+	for($i = 0; $i < count($forecastDewpt); $i++)
+	{
+		if(!is_numeric($forecastDewpt[$i]) || !is_numeric($forecastTemp[$i])) $forecastRh[] = -1;
+		else $forecastRh[] = round(100 * (exp(($forecastDewpt[$i] * 17.625) / ($forecastDewpt[$i] + 243.04)) / exp(($forecastTemp[$i] * 17.625) / ($forecastTemp[$i] + 243.04))));
+	}
 	
 	//Load parsed data into return data array
 	$onDay = 0;

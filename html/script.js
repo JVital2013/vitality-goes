@@ -826,9 +826,13 @@ function menuSelect(menuSlug)
 						
 						if("maxTemp" in todaysForcast) renderLeftRightLine(forcastCard, "High", todaysForcast.maxTemp + "&deg; F");
 						if("amPrecip" in todaysForcast) renderLeftRightLine(forcastCard, "Precipitation", todaysForcast.amPrecip + "%");
-						if("amHumidity" in todaysForcast) renderLeftRightLine(forcastCard, "Humidity", todaysForcast.amHumidity + "%");
+						if("amHumidity" in todaysForcast) renderLeftRightLine(forcastCard, "Humidity",
+							(todaysForcast.amHumidity == -1 ? "Unknown" : todaysForcast.amHumidity + "%"));
 						
-						if((("amClouds" in todaysForcast && "amPrecip" in todaysForcast) || "maxTemp" in todaysForcast || "amPrecip" in todaysForcast || "amHumidity" in todaysForcast) && (("pmClouds" in todaysForcast && "pmPrecip" in todaysForcast) || "minTemp" in todaysForcast || "pmPrecip" in todaysForcast || "pmHumidity" in todaysForcast)) forcastCard.innerHTML += "<div class='forecastHeader' style='margin-top: 25px;'>Evening</div>";
+						if((("amClouds" in todaysForcast && "amPrecip" in todaysForcast) || "maxTemp" in todaysForcast || "amPrecip" in todaysForcast || "amHumidity" in todaysForcast) &&
+							(("pmClouds" in todaysForcast && "pmPrecip" in todaysForcast) || "minTemp" in todaysForcast || "pmPrecip" in todaysForcast || "pmHumidity" in todaysForcast))
+							forcastCard.innerHTML += "<div class='forecastHeader' style='margin-top: 25px;'>Evening</div>";
+						
 						if("pmClouds" in todaysForcast && "pmPrecip" in todaysForcast)
 						{
 							//Probably not raining
@@ -850,7 +854,8 @@ function menuSelect(menuSlug)
 						
 						if("minTemp" in todaysForcast) renderLeftRightLine(forcastCard, "Low", todaysForcast.minTemp + "&deg; F");
 						if("pmPrecip" in todaysForcast) renderLeftRightLine(forcastCard, "Precipitation", todaysForcast.pmPrecip + "%");
-						if("pmHumidity" in todaysForcast) renderLeftRightLine(forcastCard, "Humidity", todaysForcast.pmHumidity + "%");
+						if("pmHumidity" in todaysForcast) renderLeftRightLine(forcastCard, "Humidity",
+							(todaysForcast.pmHumidity == -1 ? "Unknown" : todaysForcast.pmHumidity + "%"));
 						
 						sevenDayForcastContainer.appendChild(forcastCard);
 					});
