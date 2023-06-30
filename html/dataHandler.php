@@ -1032,7 +1032,19 @@ elseif($_GET['type'] == "hurricaneJSON")
 					//Find start of file
 					if(stripos($thisLine, "BULLETIN") === 0)
 					{
+						//Get Storm Name and advisory number
 						$nameLine = trim($hurricaneStatementLines[++$i]);
+						$nameLineParts = preg_split('/ (Intermediate )?Advisory Number/', $nameLine);
+						if(count($nameLineParts) == 2) $thisAdvisoryNumber = trim($nameLineParts[1]);
+						else
+						{
+							$advisoryLine = trim($hurricaneStatementLines[++$i]);
+							$advisoryLineParts = preg_split('/(Intermediate )?Advisory Number/', $advisoryLine);
+							$thisAdvisoryNumber = trim($advisoryLineParts[1]);
+						}
+						if($thisAdvisoryNumber == "") $thisAdvisoryNumber = trim($hurricaneStatementLines[++$i]);
+						
+						//Get this storm's identifier
 						$identifierLine = trim($hurricaneStatementLines[++$i]);
 						$advisoryTime = trim($hurricaneStatementLines[++$i]);
 						if(stripos($advisoryTime, "ISSUED BY") === 0) $advisoryTime = trim($hurricaneStatementLines[++$i]);
@@ -1041,10 +1053,6 @@ elseif($_GET['type'] == "hurricaneJSON")
 						$identifierParts = preg_split('/\s+/', $identifierLine);
 						$stormIdentifier = substr($identifierParts[count($identifierParts) - 1], 0, 4) . "YY";
 						if(!isset($returnData[$stormIdentifier])) $returnData[$stormIdentifier] = [];
-						
-						//Get Title and identifier
-						$nameLineParts = preg_split('/ (Intermediate )?Advisory Number/', $nameLine);
-						$thisAdvisoryNumber = trim($nameLineParts[1]);
 						if(isset($returnData[$stormIdentifier]['latestAdvisory']) && strnatcmp($returnData[$stormIdentifier]['latestAdvisory'], $thisAdvisoryNumber) >= 0) break;
 						
 						$returnData[$stormIdentifier]['title'] = $nameLineParts[0];
