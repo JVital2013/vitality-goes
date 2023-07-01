@@ -267,18 +267,16 @@ function findNewestEMWIN($allEmwinFiles, $product)
 	$highestImage = 0;
 	$path = "";
 	
-	foreach($allEmwinFiles as $thisFile)
+	$productEmwinFiles = preg_grep("/$product/", $allEmwinFiles);
+	foreach($productEmwinFiles as $thisFile)
 	{
-		if(strpos($thisFile, $product) !== false)
+		$fileNameParts = explode("_", basename($thisFile));
+		if(count($fileNameParts) != 6) continue;
+		
+		if($fileNameParts[4] > $highestImage)
 		{
-			$fileNameParts = explode("_", basename($thisFile));
-			if(count($fileNameParts) != 6) continue;
-			
-			if($fileNameParts[4] > $highestImage)
-			{
-				$path = $thisFile;
-				$highestImage = $fileNameParts[4];
-			}
+			$path = $thisFile;
+			$highestImage = $fileNameParts[4];
 		}
 	}
 	
@@ -299,22 +297,18 @@ function findSpecificEMWIN($allEmwinFiles, $product, $timestamp)
 	$DateTime = new DateTime("now", new DateTimeZone(date_default_timezone_get()));
 	$DateTime->setTimestamp($timestamp);
 	$DateTime->setTimezone(new DateTimeZone("UTC"));
-	
-	foreach($allEmwinFiles as $thisFile)
-	{
-		if(strpos($thisFile, $DateTime->format('YmdHis')) !== false && strpos($thisFile, $product) !== false) return $thisFile;
-	}
-	
+	$specificEmwinFiles = array_values(preg_grep("/_" . $DateTime->format('YmdHis') . "_[^\\\\\/]*{$product}[^\\\\\/]*\..{3}$/", $allEmwinFiles));
+
+	if(count($specificEmwinFiles) > 0) return $specificEmwinFiles[0];
 	return false;
 }
 
 function findMetadataEMWIN($allEmwinFiles, $product)
 {
 	$retVal = [];
-	foreach($allEmwinFiles as $thisFile)
+	$productEmwinFiles = preg_grep("/$product/", $allEmwinFiles);
+	foreach($productEmwinFiles as $thisFile)
 	{
-		if(stripos($thisFile, $product) === false) continue;
-		
 		$fileNameParts = explode("_", basename($thisFile));
 		if(count($fileNameParts) != 6) continue;
 		
