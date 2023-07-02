@@ -58,7 +58,7 @@ EMWIN Imagery is configured [along with other image categories](config.md#catego
 ## Other EMWIN
 The Other EMWIN tab of Vitality GOES shows miscellaneous data configured by the system administrator, as well as a data loader that allows the user to query additional data.
 
-To configure the data shown on this screen for all users, or to disable the additional data loader, see [the config documentation](config.md#otheremwin). The options available in [otheremwin.ini selectors](config.md#otheremwinini-configuration) match those availble in the additional data loader.
+To configure the data shown on this screen for all users, or to disable the additional data loader, see [the config documentation](config.md#otheremwin). The options available in [otheremwin.ini selectors](config.md#otheremwinini-configuration) match those available in the additional data loader.
 
 The additional data loader also contains an "Automatic Data Selector" that makes it easy to discover what data is available to view.
 
