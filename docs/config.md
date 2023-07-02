@@ -19,7 +19,7 @@ This is the main config file. It will likely need configured when you first depl
 * `satdumpAPI`: Points to the SatDump REST API to pull decoder/demodulator statistics. You must run SatDump with the `--http_server` flag to get statistics. If you're not using SatDump or don't want statistics, comment/delete this line.
 * `emwinPath`: Point to the emwin repository of your choice. If you're picking up both GOES 16 and 18, you can use either's EMWIN files. Comment/delete this line to disable emwin text data parsing (Current Weather, Hurricane Center, and Other EMWIN).
 * `adminPath`: The directory with admin text you want to display. SatDump will save these files out-of-the-box, but goestools must be patched with [this patch for it to show up](https://github.com/pietern/goestools/pull/105/files). Comment/delete this line to disable. For GOES satellites only.
-* `fastEmwin`: Use a faster algorithm to parse EMWIN files for data. Recommended for Windows servers and servers with a large archive. **Warning:** if you turn this on, your EMWIN data folder must be flat! It cannot have subfolders of any kind, including dated subfolders.  *Default = false*.
+* `fastEmwin`: Use a faster algorithm to parse EMWIN files for data. Recommended for Windows servers and servers with a large archive. Warning: if you turn this on, your EMWIN data folder must be flat! It cannot have subfolders of any kind, including dated subfolders.  *Default = false*.
 * `spaceWeatherAlerts`: Set to true if you want to display space weather alerts along with other weather alerts. *Default = false*.
 * `showSysInfo`: Set to true if you want to display information about your Vitality GOES server, such as system resource availability and system temps. Set to false to disable.
 * `debug`: Set to true to enable PHP errors. Only set this to true if you're debugging data returned by the DataHandler (advanced users only).
@@ -125,7 +125,7 @@ videoPath = GOES16FalseColor.mp4
 * `[fdfc_16]`: A unique identifier for the image. This can be anything, but it must be unique and contain no spaces
 * `path`: The folder that holds all the images for a particular GOES product. In this example, it uses the `{GOES16}` variable defined in the `Paths` section of config.ini
 * `title`: How the image will be labeled in Vitality GOES
-* `fast`*(Default: false)*:  Use a faster algorithm to parse data. Recommended for Windows servers and servers with a large archives. **Warning:** if you turn this on, the path for this image section must be flat! It cannot have subfolders of any kind, including dated subfolders.
+* `fast` *(Default: false)*:  Use a faster algorithm to parse data. Recommended for Windows servers and servers with a large archives. Warning: if you turn this on, the path for this image section must be flat! It cannot have subfolders of any kind, including dated subfolders.
 * `mode` *(Default: endz)*: Defines the mode the internal image filename parser should use. This should be based on how your image files are named. See below for a table of supported filename parser modes
 * `filter` *(Optional)*: Only load images whose filename contains the specified string. This can be used to select for a specific channel when you have multiple image channels in the same folder. If all of your images of a unique type are in the same folder, this is not needed.
 * `color` *(Optional)*: Color of the image's card in the web interface. Any CSS color code can be used. The color setting is optional and is not configured by default.
