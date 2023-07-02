@@ -124,7 +124,7 @@ videoPath = GOES16FalseColor.mp4
 
 * `[fdfc_16]`: A unique identifier for the image. This can be anything, but it must be unique and contain no spaces
 * `path`: The folder that holds all the images for a particular GOES product. In this example, it uses the `{GOES16}` variable defined in the `Paths` section of config.ini
-* `title`: How the image will be labeled in Vitality GOES
+* `title`: The image label in Vitality GOES
 * `fast` *(Default: false)*:  Use a faster algorithm to parse data. Recommended for Windows servers and servers with a large archives. Warning: if you turn this on, the path for this image section must be flat! It cannot have subfolders of any kind, including dated subfolders.
 * `mode` *(Default: endz)*: Defines the mode the internal image filename parser should use. This should be based on how your image files are named. See below for a table of supported filename parser modes
 * `filter` *(Optional)*: Only load images whose filename contains the specified string. This can be used to select for a specific channel when you have multiple image channels in the same folder. If all of your images of a unique type are in the same folder, this is not needed.
@@ -163,8 +163,8 @@ format = paragraph
 ```
 
 * `[ADMSDM]`: A unique identifier for the text data. This can be anything, but it must be unique and contain no spaces.
-* `identifier`: A regular expression that matches the Eight character EMWIN file name. The regular expression must match the entire eight-character name. In this example, the eight-character name must start with "ADMSDM", but it can end with anything.
-* `title`: How the text data will be labeled in Vitality GOES
+* `identifier`: An Eight-Character EMWIN File Name, or a regular expression that matches one. If it's a regular expression, it must match the entire eight-character name. In this example, the eight-character name must start with "ADMSDM", but it can end with anything.
+* `title`: The text label in Vitality GOES
 * `truncate`: How many lines to remove from the beginning of the file. This is to remove additional headers.
 * `format`: Can be "paragraph" or "formatted"
   * `paragraph`: The data consists of sentences that can be converted easily into paragraph form.
