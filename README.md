@@ -29,7 +29,7 @@ Vitality GOES has the following features:
 * It is easily usable by anyone with no knowledge of radio, satellites, or programming once set up by a ground station technician (you!).
 * Vitality GOES presents all full-disk images, and mesoscale imagery, and more in a user friendly and easily navigatable way.
 * Current weather conditions, forecasts, watches, and warnings from the GOES-16/18 HRIT/EMWIN data feed are presented to the user in a way that is appealing and easy to read. There is no need to parse through data for other locations: your configured location's data is the only thing you're shown.
-* Discover and browse addional data from the EMWIN data feed. For a writeup on the EMWIN data Vitality GOES pulls and how it's used, see [here](docs/used-emwin-data.md).
+* Discover and browse additional data from the EMWIN data feed. For a writeup on the EMWIN data Vitality GOES pulls and how it's used, see [here](docs/used-emwin-data.md).
 * Monitor the status of the underlying goestools/SatDump stack, including systems temps, error correction rates, and packet drop rates.
 
 Sample configurations are provided for the following satellite/station setups:
