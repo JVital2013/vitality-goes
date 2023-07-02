@@ -48,7 +48,8 @@ function setCookie(name, value)
 {
 	e = new Date;
 	e.setDate(e.getDate() + 365);
-	document.cookie = name + "=" + encodeURIComponent(value) + ';expires=' + e.toUTCString() + ';path=/;domain=.' + document.domain;
+	cookiePrefix = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/.test(document.domain) ? "" : ".";
+	document.cookie = name + "=" + encodeURIComponent(value) + ';expires=' + e.toUTCString() + ';path=/;domain=' + cookiePrefix + document.domain;
 }
 function encodeProfile(profileArray)
 {

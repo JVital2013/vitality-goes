@@ -157,8 +157,9 @@ if($sendCookie)
 		]);
 	}
 	
-	setcookie("selectedProfile", "$selectedProfile", time() + 31536000, "/", ".".$_SERVER['SERVER_NAME']);
-	setrawcookie("localSettings", join("~", $profileParts), time() + 31536000, "/", ".".$_SERVER['SERVER_NAME']);
+	$cookiePrefix = (ip2long($_SERVER['SERVER_NAME']) === false ? "." : "");
+	setcookie("selectedProfile", "$selectedProfile", time() + 31536000, "/", $cookiePrefix.$_SERVER['SERVER_NAME']);
+	setrawcookie("localSettings", join("~", $profileParts), time() + 31536000, "/", $cookiePrefix.$_SERVER['SERVER_NAME']);
 }
 
 //Set the specified timezone

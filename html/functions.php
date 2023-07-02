@@ -168,8 +168,9 @@ function loadOtherEmwin($config)
 				$thisCard['truncate']
 			]);
 		}
-
-		setrawcookie("otheremwin", join("~", $profileParts), time() + 31536000, "/", ".".$_SERVER['SERVER_NAME']);
+		
+		$cookiePrefix = (ip2long($_SERVER['SERVER_NAME']) === false ? "." : "");
+		setrawcookie("otheremwin", join("~", $profileParts), time() + 31536000, "/", $cookiePrefix.$_SERVER['SERVER_NAME']);
 	}
 	
 	return $otheremwin;
