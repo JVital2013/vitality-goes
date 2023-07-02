@@ -30,6 +30,8 @@ function loadConfig()
 	if(!array_key_exists('general', $config)) die("Invalid config.ini - general section is missing");
 	
 	//Boolean Values
+	$config['general']['fastEmwin'] = (array_key_exists('fastEmwin', $config['general']) &&
+		stripos($config['general']['fastEmwin'], "true") !== false);
 	$config['general']['showSysInfo'] = (array_key_exists('showSysInfo', $config['general']) &&
 		stripos($config['general']['showSysInfo'], "true") !== false);
 	$config['general']['debug'] = (array_key_exists('debug', $config['general']) &&
@@ -79,6 +81,9 @@ function loadConfig()
 				if(!array_key_exists("mode", $configPart[$slugs[$i]])) $configPart[$slugs[$i]]['mode'] = "endz";
 				if(array_key_exists('paths', $config)) foreach($config['paths'] as $key => $value)
 					$configPart[$slugs[$i]]['path'] = str_replace('{' . $key . '}', $value, $configPart[$slugs[$i]]['path']);
+				
+				$configPart[$slugs[$i]]['fast'] =
+					(array_key_exists('fast', $configPart[$slugs[$i]]) ? stripos($configPart[$slugs[$i]]['fast'], "true") !== false : false);
 			}
 			
 			$config['categories'][$type]['data'] = $configPart;
@@ -89,7 +94,7 @@ function loadConfig()
 	if(array_key_exists('paths', $config)) unset($config['paths']);
 	if(!array_key_exists('city', $config['location'])) $config['location']['city'] = "";
 	if(!array_key_exists('rwrOrig', $config['location']) && array_key_exists('orig', $config['location'])) $config['location']['rwrOrig'] = $config['location']['orig'];
-	
+
 	return $config;
 }
 
@@ -222,12 +227,17 @@ function loadTheme($config)
 	else return false;
 }
 
-function scandir_recursive($dir)
+function scandir_recursive($dir, $fast)
 {
+	if($fast) $iterator = new FilesystemIterator($dir, FilesystemIterator::SKIP_DOTS | FilesystemIterator::CURRENT_AS_PATHNAME);
+	else
+	{
+		$directoryIterator = new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS | FilesystemIterator::CURRENT_AS_PATHNAME);
+		$iterator = new RecursiveIteratorIterator($directoryIterator);
+	}
+	
 	$retVal = [];
-	$iterator = new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS | FilesystemIterator::CURRENT_AS_PATHNAME);
-	$results = new RecursiveIteratorIterator($iterator);
-	foreach($results as $result) $retVal[] = $result;
+	foreach($iterator as $result) $retVal[] = $result;
 	return $retVal;
 }
 

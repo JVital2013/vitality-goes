@@ -190,6 +190,7 @@ if($_GET['type'] == "preload")
 			unset($config['categories'][$type]['data'][$thisSlug]['path']);
 			unset($config['categories'][$type]['data'][$thisSlug]['filter']);
 			unset($config['categories'][$type]['data'][$thisSlug]['mode']);
+			unset($config['categories'][$type]['data'][$thisSlug]['fast']);
 		}
 		
 		$preloadData['categories'][$type] = $config['categories'][$type];
@@ -282,7 +283,7 @@ elseif($_GET['type'] == "metadata")
 		if(array_key_exists('emwinPath', $config['general']) && is_dir($config['general']['emwinPath']))
 		{
 			//Get all emwin files and config
-			$allEmwinFiles = scandir_recursive($config['general']['emwinPath']);
+			$allEmwinFiles = scandir_recursive($config['general']['emwinPath'], $config['general']['fastEmwin']);
 			$otherEmwinConfig = loadOtherEmwin($config);
 			
 			//Load pertinent pieces of information where for cards with all available information
@@ -371,7 +372,7 @@ elseif($_GET['type'] == "metadata")
 		if(array_key_exists('adminPath', $config['general']) &&  is_dir($config['general']['adminPath']))
 		{
 			//Admin update
-			$allAdminFiles = scandir_recursive($config['general']['adminPath']);
+			$allAdminFiles = scandir_recursive($config['general']['adminPath'], true);
 			$allAdminFiles = preg_grep("/[0-9]{4}\.[0-9]{2}\.[0-9]{2}\.(txt|TXT)$/", $allAdminFiles);
 			usort($allAdminFiles, "sortByBasename");
 			$adminDateParts = explode("_", basename($allAdminFiles[count($allAdminFiles) - 1]));
@@ -636,7 +637,7 @@ elseif($_GET['type'] == "metadata")
 			default: die("Invalid server config: " . $config['categories'][$_GET['id']]['data'][$_GET['subid']]['mode'] . "is not a valid file parser mode!"); break;
 		}
 		
-		$fileList = scandir_recursive($config['categories'][$_GET['id']]['data'][$_GET['subid']]['path']);
+		$fileList = scandir_recursive($config['categories'][$_GET['id']]['data'][$_GET['subid']]['path'], $config['categories'][$_GET['id']]['data'][$_GET['subid']]['fast']);
 		foreach($fileList as $file)
 		{
 			if(!preg_match($regex, $file, $regexMatches)) continue;
@@ -695,7 +696,7 @@ elseif($_GET['type'] == "data")
 		default: die(); break;
 	}
 
-	$fileList = scandir_recursive($config['categories'][$_GET['id']]['data'][$_GET['subid']]['path']);
+	$fileList = scandir_recursive($config['categories'][$_GET['id']]['data'][$_GET['subid']]['path'], $config['categories'][$_GET['id']]['data'][$_GET['subid']]['fast']);
 	foreach($fileList as $thisFile)
 	{
 		if(preg_match($regex, $thisFile))
@@ -716,7 +717,7 @@ elseif($_GET['type'] == "hurricaneData")
 	if(!array_key_exists('timestamp', $_GET) || !array_key_exists('id', $_GET) || preg_match("/^[A-Z0-9]{2}$/", $_GET['id']) == 0 
 		|| !array_key_exists('product', $_GET) || preg_match("/^[A-Z0-9]{6}$/", $_GET['product']) == 0) die();
 		
-	$path = findSpecificEMWIN(scandir_recursive($config['general']['emwinPath']), $_GET['product'].$_GET['id'], $_GET['timestamp']);
+	$path = findSpecificEMWIN(scandir_recursive($config['general']['emwinPath'], $config['general']['fastEmwin']), $_GET['product'].$_GET['id'], $_GET['timestamp']);
 	header('Content-Type: ' . mime_content_type($path));
 	header('Content-Disposition: inline; filename=' . basename($path));
 	header('Content-Length: ' . filesize($path));
@@ -725,7 +726,7 @@ elseif($_GET['type'] == "hurricaneData")
 elseif($_GET['type'] == "localRadarData")
 {
 	if(!array_key_exists('timestamp', $_GET)) die();
-	$path = findSpecificEMWIN(scandir_recursive($config['general']['emwinPath']), "RAD" . $currentSettings[$selectedProfile]['radarCode'], $_GET['timestamp']);
+	$path = findSpecificEMWIN(scandir_recursive($config['general']['emwinPath'], $config['general']['fastEmwin']), "RAD" . $currentSettings[$selectedProfile]['radarCode'], $_GET['timestamp']);
 	header('Content-Type: ' . mime_content_type($path));
 	header('Content-Disposition: inline; filename=' . basename($path));
 	header('Content-Length: ' . filesize($path));
@@ -733,7 +734,7 @@ elseif($_GET['type'] == "localRadarData")
 }
 elseif($_GET['type'] == "tle")
 {
-	$path = findNewestEmwin(scandir_recursive($config['general']['emwinPath']), "EPHTWOUS");
+	$path = findNewestEmwin(scandir_recursive($config['general']['emwinPath'], $config['general']['fastEmwin']), "EPHTWOUS");
 	header("Pragma: no-cache");
 	header('Content-Type: ' . mime_content_type($path));
 	header("Cache-Control: max-age=0, no-cache, no-store, must-revalidate");
@@ -750,7 +751,7 @@ elseif($_GET['type'] == "settings")
 	{
 		case "general":
 			//Query all emwin files
-			$allEmwinFiles = scandir_recursive($config['general']['emwinPath']);
+			$allEmwinFiles = scandir_recursive($config['general']['emwinPath'], $config['general']['fastEmwin']);
 			
 			//Find pertinent data in emwin files
 			$dropdownList['radar'] = $dropdownList['stateAbbr'] = $dropdownList['orig'] = $dropdownList['rwrOrig'] = $dropdownList['timezone'] = $allOrig = $allRwrOrig = [];
@@ -790,7 +791,7 @@ elseif($_GET['type'] == "settings")
 			
 		case "wxZone":
 			if(!preg_match("/^[A-Z0-9]{5}$/", $_GET['orig'])) break;
-			$localZfpPath = findNewestEMWIN(scandir_recursive($config['general']['emwinPath']), "ZFP".$_GET['orig']);
+			$localZfpPath = findNewestEMWIN(scandir_recursive($config['general']['emwinPath'], $config['general']['fastEmwin']), "ZFP".$_GET['orig']);
 			if($localZfpPath == "") break;
 			
 			$localZfpArr = file($localZfpPath);
@@ -817,7 +818,7 @@ elseif($_GET['type'] == "settings")
 			
 		case "city":
 			if(!preg_match("/^[A-Z0-9]{5}$/", $_GET['rwrOrig'])) break;
-			$localRwrPath = findNewestEMWIN(scandir_recursive($config['general']['emwinPath']), "RWR".$_GET['rwrOrig']);
+			$localRwrPath = findNewestEMWIN(scandir_recursive($config['general']['emwinPath'], $config['general']['fastEmwin']), "RWR".$_GET['rwrOrig']);
 			if($localRwrPath == "") break;
 			
 			$localRwrArr = file($localRwrPath);
@@ -865,7 +866,7 @@ elseif($_GET['type'] == "alertJSON")
 		$returnData['localEvacuations'] = $returnData['hurricaneStatement'] = $returnData['weatherWarnings'] = $returnData['spaceWeatherAlerts'] = [];
 	
 	//Query all emwin files
-	$allEmwinFiles = scandir_recursive($config['general']['emwinPath']);
+	$allEmwinFiles = scandir_recursive($config['general']['emwinPath'], $config['general']['fastEmwin']);
 	$alertStateAbbrs = "(" . implode('|', array_unique(array($currentSettings[$selectedProfile]['stateAbbr'], substr($currentSettings[$selectedProfile]['orig'], -2), substr($currentSettings[$selectedProfile]['rwrOrig'], -2)))) . ")";
 	
 	//Find pertinent data in the EMWIN files
@@ -990,7 +991,7 @@ elseif($_GET['type'] == "hurricaneJSON")
 	if(array_key_exists('emwinPath', $config['general']) && is_dir($config['general']['emwinPath']))
 	{
 		//Get all hurricane emwin files
-		$allEmwinFiles = scandir_recursive($config['general']['emwinPath']);
+		$allEmwinFiles = scandir_recursive($config['general']['emwinPath'], $config['general']['fastEmwin']);
 		$allHurricaneImagery = preg_grep("/-(AL|EP)[0-9]{2}[A-Z0-9]{2}(5D|WS|RS)\.PNG$/i", $allEmwinFiles);
 		$allHEPZ = preg_grep("/_[0-9]{14}_[^\\\\\/]*-HEPZ[^\\\\\/]{4}\.TXT$/i", $allEmwinFiles);
 		$allTCA = preg_grep("/_[0-9]{14}_[^\\\\\/]*-TCA[^\\\\\/]{5}\.TXT$/i", $allEmwinFiles);
@@ -1005,6 +1006,7 @@ elseif($_GET['type'] == "hurricaneJSON")
 			$imageType = substr($productIdentifier, -2);
 			
 			//Get date of product
+			$fileNameParts = explode("_", basename($thisFile));
 			$DateTime = new DateTime($fileNameParts[4], new DateTimeZone("UTC"));
 			$DateTime->setTimezone(new DateTimeZone(date_default_timezone_get()));
 			$date = $DateTime->format("F j, Y g:i A");
@@ -1233,7 +1235,7 @@ elseif($_GET['type'] == "weatherJSON")
 	$returnData['state'] = htmlspecialchars($currentSettings[$selectedProfile]['stateAbbr']);
 	
 	//Get all EMWIN files for use later
-	$allEmwinFiles = scandir_recursive($config['general']['emwinPath']);
+	$allEmwinFiles = scandir_recursive($config['general']['emwinPath'], $config['general']['fastEmwin']);
 	
 	//Current Radar
 	$returnData['localRadarMetadata'] = [];
