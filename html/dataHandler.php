@@ -868,118 +868,126 @@ elseif($_GET['type'] == "alertJSON")
 	
 	//Query all emwin files
 	$allEmwinFiles = scandir_recursive($config['general']['emwinPath'], $config['general']['fastEmwin']);
-	$alertStateAbbrs = "(" . implode('|', array_unique(array($currentSettings[$selectedProfile]['stateAbbr'], substr($currentSettings[$selectedProfile]['orig'], -2), substr($currentSettings[$selectedProfile]['rwrOrig'], -2)))) . ")";
+	$alertStateAbbrs = "(" . implode('|', array_unique(array($currentSettings[$selectedProfile]['stateAbbr'],
+		substr($currentSettings[$selectedProfile]['orig'], -2), substr($currentSettings[$selectedProfile]['rwrOrig'], -2)))) . ")";
 	
-	//Find pertinent data in the EMWIN files
-	foreach($allEmwinFiles as $thisFile)
+	//Find pertinent files
+	$wwFiles = preg_grep("/-(SQW|DSW|FRW|FFW|FLW|SVR|TOR|EWW)" . $currentSettings[$selectedProfile]['orig'] . "\.TXT$/i", $allEmwinFiles);
+	$hlsFiles = preg_grep("/-HLS.*" . $currentSettings[$selectedProfile]['orig'] . "\.TXT$/i", $allEmwinFiles);
+	$laeFiles = preg_grep("/-LAE.*$alertStateAbbrs\.TXT$/i", $allEmwinFiles);
+	$bluFiles = preg_grep("/-BLU.*$alertStateAbbrs\.TXT$/i", $allEmwinFiles);
+	$caeFiles = preg_grep("/-CAE.*$alertStateAbbrs\.TXT$/i", $allEmwinFiles);
+	$cdwFiles = preg_grep("/-CDW.*$alertStateAbbrs\.TXT$/i", $allEmwinFiles);
+	$eviFiles = preg_grep("/-EVI.*$alertStateAbbrs\.TXT$/i", $allEmwinFiles);
+	
+	//Load data from files found
+	foreach($laeFiles as $thisFile) $returnData['localEmergencies'] = array_merge($returnData['localEmergencies'], linesToParagraphs(file($thisFile), 4));
+	foreach($bluFiles as $thisFile) $returnData['blueAlerts'] = array_merge($returnData['blueAlerts'], linesToParagraphs(file($thisFile), 4));
+	foreach($caeFiles as $thisFile) $returnData['amberAlerts'] = array_merge($returnData['amberAlerts'], linesToParagraphs(file($thisFile), 4));
+	foreach($cdwFiles as $thisFile) $returnData['civilDangerWarnings'] = array_merge($returnData['civilDangerWarnings'], linesToParagraphs(file($thisFile), 4));
+	foreach($eviFiles as $thisFile) $returnData['localEvacuations'] = array_merge($returnData['localEvacuations'], linesToParagraphs(file($thisFile), 4));
+	
+	//Hurricane Statement - Only get most recent
+	foreach($hlsFiles as $thisFile)
 	{
-		//Various alerts
-		if(preg_match("/-LAE.*$alertStateAbbrs\.TXT$/", $thisFile)) $returnData['localEmergencies'] = array_merge($returnData['localEmergencies'], linesToParagraphs(file($thisFile), 4));
-		if(preg_match("/-BLU.*$alertStateAbbrs\.TXT$/", $thisFile)) $returnData['blueAlerts'] = array_merge($returnData['blueAlerts'], linesToParagraphs(file($thisFile), 4));
-		if(preg_match("/-CAE.*$alertStateAbbrs\.TXT$/", $thisFile)) $returnData['amberAlerts'] = array_merge($returnData['amberAlerts'], linesToParagraphs(file($thisFile), 4));
-		if(preg_match("/-CDW.*$alertStateAbbrs\.TXT$/", $thisFile)) $returnData['civilDangerWarnings'] = array_merge($returnData['civilDangerWarnings'], linesToParagraphs(file($thisFile), 4));
-		if(preg_match("/-EVI.*$alertStateAbbrs\.TXT$/", $thisFile)) $returnData['localEvacuations'] = array_merge($returnData['localEvacuations'], linesToParagraphs(file($thisFile), 4));
-		
-		//Space weather alerts, if enabled
-		if($config['general']['spaceWeatherAlerts'] && preg_match("/-(ALT(K07|K08|K09)|WAT(A50|A99))US\.TXT$/", $thisFile))
-			$returnData['spaceWeatherAlerts'] = array_merge($returnData['spaceWeatherAlerts'], linesToParagraphs(file($thisFile), 3));
-		
-		//Hurricane Statement - Only get most recent
-		if(preg_match("/-HLS.*" . $currentSettings[$selectedProfile]['orig'] . "\.TXT$/", $thisFile))
+		$hurricaneStatementLines = file($thisFile);
+		foreach($hurricaneStatementLines as $hurricaneStatementLine)
 		{
-			$hurricaneStatementLines = file($thisFile);
-			foreach($hurricaneStatementLines as $hurricaneStatementLine)
+			$thisLine = trim($hurricaneStatementLine);
+			if($thisLine != "" && is_numeric($thisLine[0]))
 			{
-				$thisLine = trim($hurricaneStatementLine);
-				if($thisLine != "" && is_numeric($thisLine[0]))
+				preg_match("/^(?<time>[0-9]* [A-Z]*)(\s+[A-Z]*\s+)(?<date>.*)$/i", trim($thisLine), $issueTimeParts);
+				$issueTimeParts['time'] = substr_replace($issueTimeParts['time'], ":", -5, 0);
+				$thisHurricaneMessageTime = strtotime($issueTimeParts['date']." ".$issueTimeParts['time']);
+				
+				if($thisHurricaneMessageTime > $latestHurricaneMessage)
 				{
-					preg_match("/^(?<time>[0-9]* [A-Z]*)(\s+[A-Z]*\s+)(?<date>.*)$/i", trim($thisLine), $issueTimeParts);
-					$issueTimeParts['time'] = substr_replace($issueTimeParts['time'], ":", -5, 0);
-					$thisHurricaneMessageTime = strtotime($issueTimeParts['date']." ".$issueTimeParts['time']);
-					
-					if($thisHurricaneMessageTime > $latestHurricaneMessage)
-					{
-						$returnData['hurricaneStatement'][0] = linesToParagraphs($hurricaneStatementLines, 4)[0];
-						$latestHurricaneMessage = $thisHurricaneMessageTime;
-					}
-					
-					break;
+					$returnData['hurricaneStatement'][0] = linesToParagraphs($hurricaneStatementLines, 4)[0];
+					$latestHurricaneMessage = $thisHurricaneMessageTime;
 				}
+				
+				break;
+			}
+		}
+	}
+	
+	//Weather warnings
+	foreach($wwFiles as $thisFile)
+	{
+		//Parse warning data from file
+		$weatherData = file($thisFile);
+		$messageStart = $messageEnd = 0;
+		for($i = 0; $i < count($weatherData); $i++)
+		{
+			//Get Header Information about weather warning, and beginning of message
+			if(stripos($weatherData[$i], "BULLETIN - ") === 0)
+			{
+				$alertType = trim($weatherData[++$i]);
+				$issuingOffice = trim($weatherData[++$i]);
+				$issueTime = trim($weatherData[++$i]);
+				$messageStart = ++$i + 1;
+				continue;
 			}
 			
-		}
-		
-		//Weather warnings
-		if(preg_match("/-(SQW|DSW|FRW|FFW|FLW|SVR|TOR|EWW)" . $currentSettings[$selectedProfile]['orig'] . "\.TXT$/", $thisFile))
-		{
-			//Parse warning data from file
-			$weatherData = file($thisFile);
-			$messageStart = $messageEnd = 0;
-			for($i = 0; $i < count($weatherData); $i++)
+			//Get end of message
+			if(trim($weatherData[$i]) == "&&")
 			{
-				//Get Header Information about weather warning, and beginning of message
-				if(stripos($weatherData[$i], "BULLETIN - ") === 0)
-				{
-					$alertType = trim($weatherData[++$i]);
-					$issuingOffice = trim($weatherData[++$i]);
-					$issueTime = trim($weatherData[++$i]);
-					$messageStart = ++$i + 1;
-					continue;
-				}
-				
-				//Get end of message
-				if(trim($weatherData[$i]) == "&&")
-				{
-					$messageEnd = $i - 1;
-					continue;
-				}
-				
-				//Get expiry time
-				if(stripos($weatherData[$i], "* Until") === 0)
-				{
-					//Convert issue time to something PHP can understand
-					preg_match("/^(?<time>[0-9]* [A-Z]*)(\s+[A-Z]*\s+)(?<date>.*)$/i", $issueTime, $issueTimeParts);
-					$issueTimeParts['time'] = substr_replace($issueTimeParts['time'], ":", -5, 0);
-					
-					//Convert the expire time to something PHP can understand
-					$expireTimeStr = substr_replace(substr(str_replace("* Until ", "", trim($weatherData[$i])), 0, -1), ":", -9, 0);
-					$expireTime = strtotime($expireTimeStr, strtotime($issueTimeParts['date']." ".$issueTimeParts['time']));
-				}
-				
-				//Get geofencing of warning
-				if(stripos($weatherData[$i], "LAT...LON") === 0)
-				{
-					$nextString = trim(str_replace("LAT...LON", "", $weatherData[$i]));
-					$geoLat = [];
-					$geoLon = [];
-					while(preg_match("/^[0-9]{4} [0-9]{4,5}/", $nextString))
-					{
-						$cordParts = explode(" ", $nextString);
-						for($j = 0; $j < count($cordParts); $j++)
-						{
-							$geoLat[] = $cordParts[$j] / 100;
-							$geoLon[] = -($cordParts[++$j] / 100);
-						}
-						
-						//Get next line of geofence (if any)
-						$nextString = trim($weatherData[++$i]);
-						if(stripos($nextString, "TIME...MOT...LOC") === 0 || trim($nextString) == "&&") break 2;
-					}
-				}
+				$messageEnd = $i - 1;
+				continue;
 			}
 			
-			//Run checks to see if execution should continue
-			if(isset($expireTime) && time() > $expireTime) continue;
-			if(array_key_exists('lat', $currentSettings[$selectedProfile]) && 
-				array_key_exists('lon', $currentSettings[$selectedProfile]) && 
-				!is_in_polygon(count($geoLat) - 1, $geoLon, $geoLat, $currentSettings[$selectedProfile]['lon'], $currentSettings[$selectedProfile]['lat'])) continue;
+			//Get expiry time
+			if(stripos($weatherData[$i], "* Until") === 0)
+			{
+				//Convert issue time to something PHP can understand
+				preg_match("/^(?<time>[0-9]* [A-Z]*)(\s+[A-Z]*\s+)(?<date>.*)$/i", $issueTime, $issueTimeParts);
+				$issueTimeParts['time'] = substr_replace($issueTimeParts['time'], ":", -5, 0);
+				
+				//Convert the expire time to something PHP can understand
+				$expireTimeStr = substr_replace(substr(str_replace("* Until ", "", trim($weatherData[$i])), 0, -1), ":", -9, 0);
+				$expireTime = strtotime($expireTimeStr, strtotime($issueTimeParts['date']." ".$issueTimeParts['time']));
+			}
 			
-			//Geolocation and time limits checked out OK; send warning to client
-			$returnData['weatherWarnings'][] = "<b>Alert type: </b>$alertType<br />" .
-				"<b>Issued By: </b>$issuingOffice<br />" .
-				"<b>Issue Time: </b>$issueTime<br />" .
-				linesToParagraphs(array_slice($weatherData, $messageStart, $messageEnd - $messageStart + 1), 0)[0];
+			//Get geofencing of warning
+			if(stripos($weatherData[$i], "LAT...LON") === 0)
+			{
+				$nextString = trim(str_replace("LAT...LON", "", $weatherData[$i]));
+				$geoLat = [];
+				$geoLon = [];
+				while(preg_match("/^[0-9]{4} [0-9]{4,5}/", $nextString))
+				{
+					$cordParts = explode(" ", $nextString);
+					for($j = 0; $j < count($cordParts); $j++)
+					{
+						$geoLat[] = $cordParts[$j] / 100;
+						$geoLon[] = -($cordParts[++$j] / 100);
+					}
+					
+					//Get next line of geofence (if any)
+					$nextString = trim($weatherData[++$i]);
+					if(stripos($nextString, "TIME...MOT...LOC") === 0 || trim($nextString) == "&&") break 2;
+				}
+			}
 		}
+		
+		//Run checks to see if execution should continue
+		if(isset($expireTime) && time() > $expireTime) continue;
+		if(array_key_exists('lat', $currentSettings[$selectedProfile]) && 
+			array_key_exists('lon', $currentSettings[$selectedProfile]) && 
+			!is_in_polygon(count($geoLat) - 1, $geoLon, $geoLat, $currentSettings[$selectedProfile]['lon'], $currentSettings[$selectedProfile]['lat'])) continue;
+		
+		//Geolocation and time limits checked out OK; send warning to client
+		$returnData['weatherWarnings'][] = "<b>Alert type: </b>$alertType<br />" .
+			"<b>Issued By: </b>$issuingOffice<br />" .
+			"<b>Issue Time: </b>$issueTime<br />" .
+			linesToParagraphs(array_slice($weatherData, $messageStart, $messageEnd - $messageStart + 1), 0)[0];
+	}
+	
+	//Space Weather Alerts, if enabled
+	if($config['general']['spaceWeatherAlerts'])
+	{
+		$swFiles = preg_grep("/-(ALT(K07|K08|K09)|WAT(A50|A99))US\.TXT$/i", $allEmwinFiles);
+		foreach($swFiles as $thisFile) $returnData['spaceWeatherAlerts'] = array_merge($returnData['spaceWeatherAlerts'], linesToParagraphs(file($thisFile), 3));
 	}
 	
 	header('Content-Type: application/json; charset=utf-8');
