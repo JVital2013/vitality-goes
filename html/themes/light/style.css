@@ -2,6 +2,14 @@ body
 {
 	background: #f5f5f5;
 }
+.errorMessage
+{
+	color: #000000;
+}
+.errorMessage .fa
+{
+	color: #44739e;
+}
 .topBar
 {
 	background: #03a9f4;
@@ -72,6 +80,14 @@ body
 	border: solid 1.5px #e0e0e0;
 	border-radius: 20px;
 }
+.prettyBox.emwinLoader
+{
+	background: #fafafa;
+}
+.prettyBox.emwinLoader.highlighted
+{
+	box-shadow: 0px 0px 5px 2px #00000050;
+}
 .prettyBoxList
 {
 	border-bottom-color: #e0e0e0;
@@ -107,14 +123,50 @@ body
 	border: solid 1px #808080;
 	color: #808080;
 }
-.otherEmwinBody::-webkit-scrollbar-track,
-.forcastCardHolder::-webkit-scrollbar-track
+.autoFilterItem
+{
+	color: #44739e;
+}
+.autoFilterSearchHolder input:enabled
+{
+	border: none;
+	border-radius: 0;
+}
+.autoFilterPicklistHolder
+{
+	border-radius: 10px;
+	border: solid 1px #44739e;
+}
+.autoFilterPicklist
+{
+	border-top: solid 1px #44739e;
+}
+.otherEmwinDeleteHolder .fa:last-child
+{
+	padding-right: 16px;
+}
+.prettyBox input:focus, .prettyBox select:focus
+{
+	outline: none;
+}
+::-webkit-scrollbar-track
 {
 	background: #e0e0e0;
 }
-.otherEmwinBody::-webkit-scrollbar-thumb,
-.forcastCardHolder::-webkit-scrollbar-thumb
+::-webkit-scrollbar-thumb
 {
 	background: #a0a0a0;
 }
-
+::-webkit-scrollbar-button:vertical:decrement
+{
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='5' fill='rgb(68, 115, 158)'><polygon points='5,0 0,5 10,5'/></svg>");
+}
+::-webkit-scrollbar-button:vertical:increment
+{
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='5' fill='rgb(68, 115, 158)'><polygon points='0,0 10,0 5,5'/></svg>");
+	border-bottom-right-radius: 10px;
+}
+::-webkit-scrollbar-button:vertical:hover
+{
+	background-color: #d0d0d0;
+}

@@ -20,15 +20,9 @@
 var sideBar = false;
 var lightGalleries = [];
 var xhttp = [];
-var config, responseData;
-
-//Load current state from sessionStorage
-var selectedMenu = sessionStorage.getItem('selectedMenu');
-if(selectedMenu == null)
-{
-	var selectedMenu = 'currentWeather';
-	sessionStorage.setItem('selectedMenu', 'currentWeather');
-}
+var config, responseData, selectedMenu;
+var programPath = document.currentScript.src.replace(location.protocol + "//" + location.hostname, "").split("script.js?v=")[0];
+var siteName = window.matchMedia('(display-mode: standalone)').matches ? "" : " - " + document.title;
 
 //Load expanded cards from sessionStorage
 storedExpandedCards = sessionStorage.getItem('expandedCards');
@@ -54,7 +48,8 @@ function setCookie(name, value)
 {
 	e = new Date;
 	e.setDate(e.getDate() + 365);
-	document.cookie = name + "=" + encodeURIComponent(value) + ';expires=' + e.toUTCString() + ';path=/;domain=.' + document.domain;
+	cookiePrefix = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/.test(document.domain) ? "" : ".";
+	document.cookie = name + "=" + encodeURIComponent(value) + ';expires=' + e.toUTCString() + ';path=/;domain=' + cookiePrefix + document.domain;
 }
 function encodeProfile(profileArray)
 {
@@ -74,6 +69,20 @@ function encodeProfile(profileArray)
 	});
 	
 	return profileParts.join('~');
+}
+function encodeOtherEmwinConfig(emwinArray)
+{
+	emwinParts = [];
+	emwinArray.forEach((thisEmwin) => {
+		emwinParts.push([
+			(thisEmwin.hasOwnProperty('identifier') ? btoa(thisEmwin.identifier).replace(/=/g, "-") : ""),
+			(thisEmwin.hasOwnProperty('title') ? thisEmwin.title : ""),
+			(thisEmwin.hasOwnProperty('format') ? (thisEmwin.format == "formatted" ? 0 : 1) : 0),
+			(thisEmwin.hasOwnProperty('truncate') ? thisEmwin.truncate : "")
+		].join("!"));
+	});
+	
+	return emwinParts.join('~');
 }
 function decodeProfile(profileString)
 {
@@ -254,12 +263,17 @@ function renderAlert(content, color)
 }
 function renderOtherEmwinContent(slug, index)
 {
+	//Find data
+	if(/^systemEmwin/.test(slug)) thisData = responseData.system[parseInt(slug.replace("systemEmwin", ""))];
+	else thisData = responseData.user[parseInt(slug.replace("userEmwin", ""))];
+	
 	//Build the GUI on first load
 	document.getElementById(slug + 'Content').className = 'prettyBoxContent noPadding';
 	target = document.getElementById(slug + 'Content').firstChild;
+	
 	if(target.innerHTML == "Loading, please wait...")
 	{
-		if(responseData[slug].length == 0)
+		if(thisData.length == 0)
 		{
 			target.innerHTML = "<div class='prettyBoxList' style='text-align: center; font-weight: bold; font-size: 13pt;'>No Messages</div>";
 			return;
@@ -295,22 +309,235 @@ function renderOtherEmwinContent(slug, index)
 	}
 	
 	//Display the message
-	document.getElementById(slug + "MessageHolder").innerHTML = responseData[slug][index];
-	document.getElementById(slug + "NumIndicator").innerHTML = "Message " + (index + 1) + " / " + responseData[slug].length;
+	document.getElementById(slug + "MessageHolder").innerHTML = thisData[index];
+	document.getElementById(slug + "NumIndicator").innerHTML = "Message " + (index + 1) + " / " + thisData.length;
 	
 	goBack = document.getElementById(slug + "GoBack");
 	goForward = document.getElementById(slug + "GoForward");
 	if(index == 0) goBack.className = 'otherEmwinNavigationArrow disabled';
 	else goBack.className = 'otherEmwinNavigationArrow';
-	if(index == responseData[slug].length - 1) goForward.className = 'otherEmwinNavigationArrow disabled';
+	if(index == thisData.length - 1) goForward.className = 'otherEmwinNavigationArrow disabled';
 	else goForward.className = 'otherEmwinNavigationArrow';
 }
 function otherEmwinNavAction(event)
 {
 	forward = /GoForward$/.test(event.currentTarget.id);
 	slug = event.currentTarget.id.replace((forward ? "GoForward" : "GoBack"), '');
+	if(/^systemEmwin/.test(slug)) thisData = responseData.system[parseInt(slug.replace("systemEmwin", ""))];
+	else thisData = responseData.user[parseInt(slug.replace("userEmwin", ""))];
 	goToMsg = parseInt(document.getElementById(slug + "NumIndicator").innerHTML.match(/^Message ([0-9]+)/)[1]) - 1 + (forward ? 1 : -1);
-	if(goToMsg >= 0 && goToMsg < responseData[slug].length) renderOtherEmwinContent(slug, goToMsg);
+	if(goToMsg >= 0 && goToMsg < thisData.length) renderOtherEmwinContent(slug, goToMsg);
+}
+function renderAutoFilterPicklist(dataProperty)
+{
+	thisPicklistHolder = document.createElement('div');
+	thisPicklistHolder.className = 'autoFilterPicklistHolder';
+	
+	thisSearchHolder = document.createElement('div');
+	thisSearchHolder.className = 'autoFilterSearchHolder';
+	thisSearch = document.createElement('input');
+	thisSearch.type = 'text';
+	thisSearch.id = dataProperty + 'Search';
+	thisSearchHolder.addEventListener("input", function(event) {renderPicklistItems();});
+	thisSearchHolder.appendChild(thisSearch);
+	thisSearchIcon = document.createElement('i');
+	thisSearchIcon.className = "fa fa-search";
+	thisSearchHolder.appendChild(thisSearchIcon);
+	thisPicklistHolder.appendChild(thisSearchHolder);
+	
+	thisPicklistBox = document.createElement('div');
+	thisPicklistBox.className = 'autoFilterPicklist';
+	thisPicklistBox.id = dataProperty + "Picklist";
+	
+	tempOption = document.createElement('div');
+	tempOption.className = 'autoFilterItem';
+	tempOption.innerHTML = "Loading...";
+	thisPicklistBox.appendChild(tempOption);
+	thisPicklistHolder.appendChild(thisPicklistBox);
+	return thisPicklistHolder;
+}
+function renderPicklistItems(selectedProduct = null, selectedOriginator = null, selectedState = null)
+{
+	//Fetch pertinent informaton
+	if(selectedProduct == null)
+	{
+		selectedProductElement = document.querySelector('#allProductsPicklist .selected');
+		selectedProduct = (selectedProductElement == null ? "" : selectedProductElement.innerHTML);
+	}
+	if(selectedOriginator == null)
+	{
+		selectedOriginatorElement = document.querySelector('#allOriginatorsPicklist .selected'); 
+		selectedOriginator = (selectedOriginatorElement == null ? "" : selectedOriginatorElement.innerHTML);
+	}
+	if(selectedState == null)
+	{
+		selectedStateElement = document.querySelector('#allStatesPicklist .selected');
+		selectedState = (selectedStateElement == null ? "" : selectedStateElement.innerHTML);
+	}
+	
+	allProductsSearch = document.getElementById('allProductsSearch').value;
+	allOriginatorsSearch = document.getElementById('allOriginatorsSearch').value;
+	allStatesSearch = document.getElementById('allStatesSearch').value;
+	
+	allProductsPicklist = document.getElementById('allProductsPicklist');
+	allOriginatorsPicklist = document.getElementById('allOriginatorsPicklist');
+	allStatesPicklist = document.getElementById('allStatesPicklist');
+	
+	//Break down all products
+	allProducts = [];
+	allOriginators = [];
+	allStates = [];
+	responseData['allUnique'].forEach(function(element){
+		thisProduct = element.substring(0, 3);
+		thisOriginator = element.substring(3, 6);
+		thisState = element.substring(6);
+		
+		if((selectedOriginator == thisOriginator || selectedOriginator == "[Any]" || selectedOriginator == "") &&
+			(selectedState == thisState || selectedState == "[Any]" || selectedState == "") &&
+			(allProductsSearch == "" || thisProduct.toLowerCase().includes(allProductsSearch.toLowerCase()))) allProducts.push(thisProduct);
+			
+		if((selectedProduct == thisProduct || selectedProduct == "[Any]" || selectedProduct == "") &&
+			(selectedState == thisState || selectedState == "[Any]" || selectedState == "") &&
+			(allOriginatorsSearch == "" || thisOriginator.toLowerCase().includes(allOriginatorsSearch.toLowerCase()))) allOriginators.push(thisOriginator);
+			
+		if((selectedProduct == thisProduct || selectedProduct == "[Any]" || selectedProduct == "") &&
+			(selectedOriginator == thisOriginator || selectedOriginator == "[Any]" || selectedOriginator == "") &&
+			(allStatesSearch == "" || thisState.toLowerCase().includes(allStatesSearch.toLowerCase()))) allStates.push(thisState);
+	});
+	
+	allProducts = [...new Set(allProducts)].sort();
+	allOriginators = [...new Set(allOriginators)].sort();
+	allStates = [...new Set(allStates)].sort();
+	
+	//Render Lists
+	allProductsPicklist.innerHTML = "";
+	newOption = document.createElement('div');
+	newOption.className = 'autoFilterItem';
+	if(selectedProduct == "[Any]") newOption.className += " selected";
+	newOption.innerHTML = "[Any]";
+	newOption.addEventListener('click', function(event) {
+		lastSelected = event.target.parentElement.querySelector('.autoFilterItem.selected');
+		if(lastSelected != null) lastSelected.className = "autoFilterItem";
+		event.target.className += " selected";
+		renderPicklistItems();
+	});
+	allProductsPicklist.appendChild(newOption);
+	allProducts.forEach(function(element){
+		newOption = document.createElement('div');
+		newOption.className = 'autoFilterItem';
+		if(selectedProduct == element) newOption.className += " selected";
+		newOption.innerHTML = element;
+		newOption.addEventListener('click', function(event) {
+			lastSelected = event.target.parentElement.querySelector('.autoFilterItem.selected');
+			if(lastSelected != null) lastSelected.className = "autoFilterItem";
+			event.target.className += " selected";
+			renderPicklistItems();
+		});
+		allProductsPicklist.appendChild(newOption);
+	});
+	
+	allOriginatorsPicklist.innerHTML = "";
+	newOption = document.createElement('div');
+	newOption.className = 'autoFilterItem';
+	if(selectedOriginator == "[Any]") newOption.className += " selected";
+	newOption.innerHTML = "[Any]";
+	newOption.addEventListener('click', function(event) {
+		lastSelected = event.target.parentElement.querySelector('.autoFilterItem.selected');
+		if(lastSelected != null) lastSelected.className = "autoFilterItem";
+		event.target.className += " selected";
+		renderPicklistItems();
+	});
+	allOriginatorsPicklist.appendChild(newOption);
+	allOriginators.forEach(function(element){
+		newOption = document.createElement('div');
+		newOption.className = 'autoFilterItem';
+		if(selectedOriginator == element) newOption.className += " selected";
+		newOption.innerHTML = element;
+		newOption.addEventListener('click', function(event) {
+			lastSelected = event.target.parentElement.querySelector('.autoFilterItem.selected');
+			if(lastSelected != null) lastSelected.className = "autoFilterItem";
+			event.target.className += " selected";
+			renderPicklistItems();
+		});
+		allOriginatorsPicklist.appendChild(newOption);
+	});
+	
+	allStatesPicklist.innerHTML = "";
+	newOption = document.createElement('div');
+	newOption.className = 'autoFilterItem';
+	if(selectedState == "[Any]") newOption.className += " selected";
+	newOption.innerHTML = "[Any]";
+	newOption.addEventListener('click', function(event) {
+		lastSelected = event.target.parentElement.querySelector('.autoFilterItem.selected');
+		if(lastSelected != null) lastSelected.className = "autoFilterItem";
+		event.target.className += " selected";
+		renderPicklistItems();
+	});
+	allStatesPicklist.appendChild(newOption);
+	allStates.forEach(function(element){
+		newOption = document.createElement('div');
+		newOption.className = 'autoFilterItem';
+		if(selectedState == element) newOption.className += " selected";
+		newOption.innerHTML = element;
+		newOption.addEventListener('click', function(event) {
+			lastSelected = event.target.parentElement.querySelector('.autoFilterItem.selected');
+			if(lastSelected != null) lastSelected.className = "autoFilterItem";
+			event.target.className += " selected";
+			renderPicklistItems();
+		});
+		allStatesPicklist.appendChild(newOption);
+	});
+	
+	//Scroll to selected
+	selectedProductElement = document.querySelector('#allProductsPicklist .selected');
+	selectedOriginatorElement = document.querySelector('#allOriginatorsPicklist .selected'); 
+	selectedStateElement = document.querySelector('#allStatesPicklist .selected');
+	if(selectedProductElement != null && !isInView(selectedProductElement)) selectedProductElement.scrollIntoView({ behavior: 'instant', block: 'nearest', inline: 'start' });
+	if(selectedOriginatorElement != null && !isInView(selectedOriginatorElement)) selectedOriginatorElement.scrollIntoView({ behavior: 'instant', block: 'nearest', inline: 'start' });
+	if(selectedStateElement != null && !isInView(selectedStateElement)) selectedStateElement.scrollIntoView({ behavior: 'instant', block: 'nearest', inline: 'start' });
+	
+	//Validate
+	checkIfValidOtherEmwin();
+}
+function checkIfValidOtherEmwin()
+{
+	//Sanity Check (this may run before the DOM is complete)
+	inputMethodSelector = document.querySelector('input[name="inputMethod"]:checked');
+	if(inputMethodSelector == null) return;
+	
+	//Not all 3 selectors can be set to [All]
+	isValid = true;
+	if(inputMethodSelector.value == 'useBuilder')
+	{
+		productSelector = document.querySelector('#allProductsPicklist .selected');
+		originatorSelector = document.querySelector('#allOriginatorsPicklist .selected'); 
+		statesSelector = document.querySelector('#allStatesPicklist .selected');
+		if(productSelector == null || originatorSelector == null || statesSelector == null) isValid = false;
+		else if(productSelector.innerHTML == "[Any]" && originatorSelector.innerHTML == "[Any]" && statesSelector.innerHTML == "[Any]") isValid = false;
+	}
+	
+	//Make sure the regex is valid
+	else
+	{
+		selectorRegex = document.getElementById('selectorRegex').value;
+		if(selectorRegex == "") isValid = false;
+		else
+		{
+			try {new RegExp(selectorRegex);}
+			catch(e) {isValid = false;}
+		}
+	}
+	
+	//Make sure the name is set
+	if(document.getElementById('nameInput').value == '') isValid = false;
+	
+	document.getElementById('saveButton').disabled = !isValid;
+}
+function isInView(ele)
+{
+	position = ele.getBoundingClientRect();
+	parentPosition = ele.parentElement.getBoundingClientRect();
+	return position.top >= parentPosition.top && position.bottom <= parentPosition.bottom;
 }
 function renderLeftRightLine(target, tempsName, tempsValue)
 {
@@ -357,7 +584,7 @@ function getForecastZone(orig)
 		}
 	}
 
-	xhttp.getForecastZone.open("GET", "dataHandler.php?type=settings&dropdown=wxZone&orig=" + orig, true);
+	xhttp.getForecastZone.open("GET", programPath + "dataHandler.php?type=settings&dropdown=wxZone&orig=" + orig, true);
 	xhttp.getForecastZone.send();
 }
 function getLocations(rwrOrig)
@@ -383,7 +610,7 @@ function getLocations(rwrOrig)
 		}
 	}
 	
-	xhttp.getLocations.open("GET", "dataHandler.php?type=settings&dropdown=city&rwrOrig=" + rwrOrig, true);
+	xhttp.getLocations.open("GET", programPath + "dataHandler.php?type=settings&dropdown=city&rwrOrig=" + rwrOrig, true);
 	xhttp.getLocations.send();
 }
 function toTitleCase(str) {
@@ -394,31 +621,42 @@ function toTitleCase(str) {
 function menuSelect(menuSlug)
 {
 	retractDrawer();
+	mainContent = document.getElementById('mainContent');
+	barTitle = document.getElementById('barTitle');
+	
+	if(window.history.state == null) window.history.replaceState({menuSlug}, '', programPath + menuSlug);
+	else if(window.history.state.menuSlug != menuSlug) window.history.pushState({menuSlug}, '', programPath + menuSlug);
 	
 	//Do nothing if there are no valid menus (there is always at least 1 child, even with no menus)
 	if(document.getElementById('sideBar').childElementCount < 2)
 	{
-		mainContent.innerHTML = "<div style='height: 30px;'></div><div class='errorMessage'>No data found to display! Please verify the server config</div>";
+		document.title = "Missing Config" + siteName;
+		barTitle.innerHTML = "Missing Config";
+		mainContent.innerHTML = "<div style='height: 30px;'></div><div class='errorMessage'><i class='fa fa-exclamation'></i><br />No data found to display! Please verify the server config</div>";
 		mainContent.className = "singleCard";
 		return;
 	}
 	
-	//Select the new menu, and find the next good one if it's not available
+	//Select the new menu, and throw an error if it's not available
 	selectedMenuElement = document.getElementById('menuItem' + selectedMenu);
+	newSelectedMenuElement = document.getElementById('menuItem' + menuSlug);
 	if(selectedMenuElement) selectedMenuElement.className = 'menuItem';
+	if(!newSelectedMenuElement)
+	{
+		document.title = "Signal Lost" + siteName;
+		barTitle.innerHTML = "Signal Lost";
+		mainContent.innerHTML = "<div style='height: 30px;'></div><div class='errorMessage'><i class='fa fa-question-circle'></i><br />404 - Page Not Found</div>";
+		mainContent.className = "singleCard";
+		return;
+	}
 	
-	if(!document.getElementById('menuItem' + menuSlug)) menuSlug = document.getElementById('sideBar').getElementsByClassName('menuItem')[0].id.replace("menuItem", "");
-	document.getElementById('menuItem' + menuSlug).className = 'menuItem selected';
-	
+	document.title = newSelectedMenuElement.lastChild.innerHTML + siteName;
+	newSelectedMenuElement.className = 'menuItem selected';
 	if(selectedMenu != menuSlug)
 	{
 		selectedMenu = menuSlug;
-		sessionStorage.setItem('selectedMenu', selectedMenu);
 		window.scrollTo({top: 0});
 	}
-	
-	mainContent = document.getElementById('mainContent');
-	barTitle = document.getElementById('barTitle');
 	
 	//Clear any remaining lightGalleries
 	Object.keys(lightGalleries).forEach(thisGallery => {lightGalleries[thisGallery].destroy();});
@@ -431,7 +669,7 @@ function menuSelect(menuSlug)
 	//Load the selected menu
 	switch(selectedMenu)
 	{
-		case 'currentWeather':
+		case 'Current-Weather':
 		barTitle.innerHTML = "Current Weather";
 		mainContent.innerHTML = "";
 		
@@ -474,7 +712,7 @@ function menuSelect(menuSlug)
 				catch(error)
 				{
 					mainContent.innerHTML = "";
-					renderCollapsingCard("serverError", "The server returned bad data. Click to expand", "prettyBoxContent", "otherEmwinBody");
+					renderCollapsingCard("serverError", "The server returned bad data. Click to expand", "prettyBoxContent", "adminMessageBody");
 					target = document.getElementById('serverErrorContent').firstChild;
 					target.innerHTML = "";
 					target.appendChild(document.createTextNode(this.responseText));
@@ -589,9 +827,13 @@ function menuSelect(menuSlug)
 						
 						if("maxTemp" in todaysForcast) renderLeftRightLine(forcastCard, "High", todaysForcast.maxTemp + "&deg; F");
 						if("amPrecip" in todaysForcast) renderLeftRightLine(forcastCard, "Precipitation", todaysForcast.amPrecip + "%");
-						if("amHumidity" in todaysForcast) renderLeftRightLine(forcastCard, "Humidity", todaysForcast.amHumidity + "%");
+						if("amHumidity" in todaysForcast) renderLeftRightLine(forcastCard, "Humidity",
+							(todaysForcast.amHumidity == -1 ? "Unknown" : todaysForcast.amHumidity + "%"));
 						
-						if((("amClouds" in todaysForcast && "amPrecip" in todaysForcast) || "maxTemp" in todaysForcast || "amPrecip" in todaysForcast || "amHumidity" in todaysForcast) && (("pmClouds" in todaysForcast && "pmPrecip" in todaysForcast) || "minTemp" in todaysForcast || "pmPrecip" in todaysForcast || "pmHumidity" in todaysForcast)) forcastCard.innerHTML += "<div class='forecastHeader' style='margin-top: 25px;'>Evening</div>";
+						if((("amClouds" in todaysForcast && "amPrecip" in todaysForcast) || "maxTemp" in todaysForcast || "amPrecip" in todaysForcast || "amHumidity" in todaysForcast) &&
+							(("pmClouds" in todaysForcast && "pmPrecip" in todaysForcast) || "minTemp" in todaysForcast || "pmPrecip" in todaysForcast || "pmHumidity" in todaysForcast))
+							forcastCard.innerHTML += "<div class='forecastHeader' style='margin-top: 25px;'>Evening</div>";
+						
 						if("pmClouds" in todaysForcast && "pmPrecip" in todaysForcast)
 						{
 							//Probably not raining
@@ -613,7 +855,8 @@ function menuSelect(menuSlug)
 						
 						if("minTemp" in todaysForcast) renderLeftRightLine(forcastCard, "Low", todaysForcast.minTemp + "&deg; F");
 						if("pmPrecip" in todaysForcast) renderLeftRightLine(forcastCard, "Precipitation", todaysForcast.pmPrecip + "%");
-						if("pmHumidity" in todaysForcast) renderLeftRightLine(forcastCard, "Humidity", todaysForcast.pmHumidity + "%");
+						if("pmHumidity" in todaysForcast) renderLeftRightLine(forcastCard, "Humidity",
+							(todaysForcast.pmHumidity == -1 ? "Unknown" : todaysForcast.pmHumidity + "%"));
 						
 						sevenDayForcastContainer.appendChild(forcastCard);
 					});
@@ -652,7 +895,7 @@ function menuSelect(menuSlug)
 			columnCalc();
 		}
 		
-		xhttp.weatherJSON.open("GET", "dataHandler.php?type=weatherJSON", true);
+		xhttp.weatherJSON.open("GET", programPath + "dataHandler.php?type=weatherJSON", true);
 		xhttp.weatherJSON.send();
 		
 		//AJAX load alerts
@@ -678,31 +921,324 @@ function menuSelect(menuSlug)
 				alertInfo.blueAlerts.forEach(function(element){renderAlert(element, "blue")});
 				alertInfo.amberAlerts.forEach(function(element){renderAlert(element, "amber")});
 				alertInfo.civilDangerWarnings.forEach(function(element){renderAlert(element, "purple")});
+				alertInfo.spaceWeatherAlerts.forEach(function(element){renderAlert(element, "blue")});
 			}
 			
 			else renderAlert("The server returned status code " + this.statusText + " (" + this.statusText + ") when trying to load weather alerts", "red");
 			delete xhttp.alertJSON;
 			columnCalc();
 		}
-		xhttp.alertJSON.open("GET", "dataHandler.php?type=alertJSON", true);
+		xhttp.alertJSON.open("GET", programPath + "dataHandler.php?type=alertJSON", true);
 		xhttp.alertJSON.send();
 		break;
 		
-		case 'otherEmwin':
+		case 'Other-EMWIN':
 		barTitle.innerHTML = "Other EMWIN";
 		mainContent.innerHTML = "";
 		
+		if(config.allowUserLoader)
+		{
+			renderCollapsingCard("emwinLoader", "Load Additional Data", "prettyBoxContent", "weatherBody");
+			document.getElementById('emwinLoaderContent').parentElement.className += " emwinLoader";
+			target = document.getElementById('emwinLoaderContent').firstChild;
+			target.innerHTML = "";
+			
+			selectorSection = document.createElement('div');
+			selectorSection.className = 'prettyBoxList';
+			selectorSection.style.padding = 0;
+			selectorSection.style.paddingBottom = "10px";
+			
+			radioButton = document.createElement('input');
+			radioButton.type = 'radio';
+			radioButton.name = 'inputMethod';
+			radioButton.id = 'useBuilder';
+			radioButton.value = 'useBuilder';
+			radioButton.checked = true;
+			radioButton.addEventListener('click', function(){
+				document.getElementById('selectorRegex').disabled = true;
+				document.getElementById('autoFilterFlex').className = 'autoFilterFlex';
+				checkIfValidOtherEmwin();
+			});
+			
+			selectorSection.appendChild(radioButton);
+			buttonLabel = document.createElement('label');
+			buttonLabel.htmlFor = 'useBuilder';
+			buttonLabel.innerHTML = "Automatic Data Selector";
+			selectorSection.appendChild(buttonLabel);
+			
+			autoFilterFlex = document.createElement('div');
+			autoFilterFlex.id = 'autoFilterFlex';
+			autoFilterFlex.className = 'autoFilterFlex';
+			
+			productFilter = document.createElement('div');
+			productFilter.className = 'autoFilterCategory';
+			productFilter.innerHTML = "Product";
+			productFilter.appendChild(renderAutoFilterPicklist("allProducts"));
+			autoFilterFlex.appendChild(productFilter);
+			
+			originatorFilter = document.createElement('div');
+			originatorFilter.className = 'autoFilterCategory';
+			originatorFilter.innerHTML = "Originator";
+			originatorFilter.appendChild(renderAutoFilterPicklist("allOriginators"));
+			autoFilterFlex.appendChild(originatorFilter);
+
+			stateFilter = document.createElement('div');
+			stateFilter.className = 'autoFilterCategory';
+			stateFilter.innerHTML = "State";
+			stateFilter.appendChild(renderAutoFilterPicklist("allStates"));
+			autoFilterFlex.appendChild(stateFilter);
+			selectorSection.appendChild(autoFilterFlex);
+			
+			regexFlex = document.createElement('div');
+			regexFlex.className = 'inputFlex';
+			radioButton = document.createElement('input');
+			radioButton.type = 'radio';
+			radioButton.name = 'inputMethod';
+			radioButton.id = 'manualRegex';
+			radioButton.value = 'manualRegex';
+			radioButton.addEventListener('click', function(){
+				document.getElementById('selectorRegex').disabled = false;
+				document.getElementById('autoFilterFlex').className = 'autoFilterFlex disabled';
+				checkIfValidOtherEmwin();
+			});
+			
+			regexFlex.appendChild(radioButton);
+			buttonLabel = document.createElement('label');
+			buttonLabel.htmlFor = 'manualRegex';
+			buttonLabel.innerHTML = "Manual Data Selector";
+			regexFlex.appendChild(buttonLabel);
+			
+			selectorRegex = document.createElement('input');
+			selectorRegex.type = 'text';
+			selectorRegex.id = 'selectorRegex';
+			selectorRegex.disabled = true;
+			selectorRegex.addEventListener('input', function() {checkIfValidOtherEmwin();} );
+			regexFlex.appendChild(selectorRegex);
+			selectorSection.appendChild(regexFlex);
+			target.appendChild(selectorSection);
+			
+			nameSection = document.createElement('div');
+			nameSection.className = 'prettyBoxList';
+			nameSection.style.padding = 0;
+			nameSection.style.paddingBottom = "10px";
+			
+			nameFlex = document.createElement('div');
+			nameFlex.className = 'inputFlex';
+			nameLabel = document.createElement('label');
+			nameLabel.htmlFor = 'nameInput';
+			nameLabel.innerHTML = "Display Name:";
+			nameFlex.appendChild(nameLabel);
+			
+			nameInput = document.createElement('input');
+			nameInput.type = 'text';
+			nameInput.id = 'nameInput';
+			nameInput.addEventListener('input', function() {checkIfValidOtherEmwin();} );
+			nameFlex.appendChild(nameInput);
+			nameSection.appendChild(nameFlex);
+			
+			truncLabel = document.createElement('div');
+			truncLabel.className = 'truncLeft';
+			truncLabel.innerHTML = "Lines to remove from beginning:";
+			nameSection.appendChild(truncLabel);
+			
+			truncInput = document.createElement('input');
+			truncInput.type = 'number';
+			truncInput.style.width = '3em';
+			truncInput.style.textAlign = 'left';
+			truncInput.value = 0;
+			truncInput.pattern = '\d*';
+			truncInput.inputMode = 'numeric';
+			truncInput.min = 0;
+			truncInput.max = 10;
+			truncInput.id = 'truncInput';
+			truncInput.className = 'weatherRight';
+			nameSection.appendChild(truncInput);
+			
+			clearDiv = document.createElement('div');
+			clearDiv.style.clear = 'both';
+			nameSection.appendChild(clearDiv);
+			target.appendChild(nameSection);
+			
+			settingsSetion = document.createElement('div');
+			settingsSetion.className = 'prettyBoxList';
+			settingsSetion.style.padding = 0;
+			settingsSetion.style.paddingBottom = "10px";
+			
+			formatHeader = document.createElement('div');
+			formatHeader.innerHTML = "Text File Type";
+			formatHeader.style.fontWeight = 'bold';
+			settingsSetion.appendChild(formatHeader);
+			
+			preOptFlex = document.createElement('div');
+			preOptFlex.className = 'fileTypeRow';
+			preOptRadio = document.createElement('input');
+			preOptRadio.type = 'radio';
+			preOptRadio.name = 'formatMethod';
+			preOptRadio.id = 'preOptRadio';
+			preOptRadio.checked = true;
+			preOptRadio.value = 'formatted';
+
+			preOptFlex.appendChild(preOptRadio);
+			preOptLabel = document.createElement('label');
+			preOptLabel.htmlFor = 'preOptRadio';
+			preOptLabel.innerHTML = "<b>Pre-formatted: </b> The data contains tables or other pre-formatted data that does not convert nicely into paragraphs";
+			preOptFlex.appendChild(preOptLabel);
+			settingsSetion.appendChild(preOptFlex);
+			
+			paraOptFlex = document.createElement('div');
+			paraOptFlex.className = 'fileTypeRow';
+			paraOptRadio = document.createElement('input');
+			paraOptRadio.type = 'radio';
+			paraOptRadio.name = 'formatMethod';
+			paraOptRadio.id = 'paraOptRadio';
+			paraOptRadio.value = 'paragraph';
+
+			paraOptFlex.appendChild(paraOptRadio);
+			paraOptLabel = document.createElement('label');
+			paraOptLabel.htmlFor = 'paraOptRadio';
+			paraOptLabel.innerHTML = "<b>Paragraph: </b> the data consists of sentences that can be converted easily into paragraph form";
+			paraOptFlex.appendChild(paraOptLabel);
+			settingsSetion.appendChild(paraOptFlex);
+			target.appendChild(settingsSetion);
+			
+			saveButtonSection = document.createElement('div');
+			saveButtonSection.className = 'prettyBoxList';
+			saveButtonSection.style.padding = 0;
+			saveButtonSection.style.marginBottom = 0;
+			saveButtonSection.style.textAlign = 'center';
+			saveButton = document.createElement('input');
+			saveButton.type = 'button';
+			saveButton.id = 'saveButton';
+			saveButton.style.fontWeight = 'bold';
+			saveButton.value = "Save";
+			saveButton.disabled = true;
+			saveButton.style.width = "100%";
+			saveButton.addEventListener('click', function() {
+				//Get Regex
+				inputMethodSelector = document.querySelector('input[name="inputMethod"]:checked');
+				if(inputMethodSelector.value == 'useBuilder')
+				{
+					productSelector = document.querySelector('#allProductsPicklist .selected').innerHTML;
+					originatorSelector = document.querySelector('#allOriginatorsPicklist .selected').innerHTML; 
+					statesSelector = document.querySelector('#allStatesPicklist .selected').innerHTML;
+					identifier = "(" + (productSelector == "[Any]" ? "[A-Z0-9]{3}" : productSelector) + ")" +
+						"(" + (originatorSelector == "[Any]" ? "[A-Z0-9]{3}" : originatorSelector) + ")" +
+						"(" + (statesSelector == "[Any]" ? "[A-Z0-9]{2}" : statesSelector) + ")";
+				}
+				else identifier = document.getElementById('selectorRegex').value;
+				
+				//Get title, Lines to truncate, and format
+				title = document.getElementById('nameInput').value.replace(/!/g, "").replace(/~/g, "");
+				format = document.querySelector('input[name="formatMethod"]:checked').value;
+				truncate = document.getElementById('truncInput').value;
+				
+				//Check if we're editing a previous entry
+				cardHeader = document.getElementById('emwinLoaderContent').previousSibling.lastChild.data;
+				if(cardHeader != "Load Additional Data")
+				{
+					config.otherEmwin.user[parseInt(cardHeader.split("#")[1]) - 1] = {
+						'identifier': identifier,
+						'title': title,
+						'format': format,
+						'truncate': truncate
+					};
+				}
+				else
+				{
+					config.otherEmwin.user.push({
+						'identifier': identifier,
+						'title': title,
+						'format': format,
+						'truncate': truncate
+					});
+				}
+				
+				setCookie("otheremwin", encodeOtherEmwinConfig(config.otherEmwin.user));
+				location.reload();
+			});
+			saveButtonSection.appendChild(saveButton);
+			target.appendChild(saveButtonSection);
+		
+			//User EMWIN Data
+			cardNum = 0;
+			config.otherEmwin.user.forEach(function(element){
+				renderCollapsingCard("userEmwin" + cardNum, element.title, "prettyBoxContent", (element.format == 'paragraph' ? "weatherBody" : "emwinMessageBody"));
+				deleteHolder = document.createElement('div');
+				deleteHolder.className = 'otherEmwinDeleteHolder';
+				
+				editButton = document.createElement('i');
+				editButton.className = 'far fa-edit';
+				editButton.title = "Edit this card's settings";
+				editButton.addEventListener('click', function(event){
+					editorCard = document.getElementById('emwinLoaderContent');
+					target = parseInt(event.target.parentElement.parentElement.nextSibling.id.replace('userEmwin', '').replace('Content', ''));
+					editorCard.parentElement.className += " highlighted";
+					editorCard.previousSibling.lastChild.data = "Editing Additional Card #" + (target + 1);
+					document.getElementById('saveButton').value = "Update \"" + config.otherEmwin.user[target].title + "\"";
+					if(editorCard.style.display == 'none') editorCard.previousSibling.click();
+					
+					document.getElementById('nameInput').value = config.otherEmwin.user[target].title;
+					document.getElementById('truncInput').value = config.otherEmwin.user[target].truncate;
+					document.getElementById('allProductsSearch').value = '';
+					document.getElementById('allOriginatorsSearch').value = '';
+					document.getElementById('allStatesSearch').value = '';
+					document.getElementById(config.otherEmwin.user[target].format == "paragraph" ? "paraOptRadio" : "preOptRadio").checked = true;
+					
+					identifierParts = /^\(([A-Z0-9]{3}|\[A-Z0-9\]\{3\})\)\(([A-Z0-9]{3}|\[A-Z0-9\]\{3\})\)\(([A-Z0-9]{2}|\[A-Z0-9\]\{2\})\)$/.exec(config.otherEmwin.user[target].identifier);
+					if(identifierParts != null)
+					{
+						document.getElementById('useBuilder').click();
+						thisProduct = (identifierParts[1] == "[A-Z0-9]{3}" ? "[Any]" : identifierParts[1]);
+						thisOriginator = (identifierParts[2] == "[A-Z0-9]{3}" ? "[Any]" : identifierParts[2]);
+						thisState = (identifierParts[3] == "[A-Z0-9]{2}" ? "[Any]" : identifierParts[3]);
+						renderPicklistItems(thisProduct, thisOriginator, thisState);
+					}
+					else
+					{
+						document.getElementById('manualRegex').click();
+						document.getElementById('selectorRegex').value = config.otherEmwin.user[target].identifier;
+					}
+					
+					window.scrollTo(0, 0);
+					event.stopPropagation();
+				});
+				deleteHolder.appendChild(editButton);
+				
+				deleteButton = document.createElement('i');
+				deleteButton.className = 'fa fa-trash-alt';
+				deleteButton.title = "Remove this card";
+				deleteButton.addEventListener('click', function(event){
+					target = parseInt(event.target.parentElement.parentElement.nextSibling.id.replace('userEmwin', '').replace('Content', ''));
+					
+					if(confirm("Are you sure you want to delete the card for \"" + config.otherEmwin.user[target].title + "\"?"))
+					{
+						config.otherEmwin.user.splice(target, 1);
+						setCookie("otheremwin", encodeOtherEmwinConfig(config.otherEmwin.user));
+						location.reload();
+					}
+					event.stopPropagation();
+				});
+				deleteHolder.appendChild(deleteButton);
+				
+				document.getElementById("userEmwin" + cardNum + "Content").previousSibling.appendChild(deleteHolder);
+				cardNum++;
+			});
+			
+		}
 		if(config.showEmwinInfo)
 		{
-			renderCollapsingCard("sdmOps", "SDM Ops Status Messages", "prettyBoxContent", "weatherBody");
-			renderCollapsingCard("spaceWeatherMessages", "Space Weather Messages", "prettyBoxContent", "weatherBody");
-			renderCollapsingCard("radarOutages", "Local Radar Outages", "prettyBoxContent", "weatherBody");
-			renderCollapsingCard("adminAlerts", "EMWIN Admin Alerts", "prettyBoxContent", "weatherBody");
-			renderCollapsingCard("adminRegional", "EMWIN Regional Admin Message", "prettyBoxContent", "weatherBody");
+			//System EMWIN Data
+			cardNum = 0;
+			config.otherEmwin.system.forEach(function(element){
+				renderCollapsingCard("systemEmwin" + cardNum, element.title, "prettyBoxContent", (element.format == 'paragraph' ? "weatherBody" : "emwinMessageBody"));
+				cardNum++;
+			});
+			
+			//Hard-coded cards
 			renderCollapsingCard("satelliteTle", "Weather Satellite TLE", "prettyBoxContent", "weatherBody");
 			renderCollapsingCard("emwinLicense", "EMWIN Licensing Info", "prettyBoxContent", "weatherBody");
 		}
-		if(config.showAdminInfo) renderCollapsingCard("adminMessage", "Latest Admin Message", "prettyBoxContent", "otherEmwinBody");
+		if(config.showAdminInfo) renderCollapsingCard("adminMessage", "Latest Admin Message", "prettyBoxContent", "adminMessageBody");
 		
 		xhttp.otherEMWIN = new XMLHttpRequest();
 		xhttp.otherEMWIN.onreadystatechange = function()
@@ -714,7 +1250,7 @@ function menuSelect(menuSlug)
 				catch(error)
 				{
 					mainContent.innerHTML = "";
-					renderCollapsingCard("serverError", "The server returned bad data. Click to expand", "prettyBoxContent", "otherEmwinBody");
+					renderCollapsingCard("serverError", "The server returned bad data. Click to expand", "prettyBoxContent", "adminMessageBody");
 					target = document.getElementById('serverErrorContent').firstChild;
 					target.innerHTML = "";
 					target.appendChild(document.createTextNode(this.responseText));
@@ -723,13 +1259,34 @@ function menuSelect(menuSlug)
 					return;
 				}
 				
+				if(config.allowUserLoader)
+				{
+					//Additional Data Loader
+					renderPicklistItems("[Any]", "[Any]", "[Any]");
+					
+					//Show error if too much data is loaded
+					if(responseData.numUserFiles > responseData.maxUserFiles && responseData.maxUserFiles != 0)
+						renderAlert("<p style='font-weight: bold;'>Warning</p><p>You have attempted to load too much additional data from this browser. \
+							Either reduce the amount of data requested, increase the 'maxUserFiles' option in config.ini, or configure addtional data in your server config.</p> \
+							<p>No additional data will be loaded until this issue is resolved.</p> \
+							<p><b>Total Requested: </b>" + responseData.numUserFiles + "<br /><b>Max Allowed: </b>" + responseData.maxUserFiles + "</p>", "red");
+					
+					//User-Defined Data
+					cardNum = 0;
+					responseData.user.forEach(function(element){
+						renderOtherEmwinContent('userEmwin' + cardNum, element.length - 1);
+						cardNum++;
+					});
+				}
+				
 				if(config.showEmwinInfo)
 				{
-					renderOtherEmwinContent('sdmOps', responseData.sdmOps.length - 1);
-					renderOtherEmwinContent('radarOutages', responseData.radarOutages.length - 1);
-					renderOtherEmwinContent('spaceWeatherMessages', responseData.spaceWeatherMessages.length - 1);
-					renderOtherEmwinContent('adminRegional', responseData.adminRegional.length - 1);
-					renderOtherEmwinContent('adminAlerts', responseData.adminAlerts.length - 1);
+					//System-defined data
+					cardNum = 0;
+					responseData.system.forEach(function(element){
+						renderOtherEmwinContent('systemEmwin' + cardNum, element.length - 1);
+						cardNum++;
+					});
 					
 					//Weather Satellite TLE
 					target = document.getElementById('satelliteTleContent').firstChild;
@@ -756,7 +1313,9 @@ function menuSelect(menuSlug)
 						downloadButton.style.width = "50%";
 						downloadButton.style.minWidth = "120px";
 						downloadButton.style.marginBottom = "5px";
-						downloadButton.addEventListener('click', function(){window.location = '/dataHandler.php?type=tle';});
+						downloadButton.addEventListener('click', function(){
+							window.location = programPath + 'dataHandler.php?type=tle';
+						});
 						downloadButtonHolder.appendChild(downloadButton);
 						target.appendChild(downloadButtonHolder);
 						
@@ -800,11 +1359,11 @@ function menuSelect(menuSlug)
 			
 			delete xhttp.otherEMWIN;
 		}
-		xhttp.otherEMWIN.open("GET", "dataHandler.php?type=metadata&id=otherEmwin", true);
+		xhttp.otherEMWIN.open("GET", programPath + "dataHandler.php?type=metadata&id=otherEmwin", true);
 		xhttp.otherEMWIN.send();
 		break;
 		
-		case 'hurricaneCenter':
+		case 'Hurricane-Center':
 		barTitle.innerHTML = "Hurricane Center";
 		mainContent.innerHTML = "";
 		renderStiffCard("loadingNotice", "Hurricane Info");
@@ -821,7 +1380,7 @@ function menuSelect(menuSlug)
 					target = document.getElementById('loadingNoticeCardBody');
 					target.innerHTML = "";
 					target.appendChild(document.createTextNode("The server returned bad data:" + this.responseText));
-					target.className += " otherEmwinBody";
+					target.className += " adminMessageBody";
 					
 					delete xhttp.hurricaneInfo;
 					return;
@@ -904,11 +1463,11 @@ function menuSelect(menuSlug)
 			
 			delete xhttp.hurricaneInfo;
 		}
-		xhttp.hurricaneInfo.open("GET", "dataHandler.php?type=hurricaneJSON", true);
+		xhttp.hurricaneInfo.open("GET", programPath + "dataHandler.php?type=hurricaneJSON", true);
 		xhttp.hurricaneInfo.send();
 		break;
 		
-		case 'localSettings':
+		case 'Local-Settings':
 		barTitle.innerHTML = "Local Settings";
 		mainContent.innerHTML = "";
 		
@@ -1056,7 +1615,7 @@ function menuSelect(menuSlug)
 						
 					}
 					
-					xhttp.dummy.open("GET", "dataHandler.php", true);
+					xhttp.dummy.open("GET", programPath + "dataHandler.php", true);
 					xhttp.dummy.send();
 				}
 			});
@@ -1112,7 +1671,7 @@ function menuSelect(menuSlug)
 					{
 						target = document.getElementById('selectedProfileCardBody');
 						target.innerHTML = "";
-						target.className += " otherEmwinBody";
+						target.className += " adminMessageBody";
 						target.appendChild(document.createTextNode("The server returned bad data: " + this.responseText));
 						delete xhttp.dropdowns;
 						return;
@@ -1184,7 +1743,7 @@ function menuSelect(menuSlug)
 				delete xhttp.dropdowns;
 			}
 
-			xhttp.dropdowns.open("GET", "dataHandler.php?type=settings&dropdown=general", true);
+			xhttp.dropdowns.open("GET", programPath + "dataHandler.php?type=settings&dropdown=general", true);
 			xhttp.dropdowns.send();
 		}
 		
@@ -1202,7 +1761,7 @@ function menuSelect(menuSlug)
 				catch(error)
 				{
 					target.appendChild(document.createTextNode("The server returned bad data:" + this.responseText));
-					target.className += " otherEmwinBody";
+					target.className += " adminMessageBody";
 					delete xhttp.theme;
 					return;
 				}
@@ -1236,11 +1795,11 @@ function menuSelect(menuSlug)
 			delete xhttp.theme;
 		}
 		
-		xhttp.theme.open("GET", "dataHandler.php?type=settings&dropdown=theme", true);
+		xhttp.theme.open("GET", programPath + "dataHandler.php?type=settings&dropdown=theme", true);
 		xhttp.theme.send();
 		break;
 		
-		case 'systemInfo':
+		case 'System-Info':
 		barTitle.innerHTML = "System Info";
 		mainContent.innerHTML = "";
 		
@@ -1278,7 +1837,7 @@ function menuSelect(menuSlug)
 					{
 						target.innerHTML = "";
 						target.appendChild(document.createTextNode("The server returned bad data: " + this.responseText));
-						target.className += " otherEmwinBody";
+						target.className += " adminMessageBody";
 						
 						target = document.getElementById('sysTempCardBody');
 						removeCard(target);
@@ -1345,7 +1904,7 @@ function menuSelect(menuSlug)
 				delete xhttp.sysInfo;
 			}
 			
-			xhttp.sysInfo.open("GET", "dataHandler.php?type=metadata&id=sysInfo", true);
+			xhttp.sysInfo.open("GET", programPath + "dataHandler.php?type=metadata&id=sysInfo", true);
 			xhttp.sysInfo.send();
 		}
 		break;
@@ -1373,7 +1932,7 @@ function showCollapseCard(event)
 		event.currentTarget.nextSibling.style.display = "block";
 		if(event.currentTarget.nextSibling.nextSibling != null) event.currentTarget.nextSibling.nextSibling.style.display = "block";
 		
-		if(selectedMenu == "systemInfo") loadStats(event.currentTarget.nextSibling);
+		if(selectedMenu == "System-Info") loadStats(event.currentTarget.nextSibling);
 		else if(event.currentTarget.nextSibling.innerHTML == "Loading, please wait...") loadImageMetadata(event.currentTarget.nextSibling);
 	}
 	else
@@ -1403,7 +1962,7 @@ function loadStats(targetedContent)
 				{
 					targetedContent.innerHTML = "";
 					targetedContent.appendChild(document.createTextNode("The server returned bad data: " + this.responseText));
-					targetedContent.className += " otherEmwinBody";
+					targetedContent.className += " adminMessageBody";
 					delete xhttp.loadStats;
 					return;
 				}
@@ -1436,7 +1995,7 @@ function loadStats(targetedContent)
 			delete xhttp.loadStats;
 		}
 		
-		xhttp.loadStats.open("GET", "dataHandler.php?type=metadata&id=" + targetedContent.id, true);
+		xhttp.loadStats.open("GET", programPath + "dataHandler.php?type=metadata&id=" + targetedContent.id, true);
 		xhttp.loadStats.send();
 	}
 }
@@ -1446,7 +2005,7 @@ function loadLocalRadar(targetedContent, metadata)
 	goesImg = document.createElement('img');
 	goesImg.className = "goesimg";
 	goesImg.id = 'lightbox-localRadar';
-	goesImg.src = "/dataHandler.php?type=localRadarData&timestamp=" + metadata.images[metadata.images.length - 1]['timestamp'];
+	goesImg.src = programPath + "dataHandler.php?type=localRadarData&timestamp=" + metadata.images[metadata.images.length - 1]['timestamp'];
 	goesImg.addEventListener('click', function(event){lightGalleries[event.target.id].openGallery(lightGalleries[event.target.id].galleryItems.length - 1);});
 	goesImg.addEventListener('lgBeforeOpen', function(event){
 		document.getElementsByTagName('body')[0].style.overflow = "hidden";
@@ -1466,7 +2025,7 @@ function loadLocalRadar(targetedContent, metadata)
 
 
 	dynamicEl = [];
-	metadata.images.forEach(thisImg => {dynamicEl.push({src: "/dataHandler.php?type=localRadarData&timestamp=" + thisImg['timestamp'],
+	metadata.images.forEach(thisImg => {dynamicEl.push({src: programPath + "dataHandler.php?type=localRadarData&timestamp=" + thisImg['timestamp'],
 		subHtml: "<b>" + metadata.title + "</b><div class='lgLabel'>" + thisImg['description'] + "</div>", timestamp: thisImg['timestamp']});});
 	
 	lightGalleries['lightbox-localRadar'] = lightGallery(goesImg, {
@@ -1485,7 +2044,7 @@ function loadHurricane(targetedContent, id, product, title, metadata)
 	goesImg = document.createElement('img');
 	goesImg.className = "goesimg";
 	goesImg.id = "lightbox-" + product + id;
-	goesImg.src = "/dataHandler.php?type=hurricaneData&id=" + id + "&product=" + product + "&timestamp=" + metadata[metadata.length - 1]['timestamp'];
+	goesImg.src = programPath + "dataHandler.php?type=hurricaneData&id=" + id + "&product=" + product + "&timestamp=" + metadata[metadata.length - 1]['timestamp'];
 	goesImg.addEventListener('click', function(event){lightGalleries[event.target.id].openGallery(lightGalleries[event.target.id].galleryItems.length - 1);});
 	goesImg.addEventListener('lgBeforeOpen', function(event){
 		document.getElementsByTagName('body')[0].style.overflow = "hidden";
@@ -1505,7 +2064,7 @@ function loadHurricane(targetedContent, id, product, title, metadata)
 
 
 	dynamicEl = [];
-	metadata.forEach(thisImg => {dynamicEl.push({src: "/dataHandler.php?type=hurricaneData&id=" + id + "&product=" + product + "&timestamp=" + thisImg['timestamp'],
+	metadata.forEach(thisImg => {dynamicEl.push({src: programPath + "dataHandler.php?type=hurricaneData&id=" + id + "&product=" + product + "&timestamp=" + thisImg['timestamp'],
 		subHtml: "<b>" + title + "</b><div class='lgLabel'>" + thisImg['description'] + "</div>", timestamp: thisImg['timestamp']});});
 	
 	lightGalleries["lightbox-" + product + id] = lightGallery(goesImg, {
@@ -1531,7 +2090,7 @@ function loadImageMetadata(targetedContent)
 			{
 				targetedContent.innerHTML = "";
 				targetedContent.appendChild(document.createTextNode("The server returned bad data: " + this.responseText));
-				targetedContent.className += " otherEmwinBody";
+				targetedContent.className += " adminMessageBody";
 				delete xhttp.loadImage;
 				return;
 			}
@@ -1543,7 +2102,7 @@ function loadImageMetadata(targetedContent)
 		delete xhttp.loadImage;
 	}
 	
-	xhttp.loadImage.open("GET", "dataHandler.php?type=metadata&id=" + selectedMenu + "&subid=" + targetedContent.id.replace('Content', ''), true);
+	xhttp.loadImage.open("GET", programPath + "dataHandler.php?type=metadata&id=" + selectedMenu + "&subid=" + targetedContent.id.replace('Content', ''), true);
 	xhttp.loadImage.send();
 }
 function loadImage(targetedContent, metadata, title = "")
@@ -1559,7 +2118,7 @@ function loadImage(targetedContent, metadata, title = "")
 	goesImg = document.createElement('img');
 	goesImg.className = "goesimg";
 	goesImg.id = 'lightbox-' + contentId;
-	goesImg.src = "/dataHandler.php?type=data&id=" + selectedMenu + "&subid=" + contentId + "&timestamp=" + metadata[metadata.length - 1]['timestamp'];
+	goesImg.src = programPath + "dataHandler.php?type=data&id=" + selectedMenu + "&subid=" + contentId + "&timestamp=" + metadata[metadata.length - 1]['timestamp'];
 	goesImg.addEventListener('click', function(event){lightGalleries[event.target.id].openGallery(lightGalleries[event.target.id].galleryItems.length - 1);});
 	goesImg.addEventListener('lgBeforeOpen', function(event){
 		document.getElementsByTagName('body')[0].style.overflow = "hidden";
@@ -1582,7 +2141,7 @@ function loadImage(targetedContent, metadata, title = "")
 		if('subHtml' in thisImg) thisSub = thisImg['subHtml'];
 		else thisSub = "<b>" + title + "</b><div class='lgLabel'>" + thisImg['description'] + "</div>";
 		dynamicEl.push({
-			src: "/dataHandler.php?type=data&id=" + selectedMenu + "&subid=" + contentId + "&timestamp=" + thisImg['timestamp'],
+			src: programPath + "dataHandler.php?type=data&id=" + selectedMenu + "&subid=" + contentId + "&timestamp=" + thisImg['timestamp'],
 			description: thisImg['description'], subHtml: thisSub, timestamp: thisImg['timestamp']
 		});
 	});
@@ -1622,7 +2181,7 @@ function switchCardView(event)
 		me.parentNode.previousSibling.innerHTML = "Loading, please wait...";
 		loadImage(me.parentNode.previousSibling, replayMetadata);
 	}
-	else me.parentNode.previousSibling.innerHTML = "<video controls loop autoplay playsinline style='width: 100%;'><source src='/videos/" + config.categories[selectedMenu].data[me.id.replace("-timelapse", "")].videoPath + "' type='video/mp4' /></video>";
+	else me.parentNode.previousSibling.innerHTML = "<video controls loop autoplay playsinline style='width: 100%;'><source src='" + programPath + "videos/" + config.categories[selectedMenu].data[me.id.replace("-timelapse", "")].videoPath + "' type='video/mp4' /></video>";
 }
 
 function switchRadarView(event)
@@ -1645,12 +2204,19 @@ function switchRadarView(event)
 	{
 		lightGalleries['lightbox-localRadar'].destroy();
 		delete lightGalleries['lightbox-localRadar'];
-		me.parentNode.previousSibling.innerHTML = "<video controls loop autoplay playsinline style='width: 100%;'><source src='/videos/" + config.localRadarVideo + "' type='video/mp4' /></video>";
+		me.parentNode.previousSibling.innerHTML = "<video controls loop autoplay playsinline style='width: 100%;'><source src='" + programPath + "videos/" + config.localRadarVideo + "' type='video/mp4' /></video>";
 	}
 }
 
+window.addEventListener("popstate", function(event){menuSelect(event.state.menuSlug);});
+window.addEventListener("appinstalled", function()
+{
+	siteName = "";
+	document.title = document.querySelector(".menuItem.selected").lastChild.innerHTML;
+});
 window.addEventListener("load", function()
 {
+	//Query config from server
 	xhttp.preload = new XMLHttpRequest();
 	xhttp.preload.onreadystatechange = function()
 	{
@@ -1660,7 +2226,7 @@ window.addEventListener("load", function()
 			try {config = JSON.parse(this.responseText);}
 			catch(error)
 			{
-				renderCollapsingCard("serverError", "The server returned bad data. Click to expand", "prettyBoxContent", "otherEmwinBody");
+				renderCollapsingCard("serverError", "The server returned bad data. Click to expand", "prettyBoxContent", "adminMessageBody");
 				target = document.getElementById('serverErrorContent').firstChild;
 				target.innerHTML = this.responseText;
 				mainContent.className = "singleCard";
@@ -1669,13 +2235,20 @@ window.addEventListener("load", function()
 			}
 			
 			//Render Menu Items
-			if(config.showCurrentWeather) renderMenuItem('currentWeather', 'cloud', 'Current Weather');
+			if(config.showCurrentWeather) renderMenuItem('Current-Weather', 'cloud', 'Current Weather');
 			Object.keys(config.categories).forEach((type) => { renderMenuItem(type, config.categories[type].icon, config.categories[type].title); });
-			if(config.showAdminInfo || config.showEmwinInfo) renderMenuItem('otherEmwin', 'align-left', 'Other EMWIN');
-			if(config.showEmwinInfo) renderMenuItem('hurricaneCenter', 'wind', 'Hurricane Center');
-			renderMenuItem('localSettings', 'cogs', 'Local Settings');
-			if(config.showGraphs || config.showSysInfo) renderMenuItem('systemInfo', 'info-circle', 'System Info');
-	
+			if(config.showAdminInfo || config.showEmwinInfo) renderMenuItem('Other-EMWIN', 'align-left', 'Other EMWIN');
+			if(config.showEmwinInfo) renderMenuItem('Hurricane-Center', 'wind', 'Hurricane Center');
+			renderMenuItem('Local-Settings', 'cogs', 'Local Settings');
+			if(config.showSysInfo) renderMenuItem('System-Info', 'info-circle', 'System Info');
+			
+			//Select the topmost menu if one is not selected
+			pathnameSplit = window.location.pathname.split('/');
+			pathSegments = pathnameSplit.slice(1);
+			selectedMenu = pathSegments[pathSegments.length - 1];
+			if(selectedMenu == "") selectedMenu = document.getElementById('sideBar').getElementsByClassName('menuItem')[0].id.replace("menuItem", "");
+			
+			//Load the menu
 			menuSelect(selectedMenu);
 		}
 		else
@@ -1690,6 +2263,6 @@ window.addEventListener("load", function()
 		delete xhttp.preload;
 	}
 	
-	xhttp.preload.open("GET", "dataHandler.php?type=preload", true);
+	xhttp.preload.open("GET", programPath + "dataHandler.php?type=preload", true);
 	xhttp.preload.send();
 });

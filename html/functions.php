@@ -16,15 +16,38 @@
  * You should have received a copy of the GNU General Public License
  * along with Vitality GOES.  If not, see <http://www.gnu.org/licenses/>.
  */
+ 
+function getProgramDir()
+{
+	return dirname(__FILE__);
+}
 function loadConfig()
 {
 	//Load main config
-	if(!file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini")) die("config.ini is missing! Make sure\nyou have config files in:\n\n" . $_SERVER['DOCUMENT_ROOT'] . "/config/");
-	$config = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini", true, INI_SCANNER_RAW);
+	if(!file_exists(getProgramDir() . "/config/config.ini")) die("config.ini is missing! Make sure\nyou have config files in:\n\n" . getProgramDir() . "/config/");
+	$config = parse_ini_file(getProgramDir() . "/config/config.ini", true, INI_SCANNER_RAW);
 	if($config === false) die("Unable to parse config.ini");
+	if(!array_key_exists('general', $config)) die("Invalid config.ini - general section is missing");
 	
-	$config['general']['showSysInfo'] = (stripos($config['general']['showSysInfo'], "true") !== false);
-	$config['general']['debug'] = (stripos($config['general']['debug'], "true") !== false);
+	//Boolean Values
+	$config['general']['fastEmwin'] = (array_key_exists('fastEmwin', $config['general']) &&
+		stripos($config['general']['fastEmwin'], "true") !== false);
+	$config['general']['showSysInfo'] = (array_key_exists('showSysInfo', $config['general']) &&
+		stripos($config['general']['showSysInfo'], "true") !== false);
+	$config['general']['debug'] = (array_key_exists('debug', $config['general']) &&
+		stripos($config['general']['debug'], "true") !== false);
+	$config['general']['spaceWeatherAlerts'] = (array_key_exists('spaceWeatherAlerts', $config['general']) &&
+		stripos($config['general']['spaceWeatherAlerts'], "true") !== false);
+	
+	//Other EMWIN config
+	if(!array_key_exists('otheremwin', $config)) $config['otheremwin'] = [];
+	if(!array_key_exists('ini', $config['otheremwin'])) $config['otheremwin']['ini'] = "otheremwin.ini";
+	if(!array_key_exists('maxUserFiles', $config['otheremwin'])) $config['otheremwin']['maxUserFiles'] = "1000";
+	if(!array_key_exists('allowUserLoader', $config['otheremwin'])) $config['otheremwin']['allowUserLoader'] = "true";
+	
+	$config['otheremwin']['ini'] = $config['otheremwin']['ini'] = getProgramDir() . '/config/' . $config['otheremwin']['ini'];
+	$config['otheremwin']['allowUserLoader'] = (stripos($config['otheremwin']['allowUserLoader'], "true") !== false);
+	$config['otheremwin']['maxUserFiles'] = intval($config['otheremwin']['maxUserFiles']);
 	
 	//Load Extra configs
 	if(!array_key_exists('categories', $config)) $config['categories'] = [];
@@ -34,9 +57,9 @@ function loadConfig()
 		{
 			//Validate Extra Configs
 			unset($config['categories'][$type]);
-			if(!file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/$inifile")) continue;
+			if(!file_exists(getProgramDir() . "/config/$inifile")) continue;
 			
-			$configPart = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/$inifile", true, INI_SCANNER_RAW);
+			$configPart = parse_ini_file(getProgramDir() . "/config/$inifile", true, INI_SCANNER_RAW);
 			if($configPart === false ||
 				!array_key_exists('_category_', $configPart) || 
 				count($configPart) < 2 || 
@@ -58,26 +81,107 @@ function loadConfig()
 				if(!array_key_exists("mode", $configPart[$slugs[$i]])) $configPart[$slugs[$i]]['mode'] = "endz";
 				if(array_key_exists('paths', $config)) foreach($config['paths'] as $key => $value)
 					$configPart[$slugs[$i]]['path'] = str_replace('{' . $key . '}', $value, $configPart[$slugs[$i]]['path']);
+				
+				$configPart[$slugs[$i]]['fast'] =
+					(array_key_exists('fast', $configPart[$slugs[$i]]) ? stripos($configPart[$slugs[$i]]['fast'], "true") !== false : false);
 			}
 			
 			$config['categories'][$type]['data'] = $configPart;
 		}
 	}
 	
-	//Config touchups
+	//Other config touchups
 	if(array_key_exists('paths', $config)) unset($config['paths']);
 	if(!array_key_exists('city', $config['location'])) $config['location']['city'] = "";
 	if(!array_key_exists('rwrOrig', $config['location']) && array_key_exists('orig', $config['location'])) $config['location']['rwrOrig'] = $config['location']['orig'];
-	
+
 	return $config;
+}
+
+function loadOtherEmwin($config)
+{
+	//Load Other Emwin Config
+	$otheremwin = [];
+	$otheremwin['user'] = [];
+	$otheremwin['system'] = false;
+	
+	if(file_exists($config['otheremwin']['ini'])) $otheremwin['system'] = parse_ini_file($config['otheremwin']['ini'], true, INI_SCANNER_RAW);
+	if($otheremwin['system'] === false) $otheremwin['system'] = [];
+	else $otheremwin['system'] = array_values($otheremwin['system']);
+	
+	//Verify Other Emwin Config
+	for($i = 0; $i < count($otheremwin['system']); $i++)
+	{
+		if(!in_array($otheremwin['system'][$i]['format'], array('paragraph', 'formatted'))) $otheremwin['system'][$i]['format'] = 'formatted';
+		if(!is_numeric($otheremwin['system'][$i]['truncate'])) $otheremwin['system'][$i]['truncate'] = 0;
+	}
+	
+	//Load Other Emwin info from cookie
+	$sendCookie = false;
+	if(array_key_exists('otheremwin', $_COOKIE) && $config['otheremwin']['allowUserLoader'])
+	{
+		$allCards = explode("~", $_COOKIE['otheremwin']);
+		foreach($allCards as $thisCard)
+		{
+			$cardParts = explode("!", $thisCard);
+			
+			//Verify data
+			if(count($cardParts) != 4 || !is_numeric($cardParts[2]) || !is_numeric($cardParts[3]))
+			{
+				$sendCookie = true;
+				continue;
+			}
+			
+			$formatInt = intval($cardParts[2]);
+			$truncateInt = intval($cardParts[3]);
+			$identifier = base64_decode(str_replace("-", "=", $cardParts[0]));
+			if(!in_array($formatInt, array(0, 1)) || $truncateInt < 0 || $truncateInt > 10 || $identifier === false || !ctype_print($identifier))
+			{
+				$sendCookie = true;
+				continue;
+			}
+			
+			//Keep cookie if there were tags in the title; just strip them
+			$titleNoTags = strip_tags($cardParts[1]);
+			if($cardParts[1] != $titleNoTags) $sendCookie = true;
+			
+			//Pass data along from cookie if OK
+			$otheremwin['user'][] = [
+				'identifier' => $identifier,
+				'title' => $titleNoTags,
+				'format' => ($formatInt == 0 ? "formatted" : "paragraph"),
+				'truncate' => $truncateInt
+			];
+		}
+	}
+
+	//Save other emwin settings in case something changed
+	if($sendCookie)
+	{
+		$profileParts = [];
+		foreach($otheremwin['user'] as $thisCard)
+		{
+			$profileParts[] = join("!", [
+				str_replace("=", "-", base64_encode($thisCard['identifier'])),
+				rawurlencode($thisCard['title']),
+				($thisCard['format'] == "formatted" ? 0 : 1),
+				$thisCard['truncate']
+			]);
+		}
+		
+		$cookiePrefix = (ip2long($_SERVER['SERVER_NAME']) === false ? "." : "");
+		setrawcookie("otheremwin", join("~", $profileParts), time() + 31536000, "/", $cookiePrefix.$_SERVER['SERVER_NAME']);
+	}
+	
+	return $otheremwin;
 }
 
 function findAllThemes()
 {
 	$themes = [];
-	if(!is_dir("{$_SERVER['DOCUMENT_ROOT']}/themes")) return $themes;
+	if(!is_dir(getProgramDir() . "/themes")) return $themes;
 	
-	$themeDirs = glob("{$_SERVER['DOCUMENT_ROOT']}/themes/*", GLOB_ONLYDIR);
+	$themeDirs = glob(getProgramDir() . "/themes/*", GLOB_ONLYDIR);
 	foreach($themeDirs as $themeDir)
 	{
 		//Make sure theme is valid
@@ -124,19 +228,18 @@ function loadTheme($config)
 	else return false;
 }
 
-function scandir_recursive($dir, &$results = array())
+function scandir_recursive($dir, $fast)
 {
-	$dirHandle = opendir($dir);
-	while(($currentFile = readdir($dirHandle)) !== false)
+	if($fast) $iterator = new FilesystemIterator($dir, FilesystemIterator::SKIP_DOTS | FilesystemIterator::CURRENT_AS_PATHNAME);
+	else
 	{
-		if($currentFile == '.' or $currentFile == '..') continue;
-		$path = $dir . DIRECTORY_SEPARATOR . $currentFile;
-		if(is_dir($path)) scandir_recursive($path, $results);
-		else $results[] = $path;
+		$directoryIterator = new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS | FilesystemIterator::CURRENT_AS_PATHNAME);
+		$iterator = new RecursiveIteratorIterator($directoryIterator);
 	}
-	closedir($dirHandle);
 	
-    return $results;
+	$retVal = [];
+	foreach($iterator as $result) $retVal[] = $result;
+	return $retVal;
 }
 
 function sortByTimestamp($a, $b)
@@ -175,18 +278,16 @@ function findNewestEMWIN($allEmwinFiles, $product)
 	$highestImage = 0;
 	$path = "";
 	
-	foreach($allEmwinFiles as $thisFile)
+	$productEmwinFiles = preg_grep("/$product/", $allEmwinFiles);
+	foreach($productEmwinFiles as $thisFile)
 	{
-		if(strpos($thisFile, $product) !== false)
+		$fileNameParts = explode("_", basename($thisFile));
+		if(count($fileNameParts) != 6) continue;
+		
+		if($fileNameParts[4] > $highestImage)
 		{
-			$fileNameParts = explode("_", basename($thisFile));
-			if(count($fileNameParts) != 6) continue;
-			
-			if($fileNameParts[4] > $highestImage)
-			{
-				$path = $thisFile;
-				$highestImage = $fileNameParts[4];
-			}
+			$path = $thisFile;
+			$highestImage = $fileNameParts[4];
 		}
 	}
 	
@@ -207,22 +308,18 @@ function findSpecificEMWIN($allEmwinFiles, $product, $timestamp)
 	$DateTime = new DateTime("now", new DateTimeZone(date_default_timezone_get()));
 	$DateTime->setTimestamp($timestamp);
 	$DateTime->setTimezone(new DateTimeZone("UTC"));
-	
-	foreach($allEmwinFiles as $thisFile)
-	{
-		if(strpos($thisFile, $DateTime->format('YmdHis')) !== false && strpos($thisFile, $product) !== false) return $thisFile;
-	}
-	
+	$specificEmwinFiles = array_values(preg_grep("/_" . $DateTime->format('YmdHis') . "_[^\\\\\/]*{$product}[^\\\\\/]*\..{3}$/", $allEmwinFiles));
+
+	if($specificEmwinFiles !== false && count($specificEmwinFiles) > 0) return $specificEmwinFiles[0];
 	return false;
 }
 
 function findMetadataEMWIN($allEmwinFiles, $product)
 {
 	$retVal = [];
-	foreach($allEmwinFiles as $thisFile)
+	$productEmwinFiles = preg_grep("/$product/", $allEmwinFiles);
+	foreach($productEmwinFiles as $thisFile)
 	{
-		if(stripos($thisFile, $product) === false) continue;
-		
 		$fileNameParts = explode("_", basename($thisFile));
 		if(count($fileNameParts) != 6) continue;
 		
@@ -237,35 +334,60 @@ function findMetadataEMWIN($allEmwinFiles, $product)
 
 function linesToParagraphs($lineArray, $linesToSkip)
 {
-	$startingParagraph = false;
-	$retVal = (count($lineArray) > 0 ? "<p style='font-weight: bold;'>" : "");
-	foreach($lineArray as $key => $line)
+	$startingParagraph = $startingSection = false;
+	$firstParagraph = true;
+	$firstParagraphText = "";
+	$retVal = [];
+	$section = 0;
+	if(count($lineArray) > 0) $retVal[] = "<p style='font-weight: bold;'>";
+	for($i = $linesToSkip; $i < count($lineArray); $i++)
 	{
-		if($key < $linesToSkip) continue;
-		$thisLine = trim($line);
+		$thisLine = trim($lineArray[$i]);
 		
 		if($thisLine == "$$")
 		{
-			$retVal .= "</p>";
-			break;
+			if(!$startingParagraph) $retVal[$section] .= "</p>";
+			$startingParagraph = false;
+			$startingSection = true;
+			continue;
 		}
 		if(empty($thisLine))
 		{
-			$retVal .= "</p>";
-			$startingParagraph = true;
+			if(!$startingParagraph && !$startingSection)
+			{
+				$retVal[$section] .= "</p>";
+				if($firstParagraph)
+				{
+					$firstParagraphText = $retVal[$section];
+					$firstParagraph = false;
+				}
+				$startingParagraph = true;
+			}
 			continue;
 		}
 		
-		if($startingParagraph)
+		if($startingSection && $i != count($lineArray) - 1)
 		{
-			$retVal .= "<p>";
+			$retVal[] = "<p>";
+			$section++;
+			$startingSection = false;
+		}
+		
+		if($startingParagraph && $i != count($lineArray) - 1)
+		{
+			$retVal[$section] .= "<p>";
 			$startingParagraph = false;
 		}
 		
-		$retVal .= "$thisLine ";
-		if(strlen($thisLine) < 55) $retVal .= "<br />";
+		$retVal[$section] .= "$thisLine ";
+		if(strlen($thisLine) < 55) $retVal[$section] .= "<br />";
 	}
 	
+	//Clean up hanging tags
+	if(!$startingParagraph && !$startingSection) $retVal[$section] .= "</p>";
+	for($i = 1; $i < count($retVal); $i++) $retVal[$i] = $firstParagraphText . $retVal[$i];
+	
+	$retVal = array_values($retVal);
 	return $retVal;
 }
 

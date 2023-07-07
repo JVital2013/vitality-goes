@@ -28,8 +28,9 @@ Vitality GOES has the following features:
 
 * It is easily usable by anyone with no knowledge of radio, satellites, or programming once set up by a ground station technician (you!).
 * Vitality GOES presents all full-disk images, and mesoscale imagery, and more in a user friendly and easily navigatable way.
-* Current weather conditions, forecasts, watches, and warnings from the GOES-16/18 HRIT/EMWIN data feed are presented to the user in a way that is appealing and easy to read. There is no need to parse through data for other locations: your configured location's data is the only thing you're shown. For a writeup on the EMWIN data Vitality GOES pulls and how it's used, see [here](docs/used-emwin-data.md).
-* Vitality GOES is able to monitor the status of the underlying goestools/SatDump stack, including systems temps, error correction rates, and packet drop rates.
+* Current weather conditions, forecasts, watches, and warnings from the GOES-16/18 HRIT/EMWIN data feed are presented to the user in a way that is appealing and easy to read. There is no need to parse through data for other locations: your configured location's data is the only thing you're shown.
+* Discover and browse additional data from the EMWIN data feed. For a writeup on the EMWIN data Vitality GOES pulls and how it's used, see [here](docs/used-emwin-data.md).
+* Monitor the status of the underlying goestools/SatDump stack, including systems temps, error correction rates, and packet drop rates.
 
 Sample configurations are provided for the following satellite/station setups:
 
@@ -51,6 +52,8 @@ A satellite downlink is picked up by your satellite dish, and is processed into 
 You need to set up a satellite dish and point it at the satellite of your choice to get started. Additionally, SatDump or goestools must be configured to save recieved data to disk. See the [additional resources section](#additional-resources) for info on how to set up a ground station with goestools, and [this YouTube Video](https://www.youtube.com/watch?v=XMDAiUjzkhw) for a quick-start guide to setting up a test station with SatDump.
 
 It is recommended that you host Vitality GOES on your ground station itself for the most up-to-date information and to simplify setup/maintenance. If you choose, it can be hosted on another machine if you have a sync process set up between the ground station and the Vitality GOES server. *Syncing received images from another machine is outside the scope of Vitality GOES.*
+
+
 
 It is also recommended that you use a Debian-based Linux distro to host the Vitality GOES server. Something like Raspberry Pi OS, Ubuntu, or Debian is preferred. If you host it on Windows, make sure your satellite data is on an NTFS drive.
 
@@ -78,7 +81,12 @@ satdump live goes_hrit F:\path\to\satdumprepo --source rtlsdr --samplerate 2.4e6
 The `http_server` part is optional and is only needed to provide decoder/demodulator statistics to Vitality GOES. For more information, see [the config documentation](/docs/config.md#general).
 
 ### Vitality GOES Dependencies
-Vitality GOES itself is a set of PHP, HTML, JavaScript, and CSS files. As such, it needs to be hosted on a web server stack. For this readme, I'm going to assume you're not running another web server on the same machine.
+Vitality GOES needs to be hosted on a web server stack. Recommended software versions:
+
+ - **Web Server:** Apache2
+ - **PHP Version:** PHP 8.0+ (PHP 7.4 is supported)
+
+For this readme, I'm going to assume you're not running another web server on the same machine.
 
 ---
 
@@ -89,6 +97,28 @@ Assuming you're on a Debian/Ubuntu-based server, the following commands should i
 sudo apt update
 sudo apt upgrade
 sudo apt install apache2 php libapache2-mod-php
+sudo a2enmod rewrite
+sudo systemctl restart apache2
+```
+
+You may also need to enable .htaccess files in Apache2 for all functionality to work. To do so, edit /etc/apache2/apache2.conf as root and update this section:
+
+```apache
+<Directory /var/www/>
+        Options Indexes FollowSymLinks
+        AllowOverride None
+        Require all granted
+</Directory>
+```
+
+to this:
+
+```apache
+<Directory /var/www/>
+        Options -Indexes
+        AllowOverride All
+        Require all granted
+</Directory>
 ```
 
 #### Windows

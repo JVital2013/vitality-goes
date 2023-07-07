@@ -1,9 +1,9 @@
 # Data parsed from EMWIN and how it's used
-The GOES HRIT/EMWIN downlink provides rich weather data, forecasts, and other information on the EMWIN virtual channels. This data is extremely useful to end users, but it's often encoded in a way that obscures its meaning - and it can be hard to find good documentation on reading the data.
+The GOES HRIT/EMWIN downlink provides rich weather data, forecasts, and other information on the EMWIN virtual channels. This data is extremely useful to end users, but it's often encoded in a way that obscures its meaning - and it can be hard to find good documentation on reading the data. Vitality GOES solves this by parsing the data and presenting pertinent information to you.
 
-Vitality GOES solves this by parsing the data and presenting pertinent information to you.
+**NOTE:** This software assumes you only keep up to 36 hours of EMWIN text data in your emwin data folder. You can keep a week of data with `fastEmwin` enabled in your config. If you keep more data than is recommended, performance will degrade and old alerts will stick around for a long time.
 
-**NOTE:** This software assumes you only keep up to 36 hours of EMWIN text data in your emwin data folder. While you probably can keep more than that, you may start to notice that old alerts will stick around longer than they should. To work around this issue, I recommend archiving old alerts in daily zip archives. [See the scripts documentation for an example of how to do that](/docs/scripts.md#cleanup-emwintextsh).
+To work around this issue, I recommend archiving old text products in daily zip archives. [See the scripts documentation for an example of how to do that](/docs/scripts.md#cleanup-emwintextsh).
 
 ## Alerts
 Active alerts and warnings will show at the top of the Current Weather tab, if there are any.
@@ -53,19 +53,20 @@ The Current Weather tab of Vitality GOES shows current weather conditions and fo
 | ZFP*****.TXT         | Zone Forecast Product    | Forecast (text)             | |
 
 ## EMWIN Imagery
-[EMWIN Imagery is configured in the emwin.ini config file](config.md#emwinini)
+EMWIN Imagery is configured [along with other image categories](config.md#category-ini-files-abiini-mesoini-etc).
 
 ## Other EMWIN
-The Other EMWIN tab of Vitality GOES shows miscellaneous data that may be useful to you (read: information I found interesting and felt like including in the web interface. If you're interested in other info, feel free to open a pull request)
+The Other EMWIN tab of Vitality GOES shows miscellaneous data configured by the system administrator, as well as a data loader that allows the user to query additional data.
+
+To configure the data shown on this screen for all users, or to disable the additional data loader, see [the config documentation](config.md#otheremwin). The options available in [otheremwin.ini selectors](config.md#otheremwinini-configuration) match those available in the additional data loader.
+
+The additional data loader also contains an "Automatic Data Selector" that makes it easy to discover what data is available to view.
+
+![Other EMWIN screenshot](https://github-production-user-asset-6210df.s3.amazonaws.com/24253715/248586409-6b5f220f-a331-4ac9-b259-5489c585ac95.png)
+In addition to user and admin configured data, the following information is always available on this screen:
 
 | GOES-N Filename Part | Product Name                  | Card Title in Vitality GOES  | Latest/All Available | Notes |
 |----------------------|-------------------------------|------------------------------|----------------------|-------|
-| ALT*****.TXT         | Space Environment Alert       | Space Weather Messages       | All Available        | |
-| WAT*****.TXT         | Space Environment Watch       | Space Weather Messages       | All Available        | |
-| FTM*****.TXT         | Radar Outage Notifications    | Local Radar Outages          | All Available        | Filtered by your state/state of your local issuing office |
-| ADA*****.TXT         | Administrative Message        | EMWIN Admin Alerts           | All Available        | |
-| ADR*****.TXT         | NWS Admin Message             | EMWIN Regional Admin Message | All Available        | |
-| ADMSDM**.TXT         | Alert Administrative Message  | SDM Ops Status Messages      | All Available        | |
 | FEEBAC1S.TXT         | ?                             | EMWIN Licensing Info         | Latest               | Issued daily around 15:30 UTC |
 | EPHTWOUS.TXT         | Weather Satellite Ephemerides | Weather Satellite TLE        | Latest               | Issued several times daily and can be used to track other satellites, including Polar orbiting satellites commonly tracked by amateurs. There are other EPH*****.TXT files that contain operational information of other NOAA-operated satellites |
 | N/A                  | Admin Text (HRIT VCID 0)      | Latest Admin Message         | Latest               | Only visible if [adminPath is configured in your config.ini](config.md#configini), and you patched goesproc [with this patch](https://github.com/pietern/goestools/pull/105/files) or are using SatDump. |

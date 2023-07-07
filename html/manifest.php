@@ -16,14 +16,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Vitality GOES.  If not, see <http://www.gnu.org/licenses/>.
  */
+ 
+//Get root directory of the application
+$programPath = dirname(__FILE__);
+$programURL = str_replace(str_replace("\\", "/", $_SERVER['DOCUMENT_ROOT']), "",  str_replace("\\", "/", $programPath));
 
-require_once($_SERVER['DOCUMENT_ROOT'] . "/functions.php");
+//Load data from config
+require_once("$programPath/functions.php");
 $siteTitle = "Vitality GOES";
 $themeColor = "#111111";
 
-if(file_exists($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini"))
+if(file_exists("$programPath/config/config.ini"))
 {
-	$config = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini", true, INI_SCANNER_RAW);
+	$config = parse_ini_file("$programPath/config/config.ini", true, INI_SCANNER_RAW);
 	$theme = loadTheme($config);
 	if(array_key_exists('siteTitle', $config['general'])) $siteTitle = htmlspecialchars(strip_tags($config['general']['siteTitle']));
 	if($theme !== false && array_key_exists('themeColor', $theme)) $themeColor = addslashes($theme['themeColor']);
@@ -35,28 +40,27 @@ header('Content-Type: application/json; charset=utf-8');
     "theme_color": "<?php echo $themeColor; ?>",
     "background_color": "<?php echo $themeColor; ?>",
     "display": "standalone",
-    "scope": "/",
-    "start_url": "/",
-    "name": "Vitality GOES Ground Station",
-    "short_name": "<?php echo $siteTitle; ?>",
+    "scope": "<?php echo $programURL; ?>/",
+    "start_url": "<?php echo $programURL; ?>/",
+    "name": "<?php echo $siteTitle; ?>",
     "icons": [
         {
-            "src": "/icon-192x192.png",
+            "src": "icon-192x192.png",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "/icon-256x256.png",
+            "src": "icon-256x256.png",
             "sizes": "256x256",
             "type": "image/png"
         },
         {
-            "src": "/icon-384x384.png",
+            "src": "icon-384x384.png",
             "sizes": "384x384",
             "type": "image/png"
         },
         {
-            "src": "/icon-512x512.png",
+            "src": "icon-512x512.png",
             "sizes": "512x512",
             "type": "image/png"
         }

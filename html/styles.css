@@ -35,10 +35,24 @@ select, input
 	margin: 2px;
 	max-width: 100%;
 }
+input[type="radio"]
+{
+	margin-right: 10px;
+}
+label
+{
+	user-select: none;
+}
 .errorMessage
 {
-	color: white;
+	color: #dddddd;
 	text-align: center;
+}
+.errorMessage .fa
+{
+	margin-bottom: 20px;
+	font-size: 250px;
+	color: #888888;
 }
 .topBar
 {
@@ -194,6 +208,14 @@ select, input
 	margin: 10px 0;
 	width: 100%;
 }
+.prettyBox.emwinLoader
+{
+	background: #222222;
+}
+.prettyBox.emwinLoader.highlighted
+{
+	box-shadow: 0px 0px 5px 2px #ffffff80;
+}
 .prettyBoxList
 {
 	border-bottom: 1px solid #888888;
@@ -265,6 +287,7 @@ select, input
 	cursor: pointer;
 	user-select: none;
 	font-size: 10pt;
+	position: relative;
 }
 .prettyBoxHeader .fa
 {
@@ -287,6 +310,11 @@ select, input
 	font-size: 10pt;
 	text-align: left;
 }
+.truncLeft
+{
+	float: left;
+	padding-top: 10px;
+}
 .weatherLeft
 {
 	float: left;
@@ -303,34 +331,154 @@ select, input
 {
 	max-width: 200px;
 }
-.otherEmwinBody
+.inputFlex
+{
+	display: flex;
+	align-items: center;
+}
+.fileTypeRow
+{
+	display: flex;
+	align-items: flex-start;
+	margin: 10px 0;
+}
+.fileTypeRow label
+{
+	flex: 1;
+}
+.inputFlex input[type="text"]
+{
+	flex: 1;
+	margin-left: 10px;
+	width: 30px;
+}
+.autoFilterFlex
+{
+	display: flex;
+	margin: 10px 0;
+}
+.autoFilterFlex.disabled
+{
+	pointer-events: none;
+	opacity: 0.5;
+}
+.autoFilterCategory
+{
+	flex: 1;
+	text-align: center;
+}
+.autoFilterPicklistHolder
+{
+	border: solid 1px #aaaaaa;
+	height: 200px;
+	margin: 5px;
+	display: flex;
+	flex-direction: column;
+}
+.autoFilterSearchHolder
+{
+	display: flex;
+}
+.autoFilterSearchHolder input
+{
+	margin: 0;
+	width: 100%;
+	border: none;
+	background: transparent;
+	color: inherit;
+	flex: 1;
+}
+.autoFilterSearchHolder input:focus
+{
+	outline: none;
+}
+.autoFilterSearchHolder i
+{
+	margin: 7px;
+	color: inherit;
+}
+.autoFilterPicklist
+{
+	border-top: solid 1px #aaaaaa;
+	overflow-y: scroll;
+	flex: 1;
+	user-select: none;
+	-webkit-overflow-scrolling: touch;
+}
+.autoFilterItem
+{
+	overflow-x: hidden;
+	padding: 4px;
+}
+.autoFilterItem.selected
+{
+	background: #efefef;
+	color: #111111;
+}
+.adminMessageBody, .emwinMessageBody .prettyBoxList:first-child
 {
 	font-size: 9pt;
 	text-align: left;
 	font-family: monospace;
 	white-space: pre;
 	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
 }
-.otherEmwinBody::-webkit-scrollbar,
-.forcastCardHolder::-webkit-scrollbar
+::-webkit-scrollbar
 {
 	height: 10px;
 }
-.otherEmwinBody::-webkit-scrollbar-track,
-.forcastCardHolder::-webkit-scrollbar-track
+::-webkit-scrollbar-track
 {
 	background: #444444;
 }
-.otherEmwinBody::-webkit-scrollbar-thumb,
-.forcastCardHolder::-webkit-scrollbar-thumb
+::-webkit-scrollbar-button:vertical:decrement
+{
+	background-position: center;
+	background-repeat: no-repeat;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='5' fill='rgb(239, 239, 239)'><polygon points='5,0 0,5 10,5'/></svg>");
+}
+::-webkit-scrollbar-button:vertical:increment
+{
+	background-position: center;
+	background-repeat: no-repeat;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='5' fill='rgb(239, 239, 239)'><polygon points='0,0 10,0 5,5'/></svg>");
+}
+::-webkit-scrollbar-button:vertical:hover
+{
+	background-color: #555555;
+}
+::-webkit-scrollbar-thumb
 {
 	background: #888888;
+}
+.otherEmwinDeleteHolder
+{
+	position: absolute;
+	top: 50%;
+    transform: translateY(-50%);
+	font-size: 12pt;
+	right: 0;
+}
+.otherEmwinDeleteHolder .fa, .otherEmwinDeleteHolder .far
+{
+	margin: 0;
+	padding: 10px 7px;
+}
+.otherEmwinDeleteHolder .fa:last-child
+{
+	padding-right: 12px;
+}
+.otherEmwinDeleteHolder .fa-trash-alt
+{
+	color: #d54040;
 }
 .prettyBoxList.otherEmwinNavigation
 {
 	display: flex;
 	justify-content: space-between;
 	padding: 0 10px;
+	font-size: 10pt;
 }
 .otherEmwinNavigation div
 {
@@ -390,6 +538,7 @@ select, input
 .forcastCardHolder
 {
 	overflow-x: scroll;
+	-webkit-overflow-scrolling: touch;
 	white-space: nowrap;
 	padding-bottom: 10px;
 	user-select: none;
