@@ -1,9 +1,9 @@
 # Data parsed from EMWIN and how it's used
-The GOES HRIT/EMWIN downlink provides rich weather data, forecasts, and other information on the EMWIN virtual channels. This data is extremely useful to end users, but it's often encoded in a way that obscures its meaning - and it can be hard to find good documentation on reading the data.
+The GOES HRIT/EMWIN downlink provides rich weather data, forecasts, and other information on the EMWIN virtual channels. This data is extremely useful to end users, but it's often encoded in a way that obscures its meaning - and it can be hard to find good documentation on reading the data. Vitality GOES solves this by parsing the data and presenting pertinent information to you.
 
-Vitality GOES solves this by parsing the data and presenting pertinent information to you.
+**NOTE:** This software assumes you only keep up to 36 hours of EMWIN text data in your emwin data folder. You can keep a week of data with `fastEmwin` enabled in your config. If you keep more data than is recommended, performance will degrade and old alerts will stick around for a long time.
 
-**NOTE:** This software assumes you only keep up to 36 hours of EMWIN text data in your emwin data folder. While you probably can keep more than that, you may start to notice that old alerts will stick around longer than they should. To work around this issue, I recommend archiving old alerts in daily zip archives. [See the scripts documentation for an example of how to do that](/docs/scripts.md#cleanup-emwintextsh).
+To work around this issue, I recommend archiving old text products in daily zip archives. [See the scripts documentation for an example of how to do that](/docs/scripts.md#cleanup-emwintextsh).
 
 ## Alerts
 Active alerts and warnings will show at the top of the Current Weather tab, if there are any.
