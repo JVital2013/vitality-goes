@@ -310,7 +310,7 @@ function findSpecificEMWIN($allEmwinFiles, $product, $timestamp)
 	$DateTime->setTimezone(new DateTimeZone("UTC"));
 	$specificEmwinFiles = array_values(preg_grep("/_" . $DateTime->format('YmdHis') . "_[^\\\\\/]*{$product}[^\\\\\/]*\..{3}$/", $allEmwinFiles));
 
-	if(count($specificEmwinFiles) > 0) return $specificEmwinFiles[0];
+	if($specificEmwinFiles !== false && count($specificEmwinFiles) > 0) return $specificEmwinFiles[0];
 	return false;
 }
 

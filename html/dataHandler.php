@@ -639,9 +639,10 @@ elseif($_GET['type'] == "metadata")
 		}
 		
 		$fileList = scandir_recursive($config['categories'][$_GET['id']]['data'][$_GET['subid']]['path'], $config['categories'][$_GET['id']]['data'][$_GET['subid']]['fast']);
-		foreach($fileList as $file)
+		$refinedList = preg_grep($regex, $fileList);
+		foreach($refinedList as $file)
 		{
-			if(!preg_match($regex, $file, $regexMatches)) continue;
+			preg_match($regex, $file, $regexMatches);
 			$DateTime = DateTime::createFromFormat($dateFormat, $regexMatches['date'], new DateTimeZone("UTC"));
 			if($DateTime === false) continue;
 			
@@ -698,20 +699,13 @@ elseif($_GET['type'] == "data")
 	}
 
 	$fileList = scandir_recursive($config['categories'][$_GET['id']]['data'][$_GET['subid']]['path'], $config['categories'][$_GET['id']]['data'][$_GET['subid']]['fast']);
-	foreach($fileList as $thisFile)
-	{
-		if(preg_match($regex, $thisFile))
-		{
-			$path = $thisFile;
-			break;
-		}
-	}
-	if(!isset($path)) die();
+	$refinedList = array_values(preg_grep($regex, $fileList));
+	if($refinedList === false || count($refinedList) == 0) die();
 	
-	header('Content-Type: ' . mime_content_type($path));
-	header('Content-Disposition: inline; filename=' . basename($path));
-	header('Content-Length: ' . filesize($path));
-	readfile($path);
+	header('Content-Type: ' . mime_content_type($refinedList[0]));
+	header('Content-Disposition: inline; filename=' . basename($refinedList[0]));
+	header('Content-Length: ' . filesize($refinedList[0]));
+	readfile($refinedList[0]);
 }
 elseif($_GET['type'] == "hurricaneData")
 {
