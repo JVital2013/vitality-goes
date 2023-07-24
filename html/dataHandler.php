@@ -923,6 +923,15 @@ elseif($_GET['type'] == "alertJSON")
 				continue;
 			}
 			
+			if($messageStart == 0 && stripos($weatherData[$i], "Dust Advisory") === 0)
+			{
+				$alertType = trim($weatherData[$i]);
+				$issuingOffice = trim($weatherData[++$i]);
+				$issueTime = trim($weatherData[++$i]);
+				$messageStart = ++$i + 1;
+				continue;
+			}
+			
 			//Get end of message
 			if(trim($weatherData[$i]) == "&&")
 			{
