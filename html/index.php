@@ -74,7 +74,7 @@ if(file_exists("$programPath/config/config.ini"))
 		<link href="<?php echo $programURL; ?>/splashscreens/iphonexr_splash.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2)" rel="apple-touch-startup-image" />
 		<link href="<?php echo $programURL; ?>/splashscreens/iphonexsmax_splash.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)" rel="apple-touch-startup-image" />
 		<script src='<?php echo $programURL; ?>/lightgallery/lightgallery.umd.js?v=20221016'></script>
-		<script src="<?php echo $programURL; ?>/lightgallery/plugins/zoom/lg-zoom.umd.js?v=20221016"></script>
+		<script src="<?php echo $programURL; ?>/lightgallery/plugins/zoom/lg-zoom.umd.js?v=20230923"></script>
 		<script src="<?php echo $programURL; ?>/lightgallery/plugins/jumpto/lg-jumpto.umd.js?v=20220811"></script>
 		<script src="<?php echo $programURL; ?>/simplerpicker/simplerpicker.js"></script>
 		<script src='<?php echo $programURL; ?>/script.js?v=20230701'></script>
