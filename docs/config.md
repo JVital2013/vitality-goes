@@ -2,7 +2,7 @@
 
 Configuration files should be placed in the `config` folder where Vitality GOES is installed. To get started, [copy the contents of a provided example config](/configs) into the `config` folder where Vitality GOES is installed. Scriptconfig.ini is not needed for Vitality GOES itself, so skip it if present.
 
-Example configs for using goestools data source are prefixed with "goestools-", while configs for SatDump are prefixed with "satdump-".
+Example configs for using goestools data source are prefixed with "goestools-", configs for SatDump are prefixed with "satdump-", and XRIT Demodulator configs are prefixed with "xrit-".
 
 ![Example Copy Configs](https://user-images.githubusercontent.com/24253715/213600531-dbd89150-309d-4695-b276-0df8e414ae55.png)
 
@@ -145,6 +145,7 @@ The following filename parser modes are supported for use in the `mode` attribut
 | beginu     | Beginning of filename     | 20230124_110636              | After the timestamp             |
 | beginz     | Beginning of filename     | 20230124T110636Z             | After the timestamp             |
 | emwin | In the middle of the filename as specified in the [EMWIN naming convention](https://www.weather.gov/emwin/format) | 20230124110636 | After the timestamp |
+| xrit       | End of filename           | 202301241106                 | Before the timestamp            |
 | end        | End of filename           | 20230124110636               | Before the timestamp            |
 | endu       | End of filename           | 20230124_110636              | Before the timestamp            |
 | **endz**   | **End of filename**       | **20230124T110636Z**         | **Before the timestamp**        |

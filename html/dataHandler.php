@@ -619,6 +619,10 @@ elseif($_GET['type'] == "metadata")
 				$regex = "/(\\\\|\/)(?<date>[0-9]{8}T[0-9]{6}Z)[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
 				$dateFormat = "Ymd\THis\Z";
 				break;
+			case "xrit":
+				$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*(?<date>[0-9]{12})\..{3}$/i";
+				$dateFormat = "YmdHi";
+				break;
 			case "emwin":
 				$regex = "/_(?<date>[0-9]{14})_[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
 				$dateFormat = "YmdHis";
@@ -685,6 +689,9 @@ elseif($_GET['type'] == "data")
 			break;
 		case "emwin":
 			$regex = "/_" . $DateTime->format('YmdHis') . "_[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
+			break;
+		case "xrit":
+			$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*" . $DateTime->format('YmdHi') . "\..{3}$/i";
 			break;
 		case "end":
 			$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*" . $DateTime->format('YmdHis') . "\..{3}$/i";
