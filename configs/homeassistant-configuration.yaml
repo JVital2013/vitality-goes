@@ -159,7 +159,7 @@ weather:
     wind_speed_unit: "mph"
     wind_bearing_template: "{{ states('sensor.vitality_goes_wind_direction') }}"
     attribution_template: "Powered by Vitality GOES - https://github.com/JVital2013/vitality-goes"
-    forecast_template: >
+    forecast_daily_template: >
       {% set forecast = namespace(value=[]) %}
       {% if state_attr("sensor.vitality_goes_forecast_day_1", "maxTemp") == none %}
         {% set forecastDay = namespace(value=1) %}

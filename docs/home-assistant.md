@@ -27,7 +27,7 @@ To fix this problem, we can use Vitality GOES as the weather provider in Home As
 To set this up, the following items should already be configured:
 
 1. **Vitality GOES:** The "Current Weather" screen must load successfully, and the "Current Weather" and "7-day Forecast" cards must work. If either are missing, verify your config.ini.
-2. **Home Assistant:** To get started with it, see [https://www.home-assistant.io/getting-started/](https://www.home-assistant.io/getting-started/).
+2. **Home Assistant:** To get started with it, see [https://www.home-assistant.io/getting-started/](https://www.home-assistant.io/getting-started/). You must be running version 2023.9 or newer.
 
 Vitality GOES and Home Assistant can (and probably should) be on different machines, as long as they can talk to each other across the network.
 
