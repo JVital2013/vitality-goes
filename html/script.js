@@ -22,6 +22,7 @@ var lightGalleries = [];
 var xhttp = [];
 var config, responseData, selectedMenu;
 var programPath = document.currentScript.src.replace(location.protocol + "//" + location.hostname, "").split("script.js?v=")[0];
+programPath = programPath.substr(programPath.indexOf("/"));
 var siteName = window.matchMedia('(display-mode: standalone)').matches ? "" : " - " + document.title;
 
 //Load expanded cards from sessionStorage
