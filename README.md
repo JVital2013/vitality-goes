@@ -1,5 +1,5 @@
 # Vitality GOES
-A Web App for showcasing Geostationary Weather Satellite Data. Vitality GOES is designed to display data received from GOES-16/18 satellites via goestools, Satdump, or XRIT Demodulator, but images from other satellites can be displayed as well.
+A Web App for showcasing Geostationary Weather Satellite Data. Vitality GOES is designed to display data received from GOES-16/18 satellites via goestools, Satdump, or XRIT Decoder, but images from other satellites can be displayed as well.
 
 **[Click Here for Screenshots and Videos](https://github.com/JVital2013/vitality-goes/wiki/Screenshots-and-Videos)**
 
@@ -34,12 +34,12 @@ Vitality GOES has the following features:
 
 Sample configurations are provided for the following satellite/station setups:
 
-| Satellite Downlink    | Supported Programs                       |
-| --------------------- | ---------------------------------------- |
-| GOES-16 and 18 HRIT   | goestools, SatDump, and XRIT Demodulator |
-| EWS-G1 (GOES-13) GVAR | SatDump                                  |
-| FengYun-2x S-VISSR    | SatDump                                  |
-| GEO-KOMPSAT 2A LRIT   | xrit-rx or SatDump                       |
+| Satellite Downlink    | Supported Programs                   |
+| --------------------- | ------------------------------------ |
+| GOES-16 and 18 HRIT   | goestools, SatDump, and XRIT Decoder |
+| EWS-G1 (GOES-13) GVAR | SatDump                              |
+| FengYun-2x S-VISSR    | SatDump                              |
+| GEO-KOMPSAT 2A LRIT   | xrit-rx or SatDump                   |
 
 ### How does it work?
 
@@ -80,8 +80,8 @@ satdump live goes_hrit F:\path\to\satdumprepo --source rtlsdr --samplerate 2.4e6
 
 The `http_server` part is optional and is only needed to provide decoder/demodulator statistics to Vitality GOES. For more information, see [the config documentation](/docs/config.md#general).
 
-### Option 3: XRIT Demodulator
-Thanks to @abomb60, data from XRIT Demodulator is supported as well.
+### Option 3: XRIT Decoder
+Thanks to @abomb60, data from USA-Satcom's XRIT Decoder is supported as well.
 
 ### Vitality GOES Dependencies
 Vitality GOES needs to be hosted on a web server stack. Recommended software versions:
