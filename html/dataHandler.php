@@ -1,6 +1,6 @@
 <?php
 /* 
- * Copyright 2022-2023 Jamie Vital
+ * Copyright 2022-2024 Jamie Vital
  * This software is licensed under the GNU General Public License
  * 
  * This file is part of Vitality GOES.
@@ -1278,11 +1278,13 @@ elseif($_GET['type'] == "weatherJSON")
 			{
 				$returnData['weatherTime'] = trim($thisLine);
 				$gotWeatherTime = true;
+				continue;
 			}
 			
-			if(stripos($thisLine, $currentSettings[$selectedProfile]['city']) === 0)
+			$trimmedLine = trim($thisLine, "* \n\r\t\v\x00");
+			if(stripos($trimmedLine, $currentSettings[$selectedProfile]['city']) === 0)
 			{
-				$currentConditionParts = preg_split("/[ ]{2,}/", trim($thisLine), 3);
+				$currentConditionParts = preg_split("/[ ]{2,}/", $trimmedLine, 3);
 				$remainingConditionParts = array_pop($currentConditionParts);
 				array_shift($currentConditionParts);
 				$currentConditionParts = array_merge($currentConditionParts, preg_split("/[ ]+/", $remainingConditionParts));
