@@ -49,11 +49,9 @@ A satellite downlink is picked up by your satellite dish, and is processed into 
 
 ## System Requirements
 
-You need to set up a satellite dish and point it at the satellite of your choice to get started. Additionally, SatDump or goestools must be configured to save recieved data to disk. See the [additional resources section](#additional-resources) for info on how to set up a ground station with goestools, and [this YouTube Video](https://www.youtube.com/watch?v=XMDAiUjzkhw) for a quick-start guide to setting up a test station with SatDump.
+You need to set up a satellite dish and point it at the satellite of your choice to get started. Additionally, SatDump or goestools must be configured to save recieved data to disk. Guides for setting up these programs can be found under [Additional Resources](#additional-resources).
 
 It is recommended that you host Vitality GOES on your ground station itself for the most up-to-date information and to simplify setup/maintenance. If you choose, it can be hosted on another machine if you have a sync process set up between the ground station and the Vitality GOES server. *Syncing received images from another machine is outside the scope of Vitality GOES.*
-
-
 
 It is also recommended that you use a Debian-based Linux distro to host the Vitality GOES server. Something like Raspberry Pi OS, Ubuntu, or Debian is preferred. If you host it on Windows, make sure your satellite data is on an NTFS drive.
 
@@ -63,15 +61,7 @@ Once configured, any modern web browser can connect to Vitality GOES and view th
 
 ## Preparing your system for Vitality GOES
 
-### Option 1: goestools
-To assist you in configuring goestools for Vitality GOES, sample `goesrecv.conf` and `goesproc-goesr.conf` files have been included in the configs folder of this repository. These files are pretty close to "stock" suggested files. You do not need to use these exact configs. You might want to remove sections you won't be using, and you'll need do do a "Find & Replace" to update the directory to where you want your GOES products stored. In the end, your setup should be configured as follows:
-
-* In goesproc-goesr.conf, image handlers should have the filename end in `{time:%Y%m%dT%H%M%SZ}`.
-* While all EMWIN information will be in the same folder, other product types should each have their own folder for best performance. For example, Channel 2 images should be in their own folder and not co-mingled with false color images.
-* If will be enabling EMWIN information in Vitality GOES, make sure you have the emwin handler enabled in `goesproc-goesr.conf`. Do not exclude text files in this handler.
-* If you plan on tracking satellite decoding statistics, make sure your `goesrecv.conf` file has a `statsd_address` defined where you are hosting Graphite/statsd. See [See the advanced configuration section](#advanced-configurations-for-goestools) for info on how to set up Graphite/statsd. You can configure this later.
-
-### Option 2: SatDump
+### Option 1: SatDump
 You can use SatDump as a data source without changing any of its configurations. While SatDump can be run interactively with a full UI, this is not recommended for long-term realtime decoding. Instead, you should launch satdump in cli mode for live decoding. Here is an example SatDump command to use an RTL-SDR to pick up GOES-16/18:
 
 ```
@@ -79,6 +69,14 @@ satdump live goes_hrit F:\path\to\satdumprepo --source rtlsdr --samplerate 2.4e6
 ```
 
 The `http_server` part is optional and is only needed to provide decoder/demodulator statistics to Vitality GOES. For more information, see [the config documentation](/docs/config.md#general).
+
+### Option 2: goestools
+To assist you in configuring goestools for Vitality GOES, sample `goesrecv.conf` and `goesproc-goesr.conf` files have been included in the configs folder of this repository. These files are pretty close to "stock" suggested files. You do not need to use these exact configs. You might want to remove sections you won't be using, and you'll need do do a "Find & Replace" to update the directory to where you want your GOES products stored. In the end, your setup should be configured as follows:
+
+* In goesproc-goesr.conf, image handlers should have the filename end in `{time:%Y%m%dT%H%M%SZ}`.
+* While all EMWIN information will be in the same folder, other product types should each have their own folder for best performance. For example, Channel 2 images should be in their own folder and not co-mingled with false color images.
+* If will be enabling EMWIN information in Vitality GOES, make sure you have the emwin handler enabled in `goesproc-goesr.conf`. Do not exclude text files in this handler.
+* If you plan on tracking satellite decoding statistics, make sure your `goesrecv.conf` file has a `statsd_address` defined where you are hosting Graphite/statsd. See [See the advanced configuration section](#advanced-configurations-for-goestools) for info on how to set up Graphite/statsd. You can configure this later.
 
 ### Option 3: XRIT Decoder
 Thanks to @abomb60, data from USA-Satcom's XRIT Decoder is supported as well.

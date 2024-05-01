@@ -139,16 +139,17 @@ The mode selected for an image tells Vitality GOES how to parse its filename. It
 The following filename parser modes are supported for use in the `mode` attribute of your category ini files:
 
 *Example Time: January 24, 2023 11:06:36 UTC*
-| Mode       | Timestamp Location        | Timestamp Format Example     | Filter matches any text...      | 
-| ---------- | ------------------------- | ---------------------------- | ------------------------------- |
-| begin      | Beginning of filename     | 20230124110636               | After the timestamp             |
-| beginu     | Beginning of filename     | 20230124_110636              | After the timestamp             |
-| beginz     | Beginning of filename     | 20230124T110636Z             | After the timestamp             |
-| emwin | In the middle of the filename as specified in the [EMWIN naming convention](https://www.weather.gov/emwin/format) | 20230124110636 | After the timestamp |
-| xrit | End of filename           | 202301241106                 | Before the timestamp            |
-| end        | End of filename           | 20230124110636               | Before the timestamp            |
-| endu       | End of filename           | 20230124_110636              | Before the timestamp            |
-| **endz**   | **End of filename**       | **20230124T110636Z**         | **Before the timestamp**        |
+| Mode          | Timestamp Location           | Timestamp Format Example     | Filter matches any text...      |
+| ------------- | ---------------------------- | ---------------------------- | ------------------------------- |
+| begin         | Beginning of filename        | 20230124110636               | After the timestamp             |
+| beginu        | Beginning of filename        | 20230124_110636              | After the timestamp             |
+| beginz        | Beginning of filename        | 20230124T110636Z             | After the timestamp             |
+| emwin         | In the middle of the filename as specified in the [EMWIN naming convention](https://www.weather.gov/emwin/format) | 20230124110636 | After the timestamp |
+| xrit          | End of filename              | 202301241106                 | Before the timestamp            |
+| end           | End of filename              | 20230124110636               | Before the timestamp            |
+| endu          | End of filename              | 20230124_110636              | Before the timestamp            |
+| satdump_geo   | Folder name holding the file | 2023-01-24_11-06-36          | At the end of the filename      |
+| **endz**      | **End of filename**          | **20230124T110636Z**         | **Before the timestamp**        |
 
 ## otheremwin.ini Configuration
 otheremwin.ini contains a list of one or more "selectors" that find and display EMWIN files based on their Eight-Character EMWIN file name (the last 8 characters before the file extension). If otheremwin.ini is not found, only Weather satellite TLEs, the EMWIN license file, and user-queried data (if configured) will be displayed.
