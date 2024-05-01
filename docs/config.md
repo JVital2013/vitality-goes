@@ -4,6 +4,8 @@ Configuration files should be placed in the `config` folder where Vitality GOES 
 
 Example configs for using goestools data source are prefixed with "goestools-", configs for SatDump are prefixed with "satdump-", and XRIT Decoder configs are prefixed with "xrit-".
 
+**Note:** The current SatDump configs are for SatDump 1.2.0 or greater. If you are using an older version of SatDump, use configs from [here](https://github.com/JVital2013/vitality-goes/tree/3c253c8cc12b61354541c3de10ee49a202d2d409/configs).
+
 ![Example Copy Configs](https://user-images.githubusercontent.com/24253715/213600531-dbd89150-309d-4695-b276-0df8e414ae55.png)
 
 Configurations are highly customizable and can be modified to fit your ground station. A typical configuration will consist of several ini files as described in the following sections. Any comments must begin with a semicolon (;).
