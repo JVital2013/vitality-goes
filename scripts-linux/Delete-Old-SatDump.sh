@@ -1,6 +1,6 @@
 #!/bin/bash
 source "$(dirname "$(readlink -fm "$0")")/scriptconfig.ini"
-twoWeeksAgoABI=$(date -u --date="-14 days" +"%Y%m%dT%H%M%SZ")
+twoWeeksAgoABI=$(date -u --date="-14 days" +"%Y-%m-%d_%H-%M-%S")
 twoWeeksAgoEMWIN=$(date -u --date="-14 days" +"%Y%m%d%H%M%S")
 twoWeeksAgoL2=$(date -u --date="-14 days" +"s%Y%j%H%M%S0")
 
@@ -32,18 +32,20 @@ do
 done
 
 #ABI Imagery
-for file in $(find $abiSrcDir/IMAGES/GOES-16 $abiSrcDir/IMAGES/GOES-18 -name "*" -type f)
+imageFiles=()
+mapfile -d $'\0' imageFiles < <(find $abiSrcDir/IMAGES/GOES-16 $abiSrcDir/IMAGES/GOES-18 $abiSrcDir/IMAGES/Himawari -name "*-*-*_*-*-*" -type d -print0 2>/dev/null)
+for file in "${imageFiles[@]}"
 do
-	datestr=$(echo $file | awk -F/ '{print $NF}' | awk -F_ '{print $NF}' | cut -d . -f 1)
+	datestr=$(basename "$file")
 	if [[ $datestr < $twoWeeksAgoABI ]]
 	then
 		echo "[$(date +"%Y-%m-%d %H:%M:%S")] Deleting $file..."
-		rm $file
+		rm -rf "$file"
 	fi
 done
 
 #L2 Imagery
-for file in $(ls $abiSrcDir/IMAGES/*.lrit.png)
+for file in $(ls $abiSrcDir/IMAGES/Unknown/*.lrit.*)
 do
 	datestr=$(echo $file | awk -F/ '{print $NF}' | cut -d _ -f 4)
 	if [[ $datestr < $twoWeeksAgoL2 ]]
