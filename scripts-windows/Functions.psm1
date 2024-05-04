@@ -22,6 +22,10 @@ Function Get-Config
             {
                 $ini[$section][$name] = $value.Trim()
                 $ini[$section][$name] = $value.Trim("`"'")
+                if($value.StartsWith("(") -and $value.EndsWith(")"))
+                {
+                    $ini[$section][$name] = [regex]::Split($value.Trim("()"), ' (?=(?:[^"]|"[^"]*")*$)')
+                }
             }
         }
     }

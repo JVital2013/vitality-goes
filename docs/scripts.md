@@ -16,14 +16,20 @@ Additional batch files for Windows can be found at [https://usradioguy.com/custo
 
 |           | Windows         | Linux         |
 |-----------|-----------------|---------------|
-| SatDump   | *Not Supported* | **Supported** |
+| SatDump   | *Supported*     | **Supported** |
 | Goestools | *Not Supported* | **Supported** |
 
-**Additional required Linux system packages:**  
+**Additional required Linux system packages:**
 ffmpeg, imagemagick
 
+**Additional required Windows programs:**
+ffmpeg
+
 **Set in scriptconfig.ini before running:**  
-`videoDir`, `abiSrcDir`, `abiImgSource`, and `abiVidName`. Additionally, `abiImgFilter` is required for the SatDump `abiImgFilter`.
+`videoDir`, `abiSrcDir`, `abiImgSource`, and `abiVidName`.
+
+- Additionally, `abiImgFilter` is required for SatDump.
+- Windows users must set `ffmpegBinary` to the full path of ffmpeg.exe (including the exe name) if ffmpeg.exe is not in their PATH.
 
 CreateVideos-ABI creates timelapse videos of ABI image products. Timelapses are rendered at 15 frames a second from midnight 1 week ago to midnight last night "satellite time". Videos are stored in `videoDir`, which should be the `videos/` folder of Vitality GOES so they can be viewed in the web client.
 
