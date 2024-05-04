@@ -1,7 +1,7 @@
 ﻿Import-Module "$PSScriptRoot\Functions.psm1"
 $config = Get-Config
 
-$twoWeeksAgo = $(Get-Date).AddDays(-4).ToUniversalTime()
+$twoWeeksAgo = $(Get-Date).AddDays(-14).ToUniversalTime()
 $twoWeeksAgoString = $twoWeeksAgo.ToString("yyyyMMddHms")
 $twoWeeksAgoL2 = "s" + $twoWeeksAgo.ToString("yyyy") + $twoWeeksAgo.DayOfYear.ToString("000") + $twoWeeksAgo.ToString("Hms") + 0
 
