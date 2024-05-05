@@ -220,8 +220,9 @@ The following software packages are included in Vitality GOES:
 ## Additional Resources
 Here are a few tools that may help you with picking up the HRIT/EMWIN Feed
 
-* [RTL-SDR Blog tutorial on GOES reception](https://www.rtl-sdr.com/rtl-sdr-com-goes-16-17-and-gk-2a-weather-satellite-reception-comprehensive-tutorial/): A good starting point for how to pick up geostationary weather satellites.
-* [USRadioGuy's GOES tutorial](https://usradioguy.com/programming-a-pi-for-goestools/): Another good tutorial to get you started with the GOES satellites
+* [USRadioGuy's SatDump Tutorial](https://usradioguy.com/receiving-goes-hrit-on-a-pi-with-satdump/): A good starting point for how to pick up geostationary weather satellites with SatDump.
+* [RTL-SDR Blog tutorial on GOES reception](https://www.rtl-sdr.com/rtl-sdr-com-goes-16-17-and-gk-2a-weather-satellite-reception-comprehensive-tutorial/): A good starting point for how to pick up geostationary weather satellites with goestools.
+* [USRadioGuy's goestools tutorial](https://usradioguy.com/programming-a-pi-for-goestools/): Another good tutorial to get you started with the GOES satellites
 * [goesrecv-monitor](https://vksdr.com/goesrecv-monitor): Goesrecv monitor is a software utility for monitoring the status of goesrecv by Pieter Noordhuis. Provides a constellation diagram of the BPSK signal along with real-time decoding statistics.
 * [goesbetween](https://github.com/JVital2013/goesbetween): Connects to goesrecv, extracts raw IQ samples from it, and sends the samples over the network via rtl_tcp. Clients like GNURadio, SDR#, SDR++, and SatDump can connect to GoesBetween to monitor the spectrum around your satellite downlink, do parallel decoding via SatDump, and more!
 * [goesrecv-ps](https://github.com/JVital2013/goesrecv-ps): a collection of PowerShell scripts for monitoring goesrecv. Contains scripts to make a baseband recording of the HRIT/EMWIN signal and monitor Virtual Channel activity.
