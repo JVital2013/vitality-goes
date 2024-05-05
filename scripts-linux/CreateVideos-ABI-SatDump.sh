@@ -72,6 +72,7 @@ do
 
 	# Generate MP4
 	rm $videoDir/$currentName.mp4 > /dev/null 2>&1
-	ffmpeg -hide_banner -loglevel error -framerate 15 -pattern_type glob -i '/tmp/abi/*.jpg' -vf 'pad=width=ceil(iw/2)*2:height=ceil(ih/2)*2,minterpolate=fps=60:mi_mode=blend:me_mode=bidir:mc_mode=obmc:me=ds:vsbmc=1' -c:v libx264 -crf 20 -pix_fmt yuv420p $videoDir/$currentName.mp4
+
+	ffmpeg -hide_banner -loglevel error -framerate 15 -pattern_type glob -i "/tmp/abi/*.$extension" -vf 'pad=width=ceil(iw/2)*2:height=ceil(ih/2)*2,minterpolate=fps=60:mi_mode=blend:me_mode=bidir:mc_mode=obmc:me=ds:vsbmc=1' -c:v libx264 -crf 20 -pix_fmt yuv420p $videoDir/$currentName.mp4
 	i=$((i+1))
 done
