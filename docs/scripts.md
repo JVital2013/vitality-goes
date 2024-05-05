@@ -14,7 +14,7 @@ Scripts for Linux hosts and are included in the [scripts-linux/](/scripts-linux/
 
 |           | Windows         | Linux         |
 |-----------|-----------------|---------------|
-| SatDump   | *Supported*     | **Supported** |
+| SatDump   | **Supported**   | **Supported** |
 | Goestools | *Not Supported* | **Supported** |
 
 **Additional required Linux system packages:**
@@ -41,10 +41,10 @@ To setup this script, it's important to understand how the `abiImgSource`, `abiI
 
 ### CreateVideos-EMWIN
 
-|           | Windows     | Linux         |
-|-----------|-------------|---------------|
-| SatDump   | *Supported* | **Supported** |
-| Goestools | *Supported* | **Supported** |
+|           | Windows       | Linux         |
+|-----------|---------------|---------------|
+| SatDump   | **Supported** | **Supported** |
+| Goestools | **Supported** | **Supported** |
 
 **Additional required Windows/Linux Programs:**
 ffmpeg
