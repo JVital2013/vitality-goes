@@ -25,9 +25,9 @@ if($config.abiImgSource.Count -ne $config.abiImgFilter.Count -or $config.abiImgS
 
 $oneWeekAgo = $(Get-Date).AddDays(-7).ToUniversalTime()
 $oneWeekAgoString = $oneWeekAgo.ToString("yyyyMMdd")
-$oneWeekAgoString += "040000"
+$oneWeekAgoString += "050000"
 $endTimeString = $(Get-Date).ToUniversalTime().ToString("yyyyMMdd")
-$endTimeString += "035959"
+$endTimeString += "045959"
 
 for($i = 0; $i -lt $config.abiImgSource.Count; $i++)
 {
@@ -83,4 +83,3 @@ for($i = 0; $i -lt $config.abiImgSource.Count; $i++)
 }
 
 Remove-Item -Recurse -Force $env:TEMP\abi -ErrorAction SilentlyContinue | Out-Null
-mkdir $env:TEMP\abi | Out-Null

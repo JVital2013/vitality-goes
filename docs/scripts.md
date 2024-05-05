@@ -6,9 +6,7 @@ Vitality GOES comes with a number of scripts to enhance and extend its functiona
 
 **To get started,** copy `scriptconfig.ini` from the sample config folder you're using into the `scripts-*/` folder you're using. Then, update all pertinent values. See each script's documentation for what's needed. Unlike the ini files for Vitality GOES itself, you need to make sure there are no spaces around the equal sign (=). Also, comments should start with a #.
 
-Scripts for Linux hosts and are included in the [scripts-linux/](/scripts-linux/) folder, while scripts for Windows are in [/scripts-windows/](/scripts-windows/). See below for each scripts' compatibility matrix and dependencies; the Windows scripts have no additional dependencies.
-
-Additional batch files for Windows can be found at [https://usradioguy.com/custom-imagery-scripts-for-goes/](https://usradioguy.com/custom-imagery-scripts-for-goes/). Over there you can find video rendering scripts for Windows, which is currently not available from this project.
+Scripts for Linux hosts and are included in the [scripts-linux/](/scripts-linux/) folder, while scripts for Windows are in [/scripts-windows/](/scripts-windows/). See below for each scripts' compatibility matrix and dependencies.
 
 ## Timelapse scripts
 
@@ -43,24 +41,25 @@ To setup this script, it's important to understand how the `abiImgSource`, `abiI
 
 ### CreateVideos-EMWIN
 
-|           | Windows         | Linux           |
-|-----------|-----------------|-----------------|
-| SatDump   | *Not Supported* | **Supported**   |
-| Goestools | *Not Supported* | **Supported**   |
+|           | Windows     | Linux         |
+|-----------|-------------|---------------|
+| SatDump   | *Supported* | **Supported** |
+| Goestools | *Supported* | **Supported** |
 
-**Additional required Linux system packages:**  
+**Additional required Windows/Linux Programs:**
 ffmpeg
 
 **Set in scriptconfig.ini before running:**  
-`videoDir`, `emwinSrcDir`, `emwinCodeName`, `emwinVideoName`, and `emwinFileExt`
+`videoDir`, `emwinSrcDir`, `emwinCodeName`, and `emwinVideoName`
+
+- Windows users must set `ffmpegBinary` to the full path of ffmpeg.exe (including the exe name) if ffmpeg.exe is not in their PATH.
 
 CreateVideos-EMWIN creates timelapse videos of EMWIN image products. Timelapses are rendered at 15 frames a second from 1 week ago to the most recent image. Videos are stored in `videoDir`, which should be the `videos/` folder of Vitality GOES so they can be viewed in the web client.
 
-To setup this script, it's important to understand how the `emwinCodeName`, `emwinVideoName`, and `emwinFileExt` variables interact with each other. These variables are arrays, and each of the arrays are "lined up" with each other. For example, the first element in `emwinCodeName`, `emwinVideoName`, and `emwinFileExt` are the configs for the first video. The second element of each array is the config for the next video, the third element of each array is the config for the third video, and so on.
+To setup this script, it's important to understand how the `emwinCodeName` and `emwinVideoName` variables interact with each other. These variables are arrays, and each of the arrays are "lined up" with each other. For example, the first element in `emwinCodeName` and `emwinVideoName` are the configs for the first video. The second element of each array is the config for the next video, the third element of each array is the config for the third video, and so on.
 
 * `emwinCodeName`: Specifies the EMWIN file name of the frames for each video. This should be similar to [`path` in your emwin.ini config file](config.md#emwinini), just without the file extension
 * `emwinVideoName`: Specifies the name of the MP4 you want to create, without the MP4 extension. Other than the missing extension, this should match the [`videoPath` in your emwin.ini config files](config.md#emwinini).
-* `emwinFileExt`: Specifies the file format of the source frames. This should match the extension of the source frames
 
 ## Other Scripts
 
