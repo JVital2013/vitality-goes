@@ -39,7 +39,7 @@ Sample configurations are provided for the following satellite/station setups:
 | GOES-16 and 18 HRIT   | goestools, SatDump, and XRIT Decoder |
 | EWS-G1 (GOES-13) GVAR | SatDump                              |
 | FengYun-2x S-VISSR    | SatDump                              |
-| GEO-KOMPSAT 2A LRIT   | xrit-rx or SatDump                   |
+| GEO-KOMPSAT 2A        | xrit-rx or SatDump                   |
 
 ### How does it work?
 
