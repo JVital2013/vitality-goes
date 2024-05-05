@@ -18,7 +18,7 @@ Function Get-Config
         "^\s*([^#].+?)\s*=\s*(.*)"
         {
             $name,$value = $matches[1..2]
-            if (!($name.StartsWith(";")))
+            if (!($name.StartsWith("#")))
             {
                 $ini[$section][$name] = $value.Trim()
                 $ini[$section][$name] = $value.Trim("`"'")
