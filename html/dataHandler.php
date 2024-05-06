@@ -455,7 +455,7 @@ elseif($_GET['type'] == "metadata")
 			
 			//CPU Load
 			$loadAvg = sys_getloadavg();
-			$metadata['sysData'][] = array("name" => "CPU Load (1min, 5min, 15min)", "value" => $loadAvg[0] . ", " . $loadAvg[1] . ", " . $loadAvg[2]);
+			$metadata['sysData'][] = array("name" => "CPU Load (1min, 5min, 15min)", "value" => round($loadAvg[0], 2) . ", " . round($loadAvg[1], 2) . ", " . round($loadAvg[2], 2));
 			
 			//Memory Usage (parsed later)
 			$memFile = fopen('/proc/meminfo','r');
@@ -607,6 +607,10 @@ elseif($_GET['type'] == "metadata")
 		
 		switch($config['categories'][$_GET['id']]['data'][$_GET['subid']]['mode'])
 		{
+			case "satdump_geo":
+				$regex = "/(\\\\|\/)(?<date>[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}-[0-9]{2}-[0-9]{2})(\\\\|\/)[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}\..{3}$/i";
+				$dateFormat = "Y-m-d_H-i-s";
+				break;
 			case "begin":
 				$regex = "/(\\\\|\/)(?<date>[0-9]{14})[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
 				$dateFormat = "YmdHis";
@@ -678,6 +682,9 @@ elseif($_GET['type'] == "data")
 	
 	switch($config['categories'][$_GET['id']]['data'][$_GET['subid']]['mode'])
 	{
+		case "satdump_geo":
+			$regex = "/(\\\\|\/)" . $DateTime->format('Y-m-d_H-i-s') . "(\\\\|\/)[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}\..{3}$/i";
+			break;
 		case "begin":
 			$regex = "/(\\\\|\/)" . $DateTime->format('YmdHis') . "[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
 			break;

@@ -18,10 +18,14 @@ Function Get-Config
         "^\s*([^#].+?)\s*=\s*(.*)"
         {
             $name,$value = $matches[1..2]
-            if (!($name.StartsWith(";")))
+            if (!($name.StartsWith("#")))
             {
                 $ini[$section][$name] = $value.Trim()
                 $ini[$section][$name] = $value.Trim("`"'")
+                if($value.StartsWith("(") -and $value.EndsWith(")"))
+                {
+                    $ini[$section][$name] = [regex]::Split($value.Trim("()"), ' (?=(?:[^"]|"[^"]*")*$)')
+                }
             }
         }
     }

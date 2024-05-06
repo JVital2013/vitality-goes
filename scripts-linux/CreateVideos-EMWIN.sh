@@ -8,9 +8,9 @@ fi
 source "$(dirname "$(readlink -fm "$0")")/scriptconfig.ini"
 
 #Verify Config is valid
-if [[ ${#emwinCodeName[@]} -ne ${#emwinVideoName[@]} || ${#emwinCodeName[@]} -ne ${#emwinFileExt[@]} ]]
+if [[ ${#emwinCodeName[@]} -ne ${#emwinVideoName[@]} ]]
 then
-	echo "emwinCodeName, emwinVideoName, and emwinFileExt must have the same number of elements in scriptconfig.ini"
+	echo "emwinCodeName and emwinVideoName must have the same number of elements in scriptconfig.ini"
 	exit
 fi
 
@@ -27,7 +27,7 @@ do
 	rm /tmp/emwin.txt > /dev/null 2>&1
 	for dateStamp in `seq $oneDayStartTime $oneDayEndTime`
 	do
-		find "$emwinSrcDir" -type f -name "*_$dateStamp*${emwinCodeName[$i]}.${emwinFileExt[$i]}" | sed -r 's/.*\/[A-Z]_[A-Z0-9]{16}_[A-Z]_[A-Z]{4}_([0-9]{14})_[0-9]{6}\-[0-9]\-[A-Z0-9]{8}\.[A-Z0-9]{3}/\1 &/' | sort | sed -r "s/[0-9]{14} (.*)/file '\1'\nduration 0.0666667/" >> /tmp/emwin.txt
+		find "$emwinSrcDir" -type f -name "*_$dateStamp*${emwinCodeName[$i]}*" | sed -r 's/.*\/[A-Z]_[A-Z0-9]{16}_[A-Z]_[A-Z]{4}_([0-9]{14})_[0-9]{6}\-[0-9]\-[A-Z0-9]{8}\.[A-Z0-9]{3}/\1 &/' | sort | sed -r "s/[0-9]{14} (.*)/file '\1'\nduration 0.0666667/" >> /tmp/emwin.txt
 	done
 	
 	#Generate MP4
