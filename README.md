@@ -122,6 +122,16 @@ to this:
 </Directory>
 ```
 
+Finally, you need to make sure Apache has read access to your satellite data. There are two ways to do this. If your data is somewhere in your user folder (ex. /home/pi), you can give the `www-data` user access to your user folder. To do so, run these commands (replacing pi with your username):
+
+```bash
+sudo usermod -a -G pi www-data
+chmod 0750 /home/pi
+sudo systemctl restart apache2
+```
+
+The other option is to configure your receiving program to save your data elsewhere (ex, /var/lib/satdata), and set your permissions as appropriate.
+
 #### Windows
 The easiest way to host Vitality GOES on a Windows box is to use XAMPP ([https://www.apachefriends.org/](https://www.apachefriends.org/)). Download and install this software. When prompted, the only parts that are needed are Apache and PHP. Don't forget to start the Apache service in the XAMPP control panel before continuing.
 
