@@ -37,4 +37,5 @@ do
 	i=$((i+1))
 done
 
+rm -f /tmp/emwin.txt
 echo "[$(date +"%Y-%m-%d %H:%M:%S")] Done!"
