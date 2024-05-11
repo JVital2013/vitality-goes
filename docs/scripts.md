@@ -143,8 +143,8 @@ Run manually as needed.
 Linux systems allow you to schedule tasks by creating a file under `/etc/cron.d/` with a list of tasks to execute. Here's how I have my cron file set up, at `/etc/cron.d/goes`:
 
 ```
-0 0 * * * youruser /path/to/vitality-goes/scripts/CreateVideos-ABI.sh
-0 2 * * * youruser /path/to/vitality-goes/scripts/CreateVideos-EMWIN.sh
-55 11 * * * youruser /path/to/vitality-goes/scripts/Cleanup-EmwinText.sh
-25,55 2-23 * * * youruser /path/to/vitality-goes/scripts/Sanchez.sh
+0 0 * * * youruser bash -lc /path/to/vitality-goes/scripts/CreateVideos-ABI.sh
+0 2 * * * youruser bash -lc /path/to/vitality-goes/scripts/CreateVideos-EMWIN.sh
+55 11 * * * youruser bash -lc /path/to/vitality-goes/scripts/Cleanup-EmwinText.sh
+25,55 2-23 * * * youruser bash -lc /path/to/vitality-goes/scripts/Sanchez.sh
 ```
