@@ -12,18 +12,19 @@ Active alerts and warnings will show at the top of the Current Weather tab, if t
 Weather watches are included at the top of the Zone Forecast Product (GOES-N name - `ZFP*****.TXT`). These warnings are teal at the top of the Current Weather Screen
 
 ### Weather Warning
-The following weather warnings are parsed and included at the top of the page Current Weather screen in red. The full text of these alerts are displayed. The geofencing information is parsed, which Vitality GOES checks against your configured latitude/longitude to see if you're within the warning area. It will also look for the `UNTIL` line so it can properly hide expired alerts.
+The following weather warnings are parsed and included at the top of the page Current Weather screen in red. The full text of these alerts are displayed. The geofencing information is parsed, which Vitality GOES checks against your configured latitude/longitude to see if you're within the warning area. It will also look for the `UNTIL` line so it can properly hide expired alerts. Note: SPS works slightly different on the backend, but it displays the same as other weather alerts.
 
-| GOES-N Filename part | Type of Warning      | 
-|----------------------|----------------------|
-| SQW*****.TXT         | Snow Squall          |
-| DSW*****.TXT         | Dust Storm           |
-| FRW*****.TXT         | Fire Weather         |
-| FFW*****.TXT         | Flash Flood          |
-| FLW*****.TXT         | Flood Warning        |
-| SVR*****.TXT         | Thunderstorms        |
-| TOR*****.TXT         | Tornado Warning      |
-| EWW*****.TXT         | Extreme Wind Warning |
+| GOES-N Filename part | Type of Warning            |
+|----------------------|----------------------------|
+| SQW*****.TXT         | Snow Squall                |
+| DSW*****.TXT         | Dust Storm                 |
+| FRW*****.TXT         | Fire Weather               |
+| FFW*****.TXT         | Flash Flood                |
+| FLW*****.TXT         | Flood Warning              |
+| SPS*****.TXT         | Special Weather Statements |
+| SVR*****.TXT         | Thunderstorms              |
+| TOR*****.TXT         | Tornado Warning            |
+| EWW*****.TXT         | Extreme Wind Warning       |
 
 ### Local Emergencies
 A number of local non-weather-related emergencies are broadcast across EMWIN and are shown at the top of the current weather screen. The full text of these alerts are shown. All alerts on disk for the state you are in are shown.

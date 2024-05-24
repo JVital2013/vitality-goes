@@ -881,6 +881,7 @@ elseif($_GET['type'] == "alertJSON")
 	
 	//Find pertinent files
 	$wwFiles = preg_grep("/-(SQW|DSW|FRW|FFW|FLW|SVR|TOR|EWW)" . $currentSettings[$selectedProfile]['orig'] . "\.TXT$/i", $allEmwinFiles);
+	$spsFiles = preg_grep("/-SPS" . $currentSettings[$selectedProfile]['orig'] . "\.TXT$/i", $allEmwinFiles);
 	$hlsFiles = preg_grep("/-HLS.*" . $currentSettings[$selectedProfile]['orig'] . "\.TXT$/i", $allEmwinFiles);
 	$laeFiles = preg_grep("/-LAE.*$alertStateAbbrs\.TXT$/i", $allEmwinFiles);
 	$bluFiles = preg_grep("/-BLU.*$alertStateAbbrs\.TXT$/i", $allEmwinFiles);
@@ -995,6 +996,94 @@ elseif($_GET['type'] == "alertJSON")
 		
 		//Geolocation and time limits checked out OK; send warning to client
 		$returnData['weatherWarnings'][] = "<b>Alert type: </b>$alertType<br />" .
+			"<b>Issued By: </b>$issuingOffice<br />" .
+			"<b>Issue Time: </b>$issueTime<br />" .
+			linesToParagraphs(array_slice($weatherData, $messageStart, $messageEnd - $messageStart + 1), 0)[0];
+	}
+	
+	//Special Weather Statements
+	foreach($spsFiles as $thisFile)
+	{
+		$weatherData = file($thisFile);
+		$messageStart = $messageEnd = 0;
+		$expireTime = -1;
+		$issuingOffice = $issueTime = "";
+		$geoLat = [];
+		$geoLon = [];
+		
+		for($i = 0; $i < count($weatherData); $i++)
+		{
+			//Get header information
+			if($messageStart == 0 && stripos($weatherData[$i], "Special Weather Statement") === 0)
+			{
+				$issuingOffice = trim($weatherData[++$i]);
+				$issueTime = trim($weatherData[++$i]);
+				continue;
+			}
+			
+			if($messageStart == 0 && $issueTime != "" && $expireTime == -1 && preg_match("/([0-9]{6})-$/", trim($weatherData[$i]), $expireTimeStr))
+			{
+				//Get Issue Date
+				preg_match("/^(?<time>[0-9]* [A-Z]*)(?<timezone>\s+[A-Z]*\s+)(?<date>.*)$/i", $issueTime, $timeParts);
+				$timeParts['time'] = substr_replace($timeParts['time'], ":", -5, 0);
+				$timestampFormatter = new DateTime($timeParts['date'] . ' ' . $timeParts['time'], new DateTimeZone(trim($timeParts['timezone'])));
+				$timestampFormatter->setTimezone(new DateTimeZone("UTC"));
+				
+				//Based on issue date, get expire date
+				$monthOffset = 0;
+				$expireDate = intval(substr($expireTimeStr[1], 0, 2));
+				if($expireDate < intval($timestampFormatter->format('j'))) $monthOffset = 1;
+				$timestampFormatter->setDate($timestampFormatter->format('Y'), intval($timestampFormatter->format('n')) + $monthOffset, $expireDate);
+				$timestampFormatter->setTime(substr($expireTimeStr[1], 2, 2), substr($expireTimeStr[1], 4, 2));
+				$expireTime = $timestampFormatter->getTimestamp();
+				continue;
+			}
+			
+			//Find second timestamp
+			if($messageStart == 0 && $issueTime != "" && stripos($weatherData[$i], $issueTime) !== false)
+			{
+				$messageStart = $i + 2;
+				continue;
+			}
+			
+			//Get end of message
+			if(trim($weatherData[$i]) == "&&")
+			{
+				$messageEnd = $i - 1;
+				continue;
+			}
+			
+			//Get geofencing of warning
+			if(stripos($weatherData[$i], "LAT...LON") === 0)
+			{
+				$nextString = trim(str_replace("LAT...LON", "", $weatherData[$i]));
+				while(preg_match("/^[0-9]{4} [0-9]{4,5}/", $nextString))
+				{
+					$cordParts = explode(" ", $nextString);
+					for($j = 0; $j < count($cordParts); $j++)
+					{
+						$geoLat[] = $cordParts[$j] / 100;
+						$geoLon[] = -($cordParts[++$j] / 100);
+					}
+					$nextString = trim($weatherData[++$i]);
+				}
+				continue;
+			}
+			
+			//Get real end of message
+			if(trim($weatherData[$i]) == "$$")
+			{
+				if($messageEnd == 0) $messageEnd = $i - 1;
+				break;
+			}
+		}
+		
+		if(time() > $expireTime || (count($geoLat) > 0 && array_key_exists('lat', $currentSettings[$selectedProfile]) && 
+			array_key_exists('lon', $currentSettings[$selectedProfile]) && !is_in_polygon(count($geoLat) - 1, $geoLon, $geoLat,
+			$currentSettings[$selectedProfile]['lon'], $currentSettings[$selectedProfile]['lat']))) continue;
+			
+		//If we got here, the SPS is valid. Display it
+		$returnData['weatherWarnings'][] = "<b>Alert type: </b>Special Weather Statement<br />" .
 			"<b>Issued By: </b>$issuingOffice<br />" .
 			"<b>Issue Time: </b>$issueTime<br />" .
 			linesToParagraphs(array_slice($weatherData, $messageStart, $messageEnd - $messageStart + 1), 0)[0];
