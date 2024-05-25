@@ -332,6 +332,51 @@ function findMetadataEMWIN($allEmwinFiles, $product)
 	return $retVal;
 }
 
+function getFormatByMode($mode, $filter)
+{
+	switch($mode)
+	{
+		case "satdump_geo":
+			$regex = "/(\\\\|\/)(?<date>[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}-[0-9]{2}-[0-9]{2})(\\\\|\/)[^\\\\\/]*{$filter}\..{3}$/i";
+			$dateFormat = "Y-m-d_H-i-s";
+			break;
+		case "begin":
+			$regex = "/(\\\\|\/)(?<date>[0-9]{14})[^\\\\\/]*{$filter}[^\\\\\/]*\..{3}$/i";
+			$dateFormat = "YmdHis";
+			break;
+		case "beginu":
+			$regex = "/(\\\\|\/)(?<date>[0-9]{8}_[0-9]{6})[^\\\\\/]*{$filter}[^\\\\\/]*\..{3}$/i";
+			$dateFormat = "Ymd_His";
+			break;
+		case "beginz":
+			$regex = "/(\\\\|\/)(?<date>[0-9]{8}T[0-9]{6}Z)[^\\\\\/]*{$filter}[^\\\\\/]*\..{3}$/i";
+			$dateFormat = "Ymd\THis\Z";
+			break;
+		case "xrit":
+			$regex = "/{$filter}[^\\\\\/]*(?<date>[0-9]{12})\..{3}$/i";
+			$dateFormat = "YmdHi";
+			break;
+		case "emwin":
+			$regex = "/_(?<date>[0-9]{14})_[^\\\\\/]*{$filter}[^\\\\\/]*\..{3}$/i";
+			$dateFormat = "YmdHis";
+			break;
+		case "end":
+			$regex = "/{$filter}[^\\\\\/]*(?<date>[0-9]{14})\..{3}$/i";
+			$dateFormat = "YmdHis";
+			break;
+		case "endu":
+			$regex = "/{$filter}[^\\\\\/]*(?<date>[0-9]{8}_[0-9]{6})\..{3}$/i";
+			$dateFormat = "Ymd_His";
+			break;
+		case "endz":
+			$regex = "/{$filter}[^\\\\\/]*(?<date>[0-9]{8}T[0-9]{6}Z)\..{3}$/i";
+			$dateFormat = "Ymd\THis\Z";
+			break;
+		default: die("Invalid server config: $mode is not a valid file parser mode!"); break;
+	}
+	return array("regex" => $regex, "dateFormat" => $dateFormat);
+}
+
 function linesToParagraphs($lineArray, $linesToSkip)
 {
 	$startingParagraph = $startingSection = false;

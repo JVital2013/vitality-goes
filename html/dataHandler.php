@@ -605,53 +605,13 @@ elseif($_GET['type'] == "metadata")
 		$metadata['title'] = $config['categories'][$_GET['id']]['data'][$_GET['subid']]['title'];
 		$metadata['images'] = [];
 		
-		switch($config['categories'][$_GET['id']]['data'][$_GET['subid']]['mode'])
-		{
-			case "satdump_geo":
-				$regex = "/(\\\\|\/)(?<date>[0-9]{4}-[0-9]{2}-[0-9]{2}_[0-9]{2}-[0-9]{2}-[0-9]{2})(\\\\|\/)[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}\..{3}$/i";
-				$dateFormat = "Y-m-d_H-i-s";
-				break;
-			case "begin":
-				$regex = "/(\\\\|\/)(?<date>[0-9]{14})[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
-				$dateFormat = "YmdHis";
-				break;
-			case "beginu":
-				$regex = "/(\\\\|\/)(?<date>[0-9]{8}_[0-9]{6})[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
-				$dateFormat = "Ymd_His";
-				break;
-			case "beginz":
-				$regex = "/(\\\\|\/)(?<date>[0-9]{8}T[0-9]{6}Z)[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
-				$dateFormat = "Ymd\THis\Z";
-				break;
-			case "xrit":
-				$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*(?<date>[0-9]{12})\..{3}$/i";
-				$dateFormat = "YmdHi";
-				break;
-			case "emwin":
-				$regex = "/_(?<date>[0-9]{14})_[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
-				$dateFormat = "YmdHis";
-				break;
-			case "end":
-				$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*(?<date>[0-9]{14})\..{3}$/i";
-				$dateFormat = "YmdHis";
-				break;
-			case "endu":
-				$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*(?<date>[0-9]{8}_[0-9]{6})\..{3}$/i";
-				$dateFormat = "Ymd_His";
-				break;
-			case "endz":
-				$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*(?<date>[0-9]{8}T[0-9]{6}Z)\..{3}$/i";
-				$dateFormat = "Ymd\THis\Z";
-				break;
-			default: die("Invalid server config: " . $config['categories'][$_GET['id']]['data'][$_GET['subid']]['mode'] . "is not a valid file parser mode!"); break;
-		}
-		
+		$formatInfo = getFormatByMode($config['categories'][$_GET['id']]['data'][$_GET['subid']]['mode'], $config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']);
 		$fileList = scandir_recursive($config['categories'][$_GET['id']]['data'][$_GET['subid']]['path'], $config['categories'][$_GET['id']]['data'][$_GET['subid']]['fast']);
-		$refinedList = preg_grep($regex, $fileList);
+		$refinedList = preg_grep($formatInfo["regex"], $fileList);
 		foreach($refinedList as $file)
 		{
-			preg_match($regex, $file, $regexMatches);
-			$DateTime = DateTime::createFromFormat($dateFormat, $regexMatches['date'], new DateTimeZone("UTC"));
+			preg_match($formatInfo["regex"], $file, $regexMatches);
+			$DateTime = DateTime::createFromFormat($formatInfo["dateFormat"], $regexMatches['date'], new DateTimeZone("UTC"));
 			if($DateTime === false) continue;
 			
 			$DateTime->setTimezone(new DateTimeZone(date_default_timezone_get()));
@@ -673,53 +633,80 @@ elseif($_GET['type'] == "data")
 	if(!array_key_exists('id', $_GET) ||
 		!array_key_exists($_GET['id'], $config['categories']) ||
 		!array_key_exists('subid', $_GET) ||
-		!array_key_exists($_GET['subid'], $config['categories'][$_GET['id']]['data']) ||
-		!array_key_exists('timestamp', $_GET))
+		!array_key_exists($_GET['subid'], $config['categories'][$_GET['id']]['data']))
 		die();
 		
-	$DateTime = new DateTime("now", new DateTimeZone("UTC"));
-	$DateTime->setTimestamp($_GET['timestamp']);
-	
-	switch($config['categories'][$_GET['id']]['data'][$_GET['subid']]['mode'])
+	//Get image at requested timestamp
+	if(array_key_exists('timestamp', $_GET))
 	{
-		case "satdump_geo":
-			$regex = "/(\\\\|\/)" . $DateTime->format('Y-m-d_H-i-s') . "(\\\\|\/)[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}\..{3}$/i";
-			break;
-		case "begin":
-			$regex = "/(\\\\|\/)" . $DateTime->format('YmdHis') . "[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
-			break;
-		case "beginu":
-			$regex = "/(\\\\|\/)" . $DateTime->format('Ymd_His') . "[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
-			break;
-		case "beginz":
-			$regex = "/(\\\\|\/)" . $DateTime->format('Ymd\THis\Z') . "[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
-			break;
-		case "emwin":
-			$regex = "/_" . $DateTime->format('YmdHis') . "_[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
-			break;
-		case "xrit":
-			$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*" . $DateTime->format('YmdHi') . "\..{3}$/i";
-			break;
-		case "end":
-			$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*" . $DateTime->format('YmdHis') . "\..{3}$/i";
-			break;
-		case "endu":
-			$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*" . $DateTime->format('Ymd_His') . "\..{3}$/i";
-			break;
-		case "endz":
-			$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*" . $DateTime->format('Ymd\THis\Z') . "\..{3}$/i";
-			break;
-		default: die(); break;
-	}
+		$DateTime = new DateTime("now", new DateTimeZone("UTC"));
+		$DateTime->setTimestamp($_GET['timestamp']);
+		
+		switch($config['categories'][$_GET['id']]['data'][$_GET['subid']]['mode'])
+		{
+			case "satdump_geo":
+				$regex = "/(\\\\|\/)" . $DateTime->format('Y-m-d_H-i-s') . "(\\\\|\/)[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}\..{3}$/i";
+				break;
+			case "begin":
+				$regex = "/(\\\\|\/)" . $DateTime->format('YmdHis') . "[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
+				break;
+			case "beginu":
+				$regex = "/(\\\\|\/)" . $DateTime->format('Ymd_His') . "[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
+				break;
+			case "beginz":
+				$regex = "/(\\\\|\/)" . $DateTime->format('Ymd\THis\Z') . "[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
+				break;
+			case "emwin":
+				$regex = "/_" . $DateTime->format('YmdHis') . "_[^\\\\\/]*{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*\..{3}$/i";
+				break;
+			case "xrit":
+				$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*" . $DateTime->format('YmdHi') . "\..{3}$/i";
+				break;
+			case "end":
+				$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*" . $DateTime->format('YmdHis') . "\..{3}$/i";
+				break;
+			case "endu":
+				$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*" . $DateTime->format('Ymd_His') . "\..{3}$/i";
+				break;
+			case "endz":
+				$regex = "/{$config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']}[^\\\\\/]*" . $DateTime->format('Ymd\THis\Z') . "\..{3}$/i";
+				break;
+			default: die(); break;
+		}
 
-	$fileList = scandir_recursive($config['categories'][$_GET['id']]['data'][$_GET['subid']]['path'], $config['categories'][$_GET['id']]['data'][$_GET['subid']]['fast']);
-	$refinedList = array_values(preg_grep($regex, $fileList));
-	if($refinedList === false || count($refinedList) == 0) die();
+		$fileList = scandir_recursive($config['categories'][$_GET['id']]['data'][$_GET['subid']]['path'], $config['categories'][$_GET['id']]['data'][$_GET['subid']]['fast']);
+		$refinedList = array_values(preg_grep($regex, $fileList));
+		if($refinedList === false || count($refinedList) == 0) die();
+		$returnImage = $refinedList[0];
+	}
 	
-	header('Content-Type: ' . mime_content_type($refinedList[0]));
-	header('Content-Disposition: inline; filename=' . basename($refinedList[0]));
-	header('Content-Length: ' . filesize($refinedList[0]));
-	readfile($refinedList[0]);
+	//Get newest image
+	else
+	{
+		$formatInfo = getFormatByMode($config['categories'][$_GET['id']]['data'][$_GET['subid']]['mode'], $config['categories'][$_GET['id']]['data'][$_GET['subid']]['filter']);
+		$fileList = scandir_recursive($config['categories'][$_GET['id']]['data'][$_GET['subid']]['path'], $config['categories'][$_GET['id']]['data'][$_GET['subid']]['fast']);
+		$refinedList = array_values(preg_grep($formatInfo["regex"], $fileList));
+		if($refinedList === false || count($refinedList) == 0) die();
+		
+		$newestTimestamp = $newest = 0;
+		for($i = 0; $i < count($refinedList); $i++)
+		{
+			preg_match($formatInfo["regex"], $refinedList[$i], $regexMatches);
+			$DateTime = DateTime::createFromFormat($formatInfo["dateFormat"], $regexMatches['date'], new DateTimeZone("UTC"));
+			if($DateTime === false) continue;
+			if($DateTime->getTimestamp() > $newestTimestamp)
+			{
+				$newest = $i;
+				$newestTimestamp = $DateTime->getTimestamp();
+			}
+		}
+		$returnImage = $refinedList[$newest];
+	}
+	
+	header('Content-Type: ' . mime_content_type($returnImage));
+	header('Content-Disposition: inline; filename=' . basename($returnImage));
+	header('Content-Length: ' . filesize($returnImage));
+	readfile($returnImage);
 }
 elseif($_GET['type'] == "hurricaneData")
 {
