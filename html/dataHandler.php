@@ -1078,8 +1078,9 @@ elseif($_GET['type'] == "alertJSON")
 			}
 		}
 		
-		if(time() > $expireTime || (count($geoLat) > 0 && array_key_exists('lat', $currentSettings[$selectedProfile]) && 
-			array_key_exists('lon', $currentSettings[$selectedProfile]) && !is_in_polygon(count($geoLat) - 1, $geoLon, $geoLat,
+		if($messageStart == 0 || $messageEnd == 0 || time() > $expireTime || (count($geoLat) > 0 &&
+			array_key_exists('lat', $currentSettings[$selectedProfile]) && array_key_exists('lon',
+			$currentSettings[$selectedProfile]) && !is_in_polygon(count($geoLat) - 1, $geoLon, $geoLat,
 			$currentSettings[$selectedProfile]['lon'], $currentSettings[$selectedProfile]['lat']))) continue;
 			
 		//If we got here, the SPS is valid. Display it

@@ -244,7 +244,7 @@ function scandir_recursive($dir, $fast)
 
 function sortByTimestamp($a, $b)
 {
-    return $a['timestamp'] - $b['timestamp'];
+	return $a['timestamp'] - $b['timestamp'];
 }
 
 function sortOrig($a, $b)
@@ -393,6 +393,13 @@ function linesToParagraphs($lineArray, $linesToSkip)
 
 function is_in_polygon($points_polygon, $vertices_x, $vertices_y, $longitude_x, $latitude_y)
 {
+	if($vertices_x[0] != $vertices_x[count($vertices_x) - 1] || $vertices_y[0] != $vertices_y[count($vertices_y) - 1])
+	{
+		$vertices_x[] = $vertices_x[0];
+		$vertices_y[] = $vertices_y[0];
+		$points_polygon++;
+	}
+
 	$i = $j = $c = 0;
 	for ($i = 0, $j = $points_polygon ; $i < $points_polygon; $j = $i++)
 	{
