@@ -15,8 +15,8 @@ A Web App for showcasing Geostationary Weather Satellite Data. Vitality GOES is 
 5. [Configuring Vitality GOES](#configuring-vitality-goes)
 6. [Updating Vitality GOES](#updating-vitality-goes)
 7. [Theming](#theming)
-8. [Integrating weather data into Home Assistant](#integrating-weather-data-into-home-assistant)
-9. [Creating configs for other satellites](#creating-configs-for-other-satellites)
+8. [Creating configs for other satellites](#creating-configs-for-other-satellites)
+9. [Other Documentation](#other-documentation)
 10. [Credits](#credits)
 11. [Additional Resources](#additional-resources)
 
@@ -202,9 +202,6 @@ If you still have your cloned vitality-goes repo from last time, you can also ju
 ## Theming
 Vitality GOES supports theming. It comes with 5 themes, but you can make your own or install others shared with you. To get started with theming, [take a look at the themes documentation](/docs/themes.md).
 
-## Integrating weather data into Home Assistant
-Home Assistant is a free and open-source smart home control system. You can use Vitality GOES as a "Weather Provider" in Home Assistant; [look here](docs/home-assistant.md) for more.
-
 ## Creating configs for other satellites
 You can use Vitality GOES to view images from other satellites not included in the sample configs. Here's how to set it up:
 
@@ -212,6 +209,10 @@ You can use Vitality GOES to view images from other satellites not included in t
 * In `config.ini`, disable `emwinPath`, `adminPath`, and everthing under `location` other than the timezone as these are also GOES specific. Configure at least one category ini file
 * Specify the images you want to display within the category ini file(s)
 * Open a pull request to have your satellite's configs included :)
+
+## Advanced use cases
+* [DataHandler API](docs/datahander-api.md)
+* [Home assistant integration](docs/home-assistant.md)
 
 ## Credits
 Special thanks to [Pieter Noordhuis for his amazing goestools package](https://pietern.github.io/goestools/). Without him, Vitality GOES would be nothing, and the GOES HRIT/EMWIN feed would remain out of reach for a large number of amateur satellite operators.

@@ -12,7 +12,7 @@ Active alerts and warnings will show at the top of the Current Weather tab, if t
 Weather watches are included at the top of the Zone Forecast Product (GOES-N name - `ZFP*****.TXT`). These warnings are teal at the top of the Current Weather Screen
 
 ### Weather Warning
-The following weather warnings are parsed and included at the top of the page Current Weather screen in red. The full text of these alerts are displayed. The geofencing information is parsed, which Vitality GOES checks against your configured latitude/longitude to see if you're within the warning area. It will also look for the `UNTIL` line so it can properly hide expired alerts. Note: SPS works slightly different on the backend, but it displays the same as other weather alerts.
+The following weather warnings are parsed and included at the top of the page Current Weather screen in red. The full text of these alerts are displayed. The geofencing information is parsed, which Vitality GOES checks against your configured latitude/longitude to see if you're within the warning area. It will also look for an expire time so past alerts can be hidden.
 
 | GOES-N Filename part | Type of Warning            |
 |----------------------|----------------------------|
