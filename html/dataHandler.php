@@ -1351,7 +1351,7 @@ elseif($_GET['type'] == "weatherJSON")
 	
 	//Current Weather Conditions
 	$rwrFile = findNewestEMWIN($allEmwinFiles, "RWR".$currentSettings[$selectedProfile]['rwrOrig']);
-	if($rwrFile != "")
+	if($rwrFile != "" && $currentSettings[$selectedProfile]['city'] != "")
 	{
 		$data = file($rwrFile);
 		$gotWeatherTime = false;
@@ -1368,11 +1368,7 @@ elseif($_GET['type'] == "weatherJSON")
 			$trimmedLine = trim($thisLine, "* \n\r\t\v\x00");
 			if(stripos($trimmedLine, $currentSettings[$selectedProfile]['city']) === 0)
 			{
-				$currentConditionParts = preg_split("/[ ]{2,}/", $trimmedLine, 3);
-				$remainingConditionParts = array_pop($currentConditionParts);
-				array_shift($currentConditionParts);
-				$currentConditionParts = array_merge($currentConditionParts, preg_split("/[ ]+/", $remainingConditionParts));
-				
+				$currentConditionParts = preg_split("/[ ]+/", trim(substr($trimmedLine, 15)));
 				if($currentConditionParts[0]." ".$currentConditionParts[1] == "NOT AVBL")
 				{
 					$returnData['weatherDesc'] = "Not Available";
