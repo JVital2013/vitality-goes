@@ -10,6 +10,7 @@ then
 	exit
 fi
 
+#Load config
 source "$(dirname "$(readlink -fm "$0")")/scriptconfig.ini"
 
 #Verify Config is valid
@@ -18,6 +19,13 @@ then
 	echo "abiImgSource, abiVidName, and abiImgFilter must have the same number of elements in scriptconfig.ini"
 	exit
 fi
+
+#Cleanup handler
+trap cleanup INT
+function cleanup() {
+    rm -rf /tmp/abi
+    exit
+}
 
 today=$(date --date="today" +"%F")
 oneWeekStartTime=$(date -u --date="$today - 7 days" +"%Y-%m-%d")
@@ -76,3 +84,6 @@ do
 	ffmpeg -hide_banner -loglevel error -framerate 15 -pattern_type glob -i "/tmp/abi/*.$extension" -vf 'pad=width=ceil(iw/2)*2:height=ceil(ih/2)*2,minterpolate=fps=60:mi_mode=blend:me_mode=bidir:mc_mode=obmc:me=ds:vsbmc=1' -c:v libx264 -crf 20 -pix_fmt yuv420p $videoDir/$currentName.mp4
 	i=$((i+1))
 done
+
+echo "[$(date +"%Y-%m-%d %H:%M:%S")] Done!"
+cleanup

@@ -10,6 +10,7 @@ then
     exit
 fi
 
+#Load config
 source "$(dirname "$(readlink -fm "$0")")/scriptconfig.ini"
 
 #Verify Config is valid
@@ -18,6 +19,13 @@ then
 	echo "abiImgSource and abiVidName must have the same number of elements in scriptconfig.ini"
 	exit
 fi
+
+#Cleanup handler
+trap cleanup INT
+function cleanup() {
+    rm -rf /tmp/abi
+    exit
+}
 
 today=$(date --date="today" +"%F")
 oneWeekStartTime=$(date -u --date="$today - 7 days" +"%Y%m%d")
@@ -67,3 +75,6 @@ do
 	
 	i=$((i+1))
 done
+
+echo "[$(date +"%Y-%m-%d %H:%M:%S")] Done!"
+cleanup

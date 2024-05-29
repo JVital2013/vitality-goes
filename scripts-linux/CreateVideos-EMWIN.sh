@@ -5,6 +5,7 @@ then
     exit
 fi
 
+#Load config
 source "$(dirname "$(readlink -fm "$0")")/scriptconfig.ini"
 
 #Verify Config is valid
@@ -13,6 +14,13 @@ then
 	echo "emwinCodeName and emwinVideoName must have the same number of elements in scriptconfig.ini"
 	exit
 fi
+
+#Cleanup handler
+trap cleanup INT
+function cleanup() {
+    rm -f /tmp/emwin.txt
+    exit
+}
 
 oneDayStartTime=$(date -u --date="-7 days" +"%Y%m%d")
 oneDayEndTime=$(date -u  --date "+1 day" +"%Y%m%d")
@@ -37,5 +45,5 @@ do
 	i=$((i+1))
 done
 
-rm -f /tmp/emwin.txt
 echo "[$(date +"%Y-%m-%d %H:%M:%S")] Done!"
+cleanup
