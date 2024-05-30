@@ -1374,6 +1374,18 @@ elseif($_GET['type'] == "weatherJSON")
 					$returnData['weatherDesc'] = "Not Available";
 					break;
 				}
+				for($i = 1; $i < count($currentConditionParts); $i++)
+				{
+					if(is_numeric($currentConditionParts[$i]))
+					{
+						for($j = 0; $j < $i - 1; $j++)
+						{
+							$currentConditionParts[0] .= " " . $currentConditionParts[1];
+							array_splice($currentConditionParts, 1, 1);
+						}
+						break;
+					}
+				}
 				
 				$returnData['weatherDesc'] = $currentConditionParts[0];
 				$returnData['temp'] = $currentConditionParts[1];
