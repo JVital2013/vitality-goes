@@ -32,7 +32,7 @@ foreach($file in $files)
 }
 
 #ABI Imagery
-$files = Get-ChildItem -Attributes Directory -Recurse -Filter "****-**-**_**-**-**" "$($config.abiSrcDir)\IMAGES\"
+$files = Get-ChildItem -Attributes Directory -Recurse -Filter "****-**-**_**-**-**" "$($config.abiSrcDir)\IMAGES\", "$($config.abiSrcDir)\L2\"
 foreach($file in $files)
 {
     $datestr = $file.Name.Replace("_", "").Replace("-", "")
@@ -40,17 +40,5 @@ foreach($file in $files)
     {
         Write-Output "[$(Get-Date -Format G)] Deleting $($file.FullName)..."
         Remove-Item $file.FullName -Recurse -Force | Out-Null
-    }
-}
-
-#L2 Imagery
-$files = Get-ChildItem -Attributes !Directory "$($config.abiSrcDir)\IMAGES\Unknown"
-foreach($file in $files)
-{
-    $datestr = $file.BaseName.Split('_')[3]
-    if($datestr -lt $twoWeeksAgoL2)
-    {
-        Write-Output "[$(Get-Date -Format G)] Deleting $($file.FullName)..."
-        Remove-Item $file.FullName -Force | Out-Null
     }
 }

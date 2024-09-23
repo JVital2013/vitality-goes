@@ -37,7 +37,7 @@ for($i = 0; $i -lt $config.abiImgSource.Count; $i++)
     mkdir $env:TEMP\abi | Out-Null
 
     $thisSourceDir = $config.abiImgSource[$i].Replace('$abiSrcDir', $config.abiSrcDir).Trim("`"")
-    $imageFiles = Get-ChildItem -Recurse -Attributes !Directory -Filter "*$($config.abiImgFilter[$i].Trim('"'))*" $thisSourceDir
+    $imageFiles = Get-ChildItem -Recurse -Attributes !Directory -Filter "*$($config.abiImgFilter[$i].Trim('"').Replace('\', ''))*" $thisSourceDir
     $j = 0
     foreach($imageFile in $imageFiles)
     {
@@ -45,27 +45,17 @@ for($i = 0; $i -lt $config.abiImgSource.Count; $i++)
         if($datestr -lt $oneWeekAgoString -or $datestr -gt $endTimeString) { continue }
 
         #Check if the image is small enough
-        $imageData = [System.Drawing.Image]::FromFile($imageFile.FullName)
-        $resizeNeeded = $false
+        $imageData = [System.Drawing.Bitmap]::FromFile($imageFile.FullName)
         $resizeX = $imageData.Width
         $resizeY = $imageData.Height
         while($resizeX -gt 1500)
         {
-            $resizeNeeded = $true
             $resizeX /= 2
             $resizeY /= 2
         }
 
-        #Resize and save, or copy, depending on original size
-        if($resizeNeeded -eq $true)
-        {
-            $resizedImage = New-Object System.Drawing.Bitmap($imageData, $('{0},{1}' -f $resizeX, $resizeY))
-            $resizedImage.Save("$($env:TEMP)\abi\image$($j.ToString("000")).png", [System.Drawing.Imaging.ImageFormat]::Png)
-        }
-        else
-        {
-            $imageData.Save("$($env:TEMP)\abi\image$($j.ToString("000")).png", [System.Drawing.Imaging.ImageFormat]::Png)
-        }
+        $resizedImage = New-Object System.Drawing.Bitmap($imageData, $('{0},{1}' -f $resizeX, $resizeY))
+        $resizedImage.Save("$($env:TEMP)\abi\image$($j.ToString("000")).png", [System.Drawing.Imaging.ImageFormat]::Png)
 
         $j++ | Out-Null
     }
