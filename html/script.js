@@ -2182,7 +2182,13 @@ function switchCardView(event)
 		me.parentNode.previousSibling.innerHTML = "Loading, please wait...";
 		loadImage(me.parentNode.previousSibling, replayMetadata);
 	}
-	else me.parentNode.previousSibling.innerHTML = "<video controls loop autoplay playsinline style='width: 100%;'><source src='" + programPath + "videos/" + config.categories[selectedMenu].data[me.id.replace("-timelapse", "")].videoPath + "' type='video/mp4' /></video>";
+	else
+	{
+		if(config.categories[selectedMenu].data[me.id.replace("-timelapse", "")].videoPath.match("https?://") == null)
+			me.parentNode.previousSibling.innerHTML = "<video controls loop autoplay playsinline style='width: 100%;'><source src='" + programPath + "videos/" + config.categories[selectedMenu].data[me.id.replace("-timelapse", "")].videoPath + "' type='video/mp4' /></video>";
+		else
+			me.parentNode.previousSibling.innerHTML = "<video controls loop autoplay playsinline style='width: 100%;'><source src='" + config.categories[selectedMenu].data[me.id.replace("-timelapse", "")].videoPath + "' type='video/mp4' /></video>";
+	}
 }
 
 function switchRadarView(event)
@@ -2205,7 +2211,10 @@ function switchRadarView(event)
 	{
 		lightGalleries['lightbox-localRadar'].destroy();
 		delete lightGalleries['lightbox-localRadar'];
-		me.parentNode.previousSibling.innerHTML = "<video controls loop autoplay playsinline style='width: 100%;'><source src='" + programPath + "videos/" + config.localRadarVideo + "' type='video/mp4' /></video>";
+		if(config.localRadarVideo.match("https?://") == null)
+			me.parentNode.previousSibling.innerHTML = "<video controls loop autoplay playsinline style='width: 100%;'><source src='" + programPath + "videos/" + config.localRadarVideo + "' type='video/mp4' /></video>";
+		else
+			me.parentNode.previousSibling.innerHTML = "<video controls loop autoplay playsinline style='width: 100%;'><source src='" + config.localRadarVideo + "' type='video/mp4' /></video>";
 	}
 }
 

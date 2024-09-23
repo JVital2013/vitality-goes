@@ -77,7 +77,7 @@ if(file_exists("$programPath/config/config.ini"))
 		<script src="<?php echo $programURL; ?>/lightgallery/plugins/zoom/lg-zoom.umd.js?v=20230923"></script>
 		<script src="<?php echo $programURL; ?>/lightgallery/plugins/jumpto/lg-jumpto.umd.js?v=20220811"></script>
 		<script src="<?php echo $programURL; ?>/simplerpicker/simplerpicker.js"></script>
-		<script src='<?php echo $programURL; ?>/script.js?v=20231227'></script>
+		<script src='<?php echo $programURL; ?>/script.js?v=20240923'></script>
 	</head>
 	<body>
 		<div class='topBar'>
