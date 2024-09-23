@@ -1191,10 +1191,14 @@ elseif($_GET['type'] == "hurricaneJSON")
 				if(stripos($thisLine, "PRESENT MOVEMENT...") === 0)
 				{
 					$movementParts = explode("...", $thisLine);
-					$speedMph = preg_replace("/[^0-9]/", "", explode(" AT ", $movementParts[1])[1]);
-					$speedKph = preg_replace("/[^0-9]/", "", $movementParts[2]);
-					$speedKnots = round($speedMph * 0.868976);
-					$returnData[$stormIdentifier]['movement'] = explode(" OR", $movementParts[1])[0] . ", $speedKnots Knots / $speedMph MPH / $speedKph KPH";
+					if($movementParts[1] == "STATIONARY") $returnData[$stormIdentifier]['movement'] = "Stationary";
+					else
+					{
+						$speedMph = preg_replace("/[^0-9]/", "", explode(" AT ", $movementParts[1])[1]);
+						$speedKph = preg_replace("/[^0-9]/", "", $movementParts[2]);
+						$speedKnots = round($speedMph * 0.868976);
+						$returnData[$stormIdentifier]['movement'] = explode(" OR", $movementParts[1])[0] . ", $speedKnots Knots / $speedMph MPH / $speedKph KPH";
+					}
 				}
 				
 				//Maximum Sustained Winds
