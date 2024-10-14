@@ -131,7 +131,7 @@ videoPath = GOES16FalseColor.mp4
 * `mode` *(Default: endz)*: Defines the mode the internal image filename parser should use. This should be based on how your image files are named. See below for a table of supported filename parser modes
 * `filter` *(Optional)*: Only load images whose filename contains the specified string. This can be used to select for a specific channel when you have multiple image channels in the same folder. If all of your images of a unique type are in the same folder, this is not needed.
 * `color` *(Optional)*: Color of the image's card in the web interface. Any CSS color code can be used. The color setting is optional and is not configured by default.
-* `videoPath` *(Optional)*: the name of the video file that contains the timelapse of this product. Videos must be rendered seperately (by the [provided script](scripts.md#createvideos-abish) or any other means), and they must be kept in the `html/videos` folder of Vitality GOES. If you're not rendering timelapse videos, comment or remove this line.
+* `videoPath` *(Optional)*: the name of the video file that contains the timelapse of this product. Videos must be rendered seperately (by the [provided script](scripts.md#createvideos-abish) or any other means), and they must be kept in the `html/videos` folder of Vitality GOES. Alternatively, you can provide the URL of a mp4 video available over http(s). If you're not rendering timelapse videos, comment or remove this line.
 
 If a file contains no configured images, or if it's `[_category_]` section is missing, it will be hidden in Vitality GOES.
 
