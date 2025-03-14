@@ -19,7 +19,7 @@ This is the main config file. It will likely need configured when you first depl
 * `siteTheme`: The theme for Vitality GOES. Leave unset to use the built-in theme, or set it to an installed theme. The included themes are "light", "purple", "red", and "uos". This option can be overridden per-browser by using the "Local Settings" screen. For more on theming, [look here](/docs/themes.md).
 * `graphiteAPI`: If you're using goestools and want to view its decoder/demodulator statistcs, this should point to your graphite host. It must include the `/render/` path at the end to work properly. If you're not using goestools/graphite, comment/remove this line. For information on how to set up graphite, [look here](/docs/graphite.md).
 * `satdumpAPI`: Points to the SatDump REST API to pull decoder/demodulator statistics. You must run SatDump with the `--http_server` flag to get statistics. If you're not using SatDump or don't want statistics, comment/delete this line.
-* `emwinPath`: Point to the emwin repository of your choice. If you're picking up both GOES 16 and 18, you can use either's EMWIN files. Comment/delete this line to disable emwin text data parsing (Current Weather, Hurricane Center, and Other EMWIN).
+* `emwinPath`: Point to the emwin repository of your choice. If you're picking up both GOES 18 and 19, you can use either's EMWIN files. Comment/delete this line to disable emwin text data parsing (Current Weather, Hurricane Center, and Other EMWIN).
 * `adminPath`: The directory with admin text you want to display. SatDump will save these files out-of-the-box, but goestools must be patched with [this patch for it to show up](https://github.com/pietern/goestools/pull/105/files). Comment/delete this line to disable. For GOES satellites only.
 * `fastEmwin`: Use a faster algorithm to parse EMWIN files for data. Recommended for Windows servers and servers with a large archive. Warning: if you turn this on, your EMWIN data folder must be flat! Data cannot be in dated subfolders.  *Default = false*.
 * `spaceWeatherAlerts`: Set to true if you want to display space weather alerts along with other weather alerts. *Default = false*.
@@ -29,15 +29,15 @@ This is the main config file. It will likely need configured when you first depl
 ### paths
 A path should be set up for each satellite downlink you're receiving. Each path defined in this section creates a variable that can be used in the `path` options of your category ini files. One or more satellite should be listed here.
 
-**NOTE:** This does not define the path of the images from a particular satellite, but rather the path for the entire downlink. For example, let's assume you're receiving GOES16, and your images are at `/home/pi/goes/goes16/fd/fc/...`. The `goes16` setting under `[paths]` would be set to `/home/pi/goes` (the parent path for the entire satellite downlink), not `/home/pi/goes/goes16` (the path just for the images from GOES16).
+**NOTE:** This does not define the path of the images from a particular satellite, but rather the path for the entire downlink. For example, let's assume you're receiving GOES19, and your images are at `/home/pi/goes/goes19/fd/fc/...`. The `goes19` setting under `[paths]` would be set to `/home/pi/goes` (the parent path for the entire satellite downlink), not `/home/pi/goes/goes19` (the path just for the images from GOES19).
 
 **Example** Let's say you have:
-- `GOES16 = /path/to/goestoolsdata` under `[paths]` of your config.ini
-- `path = {GOES16}/goes16/fd/fc/` is set under an image handler like `[fdfc_16]` in your abi.ini file
+- `GOES19 = /path/to/goestoolsdata` under `[paths]` of your config.ini
+- `path = {GOES19}/goes19/fd/fc/` is set under an image handler like `[fdfc_19]` in your abi.ini file
 
-With this configuration, Vitality GOES will expect your images to be at `/path/to/goestoolsdata/goes16/fd/fc/`. Images may be in subfolders.
+With this configuration, Vitality GOES will expect your images to be at `/path/to/goestoolsdata/goes19/fd/fc/`. Images may be in subfolders.
 
-If hosted on Windows, set your paths to something like `GOES16 = C:\path\to\satdumpdata`
+If hosted on Windows, set your paths to something like `GOES19 = C:\path\to\satdumpdata`
 
 ### categories
 The category section defines one or more menu items (or "categories") within Vitality GOES. Each category can have any ID you want, and must point to an ini file that's also in Vitality GOES's `config` directory. See the "Category ini files" section below for info on how to customize them.
@@ -114,18 +114,18 @@ icon = globe-americas
 You can have multiple image sections per ini file
 
 ```ini
-[fdfc_16]
-path = {GOES16}/goes16/fd/fc/
-title = "GOES 16 - Color"
+[fdfc_19]
+path = {GOES19}/goes19/fd/fc/
+title = "GOES 19 - Color"
 fast = false
 mode = endz
 filter = _FD_
 color = #003241
-videoPath = GOES16FalseColor.mp4
+videoPath = GOES19FalseColor.mp4
 ```
 
-* `[fdfc_16]`: A unique identifier for the image. This can be anything, but it must be unique and contain no spaces
-* `path`: The folder that holds all the images for a particular GOES product. In this example, it uses the `{GOES16}` variable defined in the `Paths` section of config.ini
+* `[fdfc_19]`: A unique identifier for the image. This can be anything, but it must be unique and contain no spaces
+* `path`: The folder that holds all the images for a particular GOES product. In this example, it uses the `{GOES19}` variable defined in the `Paths` section of config.ini
 * `title`: The image label in Vitality GOES
 * `fast` *(Default: false)*:  Use a faster algorithm to parse data. Recommended for Windows servers and servers with a large archives. Warning: if you turn this on, the path for this image section must be flat! It cannot have subfolders of any kind, including dated subfolders.
 * `mode` *(Default: endz)*: Defines the mode the internal image filename parser should use. This should be based on how your image files are named. See below for a table of supported filename parser modes

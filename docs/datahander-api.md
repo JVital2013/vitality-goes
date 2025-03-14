@@ -32,8 +32,8 @@ http://www.example.com/dataHander.php?type=alertJSON
 #### Example queries
 
 ```
-http://www.example.com/dataHandler.php?type=data&id=abi&subid=fdfc_16
-http://www.example.com/dataHandler.php?type=data&id=abi&subid=fdfc_16&timestamp=1716681621
+http://www.example.com/dataHandler.php?type=data&id=abi&subid=fdfc_19
+http://www.example.com/dataHandler.php?type=data&id=abi&subid=fdfc_19&timestamp=1716681621
 http://www.example.com/dataHandler.php?type=data&id=nws&subid=CAR&timestamp=1716678000
 ```
 
@@ -84,8 +84,8 @@ http://www.example.com/dataHandler.php?type=localRadarData&timestamp=1716750055
 #### Example queries
 
 ```
-http://www.example.com/dataHander.php?type=metadata&id=abi&subtype=fdfc_16
-http://www.example.com/dataHander.php?type=metadata&id=meso&subid=m1ch02_16
+http://www.example.com/dataHander.php?type=metadata&id=abi&subtype=fdfc_19
+http://www.example.com/dataHander.php?type=metadata&id=meso&subid=m1ch02_19
 http://www.example.com/dataHander.php?type=metadata&id=sysInfo
 ```
 

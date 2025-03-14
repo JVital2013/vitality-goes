@@ -1,5 +1,5 @@
 # Vitality GOES
-A Web App for showcasing Geostationary Weather Satellite Data. Vitality GOES is designed to display data received from GOES-16/18 satellites via goestools, Satdump, or XRIT Decoder, but images from other satellites can be displayed as well.
+A Web App for showcasing Geostationary Weather Satellite Data. Vitality GOES is designed to display data received from GOES-16/18/19 satellites via goestools, Satdump, or XRIT Decoder, but images from other satellites can be displayed as well.
 
 **[Click Here for Screenshots and Videos](https://github.com/JVital2013/vitality-goes/wiki/Screenshots-and-Videos)**
 
@@ -28,7 +28,7 @@ Vitality GOES has the following features:
 
 * It is easily usable by anyone with no knowledge of radio, satellites, or programming once set up by a ground station technician (you!).
 * Vitality GOES presents all full-disk images, and mesoscale imagery, and more in a user friendly and easily navigatable way.
-* Current weather conditions, forecasts, watches, and warnings from the GOES-16/18 HRIT/EMWIN data feed are presented to the user in a way that is appealing and easy to read. There is no need to parse through data for other locations: your configured location's data is the only thing you're shown.
+* Current weather conditions, forecasts, watches, and warnings from the GOES-16/18/19 HRIT/EMWIN data feed are presented to the user in a way that is appealing and easy to read. There is no need to parse through data for other locations: your configured location's data is the only thing you're shown.
 * Discover and browse additional data from the EMWIN data feed. For a writeup on the EMWIN data Vitality GOES pulls and how it's used, see [here](docs/used-emwin-data.md).
 * Monitor the status of the underlying goestools/SatDump stack, including systems temps, error correction rates, and packet drop rates.
 
@@ -36,7 +36,7 @@ Sample configurations are provided for the following satellite/station setups:
 
 | Satellite Downlink    | Supported Programs                   |
 | --------------------- | ------------------------------------ |
-| GOES-16 and 18 HRIT   | goestools, SatDump, and XRIT Decoder |
+| GOES-16/18/19 HRIT    | goestools, SatDump, and XRIT Decoder |
 | EWS-G1 (GOES-13) GVAR | SatDump                              |
 | FengYun-2x S-VISSR    | SatDump                              |
 | GEO-KOMPSAT 2A        | xrit-rx or SatDump                   |
@@ -62,7 +62,7 @@ Once configured, any modern web browser can connect to Vitality GOES and view th
 ## Preparing your system for Vitality GOES
 
 ### Option 1: SatDump
-You can use SatDump as a data source without changing any of its configurations. While SatDump can be run interactively with a full UI, this is not recommended for long-term realtime decoding. Instead, you should launch satdump in cli mode for live decoding. Here is an example SatDump command to use an RTL-SDR to pick up GOES-16/18:
+You can use SatDump as a data source without changing any of its configurations. While SatDump can be run interactively with a full UI, this is not recommended for long-term realtime decoding. Instead, you should launch satdump in cli mode for live decoding. Here is an example SatDump command to use an RTL-SDR to pick up GOES-16/18/19:
 
 ```
 satdump live goes_hrit F:\path\to\satdumprepo --source rtlsdr --samplerate 2.4e6 --frequency 1694.1e6 --gain 49 --http_server 0.0.0.0:8080 --fill_missing

@@ -2,7 +2,7 @@
 
 Vitality GOES comes with a number of scripts to enhance and extend its functionality. All of these scripts are optional, but `Cleanup-EmwinText` is highly recommended since it keeps your EMWIN folder from getting too full.
 
-*Included scripts are for GOES-16/18 HRIT data only*
+*Included scripts are for GOES-16/18/19 HRIT data only*
 
 **To get started,** copy `scriptconfig.ini` from the sample config folder you're using into the `scripts-*/` folder you're using. Then, update all pertinent values. See each script's documentation for what's needed. Unlike the ini files for Vitality GOES itself, you need to make sure there are no spaces around the equal sign (=). Also, comments should start with a #.
 
@@ -81,7 +81,7 @@ xplanet, imagemagick
 
 Sanchez.sh is a script that automates Sanchez renders of your geostationary captures. The first time this script runs, it will automatically download 13 images to use as an underlay: one for each month, and a night time image with city lights. After the first run, the script will function without internet. You can also manually download the necessary images and save them in the Resources folder with the correct name, found in the same directory as Sanchez.sh.
 
-The script reads Channel 13 imagery from `sanchezSrcPath16` and `sanchezSrcPath18`. Then, it creates false-color imagery of GOES-16, GOES-18, and composites. Images are saved in the respective `sanchesDst*` directory.
+The script reads Channel 13 imagery from `sanchezSrcPath19` and `sanchezSrcPath18`. Then, it creates false-color imagery of GOES-19, GOES-18, and composites. Images are saved in the respective `sanchesDst*` directory.
 
 The script will also do any "back" renders that it may have missed due to the script being disabled, failing to run, or other issues. When done, enable the Sanchez sections in your [abi.ini config file](config.md#abiini-mesoini-and-l2ini) to display your fancy new renders.
 
