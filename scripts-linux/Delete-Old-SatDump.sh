@@ -32,7 +32,7 @@ done
 
 #ABI Imagery
 imageFiles=()
-mapfile -d $'\0' imageFiles < <(find $abiSrcDir/IMAGES/GOES-16 $abiSrcDir/IMAGES/GOES-18 $abiSrcDir/IMAGES/Himawari $abiSrcDir/L2 -name "*-*-*_*-*-*" -type d -print0 2>/dev/null)
+mapfile -d $'\0' imageFiles < <(find $abiSrcDir/IMAGES/GOES-19 $abiSrcDir/IMAGES/GOES-18 $abiSrcDir/IMAGES/Himawari $abiSrcDir/L2 -name "*-*-*_*-*-*" -type d -print0 2>/dev/null)
 for file in "${imageFiles[@]}"
 do
 	datestr=$(basename "$file")
