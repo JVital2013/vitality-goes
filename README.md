@@ -237,4 +237,4 @@ Here are a few tools that may help you with picking up the HRIT/EMWIN Feed
 * [goesrecv-ps](https://github.com/JVital2013/goesrecv-ps): a collection of PowerShell scripts for monitoring goesrecv. Contains scripts to make a baseband recording of the HRIT/EMWIN signal and monitor Virtual Channel activity.
 
 ## License
-2022-2024 Jamie Vital. [Made available under the GPLv3 License.](LICENSE)
+2022-2025 Jamie Vital. [Made available under the GPLv3 License.](LICENSE)
