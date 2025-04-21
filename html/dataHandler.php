@@ -916,20 +916,19 @@ elseif($_GET['type'] == "alertJSON")
 		for($i = 0; $i < count($weatherData); $i++)
 		{
 			//Get Header Information about weather warning, and beginning of message
-			if(stripos($weatherData[$i], "BULLETIN - ") === 0)
+			if(stripos($weatherData[$i], "BULLETIN - ") === 0 || ($messageStart == 0 && stripos($weatherData[$i], "Dust Advisory") === 0))
 			{
+				if($messageStart == 0 && stripos($weatherData[$i], "Dust Advisory") === 0) $i++;
 				$alertType = trim($weatherData[++$i]);
 				$issuingOffice = trim($weatherData[++$i]);
 				$issueTime = trim($weatherData[++$i]);
-				$messageStart = ++$i + 1;
-				continue;
-			}
-			
-			if($messageStart == 0 && stripos($weatherData[$i], "Dust Advisory") === 0)
-			{
-				$alertType = trim($weatherData[$i]);
-				$issuingOffice = trim($weatherData[++$i]);
-				$issueTime = trim($weatherData[++$i]);
+
+				if(substr($issueTime, 0, 9) === "Issued by")
+				{
+					$issuingOffice = substr($issueTime, 10);
+					$issueTime = trim($weatherData[++$i]);
+				}
+
 				$messageStart = ++$i + 1;
 				continue;
 			}
@@ -1005,6 +1004,12 @@ elseif($_GET['type'] == "alertJSON")
 			{
 				$issuingOffice = trim($weatherData[++$i]);
 				$issueTime = trim($weatherData[++$i]);
+				if(substr($issueTime, 0, 9) === "Issued by")
+				{
+					$issuingOffice = substr($issueTime, 10);
+					$issueTime = trim($weatherData[++$i]);
+				}
+
 				continue;
 			}
 			
