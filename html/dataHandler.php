@@ -1,6 +1,6 @@
 <?php
 /* 
- * Copyright 2022-2024 Jamie Vital
+ * Copyright 2022-2025 Jamie Vital
  * This software is licensed under the GNU General Public License
  * 
  * This file is part of Vitality GOES.
@@ -1434,19 +1434,28 @@ elseif($_GET['type'] == "weatherJSON")
 	if($dataPath == "")
 	{
 		$dataPath = findNewestEMWIN($allEmwinFiles, "AFD".$currentSettings[$selectedProfile]['orig']);
-		if($dataPath == "")
-		{
-			$returnData['summaryTime'] = "";
-			$returnData['summary'] = "";
-		}
+		$returnData['summaryTime'] = "";
+		
+		if($dataPath == "") $returnData['summary'] = "";
+		
 		else
 		{
 			$data = file($dataPath);
 			$dataBuffer = [];
 			$decodingLine = -1;
+			$gotSummaryTime = false;
 			foreach($data as $rawLine)
 			{
 				$thisLine = trim($rawLine);
+				
+				//The first line that starts with a number is the time of the report
+				if(!$gotSummaryTime && is_numeric($thisLine[0]))
+				{
+					$returnData['summaryTime'] = $thisLine;
+					$gotSummaryTime = true;
+					continue;
+				}
+				
 				if(stripos($thisLine, ".DISCUSSION...") === 0 || stripos($thisLine, ".NEAR TERM") === 0 || stripos($thisLine, ".SHORT TERM") === 0 || stripos($thisLine, ".UPDATE") === 0)
 				{
 					$decodingLine = 0;
@@ -1461,7 +1470,6 @@ elseif($_GET['type'] == "weatherJSON")
 				$decodingLine++;
 			}
 			
-			$returnData['summaryTime'] = trim($data[5]);
 			$returnData['summary'] = linesToParagraphs($dataBuffer, 0)[0];
 		}
 	}
@@ -1469,9 +1477,12 @@ elseif($_GET['type'] == "weatherJSON")
 	{
 		$data = file($dataPath);
 		$startOfSummary = 0;
-		while(stripos($data[$startOfSummary], "SUMMARY") === false && stripos($data[$startOfSummary], "FORECAST") === false) $startOfSummary++;
 		
-		$returnData['summaryTime'] = trim($data[$startOfSummary + 2]);
+		while(stripos($data[$startOfSummary], "SUMMARY") === false && stripos($data[$startOfSummary], "FORECAST") === false) $startOfSummary++;
+		$summaryTimeLine = $startOfSummary;
+		while(!is_numeric($data[$summaryTimeLine][0])) $summaryTimeLine++;
+		
+		$returnData['summaryTime'] = trim($data[$summaryTimeLine]);
 		$returnData['summary'] = linesToParagraphs($data, $startOfSummary + 4)[0];
 	}
 	
