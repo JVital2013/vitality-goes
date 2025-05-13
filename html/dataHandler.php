@@ -1435,9 +1435,7 @@ elseif($_GET['type'] == "weatherJSON")
 	{
 		$dataPath = findNewestEMWIN($allEmwinFiles, "AFD".$currentSettings[$selectedProfile]['orig']);
 		$returnData['summaryTime'] = "";
-		
 		if($dataPath == "") $returnData['summary'] = "";
-		
 		else
 		{
 			$data = file($dataPath);
