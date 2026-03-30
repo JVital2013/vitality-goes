@@ -1,5 +1,4 @@
-/* 
- * Copyright 2022-2025 Jamie Vital
+/* Copyright 2022-2025 Jamie Vital
  * This software is licensed under the GNU General Public License
  * 
  * This file is part of Vitality GOES.
@@ -24,6 +23,7 @@ var config, responseData, selectedMenu;
 var programPath = document.currentScript.src.replace(location.protocol + "//" + location.hostname, "").split("script.js?v=")[0];
 programPath = programPath.substr(programPath.indexOf("/"));
 var siteName = window.matchMedia('(display-mode: standalone)').matches ? "" : " - " + document.title;
+var fixedProfileCount;
 
 //Load expanded cards from sessionStorage
 storedExpandedCards = sessionStorage.getItem('expandedCards');
@@ -658,7 +658,7 @@ function menuSelect(menuSlug)
 		selectedMenu = menuSlug;
 		window.scrollTo({top: 0});
 	}
-	
+
 	//Clear any remaining lightGalleries
 	Object.keys(lightGalleries).forEach(thisGallery => {lightGalleries[thisGallery].destroy();});
 	lightGalleries = [];
@@ -679,7 +679,11 @@ function menuSelect(menuSlug)
 		renderStiffCard("summaryWeather", "Weather Summary");
 		renderStiffCard("sevenDayWeather", "7-Day Forecast");
 		renderStiffCard("forecastWeather", "Forecast");
-		
+		if(config.showEmwinInfo) renderStiffCard("selectedProfile", "Profile Selector"); //Profile selector on Current-Weather
+
+		//Setup profile selector, mode 0 for only changing saved profiles
+		if(config.showEmwinInfo) setUpProfileSelector(0)
+
 		//Load Weather map
 		target = document.getElementById("radarWeatherCardBody");
 		if(config.localRadarVideo)
@@ -783,11 +787,113 @@ function menuSelect(menuSlug)
 				if("pressure" in responseData) renderLeftRightLine(target, "Barometric Pressure", responseData.pressure);
 				if("wind" in responseData && "windDirection" in responseData) renderLeftRightLine(target, "Wind", (responseData.wind == 0 ? "Calm" : responseData.windDirection + ", " + responseData.wind + " MPH"));
 				if("windGust" in responseData && responseData.windGust != "N/A") renderLeftRightLine(target, "Wind Gust", responseData.windGust);
-				if("remarks" in responseData && responseData.remarks != "") renderLeftRightLine(target, "Remarks", responseData.remarks);
-				
-				if(target.innerHTML == "") removeCard(target);
-				else target.innerHTML += "<div class='goeslabel'>Last Update: " + responseData.weatherTime + "</div>";
-				
+				if("remarks" in responseData && responseData.remarks != ""){
+                    			modifiedRemarks = responseData.remarks;
+
+                    			// **Add new remarks decoding here: (use else if statements)**
+
+                    			// Wind Chill Index
+                    			if(responseData.remarks.includes("WCI")){
+                        			dataIndex = modifiedRemarks.indexOf("WCI"); // +4 to this gives index of beginning of WCI data
+                        			// find index of next blank space after data
+                        			if(modifiedRemarks.indexOf(" ", dataIndex + 4) != -1){
+                            				// location of first blank space after data
+                            				dataEndIndex = modifiedRemarks.indexOf(" ", dataIndex + 4);
+                            				// print out WCI
+                            				renderLeftRightLine(target, "Wind Chill Index", modifiedRemarks.substring(dataIndex +4, dataEndIndex) + "&deg; F");
+                            				// remove WCI and data from beginning or middle of modifiedRemarks for further processing
+                            				modifiedRemarks = modifiedRemarks.replace(modifiedRemarks.substring(dataIndex,dataEndIndex+1), "");
+                				}
+                        			// no further blank spaces after WCI data, then it is the end of the string
+                        			else{
+                            				// print out WCI
+                            				renderLeftRightLine(target, "Wind Chill Index", modifiedRemarks.substring(dataIndex +4, modifiedRemarks.length) + "&deg; F");
+                            				// remove WCI and data from end of modifiedRemarks for further processing
+                            				if(dataIndex-1 >= 0) modifiedRemarks = modifiedRemarks.replace(modifiedRemarks.slice(dataIndex-1), "");
+                    					// if dataIndex-1 <0, then WCI is the beginning of string, and already known to be end of string, so set to empty
+                            				else modifiedRemarks = "";
+                        			}
+                    			}
+
+                    			// Visibility
+                    			if(responseData.remarks.includes("VSB")){
+                        			dataIndex = modifiedRemarks.indexOf("VSB"); // +4 to this gives index of beginning of VSB data
+                        			// find index of next blank space after data
+                        			if(modifiedRemarks.indexOf(" ", dataIndex + 4) != -1){
+                            			// location of first blank space after data
+                            			dataEndIndex = modifiedRemarks.indexOf(" ", dataIndex + 4);
+                            			// print out VSB
+                            			renderLeftRightLine(target, "Visibility", modifiedRemarks.substring(dataIndex +4, dataEndIndex) + " mi");
+                            			// remove VSB and data from beginning or middle of modifiedRemarks for further processing
+                            			modifiedRemarks = modifiedRemarks.replace(modifiedRemarks.substring(dataIndex,dataEndIndex+1), "");
+                				}
+                        			// no further blank spaces after VSB data, then it is the end of the string
+                        			else{
+                            				// print out VSB
+                            				renderLeftRightLine(target, "Visibility", modifiedRemarks.substring(dataIndex +4, modifiedRemarks.length) + " mi");
+                            				// remove VSB and data from end of modifiedRemarks for further processing
+                    					if(dataIndex-1 >= 0) modifiedRemarks = modifiedRemarks.replace(modifiedRemarks.slice(dataIndex-1), "");
+                            				// if dataIndex-1 <0, then VSB is the beginning of string, and already known to be end of string, so set to empty
+                            				else modifiedRemarks = "";
+                        			}
+                    			}
+
+                    			// Heat Index
+                    			if(responseData.remarks.includes("HX")){
+                        			dataIndex = modifiedRemarks.indexOf("HX"); // +4 to this gives index of beginning of VSB data
+                        			// find index of next blank space after data
+                        			if(modifiedRemarks.indexOf(" ", dataIndex + 4) != -1){
+                            			// location of first blank space after data
+                            			dataEndIndex = modifiedRemarks.indexOf(" ", dataIndex + 4);
+                    				// print out HX
+                            			renderLeftRightLine(target, "Heat Index", modifiedRemarks.substring(dataIndex +4, dataEndIndex) + "&deg; F");
+                            			// remove HX and data from beginning or middle of modifiedRemarks for further processing
+                            			modifiedRemarks = modifiedRemarks.replace(modifiedRemarks.substring(dataIndex,dataEndIndex+1), "");
+                        			}
+                        			// no further blank spaces after HX data, then it is the end of the string
+                        			else{
+                    					// print out HX
+                            				renderLeftRightLine(target, "Heat Index", modifiedRemarks.substring(dataIndex +4, modifiedRemarks.length) + "&deg; F");
+                            				// remove HX and data from end of modifiedRemarks for further processing
+                            				if(dataIndex-1 >= 0) modifiedRemarks = modifiedRemarks.replace(modifiedRemarks.slice(dataIndex-1), "");
+                            				// if dataIndex-1 <0, then HX is the beginning of string, and already known to be end of string, so set to empty
+                            				else modifiedRemarks = "";
+                        			}
+                    			}
+
+                    			// Print any remaining remarks
+                    			if(modifiedRemarks != "") renderLeftRightLine(target, "Remarks", modifiedRemarks); // if modified remarks exists (some known remarks types found) and isn't empty, print
+        			}
+
+                		// If Wind Chill not given in remarks, calculate and print if different from given temp
+                		if(!target.innerText.includes("Wind Chill Index")){
+                    			T = Number(responseData.temp);
+                    			V = Number(responseData.wind);
+                    			if(V > 3 && T <= 50){
+                        			WCI = 35.74 + 0.6125*T - 35.75*(V**0.16) + 0.4275*T*(V**0.16);
+                        			// print out WCI if less than temp
+                        			if(Math.round(WCI) < T) renderLeftRightLine(target, "Wind Chill Index", Math.round(WCI) + "&deg; F");
+                    			}
+                		}
+
+                		// If Heat Index not given in remarks, calculate and print if different from given temp
+                		if(!target.innerText.includes("Heat Index")){
+                    			T = Number(responseData.temp);
+                    			RH = Number(responseData.humidity);
+                    			// Simple HX formula, avg with air temp
+                    			HX = 0.5 * (T + 61 + (T-68)*1.2 + 0.094*RH);
+                    			// If simple formula gives a result of 80 or higher, complete the full formula
+                    			if(HX >= 80){
+                        			HX = -42.379 + 2.04901523*T + 10.14333127*RH - 0.22475541*T*RH - 0.00263783*T**2 - 0.05481717*RH**2 + 0.00122874*T**2*RH + 0.00085282*T*RH**2 - 0.00000199*T**2*RH**2;
+                        			if(RH <= 14 && T >= 80 && T <= 112) HX = HX - (13-RH)/4 * Math.sqrt((17 - Math.abs(T-95)) / 17); //Correction #1
+                        			if(RH >= 86 && T >= 80 && T <= 87) HX = HX + (RH-85)/10 * (87-T)/5; //Correction #2
+                    			}
+                    			// print out HX if greater than temp
+                    			if(Math.round(HX) > T) renderLeftRightLine(target, "Heat Index", Math.round(HX) + "&deg; F");
+                		}
+
+				}
+								
 				//Weather Summary
 				target = document.getElementById("summaryWeatherCardBody");
 				if(responseData.summary == "") removeCard(target);
@@ -816,7 +922,7 @@ function menuSelect(menuSlug)
 								if(todaysForcast.amPrecip < 50) forcastCard.innerHTML += "<i class='fa fa-cloud-sun fa-4x'></i><br />";
 								else forcastCard.innerHTML += "<i class='fa fa-cloud-sun-rain fa-4x'></i><br />";
 							}
-							else if(todaysForcast.amClouds == "B2" || todaysForcast.amClouds == "OV")
+							else if(todaysForcast.amClouds == "B2" || todaysForcast.amClouds == "BK" || todaysForcast.amClouds == "OV")
 							{
 								if(todaysForcast.amPrecip < 50) forcastCard.innerHTML += "<i class='fa fa-cloud fa-4x'></i><br />";
 								else forcastCard.innerHTML += "<i class='fa fa-cloud-showers-heavy fa-4x'></i><br />";
@@ -844,7 +950,7 @@ function menuSelect(menuSlug)
 								if(todaysForcast.pmPrecip < 50) forcastCard.innerHTML += "<i class='fa fa-cloud-moon fa-4x'></i><br />";
 								else forcastCard.innerHTML += "<i class='fa fa-cloud-moon-rain fa-4x'></i><br />";
 							}
-							else if(todaysForcast.pmClouds == "B2" || todaysForcast.pmClouds == "OV")
+							else if(todaysForcast.pmClouds == "B2" || todaysForcast.pmClouds == "BK" || todaysForcast.pmClouds == "OV")
 							{
 								if(todaysForcast.pmPrecip < 50) forcastCard.innerHTML += "<i class='fa fa-cloud fa-4x'></i><br />";
 								else forcastCard.innerHTML += "<i class='fa fa-cloud-showers-heavy fa-4x'></i><br />";
@@ -922,7 +1028,7 @@ function menuSelect(menuSlug)
 				alertInfo.blueAlerts.forEach(function(element){renderAlert(element, "blue")});
 				alertInfo.amberAlerts.forEach(function(element){renderAlert(element, "amber")});
 				alertInfo.civilDangerWarnings.forEach(function(element){renderAlert(element, "purple")});
-				alertInfo.spaceWeatherAlerts.forEach(function(element){renderAlert(element, "blue")});
+				alertInfo.spaceWeatherAlerts.forEach(function(element){renderAlert(element, "orange")});
 			}
 			
 			else renderAlert("The server returned status code " + this.statusText + " (" + this.statusText + ") when trying to load weather alerts", "red");
@@ -1478,71 +1584,8 @@ function menuSelect(menuSlug)
 		
 		if(config.showEmwinInfo)
 		{
-			//Set up profile
-			selectedProfile = parseInt(getCookie('selectedProfile'));
-			currentSettings = decodeProfile(getCookie('localSettings'));
-			profileSelectorHolder = document.createElement('div');
-			profileSelectorHolder.className = 'prettyBoxList profileSelector';
-			profileSelectorHolder.innerHTML = "<span style='font-weight: bold;'>Profile: </span>";
-			
-			profileSelector = document.createElement('select');
-			profileSelector.id = 'profileSelector';
-			profileSelector.style.minWidth = "30px";
-			thisProfile = 0;
-			currentSettings.forEach(profile => {
-				newOption = document.createElement('option');
-				newOption.value = thisProfile;
-				newOption.text = (thisProfile == 0 ? "Ground Station Defaults" : (profile.city == "" ? profile.wxZone : toTitleCase(profile.city)) + ", " + profile.stateAbbr);
-				profileSelector.appendChild(newOption);
-				thisProfile++;
-			});
-			profileSelector.selectedIndex = selectedProfile;
-			profileSelector.addEventListener('change', function(evt) {
-				lastRadarCode = currentSettings[selectedProfile].radarCode;
-				
-				selectedProfile = document.getElementById('profileSelector').selectedIndex;
-				setCookie('selectedProfile', selectedProfile);
-				
-				if(currentSettings[selectedProfile].radarCode != lastRadarCode) location.reload();
-				else menuSelect(selectedMenu);
-			});
-			profileSelectorHolder.appendChild(profileSelector);
-			
-			addNewButton = document.createElement('input');
-			addNewButton.id = "addNewButton";
-			addNewButton.type = "button";
-			addNewButton.value = "Add";
-			addNewButton.disabled = (currentSettings.length >= 10);
-			addNewButton.addEventListener('click', function() {
-				currentSettings.push(currentSettings[selectedProfile]);
-				setCookie("localSettings", encodeProfile(currentSettings));
-				setCookie("selectedProfile", currentSettings.length - 1);
-				menuSelect(selectedMenu);
-			});
-			profileSelectorHolder.appendChild(addNewButton);
-			
-			deleteButton = document.createElement('input');
-			deleteButton.id = "deleteButton";
-			deleteButton.type = "button";
-			deleteButton.value = "Delete";
-			deleteButton.style.color = "red";
-			deleteButton.addEventListener('click', function() {
-				lastRadarCode = currentSettings[selectedProfile].radarCode;
-				
-				currentSettings.splice(selectedProfile, 1);
-				selectedProfile = 0;
-				
-				setCookie("localSettings", encodeProfile(currentSettings));
-				setCookie("selectedProfile", selectedProfile);
-				
-				if(currentSettings[selectedProfile].radarCode != lastRadarCode) location.reload();
-				else menuSelect(selectedMenu);
-			});
-			profileSelectorHolder.appendChild(deleteButton);
-			
-			target = document.getElementById('selectedProfileCardBody');
-			target.innerHTML = "";
-			target.appendChild(profileSelectorHolder);
+			//Setup profile selector, mode 1 for local settings page
+			setUpProfileSelector(1)
 			
 			generalSettingsHolder = document.createElement('div');
 			generalSettingsHolder.className = 'prettyBoxList';
@@ -1586,7 +1629,7 @@ function menuSelect(menuSlug)
 			saveButton.value = "Save";
 			saveButton.style.width = "100%";
 			saveButton.addEventListener('click', function() {
-				if(selectedProfile != 0)
+				if(selectedProfile >= fixedProfileCount)
 				{
 					lastRadarCode = currentSettings[selectedProfile].radarCode;
 					
@@ -1624,7 +1667,7 @@ function menuSelect(menuSlug)
 			target.appendChild(saveButtonHolder);
 			
 			//Set up interface
-			if(selectedProfile == 0)
+			if(selectedProfile < fixedProfileCount)
 			{
 				document.getElementById('deleteButton').disabled = true;
 				document.getElementById('deleteButton').style.color = "";
@@ -2217,6 +2260,92 @@ function switchRadarView(event)
 			me.parentNode.previousSibling.innerHTML = "<video controls loop autoplay playsinline style='width: 100%;'><source src='" + config.localRadarVideo + "' type='video/mp4' /></video>";
 	}
 }
+function setUpProfileSelector(mode)
+{
+		//Setup profile selector, mode 1 for local settings page, mode 0 for only changing saved profiles
+		
+		//Set up profile
+		selectedProfile = parseInt(getCookie('selectedProfile'));
+		currentSettings = decodeProfile(getCookie('localSettings'));
+		profileSelectorHolder = document.createElement('div');
+		profileSelectorHolder.className = 'prettyBoxList profileSelector';
+		if(mode==1) profileSelectorHolder.innerHTML = "<span style='font-weight: bold;'>Profile: </span>";
+		
+		profileSelector = document.createElement('select');
+		profileSelector.id = 'profileSelector';
+		profileSelector.style.minWidth = "30px";
+		thisProfile = 0;
+		currentSettings.forEach(profile => {
+				newOption = document.createElement('option');
+				newOption.value = thisProfile;
+				//Changed to support up to 10 preferred profiles, uncomment else ifs to add custom names to fixed profiles if the built in one isn't sufficient, names here will not override profiles that aren't fixed
+				if(thisProfile == 0) newOption.text = "Ground Station Defaults";
+				//else if(thisProfile<fixedProfileCount && thisProfile == 1) newOption.text = "";
+				//else if(thisProfile<fixedProfileCount && thisProfile == 2) newOption.text = "";
+				//else if(thisProfile<fixedProfileCount && thisProfile == 3) newOption.text = "";
+				//else if(thisProfile<fixedProfileCount && thisProfile == 4) newOption.text = "";
+				//else if(thisProfile<fixedProfileCount && thisProfile == 5) newOption.text = "";
+				//else if(thisProfile<fixedProfileCount && thisProfile == 6) newOption.text = "";
+				//else if(thisProfile<fixedProfileCount && thisProfile == 7) newOption.text = "";
+				//else if(thisProfile<fixedProfileCount && thisProfile == 8) newOption.text = "";
+				//else if(thisProfile<fixedProfileCount && thisProfile == 9) newOption.text = "";
+				else newOption.text = (profile.city == "" ? profile.wxZone : toTitleCase(profile.city)) + ", " + profile.stateAbbr;
+				profileSelector.appendChild(newOption);
+				thisProfile++;
+		});
+		profileSelector.selectedIndex = selectedProfile;
+		profileSelector.addEventListener('change', function(evt) {
+				lastRadarCode = currentSettings[selectedProfile].radarCode;
+		
+				selectedProfile = document.getElementById('profileSelector').selectedIndex;
+				setCookie('selectedProfile', selectedProfile);
+		
+				if(currentSettings[selectedProfile].radarCode != lastRadarCode) location.reload();
+				else menuSelect(selectedMenu);
+		});
+		profileSelectorHolder.appendChild(profileSelector);
+	
+        if(mode==1)
+        {
+                addNewButton = document.createElement('input');
+                addNewButton.id = "addNewButton";
+                addNewButton.type = "button";
+                addNewButton.value = "Add";
+                addNewButton.disabled = (currentSettings.length >= 10);
+                addNewButton.addEventListener('click', function() {
+                        currentSettings.push(currentSettings[selectedProfile]);
+                        setCookie("localSettings", encodeProfile(currentSettings));
+                        setCookie("selectedProfile", currentSettings.length - 1);
+                        menuSelect(selectedMenu);
+                });
+                profileSelectorHolder.appendChild(addNewButton);
+
+                deleteButton = document.createElement('input');
+                deleteButton.id = "deleteButton";
+                deleteButton.type = "button";
+                deleteButton.value = "Delete";
+                deleteButton.style.color = "red";
+                deleteButton.addEventListener('click', function() {
+                        lastRadarCode = currentSettings[selectedProfile].radarCode;
+
+                        currentSettings.splice(selectedProfile, 1);
+                        selectedProfile = 0;
+
+                        setCookie("localSettings", encodeProfile(currentSettings));
+                        setCookie("selectedProfile", selectedProfile);
+
+                        if(currentSettings[selectedProfile].radarCode != lastRadarCode) location.reload();
+                        else menuSelect(selectedMenu);
+                });
+                profileSelectorHolder.appendChild(deleteButton);
+        }
+
+        target = document.getElementById('selectedProfileCardBody');
+        target.innerHTML = "";
+        target.appendChild(profileSelectorHolder);
+
+        return target;
+}
 
 window.addEventListener("popstate", function(event){menuSelect(event.state.menuSlug);});
 window.addEventListener("appinstalled", function()
@@ -2243,6 +2372,9 @@ window.addEventListener("load", function()
 				delete xhttp.preload;
 				return;
 			}
+
+			//Get number of fixed profiles from dataHandler
+			fixedProfileCount = config.numFixedProfiles;
 			
 			//Render Menu Items
 			if(config.showCurrentWeather) renderMenuItem('Current-Weather', 'cloud', 'Current Weather');

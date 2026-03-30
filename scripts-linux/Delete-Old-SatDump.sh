@@ -2,6 +2,7 @@
 source "$(dirname "$(readlink -fm "$0")")/scriptconfig.ini"
 twoWeeksAgoABI=$(date -u --date="-14 days" +"%Y-%m-%d_%H-%M-%S")
 twoWeeksAgoEMWIN=$(date -u --date="-14 days" +"%Y%m%d%H%M%S")
+twoWeeksAgoEMWINzip=$(date -u --date="-14 days" +"%Y-%m-%d")
 
 #NWS
 for file in $(find $abiSrcDir/IMAGES/NWS -name "*" -type f)
@@ -17,11 +18,26 @@ done
 #EMWIN
 for file in $(find $emwinSrcDir -name "*" -type f)
 do
+
+    # zips
+#	if [[ $file =~ .*\.zip ]]
+#	then
+#       datestr=$(echo $file | awk -F/ '{print $NF}' | cut -d _ -f 1)
+#	    if [[ $datestr < $twoWeeksAgoEMWINzip ]]
+#       then
+#	        echo "[$(date +"%Y-%m-%d %H:%M:%S")] Deleting $file..."
+#	        rm $file
+#           continue
+#	    fi
+#	fi
+
+	# skip zips
 	if [[ $file =~ .*\.zip ]]
 	then
 		continue
 	fi
-	
+
+	# other files
 	datestr=$(echo $file | awk -F/ '{print $NF}' | cut -d _ -f 5)
 	if [[ $datestr < $twoWeeksAgoEMWIN ]]
 	then

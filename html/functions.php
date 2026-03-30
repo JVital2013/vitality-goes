@@ -413,7 +413,7 @@ function linesToParagraphs($lineArray, $linesToSkip)
 		
 		if($startingSection && $i != count($lineArray) - 1)
 		{
-			$retVal[] = "<p>";
+			$retVal[] = "<p style='font-weight: bold;'>";
 			$section++;
 			$startingSection = false;
 		}
@@ -430,7 +430,6 @@ function linesToParagraphs($lineArray, $linesToSkip)
 	
 	//Clean up hanging tags
 	if(!$startingParagraph && !$startingSection) $retVal[$section] .= "</p>";
-	for($i = 1; $i < count($retVal); $i++) $retVal[$i] = $firstParagraphText . $retVal[$i];
 	
 	$retVal = array_values($retVal);
 	return $retVal;
